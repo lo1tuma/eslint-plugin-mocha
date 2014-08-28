@@ -1,7 +1,7 @@
 'use strict';
 
 var expect = require('chai').expect,
-    noCallsToMochasOnlyFunction = require('../../../../config/eslint/rules/no-calls-to-mochas-only-function');
+    noExlusiveTests = require('../../lib/rules/no-exclusive-tests');
 
 
 function esLinter(ruleName, ruleFunction) {
@@ -19,10 +19,10 @@ function esLinter(ruleName, ruleFunction) {
 }
 
 
-describe('Test ESLint no-calls-to-mochas-only-function rule', function () {
+describe('Test ESLint no-exclusive-tests rule', function () {
 
-    var noCallsToMochasOnlyFunctionRuleName = 'no-calls-to-mochas-only-function',
-        noCallsToMochasOnlyFunctionLinter = esLinter(noCallsToMochasOnlyFunctionRuleName, noCallsToMochasOnlyFunction),
+    var noExclusiveTestsRuleName = 'no-exclusive-tests',
+        noExlusiveTestsLinter = esLinter(noExclusiveTestsRuleName, noExlusiveTests),
         ruleViolatingTestcases = [
             'describe.only()',
             'describe["only"]()',
@@ -38,14 +38,14 @@ describe('Test ESLint no-calls-to-mochas-only-function rule', function () {
     ruleViolatingTestcases.forEach(function (testcase) {
 
         it('should detect simple and static "' + testcase + '" calls', function () {
-            var errors = noCallsToMochasOnlyFunctionLinter.verify(testcase),
+            var errors = noExlusiveTestsLinter.verify(testcase),
                 firstError;
 
             expect(errors).to.exist;
             expect(errors).to.have.length(1);
 
             firstError = errors[0];
-            expect(firstError.ruleId).to.equal(noCallsToMochasOnlyFunctionRuleName);
+            expect(firstError.ruleId).to.equal(noExclusiveTestsRuleName);
         });
 
     });
@@ -53,7 +53,7 @@ describe('Test ESLint no-calls-to-mochas-only-function rule', function () {
     undetectedRuleViolationTestcases.forEach(function (testcase) {
 
         it('will fail to detect complex "' + testcase + '" calls', function () {
-            var errors = noCallsToMochasOnlyFunctionLinter.verify(testcase);
+            var errors = noExlusiveTestsLinter.verify(testcase);
 
             expect(errors).to.be.empty;
         });
