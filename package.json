@@ -4,7 +4,10 @@
     "description": "Eslint rules for mocha.",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "npm run unit-test --coverage && npm run check-coverage",
+        "unit-test": "istanbul test --dir build/coverage _mocha test -- --recursive --reporter dot",
+        "check-coverage": "istanbul check-coverage --statement 100 --branch 100 --function 100 --lines 100",
+        "report-coverage-html": "istanbul report --dir  build/coverage html"
     },
     "devDependencies": {
         "istanbul": "0.3.0",
