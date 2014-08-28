@@ -7,6 +7,8 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "devDependencies": {
+        "istanbul": "0.3.0",
+        "mocha": "1.21.4",
         "eslint-tester": "0.1.0"
     },
     "peerDependencies": {
