@@ -1,0 +1,33 @@
+{
+    "name": "eslint-plugin-mocha",
+    "version": "0.0.0-dev",
+    "description": "Eslint rules for mocha.",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "devDependencies": {
+        "eslint-tester": "0.1.0"
+    },
+    "peerDependencies": {
+        "eslint": "~0.8.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/lo1tuma/eslint-plugin-mocha.git"
+    },
+    "author": "Mathias Schreck <schreck.mathias@gmail.com>",
+    "contributors": [
+        "Alexander Schmidt <alexanderschmidt1@gmail.com>"
+    ],
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/lo1tuma/eslint-plugin-mocha/issues"
+    },
+    "homepage": "https://github.com/lo1tuma/eslint-plugin-mocha",
+    "keywords": [
+        "eslint-plugin",
+        "mocha",
+        "eslint"
+    ]
+}
