@@ -20,19 +20,19 @@ eslintTester.addRuleTest('lib/rules/no-exclusive-tests', {
     invalid: [
         {
             code: 'describe.only()',
-            errors: [ { message: expectedErrorMessage } ]
+            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
         },
         {
             code: 'describe["only"]()',
-            errors: [ { message: expectedErrorMessage } ]
+            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
         },
         {
             code: 'it.only()',
-            errors: [ { message: expectedErrorMessage } ]
+            errors: [ { message: expectedErrorMessage, column: 3, line: 1 } ]
         },
         {
             code: 'it["only"]()',
-            errors: [ { message: expectedErrorMessage } ]
+            errors: [ { message: expectedErrorMessage, column: 3, line: 1 } ]
         }
     ]
 
