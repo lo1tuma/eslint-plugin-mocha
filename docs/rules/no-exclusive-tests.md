@@ -18,7 +18,7 @@ describeOnly.apply(describe);
 
 The following patterns are considered warnings:
 
-```js`
+```js
 // bdd
 describe.only("foo", function () {});
 it.only("foo", function () {});
