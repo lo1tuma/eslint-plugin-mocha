@@ -12,9 +12,13 @@ eslintTester.addRuleTest('lib/rules/no-exclusive-tests', {
         'it()',
         'describe.skip()',
         'it.skip()',
+        'suite()',
+        'test()',
+        'suite.skip()',
+        'test.skip()',
         'var appliedOnly = describe.only; appliedOnly.apply(describe)',
         'var calledOnly = it.only; calledOnly.call(it)',
-        'var computedOnly = "only"; describe[computedOnly]()'
+        'var dynamicOnly = "only"; suite[dynamicOnly]()'
     ],
 
     invalid: [
@@ -33,6 +37,22 @@ eslintTester.addRuleTest('lib/rules/no-exclusive-tests', {
         {
             code: 'it["only"]()',
             errors: [ { message: expectedErrorMessage, column: 3, line: 1 } ]
+        },
+        {
+            code: 'suite.only()',
+            errors: [ { message: expectedErrorMessage, column: 6, line: 1 } ]
+        },
+        {
+            code: 'suite["only"]()',
+            errors: [ { message: expectedErrorMessage, column: 6, line: 1 } ]
+        },
+        {
+            code: 'test.only()',
+            errors: [ { message: expectedErrorMessage, column: 5, line: 1 } ]
+        },
+        {
+            code: 'test["only"]()',
+            errors: [ { message: expectedErrorMessage, column: 5, line: 1 } ]
         }
     ]
 

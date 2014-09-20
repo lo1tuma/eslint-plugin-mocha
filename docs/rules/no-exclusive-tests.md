@@ -8,7 +8,7 @@ This rule reminds you to remove `.only` from your tests by raising a warning whe
 
 ## Rule Details
 
-This rule looks for every `describe.only` and `it.only` occurrences within the source code.
+This rule looks for every `describe.only`, `it.only`, `suite.only` and `test.only` occurrences within the source code.
 Of course there are some edge-cases which can’t be detected by this rule e.g.:
 
 ```js
@@ -18,33 +18,41 @@ describeOnly.apply(describe);
 
 The following patterns are considered warnings:
 
-```js
+```js`
+// bdd
 describe.only("foo", function () {});
-
 it.only("foo", function () {});
-
 describe["only"]("bar", function () {});
-
 it["only"]("bar", function () {});
+
+// tdd
+suite.only("foo", function () {});
+test.only("foo", function () {});
+suite["only"]("bar", function () {});
+test["only"]("bar", function () {});
 
 ```
 
 These patterns would not be considered warnings:
 
 ```js
+// bdd
 describe("foo", function () {});
-
 it("foo", function () {});
-
 describe.skip("bar", function () {});
-
 it.skip("bar", function () {});
+
+// tdd
+suite("foo", function () {});
+test("foo", function () {});
+suite.skip("bar", function () {});
+test.skip("bar", function () {});
 ```
 
 ## When Not To Use It
 
 * If you really want to execute only one test-suite or test-case because all other tests should not be executed, turn this rule off.
-* If you use another library which exposes a similar API as mocha (`describe.only` or `it.only`), you should turn this rule off, because it would raise warnings.
+* If you use another library which exposes a similar API as mocha (e.g. `describe.only`), you should turn this rule off, because it would raise warnings.
 
 ## Further Reading
 
