@@ -18,7 +18,7 @@
         "coveralls": "2.11.1"
     },
     "peerDependencies": {
-        "eslint": "^0.8.0"
+        "eslint": ">=0.8.0"
     },
     "repository": {
         "type": "git",
