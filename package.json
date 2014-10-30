@@ -12,10 +12,10 @@
     },
     "devDependencies": {
         "istanbul": "0.3.2",
-        "mocha": "1.21.4",
-        "eslint-tester": "0.2.1",
-        "eslint": "^0.8.0",
-        "coveralls": "2.11.1"
+        "mocha": "2.0.1",
+        "eslint-tester": "0.3.0",
+        "eslint": ">=0.8.0",
+        "coveralls": "2.11.2"
     },
     "peerDependencies": {
         "eslint": ">=0.8.0"
