@@ -12,12 +12,12 @@
         "changelog": "pr-log"
     },
     "devDependencies": {
-        "istanbul": "0.3.2",
-        "mocha": "2.0.1",
-        "eslint-tester": "0.3.0",
-        "eslint": ">=0.8.0",
-        "coveralls": "2.11.2",
-        "pr-log": "1.0.0"
+        "pr-log": "1.0.0",
+        "istanbul": "0.3.7",
+        "mocha": "2.1.0",
+        "eslint-tester": "0.6.0",
+        "eslint": "0.15.1",
+        "coveralls": "2.11.2"
     },
     "peerDependencies": {
         "eslint": ">=0.8.0"
