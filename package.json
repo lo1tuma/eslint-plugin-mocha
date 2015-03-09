@@ -13,7 +13,7 @@
         "changelog": "pr-log"
     },
     "devDependencies": {
-        "pr-log": "1.0.0",
+        "pr-log": "1.1.0",
         "istanbul": "0.3.7",
         "mocha": "2.1.0",
         "eslint-tester": "0.6.0",
