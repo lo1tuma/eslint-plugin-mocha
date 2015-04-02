@@ -7,9 +7,27 @@
 
 ESLint rules for [mocha](http://visionmedia.github.io/mocha/).
 
-## Getting Started
+## Install and configure
 
 This plugin requires ESLint `0.8.0` or later.
+
+`npm install --save-dev eslint-plugin-mocha`
+
+Then add a reference to this plugin and selected rules in your eslint config:
+
+```json
+{
+  "plugins": [
+    "mocha"
+  ],
+  "rules": {
+    "mocha/no-exclusive-tests": 2
+  }
+}
+```
+See [Configuring Eslint](http://eslint.org/docs/user-guide/configuring) on [eslint.org](http://eslint.org) for more info.
+
+## Rules documentation
 
 The documentation of the rules can be found [here](docs/rules).
 
