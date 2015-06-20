@@ -56,4 +56,4 @@ test.skip("bar", function () {});
 
 ## Further Reading
 
-* [Exclusive Tests](http://visionmedia.github.io/mocha/#exclusive-tests)
+* [Exclusive Tests](http://mochajs.org/#exclusive-tests)
