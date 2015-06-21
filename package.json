@@ -5,10 +5,9 @@
     "main": "index.js",
     "scripts": {
         "pretest": "eslint .",
-        "test": "npm run unit-test --coverage && npm run check-coverage",
-        "unit-test": "istanbul test --dir build/coverage _mocha test -- --recursive --reporter dot",
+        "test": "npm run test:unit --coverage && npm run check-coverage",
+        "test:unit": "istanbul test --dir build/coverage _mocha test -- --recursive --reporter dot",
         "check-coverage": "istanbul check-coverage --statement 100 --branch 100 --function 100 --lines 100",
-        "report-coverage-html": "istanbul report --dir  build/coverage html",
         "coveralls": "cat ./build/coverage/lcov.info | coveralls",
         "changelog": "pr-log"
     },
