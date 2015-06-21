@@ -5,7 +5,7 @@
 
 # eslint-plugin-mocha
 
-ESLint rules for [mocha](http://visionmedia.github.io/mocha/).
+ESLint rules for [mocha](http://mochajs.org/).
 
 ## Install and configure
 
