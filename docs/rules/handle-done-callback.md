@@ -16,7 +16,7 @@ it('should work', function (done) {
 });
 ```
 
-In this example the `done callback was never called and test will time out.
+In this example the `done` callback was never called and test will time out.
 
 ## Rule Details
 
