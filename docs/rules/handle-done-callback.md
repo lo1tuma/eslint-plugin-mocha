@@ -1,4 +1,4 @@
-# Enforces handling of callbacks for async tests (no-exclusive-tests)
+# Enforces handling of callbacks for async tests (handle-done-callback)
 
 Mocha allows you to write asynchronous tests by adding a `done` callback to the parameters of your test function.
 It is easy to forget calling this callback after the asynchronous operation is done.
