@@ -1,3 +1,30 @@
+## 0.3.0 (June 23, 2015)
+
+### Features
+
+* Add new rule handle-done-callback (#15)
+
+### Build-Related
+
+* Refactor package.json scripts (#17)
+* Disable sudo on travis-ci (#10)
+* Run travis build on node 0.12 and iojs (#11)
+* Ignore log files and .idea folder (#9)
+* Add changelog (#8)
+
+### Documentation
+
+* Fix links to mocha website (#16)
+* Add install documentation to README (#14)
+
+### Dependency Upgrades
+
+* Update dependencies (#18)
+* Update pr-log (#13)
+* Update eslint (#12)
+* Update dev dependencies (#7)
+
+
 ## 0.2.2 (October 25, 2014)
 
 ### Bug Fixes
