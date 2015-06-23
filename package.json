@@ -11,6 +11,9 @@
         "coveralls": "cat ./build/coverage/lcov.info | coveralls",
         "changelog": "pr-log"
     },
+    "dependencies": {
+        "lodash": "^3.9.3"
+    },
     "devDependencies": {
         "pr-log": "1.1.0",
         "istanbul": "0.3.15",
