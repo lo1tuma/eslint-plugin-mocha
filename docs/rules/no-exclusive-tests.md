@@ -8,7 +8,7 @@ This rule reminds you to remove `.only` from your tests by raising a warning whe
 
 ## Rule Details
 
-This rule looks for every `describe.only`, `it.only`, `suite.only` and `test.only` occurrences within the source code.
+This rule looks for every `describe.only`, `it.only`, `suite.only`, `test.only` and `context.only` occurrences within the source code.
 Of course there are some edge-cases which can’t be detected by this rule e.g.:
 
 ```js
