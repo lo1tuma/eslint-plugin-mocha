@@ -16,6 +16,8 @@ eslintTester.addRuleTest('lib/rules/no-exclusive-tests', {
         'test()',
         'suite.skip()',
         'test.skip()',
+        'context()',
+        'context.skip()',
         'var appliedOnly = describe.only; appliedOnly.apply(describe)',
         'var calledOnly = it.only; calledOnly.call(it)',
         'var dynamicOnly = "only"; suite[dynamicOnly]()'
@@ -53,6 +55,14 @@ eslintTester.addRuleTest('lib/rules/no-exclusive-tests', {
         {
             code: 'test["only"]()',
             errors: [ { message: expectedErrorMessage, column: 5, line: 1 } ]
+        },
+        {
+            code: 'context.only()',
+            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
+        },
+        {
+            code: 'context["only"]()',
+            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
         }
     ]
 
