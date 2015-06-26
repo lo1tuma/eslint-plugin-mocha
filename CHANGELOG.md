@@ -1,3 +1,10 @@
+## 0.4.0 (June 26, 2015)
+
+### Enhancements
+
+* add context.only to no-exclusive-tests rule (#21)
+
+
 ## 0.3.0 (June 23, 2015)
 
 ### Features
