@@ -1,10 +1,11 @@
 'use strict';
 
-var linter = require('eslint').linter,
-    ESLintTester = require('eslint-tester'),
-    eslintTester = new ESLintTester(linter);
+var RuleTester = require('eslint').RuleTester;
+var rule = require('../../lib/rules/handle-done-callback');
 
-eslintTester.addRuleTest('lib/rules/handle-done-callback', {
+var ruleTester = new RuleTester();
+
+ruleTester.run('handle-done-callback', rule, {
     valid: [
         'foo(function (done) { });',
         'var foo = function (done) { };',
@@ -37,52 +38,52 @@ eslintTester.addRuleTest('lib/rules/handle-done-callback', {
     invalid: [
         {
             code: 'it("", function (done) { });',
-            errors: [ { message: 'Expected "done" callback to be handled.', column: 17, line: 1 } ]
+            errors: [ { message: 'Expected "done" callback to be handled.', column: 18, line: 1 } ]
         },
         {
             code: 'it("", function (done) { callback(); });',
-            errors: [ { message: 'Expected "done" callback to be handled.', column: 17, line: 1 } ]
+            errors: [ { message: 'Expected "done" callback to be handled.', column: 18, line: 1 } ]
         },
         {
             code: 'it("", function (callback) { });',
-            errors: [ { message: 'Expected "callback" callback to be handled.', column: 17, line: 1 } ]
+            errors: [ { message: 'Expected "callback" callback to be handled.', column: 18, line: 1 } ]
         },
         {
             code: 'it("", function (done) { asyncFunction(function (error) { expect(error).to.be.null; }); });',
-            errors: [ { message: 'Expected "done" callback to be handled.', column: 17, line: 1 } ]
+            errors: [ { message: 'Expected "done" callback to be handled.', column: 18, line: 1 } ]
         },
         {
             code: 'it.only("", function (done) { });',
-            errors: [ { message: 'Expected "done" callback to be handled.', column: 22, line: 1 } ]
+            errors: [ { message: 'Expected "done" callback to be handled.', column: 23, line: 1 } ]
         },
         {
             code: 'test("", function (done) { });',
-            errors: [ { message: 'Expected "done" callback to be handled.', column: 19, line: 1 } ]
+            errors: [ { message: 'Expected "done" callback to be handled.', column: 20, line: 1 } ]
         },
         {
             code: 'test.only("", function (done) { });',
-            errors: [ { message: 'Expected "done" callback to be handled.', column: 24, line: 1 } ]
+            errors: [ { message: 'Expected "done" callback to be handled.', column: 25, line: 1 } ]
         },
         {
             code: 'before(function (done) { });',
-            errors: [ { message: 'Expected "done" callback to be handled.', column: 17, line: 1 } ]
+            errors: [ { message: 'Expected "done" callback to be handled.', column: 18, line: 1 } ]
         },
         {
             code: 'after(function (done) { });',
-            errors: [ { message: 'Expected "done" callback to be handled.', column: 16, line: 1 } ]
+            errors: [ { message: 'Expected "done" callback to be handled.', column: 17, line: 1 } ]
         },
         {
             code: 'beforeEach(function (done) { });',
-            errors: [ { message: 'Expected "done" callback to be handled.', column: 21, line: 1 } ]
+            errors: [ { message: 'Expected "done" callback to be handled.', column: 22, line: 1 } ]
         },
         {
             code: 'afterEach(function (done) { });',
-            errors: [ { message: 'Expected "done" callback to be handled.', column: 20, line: 1 } ]
+            errors: [ { message: 'Expected "done" callback to be handled.', column: 21, line: 1 } ]
         },
         {
             code: 'it("", (done) => { });',
             ecmaFeatures: { arrowFunctions: true },
-            errors: [ { message: 'Expected "done" callback to be handled.', column: 8, line: 1 } ]
+            errors: [ { message: 'Expected "done" callback to be handled.', column: 9, line: 1 } ]
         }
     ]
 });
