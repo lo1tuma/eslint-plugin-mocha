@@ -11,6 +11,8 @@ ruleTester.run('no-synchronous-tests', rule, {
         'it("");',
         'it("", function () { return promise(); });',
         'it("", function () { return promise(); });',
+        'it("", function () { var promise = myFn(); return promise; });',
+        'var someFn = function(){ }; it("", someFn);',
         'it("", function (done) { done(); });',
         'it("", function (callback) { callback(); });',
         'it("", function (done) { if (a) { done(); } });',
