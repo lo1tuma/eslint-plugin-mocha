@@ -4,6 +4,7 @@ var expect = require('chai').expect,
     fs = require('fs'),
     path = require('path'),
     rulesDir = path.join(__dirname, '../lib/rules/'),
+    documentationDir = path.join(__dirname, '../docs/rules/'),
     plugin = require('..');
 
 describe('eslint-plugin-mocha', function () {
@@ -22,6 +23,26 @@ describe('eslint-plugin-mocha', function () {
 
             expect(plugin).to.have.deep.property('rules.' + ruleName)
                 .that.equals(require(rulesDir + ruleName));
+        });
+    });
+
+    describe('documentation', function () {
+        var documentationFiles;
+
+        before(function (done) {
+            fs.readdir(documentationDir, function (error, files) {
+                documentationFiles = files;
+                done(error);
+            });
+        });
+
+        it('should have each rule documented', function () {
+            ruleFiles.forEach(function (file) {
+                var ruleName = path.basename(file, '.js'),
+                    expectedDocumentationFileName = ruleName + '.md';
+
+                expect(documentationFiles).to.contain(expectedDocumentationFileName);
+            });
         });
     });
 });
