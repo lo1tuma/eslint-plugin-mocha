@@ -1,13 +1,13 @@
 'use strict';
 
 var RuleTester = require('eslint').RuleTester;
-var rule = require('../../lib/rules/no-exclusive-tests');
+var rules = require('../../').rules;
 
 var ruleTester = new RuleTester();
 
 var expectedErrorMessage = 'Unexpected exclusive mocha test.';
 
-ruleTester.run('no-exclusive-tests', rule, {
+ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
 
     valid: [
         'describe()',
