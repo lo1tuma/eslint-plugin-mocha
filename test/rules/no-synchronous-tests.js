@@ -1,11 +1,11 @@
 'use strict';
 
 var RuleTester = require('eslint').RuleTester;
-var rule = require('../../lib/rules/no-synchronous-tests');
+var rules = require('../../').rules;
 
 var ruleTester = new RuleTester();
 
-ruleTester.run('no-synchronous-tests', rule, {
+ruleTester.run('no-synchronous-tests', rules['no-synchronous-tests'], {
     valid: [
         'it();',
         'it("");',
