@@ -13,6 +13,7 @@ ruleTester.run('no-synchronous-tests', rule, {
         'it("", function () { return promise(); });',
         'it("", function () { var promise = myFn(); return promise; });',
         'var someFn = function(){ }; it("", someFn);',
+        'it("", function (done) { });',
         'it("", function (done) { done(); });',
         'it("", function (callback) { callback(); });',
         'it("", function (done) { if (a) { done(); } });',
@@ -40,30 +41,34 @@ ruleTester.run('no-synchronous-tests', rule, {
         {
             code: 'it("", () => promise() );',
             ecmaFeatures: { arrowFunctions: true }
+        },
+        {
+            code: 'it("", () => promise.then() );',
+            ecmaFeatures: { arrowFunctions: true }
         }
     ],
 
     invalid: [
         {
             code: 'it("", function () {});',
-            errors: [ { message: 'Expected test to handle a callback or return a promise.', column: 8, line: 1 } ]
+            errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1 } ]
         },
         {
             code: 'it("", function () { callback(); });',
-            errors: [ { message: 'Expected test to handle a callback or return a promise.', column: 8, line: 1 } ]
+            errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1 } ]
         },
         {
             code: 'it(function () { return; });',
-            errors: [ { message: 'Expected test to handle a callback or return a promise.', column: 4, line: 1 } ]
+            errors: [ { message: 'Unexpected synchronous test.', column: 4, line: 1 } ]
         },
         {
             code: 'it("", function () { return "a string" });',
-            errors: [ { message: 'Expected test to handle a callback or return a promise.', column: 8, line: 1 } ]
+            errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1 } ]
         },
         {
             code: 'it("", () => "not-a-promise" );',
             ecmaFeatures: { arrowFunctions: true },
-            errors: [ { message: 'Expected test to handle a callback or return a promise.', column: 8, line: 1 } ]
+            errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1 } ]
         }
     ]
 });
