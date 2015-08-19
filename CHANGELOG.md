@@ -1,3 +1,15 @@
+## 0.5.0 (August 19, 2015)
+
+### Features
+
+* Add no-synchronous-tests rule (#26)
+
+### Dependency Upgrades
+
+* ESLint 1.x compatibility (#25)
+* Update dependencies (#22)
+
+
 ## 0.4.0 (June 26, 2015)
 
 ### Enhancements
