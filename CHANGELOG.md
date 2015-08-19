@@ -1,3 +1,9 @@
+## 0.5.1 (August 20, 2015)
+
+### Bug Fixes
+
+* add new rule to index.js and change tests to keep that from happening (#28)
+
 ## 0.5.0 (August 19, 2015)
 
 ### Features
