@@ -1,9 +1,8 @@
 'use strict';
 
-var RuleTester = require('eslint').RuleTester;
-var rules = require('../../').rules;
-
-var ruleTester = new RuleTester();
+var RuleTester = require('eslint').RuleTester,
+    rules = require('../../').rules,
+    ruleTester = new RuleTester();
 
 ruleTester.run('handle-done-callback', rules['handle-done-callback'], {
     valid: [
