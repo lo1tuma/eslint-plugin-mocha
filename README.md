@@ -1,6 +1,6 @@
 [![NPM Version](https://img.shields.io/npm/v/eslint-plugin-mocha.svg?style=flat)](https://www.npmjs.org/package/eslint-plugin-mocha)
-[![Build Status](https://img.shields.io/travis/lo1tuma/eslint-plugin-mocha.svg?style=flat)](https://travis-ci.org/lo1tuma/eslint-plugin-mocha)
-[![Coverage Status](https://img.shields.io/coveralls/lo1tuma/eslint-plugin-mocha.svg?style=flat)](https://coveralls.io/r/lo1tuma/eslint-plugin-mocha)
+[![Build Status](https://img.shields.io/travis/lo1tuma/eslint-plugin-mocha/master.svg?style=flat)](https://travis-ci.org/lo1tuma/eslint-plugin-mocha)
+[![Coverage Status](https://img.shields.io/coveralls/lo1tuma/eslint-plugin-mocha/master.svg?style=flat)](https://coveralls.io/r/lo1tuma/eslint-plugin-mocha)
 [![Peer Dependencies](http://img.shields.io/david/peer/lo1tuma/eslint-plugin-mocha.svg?style=flat)](https://david-dm.org/lo1tuma/eslint-plugin-mocha#info=peerDependencies&view=table)
 
 # eslint-plugin-mocha
