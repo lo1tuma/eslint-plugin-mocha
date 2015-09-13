@@ -26,43 +26,53 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
     invalid: [
         {
             code: 'describe.only()',
-            errors: [ { message: expectedErrorMessage, column: 10, line: 1 } ]
+            errors: [ { message: expectedErrorMessage, column: 10, line: 1 } ],
+            output: 'describe()'
         },
         {
             code: 'describe["only"]()',
-            errors: [ { message: expectedErrorMessage, column: 10, line: 1 } ]
+            errors: [ { message: expectedErrorMessage, column: 10, line: 1 } ],
+            output: 'describe()'
         },
         {
             code: 'it.only()',
-            errors: [ { message: expectedErrorMessage, column: 4, line: 1 } ]
+            errors: [ { message: expectedErrorMessage, column: 4, line: 1 } ],
+            output: 'it()'
         },
         {
             code: 'it["only"]()',
-            errors: [ { message: expectedErrorMessage, column: 4, line: 1 } ]
+            errors: [ { message: expectedErrorMessage, column: 4, line: 1 } ],
+            output: 'it()'
         },
         {
             code: 'suite.only()',
-            errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ]
+            errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ],
+            output: 'suite()'
         },
         {
             code: 'suite["only"]()',
-            errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ]
+            errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ],
+            output: 'suite()'
         },
         {
             code: 'test.only()',
-            errors: [ { message: expectedErrorMessage, column: 6, line: 1 } ]
+            errors: [ { message: expectedErrorMessage, column: 6, line: 1 } ],
+            output: 'test()'
         },
         {
             code: 'test["only"]()',
-            errors: [ { message: expectedErrorMessage, column: 6, line: 1 } ]
+            errors: [ { message: expectedErrorMessage, column: 6, line: 1 } ],
+            output: 'test()'
         },
         {
             code: 'context.only()',
-            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
+            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ],
+            output: 'context()'
         },
         {
             code: 'context["only"]()',
-            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
+            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ],
+            output: 'context()'
         }
     ]
 
