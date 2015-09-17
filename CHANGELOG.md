@@ -1,3 +1,26 @@
+## 1.0.0 (September 17, 2015)
+
+### Enhancements
+
+* Implement autofix for no-exclusive-tests (#34)
+* Improve detection if done callback is handled (#23)
+* Add integration tests (#30)
+* Instrumment all sources for coverage (#29)
+
+### Build-Related
+
+* Add node 4 to travis-ci build (#42)
+
+### Dependency Upgrades
+
+* Update devDependencies (#43)
+* Update eslint (#31)
+
+### Documentation
+
+* Add NPM Downloads badge (#41)
+* Badges in README.md should only show master status (#40)
+
 ## 0.5.1 (August 20, 2015)
 
 ### Bug Fixes
