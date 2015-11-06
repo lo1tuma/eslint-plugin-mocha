@@ -12,7 +12,7 @@
         "changelog": "pr-log"
     },
     "dependencies": {
-        "lodash": "^3.9.3"
+        "ramda": "^0.18.0"
     },
     "devDependencies": {
         "chai": "3.2.0",
