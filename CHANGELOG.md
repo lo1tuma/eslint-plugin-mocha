@@ -1,3 +1,13 @@
+## 1.1.0 (November 13, 2015)
+
+### Features
+
+* Implement new rule no-global-tests (#46)
+
+### Enhancements
+
+* Replace lodash with ramda (#45)
+
 ## 1.0.0 (September 17, 2015)
 
 ### Enhancements
