@@ -31,19 +31,19 @@ ruleTester.run('no-synchronous-tests', rules['no-synchronous-tests'], {
         'var foo = function () { };',
         {
             code: 'it("", (done) => { done(); });',
-            ecmaFeatures: { arrowFunctions: true }
+            parserOptions: { ecmaVersion: 6 }
         },
         {
             code: 'it("", () => { return promise(); });',
-            ecmaFeatures: { arrowFunctions: true }
+            parserOptions: { ecmaVersion: 6 }
         },
         {
             code: 'it("", () => promise() );',
-            ecmaFeatures: { arrowFunctions: true }
+            parserOptions: { ecmaVersion: 6 }
         },
         {
             code: 'it("", () => promise.then() );',
-            ecmaFeatures: { arrowFunctions: true }
+            parserOptions: { ecmaVersion: 6 }
         }
     ],
 
@@ -66,7 +66,7 @@ ruleTester.run('no-synchronous-tests', rules['no-synchronous-tests'], {
         },
         {
             code: 'it("", () => "not-a-promise" );',
-            ecmaFeatures: { arrowFunctions: true },
+            parserOptions: { ecmaVersion: 6 },
             errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1 } ]
         }
     ]

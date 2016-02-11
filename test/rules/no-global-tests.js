@@ -33,9 +33,9 @@ ruleTester.run('no-global-tests', rule, {
         '[1,2,3].forEach(function () { it(); });',
         {
             code: 'import foo from "bar"; describe("", () => it());',
-            ecmaFeatures: {
-                modules: true,
-                arrowFunctions: true
+            parserOptions: {
+                sourceType: 'module',
+                ecmaVersion: 6
             }
         }
     ],
@@ -83,8 +83,8 @@ ruleTester.run('no-global-tests', rule, {
         },
         {
             code: 'import foo from "bar"; it("");',
-            ecmaFeatures: {
-                modules: true
+            parserOptions: {
+                sourceType: 'module'
             },
             errors: [ { message: expectedErrorMessage, column: 24, line: 1 } ]
         }
