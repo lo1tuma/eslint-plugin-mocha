@@ -33,7 +33,8 @@ describe('eslint-plugin-mocha', function () {
         before(function (done) {
             fs.readdir(documentationDir, function (readDirError, files) {
                 if (readDirError) {
-                    return done(readDirError);
+                    done(readDirError);
+                    return;
                 }
 
                 documentationFiles = files.filter(function (file) {

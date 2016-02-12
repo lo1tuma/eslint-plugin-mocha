@@ -30,7 +30,7 @@ ruleTester.run('handle-done-callback', rules['handle-done-callback'], {
 
         {
             code: 'it("", (done) => { done(); });',
-            ecmaFeatures: { arrowFunctions: true }
+            parserOptions: { ecmaVersion: 6 }
         }
     ],
 
@@ -81,7 +81,7 @@ ruleTester.run('handle-done-callback', rules['handle-done-callback'], {
         },
         {
             code: 'it("", (done) => { });',
-            ecmaFeatures: { arrowFunctions: true },
+            parserOptions: { ecmaVersion: 6 },
             errors: [ { message: 'Expected "done" callback to be handled.', column: 9, line: 1 } ]
         },
         {
