@@ -4,7 +4,10 @@
     },
 
     "parserOptions": {
-        "ecmaVersion": 6,
+      "ecmaVersion": 5,
+      "ecmaFeatures": {
+        "globalReturn": true
+      }
     },
 
     "rules": {
@@ -23,6 +26,8 @@
         "no-dupe-keys": 2,
         "no-dupe-args": 2,
         "no-else-return": 2,
+        "no-empty": 2,
+        "no-empty-character-class": 2,
         "no-eq-null": 2,
         "no-eval": 2,
         "no-ex-assign": 2,
@@ -41,7 +46,7 @@
         "no-irregular-whitespace": 2,
         "no-iterator": 2,
         "no-label-var": 2,
-        "no-labels": 2,
+        "no-labels": [2, {"allowLoop": true, "allowSwitch": true}],
         "no-lone-blocks": 2,
         "no-lonely-if": 2,
         "no-loop-func": 2,
