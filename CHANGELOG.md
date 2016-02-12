@@ -1,3 +1,9 @@
+## 2.0.0 (February 13, 2016)
+
+### Breaking Changes
+
+* Update to eslint 2.0.0 (#49)
+
 ## 1.1.0 (November 13, 2015)
 
 ### Features
