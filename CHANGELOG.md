@@ -1,3 +1,19 @@
+## 2.1.0 (April 11, 2016)
+
+### Bug Fixes
+
+* Support specify alias (#58)
+
+### Dependency Upgrades
+
+* Update ramda to version 0.21.0 🚀 (#56)
+* Update ramda to version 0.20.0 🚀 (#53)
+
+### Features
+
+* Add rule no-skipped-tests (#55)
+
+
 ## 2.0.0 (February 13, 2016)
 
 ### Breaking Changes
