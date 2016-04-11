@@ -7,7 +7,7 @@ Sometimes tests are skipped as part of a debugging process, and aren't intended 
 
 ## Rule Details
 
-This rule looks for `describe.skip`, `it.skip`, `suite.skip`, `test.skip`, `context.skip`, `xdescribe`, `xit`, and `xcontext` occurrences within the source code.
+This rule looks for `describe.skip`, `it.skip`, `suite.skip`, `test.skip`, `context.skip`, `specify.skip`, `xdescribe`, `xit`, `xcontext` and `xspecify` occurrences within the source code.
 
 The following patterns are considered warnings:
 

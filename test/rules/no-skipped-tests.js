@@ -88,7 +88,18 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
             code: 'xcontext()',
             errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
             output: 'context()'
+        },
+        {
+            code: 'specify.skip()',
+            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ],
+            output: 'specify()'
+        },
+        {
+            code: 'xspecify()',
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
+            output: 'specify()'
         }
+
     ]
 
 });

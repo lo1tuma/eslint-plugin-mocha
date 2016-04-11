@@ -64,6 +64,14 @@ ruleTester.run('handle-done-callback', rules['handle-done-callback'], {
             errors: [ { message: 'Expected "done" callback to be handled.', column: 25, line: 1 } ]
         },
         {
+            code: 'specify("", function (done) { });',
+            errors: [ { message: 'Expected "done" callback to be handled.', column: 23, line: 1 } ]
+        },
+        {
+            code: 'specify.only("", function (done) { });',
+            errors: [ { message: 'Expected "done" callback to be handled.', column: 28, line: 1 } ]
+        },
+        {
             code: 'before(function (done) { });',
             errors: [ { message: 'Expected "done" callback to be handled.', column: 18, line: 1 } ]
         },

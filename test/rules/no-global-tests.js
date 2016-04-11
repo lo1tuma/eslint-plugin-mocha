@@ -82,6 +82,26 @@ ruleTester.run('no-global-tests', rule, {
             errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
         },
         {
+            code: 'specify();',
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+        },
+        {
+            code: 'specify.only();',
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+        },
+        {
+            code: 'specify["only"]();',
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+        },
+        {
+            code: 'specify.skip();',
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+        },
+        {
+            code: 'specify["skip"]();',
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+        },
+        {
             code: 'import foo from "bar"; it("");',
             parserOptions: {
                 sourceType: 'module'

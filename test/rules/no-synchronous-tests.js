@@ -68,6 +68,15 @@ ruleTester.run('no-synchronous-tests', rules['no-synchronous-tests'], {
             code: 'it("", () => "not-a-promise" );',
             parserOptions: { ecmaVersion: 6 },
             errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1 } ]
+        },
+        {
+            code: 'specify("", function () {});',
+            errors: [ { message: 'Unexpected synchronous test.', column: 13, line: 1 } ]
+        },
+        {
+            code: 'specify.only("", function () {});',
+            errors: [ { message: 'Unexpected synchronous test.', column: 18, line: 1 } ]
         }
+
     ]
 });

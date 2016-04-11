@@ -20,7 +20,9 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
         'context.skip()',
         'var appliedOnly = describe.only; appliedOnly.apply(describe)',
         'var calledOnly = it.only; calledOnly.call(it)',
-        'var dynamicOnly = "only"; suite[dynamicOnly]()'
+        'var dynamicOnly = "only"; suite[dynamicOnly]()',
+        'specify()',
+        'specify.skip()'
     ],
 
     invalid: [
@@ -73,6 +75,16 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
             code: 'context["only"]()',
             errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ],
             output: 'context()'
+        },
+        {
+            code: 'specify.only()',
+            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ],
+            output: 'specify()'
+        },
+        {
+            code: 'specify["only"]()',
+            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ],
+            output: 'specify()'
         }
     ]
 
