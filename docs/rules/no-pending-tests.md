@@ -18,8 +18,6 @@ it("foo");
 // tdd
 suite("foo");
 test("foo");
-suite("bar");
-test("bar");
 ```
 
 These patterns are not considered warnings:
