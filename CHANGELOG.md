@@ -1,3 +1,9 @@
+## 2.2.0 (April 14, 2016)
+
+### Features
+
+* Add rule no-pending-tests (#59)
+
 ## 2.1.0 (April 11, 2016)
 
 ### Bug Fixes
@@ -12,7 +18,6 @@
 ### Features
 
 * Add rule no-skipped-tests (#55)
-
 
 ## 2.0.0 (February 13, 2016)
 
