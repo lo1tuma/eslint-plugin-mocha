@@ -28,63 +28,51 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
     invalid: [
         {
             code: 'describe.only()',
-            errors: [ { message: expectedErrorMessage, column: 10, line: 1 } ],
-            output: 'describe()'
+            errors: [ { message: expectedErrorMessage, column: 10, line: 1 } ]
         },
         {
             code: 'describe["only"]()',
-            errors: [ { message: expectedErrorMessage, column: 10, line: 1 } ],
-            output: 'describe()'
+            errors: [ { message: expectedErrorMessage, column: 10, line: 1 } ]
         },
         {
             code: 'it.only()',
-            errors: [ { message: expectedErrorMessage, column: 4, line: 1 } ],
-            output: 'it()'
+            errors: [ { message: expectedErrorMessage, column: 4, line: 1 } ]
         },
         {
             code: 'it["only"]()',
-            errors: [ { message: expectedErrorMessage, column: 4, line: 1 } ],
-            output: 'it()'
+            errors: [ { message: expectedErrorMessage, column: 4, line: 1 } ]
         },
         {
             code: 'suite.only()',
-            errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ],
-            output: 'suite()'
+            errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ]
         },
         {
             code: 'suite["only"]()',
-            errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ],
-            output: 'suite()'
+            errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ]
         },
         {
             code: 'test.only()',
-            errors: [ { message: expectedErrorMessage, column: 6, line: 1 } ],
-            output: 'test()'
+            errors: [ { message: expectedErrorMessage, column: 6, line: 1 } ]
         },
         {
             code: 'test["only"]()',
-            errors: [ { message: expectedErrorMessage, column: 6, line: 1 } ],
-            output: 'test()'
+            errors: [ { message: expectedErrorMessage, column: 6, line: 1 } ]
         },
         {
             code: 'context.only()',
-            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ],
-            output: 'context()'
+            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
         },
         {
             code: 'context["only"]()',
-            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ],
-            output: 'context()'
+            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
         },
         {
             code: 'specify.only()',
-            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ],
-            output: 'specify()'
+            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
         },
         {
             code: 'specify["only"]()',
-            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ],
-            output: 'specify()'
+            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
         }
     ]
 
