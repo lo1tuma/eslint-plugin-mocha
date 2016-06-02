@@ -1,3 +1,9 @@
+## 3.0.0 (June 2, 2016)
+
+### Breaking Changes
+
+* Remove autofix on no-exclusive-tests rule.  (#63)
+
 ## 2.2.0 (April 14, 2016)
 
 ### Features
