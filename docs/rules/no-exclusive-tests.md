@@ -6,8 +6,6 @@ After you have fixed your test and before committing the changes you have to rem
 
 This rule reminds you to remove `.only` from your tests by raising a warning whenever you are using the exclusivity feature.
 
-**Fixable:** Problems detected by this rule are automatically fixable using the `--fix` flag on the command line.
-
 ## Rule Details
 
 This rule looks for every `describe.only`, `it.only`, `suite.only`, `test.only`, `context.only` and `specify.only`occurrences within the source code.
