@@ -22,7 +22,7 @@ Then add a reference to this plugin and selected rules in your eslint config:
     "mocha"
   ],
   "rules": {
-    "mocha/no-exclusive-tests": 2
+    "mocha/no-exclusive-tests": "error"
   }
 }
 ```
