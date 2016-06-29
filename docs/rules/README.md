@@ -6,3 +6,4 @@
 * [handle-done-callback](handle-done-callback.md) - enforces handling of callbacks for async tests
 * [no-synchronous-tests](no-synchronous-tests.md) - disallow synchronous tests
 * [no-global-tests](no-global-tests.md) - disallow global tests
+* [valid-it-test-desc](valid-it-test-desc.md) - check "it()" and "test()" descriptions against a pre-configured regular expression
