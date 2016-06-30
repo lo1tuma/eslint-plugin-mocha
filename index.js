@@ -7,6 +7,7 @@ module.exports = {
         'no-skipped-tests': require('./lib/rules/no-skipped-tests'),
         'handle-done-callback': require('./lib/rules/handle-done-callback'),
         'no-synchronous-tests': require('./lib/rules/no-synchronous-tests'),
-        'no-global-tests': require('./lib/rules/no-global-tests')
+        'no-global-tests': require('./lib/rules/no-global-tests'),
+        'valid-test-description': require('./lib/rules/valid-test-description')
     }
 };
