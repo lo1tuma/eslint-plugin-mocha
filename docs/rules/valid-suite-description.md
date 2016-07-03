@@ -10,9 +10,9 @@ By default, the rule supports "describe", "context" and "suite" suite function n
 Example of a custom rule configuration:
 
 ```js
-   rules: {
-       "mocha/valid-suite-description": ["warning", "^[A-Z]"]
-   },
+rules: {
+   "mocha/valid-suite-description": ["warning", "^[A-Z]"]
+},
 ```
 
 where:
@@ -45,7 +45,7 @@ suite("Test suite", function() { });
 There is also possible to configure a custom list of suite names via the second rule configuration option:
 
 ```js
-   rules: {
-       "mocha/valid-suite-description": ["warning", "^[A-Z]", ["describe", "context", "suite", "mysuitename"]]
-   },
+rules: {
+   "mocha/valid-suite-description": ["warning", "^[A-Z]", ["describe", "context", "suite", "mysuitename"]]
+},
 ```
