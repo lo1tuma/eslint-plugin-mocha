@@ -36,7 +36,7 @@ These patterns would not be considered warnings:
 ```js
 // bdd
 describe("Test suite", function() { });
-context("Test suite, function() { });
+context("Test suite", function() { });
 
 // tdd
 suite("Test suite", function() { });
