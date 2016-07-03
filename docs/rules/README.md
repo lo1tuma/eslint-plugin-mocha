@@ -1,6 +1,6 @@
 # Rules
 
-* [no-exclusive-tests](no-exclusive-tests.md) - disallow exclusive mocha tests (fixable)
+* [no-exclusive-tests](no-exclusive-tests.md) - disallow exclusive mocha tests
 * [no-skipped-tests](no-skipped-tests.md) - disallow skipped mocha tests (fixable)
 * [no-pending-tests](no-pending-tests.md) - disallow pending/unimplemented mocha tests
 * [handle-done-callback](handle-done-callback.md) - enforces handling of callbacks for async tests
