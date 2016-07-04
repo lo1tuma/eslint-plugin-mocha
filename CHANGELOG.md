@@ -1,3 +1,28 @@
+## 4.0.0 (July 4, 2016)
+
+### Features
+
+* feat(rules): add 'valid-suite-description' rule (#74)
+* feat(rules): add 'valid-test-description' rule (#68)
+
+### Enhancements
+
+* Add recommended config (#72)
+
+### Dependency Upgrades
+
+* Update eslint to version 3.0.0 🚀 (#70)
+
+### Breaking Changes
+
+* Drop support old node versions (#71)
+
+### Documentation
+
+* Remove fixable from no-exclusive on README (#73)
+* [README] Use a more explicit config (#65)
+* update to docs to match removed autofix (#64)
+
 ## 3.0.0 (June 2, 2016)
 
 ### Breaking Changes
