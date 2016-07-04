@@ -8,7 +8,8 @@ module.exports = {
         'handle-done-callback': require('./lib/rules/handle-done-callback'),
         'no-synchronous-tests': require('./lib/rules/no-synchronous-tests'),
         'no-global-tests': require('./lib/rules/no-global-tests'),
-        'valid-test-description': require('./lib/rules/valid-test-description')
+        'valid-test-description': require('./lib/rules/valid-test-description'),
+        'valid-suite-description': require('./lib/rules/valid-suite-description')
     },
     configs: {
         recommended: {
