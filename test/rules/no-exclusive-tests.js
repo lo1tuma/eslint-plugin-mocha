@@ -9,8 +9,14 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
 
     valid: [
         'describe()',
+        'describeComponent()',
+        'describeModel()',
+        'describeModule()',
         'it()',
         'describe.skip()',
+        'describeComponent.skip()',
+        'describeModel.skip()',
+        'describeModule.skip()',
         'it.skip()',
         'suite()',
         'test()',
@@ -33,6 +39,30 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
         {
             code: 'describe["only"]()',
             errors: [ { message: expectedErrorMessage, column: 10, line: 1 } ]
+        },
+        {
+            code: 'describeComponent.only()',
+            errors: [ { message: expectedErrorMessage, column: 19, line: 1 } ]
+        },
+        {
+            code: 'describeComponent["only"]()',
+            errors: [ { message: expectedErrorMessage, column: 19, line: 1 } ]
+        },
+        {
+            code: 'describeModel.only()',
+            errors: [ { message: expectedErrorMessage, column: 15, line: 1 } ]
+        },
+        {
+            code: 'describeModel["only"]()',
+            errors: [ { message: expectedErrorMessage, column: 15, line: 1 } ]
+        },
+        {
+            code: 'describeModule.only()',
+            errors: [ { message: expectedErrorMessage, column: 16, line: 1 } ]
+        },
+        {
+            code: 'describeModule["only"]()',
+            errors: [ { message: expectedErrorMessage, column: 16, line: 1 } ]
         },
         {
             code: 'it.only()',
