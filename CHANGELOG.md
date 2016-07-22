@@ -1,3 +1,9 @@
+## 4.1.0 (July 22, 2016)
+
+### Features
+
+* no-mocha-arrows: New rule (#78)
+
 ## 4.0.0 (July 4, 2016)
 
 ### Features
