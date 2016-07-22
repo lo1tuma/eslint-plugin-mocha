@@ -9,8 +9,14 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
 
     valid: [
         'describe()',
+        'describeComponent()',
+        'describeModel()',
+        'describeModule()',
         'it()',
         'describe.only()',
+        'describeComponent.only()',
+        'describeModel.only()',
+        'describeModule.only()',
         'it.only()',
         'suite()',
         'test()',
@@ -38,6 +44,51 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
             code: 'xdescribe()',
             errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
             output: 'describe()'
+        },
+        {
+            code: 'describeComponent.skip()',
+            errors: [ { message: expectedErrorMessage, column: 19, line: 1 } ],
+            output: 'describeComponent()'
+        },
+        {
+            code: 'describeComponent["skip"]()',
+            errors: [ { message: expectedErrorMessage, column: 19, line: 1 } ],
+            output: 'describeComponent()'
+        },
+        {
+            code: 'xdescribeComponent()',
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
+            output: 'describeComponent()'
+        },
+        {
+            code: 'describeModel.skip()',
+            errors: [ { message: expectedErrorMessage, column: 15, line: 1 } ],
+            output: 'describeModel()'
+        },
+        {
+            code: 'describeModel["skip"]()',
+            errors: [ { message: expectedErrorMessage, column: 15, line: 1 } ],
+            output: 'describeModel()'
+        },
+        {
+            code: 'xdescribeModel()',
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
+            output: 'describeModel()'
+        },
+        {
+            code: 'describeModule.skip()',
+            errors: [ { message: expectedErrorMessage, column: 16, line: 1 } ],
+            output: 'describeModule()'
+        },
+        {
+            code: 'describeModule["skip"]()',
+            errors: [ { message: expectedErrorMessage, column: 16, line: 1 } ],
+            output: 'describeModule()'
+        },
+        {
+            code: 'xdescribeModule()',
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
+            output: 'describeModule()'
         },
         {
             code: 'it.skip()',
@@ -103,4 +154,3 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
     ]
 
 });
-
