@@ -73,6 +73,16 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
         {
             code: 'specify["only"]()',
             errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
+        },
+        {
+            code: 'custom.only()',
+            options: [ { additionalTestFunctions: [ 'custom' ] } ],
+            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
+        },
+        {
+            code: 'custom["only"]()',
+            options: [ { additionalTestFunctions: [ 'custom' ] } ],
+            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
         }
     ]
 
