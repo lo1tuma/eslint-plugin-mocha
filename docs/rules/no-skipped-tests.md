@@ -46,22 +46,23 @@ test.only("bar", function () {});
 
 # Options
 
-This rule supports the following configuration options, which can be passed in as a single object.  An example is below.
+This rule supports the following shared configuration options:
 
 * `additionalTestFunctions`: An array of extra test functions to protect.  This might be used with a custom Mocha extension, such as [`ember-mocha`](https://github.com/switchfly/ember-mocha)
-* `additonalXFunctions`: An array of extra x-function to protect
+* `additionalXFunctions`: An array of extra x-function to protect
 
 ```json
 {
     "rules": {
-        "mocha/no-skipped-tests": ["error", {
-            "additionalTestFunctions": [
-                "describeModule"
-            ],
-            "additionalXFunctions": [
-                "xdescribeModule"
-            ]
-        }]
+        "mocha/no-skipped-tests": "error"
+    },
+    "settings": {
+       "mocha/additionalTestFunctions": [
+           "describeModule"
+       ],
+       "mocha/additionalXFunctions": [
+           "xdescribeModule"
+       ]
     }
 }
 ```

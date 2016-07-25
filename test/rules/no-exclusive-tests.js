@@ -76,12 +76,34 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
         },
         {
             code: 'custom.only()',
-            options: [ { additionalTestFunctions: [ 'custom' ] } ],
+            settings: {
+                'mocha/additionalTestFunctions': [ 'custom' ]
+            },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
         },
         {
             code: 'custom["only"]()',
-            options: [ { additionalTestFunctions: [ 'custom' ] } ],
+            settings: {
+                'mocha/additionalTestFunctions': [ 'custom' ]
+            },
+            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
+        },
+        {
+            code: 'custom.only()',
+            settings: {
+                mocha: {
+                    additionalTestFunctions: [ 'custom' ]
+                }
+            },
+            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
+        },
+        {
+            code: 'custom["only"]()',
+            settings: {
+                mocha: {
+                    additionalTestFunctions: [ 'custom' ]
+                }
+            },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
         }
     ]

@@ -101,19 +101,55 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
         },
         {
             code: 'custom.skip()',
-            options: [ { additionalTestFunctions: [ 'custom' ] } ],
+            settings: {
+                'mocha/additionalTestFunctions': [ 'custom' ]
+            },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ],
             output: 'custom()'
         },
         {
             code: 'custom["skip"]()',
-            options: [ { additionalTestFunctions: [ 'custom' ] } ],
+            settings: {
+                'mocha/additionalTestFunctions': [ 'custom' ]
+            },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ],
             output: 'custom()'
         },
         {
             code: 'xcustom()',
-            options: [ { additionalXFunctions: [ 'xcustom' ] } ],
+            settings: {
+                'mocha/additionalXFunctions': [ 'xcustom' ]
+            },
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
+            output: 'custom()'
+        },
+        {
+            code: 'custom.skip()',
+            settings: {
+                mocha: {
+                    additionalTestFunctions: [ 'custom' ]
+                }
+            },
+            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ],
+            output: 'custom()'
+        },
+        {
+            code: 'custom["skip"]()',
+            settings: {
+                mocha: {
+                    additionalTestFunctions: [ 'custom' ]
+                }
+            },
+            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ],
+            output: 'custom()'
+        },
+        {
+            code: 'xcustom()',
+            settings: {
+                mocha: {
+                    additionalXFunctions: [ 'xcustom' ]
+                }
+            },
             errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
             output: 'custom()'
         }

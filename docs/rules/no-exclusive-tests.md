@@ -51,18 +51,19 @@ test.skip("bar", function () {});
 
 # Options
 
-This rule supports the following configuration options, which can be passed in as a single object.  An example is below.
+This rule supports the following shared configuration options:
 
 * `additionalTestFunctions`: An array of extra test functions to protect.  This might be used with a custom Mocha extension, such as [`ember-mocha`](https://github.com/switchfly/ember-mocha)
 
 ```json
 {
     "rules": {
-        "mocha/no-exclusive-tests": ["error", {
-            "additionalTestFunctions": [
-                "describeModule"
-            ]
-        }]
+        "mocha/no-exclusive-tests": "error"
+    },
+    "settings": {
+       "mocha/additionalTestFunctions": [
+           "describeModule"
+       ]
     }
 }
 ```
