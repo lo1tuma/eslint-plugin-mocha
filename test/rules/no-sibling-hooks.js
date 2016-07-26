@@ -1,0 +1,80 @@
+'use strict';
+
+var RuleTester = require('eslint').RuleTester,
+    rules = require('../../').rules,
+    ruleTester = new RuleTester();
+
+ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
+
+    valid: [
+        'describe(function() { before(function() {}); it(function() {}); });',
+        'describe(function() { after(function() {}); it(function() {}); });',
+        'describe(function() { beforeEach(function() {}); it(function() {}); });',
+        'describe(function() { afterEach(function() {}); it(function() {}); });',
+        'describe(function() { before(function() {}); after(function() {}); });',
+        'describe(function() { before(function() {}); beforeEach(function() {}); });',
+        'describe(function() { beforeEach(function() {}); afterEach(function() {}); });',
+        'before(function() {}); beforeEach(function() {});',
+        'foo.before(function() {}); foo.before(function() {});',
+        [
+          'describe(function() {',
+          '    before(function() {});',
+          '    describe(function() {',
+          '        before(function() {});',
+          '    });',
+          '});'
+        ].join(' '),
+        [
+          'describe(function() {',
+          '    describe(function() {',
+          '        before(function() {});',
+          '    });',
+          '    before(function() {});',
+          '});'
+        ].join(' ')
+    ],
+
+    invalid: [
+        {
+            code: 'describe(function() { before(function() {}); before(function() {}); });',
+            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 46, line: 1 } ]
+        },
+        {
+            code: 'describe(function() { after(function() {}); after(function() {}); });',
+            errors: [ { message: 'Unexpected use of duplicate Mocha `after` hook', column: 45, line: 1 } ]
+        },
+        {
+            code: 'describe(function() { beforeEach(function() {}); beforeEach(function() {}); });',
+            errors: [ { message: 'Unexpected use of duplicate Mocha `beforeEach` hook', column: 50, line: 1 } ]
+        },
+        {
+            code: 'describe(function() { afterEach(function() {}); afterEach(function() {}); });',
+            errors: [ { message: 'Unexpected use of duplicate Mocha `afterEach` hook', column: 49, line: 1 } ]
+        },
+        {
+            code: [
+              'describe(function() {',
+              '    before(function() {});',
+              '    describe(function() {',
+              '        before(function() {});',
+              '        before(function() {});',
+              '    });',
+              '});'
+            ].join(' '),
+            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 115, line: 1 } ]
+        },
+        {
+            code: [
+              'describe(function() {',
+              '    before(function() {});',
+              '    describe(function() {',
+              '        before(function() {});',
+              '    });',
+              '    before(function() {});',
+              '});'
+            ].join(' '),
+            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 119, line: 1 } ]
+        }
+    ]
+
+});

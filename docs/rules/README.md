@@ -8,5 +8,6 @@
 * [no-global-tests](no-global-tests.md) - disallow global tests
 * [valid-test-description](valid-test-description.md) - match test descriptions against a pre-configured regular expression
 * [valid-suite-description](valid-suite-description.md) - match suite descriptions against a pre-configured regular expression
+* [no-sibling-hooks](no-sibling-hooks.md) - disallow duplicate uses of a hook at the same level inside a describe
 * [no-mocha-arrows](no-mocha-arrows.md) - disallow arrow functions as arguments to mocha globals
 * [no-hooks](no-hooks.md) - disallow hooks
