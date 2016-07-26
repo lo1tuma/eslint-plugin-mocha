@@ -1,3 +1,9 @@
+## 4.2.0 (July 26, 2016)
+
+### Features
+
+* Allow custom test functions (#81)
+
 ## 4.1.0 (July 22, 2016)
 
 ### Features
