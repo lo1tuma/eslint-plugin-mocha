@@ -44,6 +44,28 @@ suite.only("bar", function () {});
 test.only("bar", function () {});
 ```
 
+# Options
+
+This rule supports the following shared configuration options:
+
+* `additionalTestFunctions`: An array of extra test functions to protect.  This might be used with a custom Mocha extension, such as [`ember-mocha`](https://github.com/switchfly/ember-mocha)
+* `additionalXFunctions`: An array of extra x-function to protect
+
+```json
+{
+    "rules": {
+        "mocha/no-skipped-tests": "error"
+    },
+    "settings": {
+       "mocha/additionalTestFunctions": [
+           "describeModule"
+       ],
+       "mocha/additionalXFunctions": [
+           "xdescribeModule"
+       ]
+    }
+}
+```
 ## When Not To Use It
 
 * If you really want to commit skipped tests to your repo, turn this rule off.

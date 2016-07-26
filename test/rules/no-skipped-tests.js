@@ -98,6 +98,60 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
             code: 'xspecify()',
             errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
             output: 'specify()'
+        },
+        {
+            code: 'custom.skip()',
+            settings: {
+                'mocha/additionalTestFunctions': [ 'custom' ]
+            },
+            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ],
+            output: 'custom()'
+        },
+        {
+            code: 'custom["skip"]()',
+            settings: {
+                'mocha/additionalTestFunctions': [ 'custom' ]
+            },
+            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ],
+            output: 'custom()'
+        },
+        {
+            code: 'xcustom()',
+            settings: {
+                'mocha/additionalXFunctions': [ 'xcustom' ]
+            },
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
+            output: 'custom()'
+        },
+        {
+            code: 'custom.skip()',
+            settings: {
+                mocha: {
+                    additionalTestFunctions: [ 'custom' ]
+                }
+            },
+            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ],
+            output: 'custom()'
+        },
+        {
+            code: 'custom["skip"]()',
+            settings: {
+                mocha: {
+                    additionalTestFunctions: [ 'custom' ]
+                }
+            },
+            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ],
+            output: 'custom()'
+        },
+        {
+            code: 'xcustom()',
+            settings: {
+                mocha: {
+                    additionalXFunctions: [ 'xcustom' ]
+                }
+            },
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
+            output: 'custom()'
         }
 
     ]
