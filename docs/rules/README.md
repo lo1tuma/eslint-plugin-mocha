@@ -9,3 +9,4 @@
 * [valid-test-description](valid-test-description.md) - match test descriptions against a pre-configured regular expression
 * [valid-suite-description](valid-suite-description.md) - match suite descriptions against a pre-configured regular expression
 * [no-mocha-arrows](no-mocha-arrows.md) - disallow arrow functions as arguments to mocha globals
+* [no-hooks](no-hooks.md) - disallow hooks
