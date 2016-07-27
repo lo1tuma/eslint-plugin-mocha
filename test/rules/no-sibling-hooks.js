@@ -31,6 +31,46 @@ ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
           '    });',
           '    before(function() {});',
           '});'
+        ].join('\n'),
+        [
+          'describe(function() {',
+          '    describe.only(function() {',
+          '        before(function() {});',
+          '    });',
+          '    before(function() {});',
+          '});'
+        ].join('\n'),
+        [
+          'describe(function() {',
+          '    describe.skip(function() {',
+          '        before(function() {});',
+          '    });',
+          '    before(function() {});',
+          '});'
+        ].join('\n'),
+        [
+          'describe(function() {',
+          '    xdescribe(function() {',
+          '        before(function() {});',
+          '    });',
+          '    before(function() {});',
+          '});'
+        ].join('\n'),
+        [
+          'describe(function() {',
+          '    context(function() {',
+          '        before(function() {});',
+          '    });',
+          '    before(function() {});',
+          '});'
+        ].join('\n'),
+        [
+          'describe(function() {',
+          '    xcontext(function() {',
+          '        before(function() {});',
+          '    });',
+          '    before(function() {});',
+          '});'
         ].join('\n')
     ],
 
