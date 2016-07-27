@@ -1,7 +1,7 @@
 # Disallow hooks (no-hooks)
 
 Mocha proposes hooks that allow code to be run before or after every or all tests. This helps define a common setup or teardown process for every test.
-It is possible to declare a hook multiple times inside the same test suite, but it can confusing. It is better to have one hook handle the whole of the setup or teardown logic of the test suite.
+It is possible to declare a hook multiple times inside the same test suite, but it can be confusing. It is better to have one hook handle the whole of the setup or teardown logic of the test suite.
 
 ## Rule Details
 
