@@ -23,7 +23,7 @@ ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
           '        before(function() {});',
           '    });',
           '});'
-        ].join(' '),
+        ].join('\n'),
         [
           'describe(function() {',
           '    describe(function() {',
@@ -31,7 +31,7 @@ ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
           '    });',
           '    before(function() {});',
           '});'
-        ].join(' ')
+        ].join('\n')
     ],
 
     invalid: [
@@ -60,8 +60,8 @@ ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
               '        before(function() {});',
               '    });',
               '});'
-            ].join(' '),
-            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 115, line: 1 } ]
+            ].join('\n'),
+            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 9, line: 5 } ]
         },
         {
             code: [
@@ -72,8 +72,8 @@ ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
               '    });',
               '    before(function() {});',
               '});'
-            ].join(' '),
-            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 119, line: 1 } ]
+            ].join('\n'),
+            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 6 } ]
         }
     ]
 
