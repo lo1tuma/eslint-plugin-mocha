@@ -11,7 +11,8 @@ module.exports = {
         'valid-test-description': require('./lib/rules/valid-test-description'),
         'valid-suite-description': require('./lib/rules/valid-suite-description'),
         'no-mocha-arrows': require('./lib/rules/no-mocha-arrows'),
-        'no-hooks': require('./lib/rules/no-hooks')
+        'no-hooks': require('./lib/rules/no-hooks'),
+        'no-sibling-hooks': require('./lib/rules/no-sibling-hooks')
     },
     configs: {
         recommended: {
