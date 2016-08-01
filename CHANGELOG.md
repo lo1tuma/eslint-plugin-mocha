@@ -1,3 +1,14 @@
+## 4.3.0 (August 1, 2016)
+
+### Dependency Upgrades
+
+* Update mocha to version 3.0.0 🚀 (#86)
+
+### Features
+
+* Add rule `no-sibling-hooks` (fixes #82) (#85)
+* Add rule `no-hooks` (fixes #39)  (#84)
+
 ## 4.2.0 (July 26, 2016)
 
 ### Features
