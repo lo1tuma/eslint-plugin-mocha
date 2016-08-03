@@ -6,6 +6,7 @@
 * [handle-done-callback](handle-done-callback.md) - enforces handling of callbacks for async tests
 * [no-synchronous-tests](no-synchronous-tests.md) - disallow synchronous tests
 * [no-global-tests](no-global-tests.md) - disallow global tests
+* [no-return-and-callback](no-return-and-callback.md) - disallow returning in a test or hook function that uses a callback
 * [valid-test-description](valid-test-description.md) - match test descriptions against a pre-configured regular expression
 * [valid-suite-description](valid-suite-description.md) - match suite descriptions against a pre-configured regular expression
 * [no-sibling-hooks](no-sibling-hooks.md) - disallow duplicate uses of a hook at the same level inside a describe
