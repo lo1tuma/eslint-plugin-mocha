@@ -12,7 +12,7 @@
         "changelog": "pr-log"
     },
     "dependencies": {
-        "ramda": "^0.21.0"
+        "ramda": "^0.22.1"
     },
     "devDependencies": {
         "chai": "^3.5.0",
