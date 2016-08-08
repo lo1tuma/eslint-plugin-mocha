@@ -51,7 +51,9 @@ ruleTester.run('no-return-and-callback', rules['no-return-and-callback'], {
         'it("title", function(done) { return; });',
         'it("title", function(done) { return undefined; });',
         'it("title", function(done) { return null; });',
-        'it("title", function(done) { return "3"; });'
+        'it("title", function(done) { return "3"; });',
+        'it("title", function(done) { return done(); });',
+        'it("title", function(done) { return done(error); });'
     ],
 
     invalid: [
@@ -100,6 +102,22 @@ ruleTester.run('no-return-and-callback', rules['no-return-and-callback'], {
         {
             code: 'afterEach("title", function(done) { return foo; });',
             errors: [ { message: message, column: 37, line: 1 } ]
+        },
+        {
+            code: 'afterEach("title", function(done) { return done; });',
+            errors: [ { message: message, column: 37, line: 1 } ]
+        },
+        {
+            code: 'afterEach("title", function(done) { return done.foo(); });',
+            errors: [ { message: message, column: 37, line: 1 } ]
+        },
+        {
+            code: 'afterEach("title", function(done) { return foo.done(); });',
+            errors: [ { message: message, column: 37, line: 1 } ]
+        },
+        {
+            code: 'afterEach("title", function(end) { return done(); });',
+            errors: [ { message: message, column: 36, line: 1 } ]
         }
     ]
 
