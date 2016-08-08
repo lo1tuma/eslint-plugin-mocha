@@ -11,3 +11,4 @@
 * [no-sibling-hooks](no-sibling-hooks.md) - disallow duplicate uses of a hook at the same level inside a describe
 * [no-mocha-arrows](no-mocha-arrows.md) - disallow arrow functions as arguments to mocha globals
 * [no-hooks](no-hooks.md) - disallow hooks
+* [no-top-level-hooks](no-top-level-hooks.md) - disallow top-level hooks
