@@ -46,7 +46,12 @@ ruleTester.run('no-return-and-callback', rules['no-return-and-callback'], {
         {
             code: 'it("title", () => { return foo(); });',
             parserOptions: es6parserOptions
-        }
+        },
+        // Allowed return statements
+        'it("title", function(done) { return; });',
+        'it("title", function(done) { return undefined; });',
+        'it("title", function(done) { return null; });',
+        'it("title", function(done) { return "3"; });'
     ],
 
     invalid: [
@@ -90,6 +95,10 @@ ruleTester.run('no-return-and-callback', rules['no-return-and-callback'], {
         },
         {
             code: 'afterEach("title", function(done) { return foo.then(done); });',
+            errors: [ { message: message, column: 37, line: 1 } ]
+        },
+        {
+            code: 'afterEach("title", function(done) { return foo; });',
             errors: [ { message: message, column: 37, line: 1 } ]
         }
     ]
