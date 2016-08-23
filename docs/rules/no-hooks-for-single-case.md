@@ -58,6 +58,20 @@ describe('foo', function () {
 });
 ```
 
+# Options
+
+This rule supports the following shared configuration options:
+
+* `allow`: An array containing the names of hooks to allow. This might be used to allow writing `after` hooks to run clean-up code. Defaults to an empty array.
+
+```json
+{
+    "rules": {
+        "mocha/no-skipped-tests": ["error", {"allow": ["after"]}]
+    }
+}
+```
+
 ## When Not To Use It
 
 * If you use another library which exposes a similar API as mocha (e.g. `before`, `after`), you should turn this rule off, because it would raise warnings.

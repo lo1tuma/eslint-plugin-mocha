@@ -83,7 +83,52 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
             '        it(function() {});',
             '    });',
             '});'
-        ].join('\n')
+        ].join('\n'),
+        {
+            code: [
+                'describe(function() {',
+                '    before(function() {});',
+                '    it(function() {});',
+                '});'
+            ].join('\n'),
+            options: [ { allow: [ 'before' ] } ]
+        },
+        {
+            code: [
+                'describe(function() {',
+                '    after(function() {});',
+                '    it(function() {});',
+                '});'
+            ].join('\n'),
+            options: [ { allow: [ 'after' ] } ]
+        },
+        {
+            code: [
+                'describe(function() {',
+                '    beforeEach(function() {});',
+                '    it(function() {});',
+                '});'
+            ].join('\n'),
+            options: [ { allow: [ 'beforeEach' ] } ]
+        },
+        {
+            code: [
+                'describe(function() {',
+                '    afterEach(function() {});',
+                '    it(function() {});',
+                '});'
+            ].join('\n'),
+            options: [ { allow: [ 'afterEach' ] } ]
+        },
+        {
+            code: [
+                'describe(function() {',
+                '    after(function() {});',
+                '    it(function() {});',
+                '});'
+            ].join('\n'),
+            options: [ { allow: [ 'after', 'afterEach' ] } ]
+        }
     ],
 
     invalid: [
@@ -93,7 +138,7 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    before(function() {});',
                 '});'
             ].join('\n'),
-            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 2 } ]
+            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 } ]
         },
         {
             code: [
@@ -102,7 +147,7 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    it(function() {});',
                 '});'
             ].join('\n'),
-            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 2 } ]
+            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 } ]
         },
         {
             code: [
@@ -111,7 +156,7 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    before(function() {});',
                 '});'
             ].join('\n'),
-            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 3 } ]
+            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 3 } ]
         },
         {
             code: [
@@ -120,7 +165,7 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    it(function() {});',
                 '});'
             ].join('\n'),
-            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 2 } ]
+            errors: [ { message: 'Unexpected use of Mocha `after` hook for a single test case', column: 5, line: 2 } ]
         },
         {
             code: [
@@ -129,7 +174,9 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    it(function() {});',
                 '});'
             ].join('\n'),
-            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 2 } ]
+            errors: [
+                { message: 'Unexpected use of Mocha `beforeEach` hook for a single test case', column: 5, line: 2 }
+            ]
         },
         {
             code: [
@@ -138,14 +185,16 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    it(function() {});',
                 '});'
             ].join('\n'),
-            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 2 } ]
+            errors: [
+                { message: 'Unexpected use of Mocha `afterEach` hook for a single test case', column: 5, line: 2 }
+            ]
         },
         {
             code: [
                 'before(function() {});',
                 'it(function() {});'
             ].join('\n'),
-            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 1, line: 1 } ]
+            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 1, line: 1 } ]
         },
         {
             code: [
@@ -154,7 +203,7 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    describe(function() {});',
                 '});'
             ].join('\n'),
-            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 2 } ]
+            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 } ]
         },
         {
             code: [
@@ -163,7 +212,7 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    xdescribe(function() {});',
                 '});'
             ].join('\n'),
-            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 2 } ]
+            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 } ]
         },
         {
             code: [
@@ -172,7 +221,7 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    it.only(function() {});',
                 '});'
             ].join('\n'),
-            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 2 } ]
+            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 } ]
         },
         {
             code: [
@@ -185,7 +234,7 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    });',
                 '});'
             ].join('\n'),
-            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 9, line: 5 } ]
+            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 9, line: 5 } ]
         },
         {
             code: [
@@ -198,7 +247,17 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    });',
                 '});'
             ].join('\n'),
-            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 2 } ]
+            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 } ]
+        },
+        {
+            code: [
+                'describe(function() {',
+                '    after(function() {});',
+                '    it(function() {});',
+                '});'
+            ].join('\n'),
+            options: [ { allow: [ 'before' ] } ],
+            errors: [ { message: 'Unexpected use of Mocha `after` hook for a single test case', column: 5, line: 2 } ]
         }
     ]
 
