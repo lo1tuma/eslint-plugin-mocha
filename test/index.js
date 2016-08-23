@@ -57,7 +57,7 @@ describe('eslint-plugin-mocha', function () {
             });
         });
 
-        it('should be linked in the documenation index', function () {
+        it('should be linked in the documentation index', function () {
             documentationFiles.forEach(function (file) {
                 var ruleName = path.basename(file, '.md'),
                     expectedLink = '* [' + ruleName + '](' + file + ')';
