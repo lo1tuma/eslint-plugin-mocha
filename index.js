@@ -13,6 +13,7 @@ module.exports = {
         'valid-suite-description': require('./lib/rules/valid-suite-description'),
         'no-mocha-arrows': require('./lib/rules/no-mocha-arrows'),
         'no-hooks': require('./lib/rules/no-hooks'),
+        'no-hooks-for-single-case': require('./lib/rules/no-hooks-for-single-case'),
         'no-sibling-hooks': require('./lib/rules/no-sibling-hooks'),
         'no-top-level-hooks': require('./lib/rules/no-top-level-hooks')
     },
