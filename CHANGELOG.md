@@ -1,3 +1,23 @@
+## 4.4.0 (August 24, 2016)
+
+### Features
+
+* Add `no-hooks-for-single-case` rule (fixes #44) (#95)
+* Add rule `no-return-and-callback` (fixes #88) (#94)
+* Add `no-top-level-hooks` rule (fixes #37) (#87)
+
+### Documentation
+
+* Fix title in `no-sibling-hooks` documentation file (#92)
+
+### Dependency Upgrades
+
+* Update ramda to version 0.22.1 🚀 (#93)
+
+### Build-Related
+
+* Add editorconfig file (#91)
+
 ## 4.3.0 (August 1, 2016)
 
 ### Dependency Upgrades
