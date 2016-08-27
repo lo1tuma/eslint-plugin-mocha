@@ -4,7 +4,7 @@ Having identical titles for two different tests or test suites may create confus
 
 ## Rule Details
 
-This rule looks at the rule of every test and test suites. It will report when two test suites or two test cases at the same level of a test suite have the same name.
+This rule looks at the title of every test and test suites. It will report when two test suites or two test cases at the same level of a test suite have the same title.
 
 The following patterns are considered warnings:
 
