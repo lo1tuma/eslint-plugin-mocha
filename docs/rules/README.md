@@ -14,3 +14,4 @@
 * [no-hooks](no-hooks.md) - disallow hooks
 * [no-hooks-for-single-case](no-hooks-for-single-case.md) - disallow hooks for a single test or test suite
 * [no-top-level-hooks](no-top-level-hooks.md) - disallow top-level hooks
+* [no-identical-title](no-identical-title.md) - disallow identical titles
