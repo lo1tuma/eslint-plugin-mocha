@@ -1,3 +1,9 @@
+## 4.5.0 (August 29, 2016)
+
+### Features
+
+* Add `no-identical-title` rule (fixes #33) (#97)
+
 ## 4.4.0 (August 24, 2016)
 
 ### Features
