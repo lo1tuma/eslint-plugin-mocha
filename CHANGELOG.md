@@ -1,3 +1,9 @@
+## 4.5.1 (August 30, 2016)
+
+### Bug Fixes
+
+* Fix crash in no-identical-title (fixes #98) (#99)
+
 ## 4.5.0 (August 29, 2016)
 
 ### Features
