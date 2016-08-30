@@ -77,7 +77,21 @@ ruleTester.run('no-identical-title', rules['no-identical-title'], {
             env: {
                 es6: true
             }
-        }
+        },
+        [
+            'describe("title " + foo, function() {',
+            '    describe("describe1", function() {});',
+            '});',
+            'describe("describe1", function() {});'
+        ].join('\n'),
+        [
+            'describe("describe1", function() {',
+            '    describe("describe2", function() {});',
+            '    describe("title " + foo, function() {',
+            '        describe("describe2", function() {});',
+            '    });',
+            '});'
+        ].join('\n')
     ],
 
     invalid: [
@@ -122,6 +136,13 @@ ruleTester.run('no-identical-title', rules['no-identical-title'], {
             code: [
                 'describe("describe1", function() {});',
                 'describe("describe1", function() {});'
+            ].join('\n'),
+            errors: [ { message: 'Test suite title is used multiple times.', column: 1, line: 2 } ]
+        },
+        {
+            code: [
+                'describe("describe1", function() {});',
+                'xdescribe("describe1", function() {});'
             ].join('\n'),
             errors: [ { message: 'Test suite title is used multiple times.', column: 1, line: 2 } ]
         },
