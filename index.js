@@ -16,7 +16,8 @@ module.exports = {
         'no-hooks-for-single-case': require('./lib/rules/no-hooks-for-single-case'),
         'no-sibling-hooks': require('./lib/rules/no-sibling-hooks'),
         'no-top-level-hooks': require('./lib/rules/no-top-level-hooks'),
-        'no-identical-title': require('./lib/rules/no-identical-title')
+        'no-identical-title': require('./lib/rules/no-identical-title'),
+        'no-before-after': require('./lib/rules/no-before-after')
     },
     configs: {
         recommended: {
