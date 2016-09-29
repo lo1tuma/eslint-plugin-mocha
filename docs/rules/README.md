@@ -15,4 +15,4 @@
 * [no-hooks-for-single-case](no-hooks-for-single-case.md) - disallow hooks for a single test or test suite
 * [no-top-level-hooks](no-top-level-hooks.md) - disallow top-level hooks
 * [no-identical-title](no-identical-title.md) - disallow identical titles
-* [one-suite-per-file](one-suite-per-file.md) - disallow multiple top-level suites in a single file
+* [max-top-level-suites](max-top-level-suites.md) - limit the number of top-level suites in a single file

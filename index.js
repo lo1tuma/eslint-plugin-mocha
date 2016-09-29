@@ -17,7 +17,7 @@ module.exports = {
         'no-sibling-hooks': require('./lib/rules/no-sibling-hooks'),
         'no-top-level-hooks': require('./lib/rules/no-top-level-hooks'),
         'no-identical-title': require('./lib/rules/no-identical-title'),
-        'one-suite-per-file': require('./lib/rules/one-suite-per-file')
+        'max-top-level-suites': require('./lib/rules/max-top-level-suites')
     },
     configs: {
         recommended: {

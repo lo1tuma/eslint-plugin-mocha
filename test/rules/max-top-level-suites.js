@@ -4,7 +4,7 @@ var RuleTester = require('eslint').RuleTester,
     rules = require('../../').rules,
     ruleTester = new RuleTester();
 
-ruleTester.run('one-suite-per-file', rules['one-suite-per-file'], {
+ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
     valid: [
         {
             code: 'describe("This is a test", function () { });'
@@ -16,9 +16,6 @@ ruleTester.run('one-suite-per-file', rules['one-suite-per-file'], {
             code: 'suite("This is a test", function () { });'
         },
         {
-            code: 'describe("this is a test", function () { });'
-        },
-        {
             code: 'describe("This is a test", function () { describe("This is a different test", function () { }) });'
         },
         {
@@ -28,8 +25,12 @@ ruleTester.run('one-suite-per-file', rules['one-suite-per-file'], {
             code: 'suite("This is a test", function () { suite("This is a different test", function () { }) });'
         },
         {
-            options: [ [ 'someFunction' ] ],
-            code: 'someFunction("Should do something", function () { });'
+            options: [ 2 ],
+            code: 'describe("This is a test", function () { });'
+        },
+        {
+            options: [ 1 ],
+            code: 'someOtherFunction();'
         },
         'someOtherFunction();'
     ],
@@ -39,7 +40,7 @@ ruleTester.run('one-suite-per-file', rules['one-suite-per-file'], {
             code: 'describe("this is a test", function () { });' +
                   'describe("this is a different test", function () { });',
             errors: [
-                { message: 'Multiple top-level suites are not allowed.' }
+                { message: 'The number of top-level suites is more than 1.' }
             ]
         },
         {
@@ -47,33 +48,33 @@ ruleTester.run('one-suite-per-file', rules['one-suite-per-file'], {
                   'describe("this is a different test", function () { });' +
                   'describe("this is an another different test", function () { });',
             errors: [
-                { message: 'Multiple top-level suites are not allowed.' }
+                { message: 'The number of top-level suites is more than 1.' }
             ]
         },
         {
             code: 'context("this is a test", function () { });' +
                   'context("this is a different test", function () { });',
             errors: [
-                { message: 'Multiple top-level suites are not allowed.' }
+                { message: 'The number of top-level suites is more than 1.' }
             ]
         },
         {
             code: 'suite("this is a test", function () { });' +
                   'suite("this is a different test", function () { });',
             errors: [
-                { message: 'Multiple top-level suites are not allowed.' }
+                { message: 'The number of top-level suites is more than 1.' }
             ]
         },
         {
             code: 'describe("this is a test", function () { }); context("this is a test", function () { });',
             errors: [
-                { message: 'Multiple top-level suites are not allowed.' }
+                { message: 'The number of top-level suites is more than 1.' }
             ]
         },
         {
             code: 'suite("this is a test", function () { }); context("this is a test", function () { });',
             errors: [
-                { message: 'Multiple top-level suites are not allowed.' }
+                { message: 'The number of top-level suites is more than 1.' }
             ]
         },
         {
@@ -81,7 +82,7 @@ ruleTester.run('one-suite-per-file', rules['one-suite-per-file'], {
                   'someOtherFunction();' +
                   'describe("this is a different test", function () { });',
             errors: [
-                { message: 'Multiple top-level suites are not allowed.' }
+                { message: 'The number of top-level suites is more than 1.' }
             ]
         },
         {
@@ -89,15 +90,43 @@ ruleTester.run('one-suite-per-file', rules['one-suite-per-file'], {
                   'describe("this is a test", function () { });' +
                   'describe("this is a different test", function () { });',
             errors: [
-                { message: 'Multiple top-level suites are not allowed.' }
+                { message: 'The number of top-level suites is more than 1.' }
             ]
         },
         {
-            options: [ [ 'customFunction' ] ],
-            code: 'customFunction("this is a test", function () { });' +
-                  'customFunction("this is a test", function () { });',
+            options: [ 2 ],
+            code: 'describe.skip("this is a test", function () { });' +
+                  'describe.only("this is a different test", function () { });' +
+                  'describe("this is a whole different test", function () { });',
             errors: [
-                { message: 'Multiple top-level suites are not allowed.' }
+                { message: 'The number of top-level suites is more than 2.' }
+            ]
+        },
+        {
+            options: [ 1 ],
+            code: 'xdescribe("this is a test", function () { });' +
+                  'describe.only("this is a different test", function () { });' +
+                  'describe("this is a whole different test", function () { });',
+            errors: [
+                { message: 'The number of top-level suites is more than 1.' }
+            ]
+        },
+        {
+            options: [ 2 ],
+            code: 'suite.skip("this is a test", function () { });' +
+                  'suite.only("this is a different test", function () { });' +
+                  'suite("this is a whole different test", function () { });',
+            errors: [
+                { message: 'The number of top-level suites is more than 2.' }
+            ]
+        },
+        {
+            options: [ 2 ],
+            code: 'context.skip("this is a test", function () { });' +
+                  'context.only("this is a different test", function () { });' +
+                  'context("this is a whole different test", function () { });',
+            errors: [
+                { message: 'The number of top-level suites is more than 2.' }
             ]
         }
     ]
