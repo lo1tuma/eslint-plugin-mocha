@@ -128,6 +128,13 @@ ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
             errors: [
                 { message: 'The number of top-level suites is more than 2.' }
             ]
+        },
+        {
+            options: [ 0 ],
+            code: 'describe("this is a test", function () { });',
+            errors: [
+                { message: 'The number of top-level suites is more than 0.' }
+            ]
         }
     ]
 });
