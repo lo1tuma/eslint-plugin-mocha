@@ -25,11 +25,15 @@ ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
             code: 'suite("This is a test", function () { suite("This is a different test", function () { }) });'
         },
         {
-            options: [ 2 ],
+            options: [ { limit: 2 } ],
             code: 'describe("This is a test", function () { });'
         },
         {
-            options: [ 1 ],
+            options: [ { limit: 1 } ],
+            code: 'someOtherFunction();'
+        },
+        {
+            options: [ { limit: 0 } ],
             code: 'someOtherFunction();'
         },
         'someOtherFunction();'
@@ -94,7 +98,7 @@ ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
             ]
         },
         {
-            options: [ 2 ],
+            options: [ { limit: 2 } ],
             code: 'describe.skip("this is a test", function () { });' +
                   'describe.only("this is a different test", function () { });' +
                   'describe("this is a whole different test", function () { });',
@@ -103,7 +107,7 @@ ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
             ]
         },
         {
-            options: [ 1 ],
+            options: [ { limit: 1 } ],
             code: 'xdescribe("this is a test", function () { });' +
                   'describe.only("this is a different test", function () { });' +
                   'describe("this is a whole different test", function () { });',
@@ -112,7 +116,7 @@ ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
             ]
         },
         {
-            options: [ 2 ],
+            options: [ { limit: 2 } ],
             code: 'suite.skip("this is a test", function () { });' +
                   'suite.only("this is a different test", function () { });' +
                   'suite("this is a whole different test", function () { });',
@@ -121,7 +125,7 @@ ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
             ]
         },
         {
-            options: [ 2 ],
+            options: [ { limit: 2 } ],
             code: 'context.skip("this is a test", function () { });' +
                   'context.only("this is a different test", function () { });' +
                   'context("this is a whole different test", function () { });',
@@ -130,7 +134,7 @@ ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
             ]
         },
         {
-            options: [ 0 ],
+            options: [ { limit: 0 } ],
             code: 'describe("this is a test", function () { });',
             errors: [
                 { message: 'The number of top-level suites is more than 0.' }

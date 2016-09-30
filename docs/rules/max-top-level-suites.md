@@ -37,6 +37,6 @@ If you want to change the suite limit to, for instance, 2 suites per file:
 
 ```js
 rules: {
-   "mocha/max-top-level-suites": ["warning", 2]
+   "mocha/max-top-level-suites": ["warning", {limit: 2}]
 },
 ```
