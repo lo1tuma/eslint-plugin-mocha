@@ -1,4 +1,4 @@
-# Match suite descriptions against a pre-configured regular expression
+# Match suite descriptions against a pre-configured regular expression (valid-suite-description)
 
 This rule enforces the suite descriptions to follow the desired format. 
 
