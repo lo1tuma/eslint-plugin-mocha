@@ -1,3 +1,14 @@
+## 4.6.0 (October 3, 2016)
+
+### Documentation
+
+* Adds rule name to title for `valid-suite-description` documentation. (#107)
+* Adds rule name to title for `valid-test-description` documentation. (#106)
+
+### Features
+
+* Add 'one-suite-per-file' rule (#103) (#105)
+
 ## 4.5.1 (August 30, 2016)
 
 ### Bug Fixes

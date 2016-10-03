@@ -1,6 +1,6 @@
 {
     "name": "eslint-plugin-mocha",
-    "version": "4.5.1",
+    "version": "4.6.0",
     "description": "Eslint rules for mocha.",
     "main": "index.js",
     "scripts": {
