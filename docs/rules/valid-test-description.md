@@ -1,4 +1,4 @@
-# Match test descriptions against a pre-configured regular expression
+# Match test descriptions against a pre-configured regular expression (valid-test-description)
 
 This rule enforces the test descriptions to follow the desired format. 
 
