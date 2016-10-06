@@ -16,3 +16,4 @@
 * [no-top-level-hooks](no-top-level-hooks.md) - disallow top-level hooks
 * [no-identical-title](no-identical-title.md) - disallow identical titles
 * [max-top-level-suites](max-top-level-suites.md) - limit the number of top-level suites in a single file
+* [no-nested-tests](no-nested-tests.md) - disallow tests to be nested within other tests
