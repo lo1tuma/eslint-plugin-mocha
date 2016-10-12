@@ -1,3 +1,9 @@
+## 4.7.0 (October 12, 2016)
+
+### Features
+
+* Add no-nested-tests rule (#109)
+
 ## 4.6.0 (October 3, 2016)
 
 ### Documentation
