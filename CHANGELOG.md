@@ -13,7 +13,7 @@
 
 ### Features
 
-* Add 'one-suite-per-file' rule (#103) (#105)
+* Add 'max-top-level-suites' rule (#103) (#105)
 
 ## 4.5.1 (August 30, 2016)
 
