@@ -23,28 +23,39 @@ ruleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
         {
             code: 'it(() => { assert(something, false); })',
             parserOptions: { ecmaVersion: 6 },
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
+            output: 'it(function () { assert(something, false); })'
         },
         {
             code: 'it(() => { assert(something, false); })',
             globals: [ 'it' ],
             parserOptions: { ecmaVersion: 6 },
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
+            output: 'it(function () { assert(something, false); })'
         },
         {
             code: 'it(() => assert(something, false))',
             parserOptions: { ecmaVersion: 6 },
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
+            output: 'it(function () { assert(something, false); })'
         },
         {
             code: 'it("should be false", () => { assert(something, false); })',
             parserOptions: { ecmaVersion: 6 },
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
+            output: 'it("should be false", function () { assert(something, false); })'
         },
         {
             code: 'it.only(() => { assert(something, false); })',
             parserOptions: { ecmaVersion: 6 },
-            errors: [ { message: 'Do not pass arrow functions to it.only()', column: 1, line: 1 } ]
+            errors: [ { message: 'Do not pass arrow functions to it.only()', column: 1, line: 1 } ],
+            output: 'it.only(function () { assert(something, false); })'
+        },
+        {
+            code: 'it("should be false", () => {\n  assert(something, false);\n})',
+            parserOptions: { ecmaVersion: 6 },
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
+            output: 'it("should be false", function () {\n  assert(something, false);\n})'
         }
     ]
 
