@@ -77,6 +77,12 @@ ruleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
             parserOptions: { ecmaVersion: 2017 },
             errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
             output: 'it(async function () { assert(something, false) })'
+        },
+        {
+            code: 'it(async () => assert(something, false))',
+            parserOptions: { ecmaVersion: 2017 },
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
+            output: 'it(async function () { return assert(something, false); })'
         }
     ]
 
