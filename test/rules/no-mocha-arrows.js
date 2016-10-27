@@ -37,7 +37,7 @@ ruleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
             code: 'it(() => assert(something, false))',
             parserOptions: { ecmaVersion: 6 },
             errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
-            output: 'it(function () { assert(something, false); })'
+            output: 'it(function () { return assert(something, false); })'
         },
         {
             code: 'it("should be false", () => { assert(something, false); })',
@@ -52,10 +52,10 @@ ruleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
             output: 'it.only(function () { assert(something, false); })'
         },
         {
-            code: 'it("should be false", () => {\n  assert(something, false);\n})',
+            code: 'it("should be false", () => {\n assert(something, false);\n})',
             parserOptions: { ecmaVersion: 6 },
             errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
-            output: 'it("should be false", function () {\n  assert(something, false);\n})'
+            output: 'it("should be false", function () {\n assert(something, false);\n})'
         }
     ]
 
