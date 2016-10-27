@@ -16,7 +16,16 @@ ruleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
             code: 'function it () {}; it(() => { console.log("okay") })',
             parserOptions: { ecmaVersion: 6 }
         },
-        'it.only()'
+        'it.only()',
+        'it(function(done) { assert(something, false); done(); })',
+        {
+            code: 'it(function*() { assert(something, false) })',
+            parserOptions: { ecmaVersion: 6 }
+        },
+        {
+            code: 'it(async function () { assert(something, false) })',
+            parserOptions: { ecmaVersion: 2017 }
+        }
     ],
 
     invalid: [
@@ -52,10 +61,22 @@ ruleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
             output: 'it.only(function () { assert(something, false); })'
         },
         {
+            code: 'it((done) => { assert(something, false); })',
+            parserOptions: { ecmaVersion: 6 },
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
+            output: 'it(function (done) { assert(something, false); })'
+        },
+        {
             code: 'it("should be false", () => {\n assert(something, false);\n})',
             parserOptions: { ecmaVersion: 6 },
             errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
             output: 'it("should be false", function () {\n assert(something, false);\n})'
+        },
+        {
+            code: 'it(async () => { assert(something, false) })',
+            parserOptions: { ecmaVersion: 2017 },
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
+            output: 'it(async function () { assert(something, false) })'
         }
     ]
 
