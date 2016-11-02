@@ -2,16 +2,13 @@
 
 var RuleTester = require('eslint').RuleTester,
     rules = require('../../').rules,
-    es6RuleTester = new RuleTester({
-        parserOptions: { ecmaVersion: 6 }
-    }),
-    expectedErrorMessage = 'Do not pass arrow functions to it()',
-    es2017RuleTester = new RuleTester({
+    ruleTester = new RuleTester({
         parserOptions: { ecmaVersion: 2017 }
     }),
+    expectedErrorMessage = 'Do not pass arrow functions to it()',
     errors = [ { message: expectedErrorMessage, column: 1, line: 1 } ];
 
-es6RuleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
+ruleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
 
     valid: [
         'it()',
@@ -21,7 +18,8 @@ es6RuleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
         'function it () {}; it(() => { console.log("okay") })',
         'it.only()',
         'it(function(done) { assert(something, false); done(); })',
-        'it(function*() { assert(something, false) })'
+        'it(function*() { assert(something, false) })',
+        'it(async function () { assert(something, false) })'
     ],
 
     invalid: [
@@ -60,18 +58,7 @@ es6RuleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
             code: 'it("should be false", () => {\n assert(something, false);\n})',
             errors: errors,
             output: 'it("should be false", function () {\n assert(something, false);\n})'
-        }
-    ]
-
-});
-
-es2017RuleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
-
-    valid: [
-        'it(async function () { assert(something, false) })'
-    ],
-
-    invalid: [
+        },
         {
             code: 'it(async () => { assert(something, false) })',
             errors: errors,
