@@ -22,7 +22,23 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
         'var calledOnly = it.only; calledOnly.call(it)',
         'var dynamicOnly = "only"; suite[dynamicOnly]()',
         'specify()',
-        'specify.skip()'
+        'specify.skip()',
+        {
+            code: 'a.b.c.skip()',
+            settings: {
+                mocha: {
+                    additionalTestFunctions: [ 'a.b.c' ]
+                }
+            }
+        },
+        {
+            code: 'a[b].c.skip()',
+            settings: {
+                mocha: {
+                    additionalTestFunctions: [ 'a.b.c' ]
+                }
+            }
+        }
     ],
 
     invalid: [
@@ -105,7 +121,51 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
+        },
+        {
+            code: 'foo.bar.only()',
+            settings: {
+                mocha: {
+                    additionalTestFunctions: [ 'foo.bar' ]
+                }
+            },
+            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
+        },
+        {
+            code: 'foo.bar["only"]()',
+            settings: {
+                mocha: {
+                    additionalTestFunctions: [ 'foo.bar' ]
+                }
+            },
+            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
+        },
+        {
+            code: 'foo["bar"].only()',
+            settings: {
+                mocha: {
+                    additionalTestFunctions: [ 'foo.bar' ]
+                }
+            },
+            errors: [ { message: expectedErrorMessage, column: 12, line: 1 } ]
+        },
+        {
+            code: 'foo["bar"]["only"]()',
+            settings: {
+                mocha: {
+                    additionalTestFunctions: [ 'foo.bar' ]
+                }
+            },
+            errors: [ { message: expectedErrorMessage, column: 12, line: 1 } ]
+        },
+        {
+            code: 'a.b.c.only()',
+            settings: {
+                mocha: {
+                    additionalTestFunctions: [ 'a.b.c' ]
+                }
+            },
+            errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ]
         }
     ]
-
 });
