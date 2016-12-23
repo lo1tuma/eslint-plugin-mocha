@@ -1,3 +1,22 @@
+## 4.8.0 (December 23, 2016)
+
+### Enhancements
+
+* Support MemberExpression for additionalTestFunctions (#114)
+* Make no-mocha-arrows rule fixable (#112)
+
+### Bug Fixes
+
+* Fix no-mocha-arrow fixer (#118)
+
+### Build-Related
+
+* Add node 7 as travis build environment (#115)
+
+### Documentation
+
+* Fix rule name in CHANGELOG to match actual rule (#111)
+
 ## 4.7.0 (October 12, 2016)
 
 ### Features
