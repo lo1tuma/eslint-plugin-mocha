@@ -71,7 +71,34 @@ ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
           '    });',
           '    before(function() {});',
           '});'
-        ].join('\n')
+        ].join('\n'),
+        {
+            code: [
+                'foo(function() {',
+                '    foo(function() {',
+                '        before(function() {});',
+                '    });',
+                '    before(function() {});',
+                '});'
+                ].join('\n'),
+            settings: {
+                'mocha/additionalSuiteNames': [ 'foo' ]
+            }
+        }, {
+            code: [
+                'foo(function() {',
+                '    foo(function() {',
+                '        before(function() {});',
+                '    });',
+                '    before(function() {});',
+                '});'
+                ].join('\n'),
+            settings: {
+                mocha: {
+                   additionalSuiteNames: [ 'foo' ]
+               }
+           }
+         }
     ],
 
     invalid: [
@@ -114,7 +141,38 @@ ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
               '});'
             ].join('\n'),
             errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 6 } ]
-        }
+        },
+        {
+            code: [
+              'foo(function() {',
+              '    before(function() {});',
+              '    foo(function() {',
+              '        before(function() {});',
+              '    });',
+              '    before(function() {});',
+              '});'
+            ].join('\n'),
+            settings: {
+                'mocha/additionalSuiteNames': [ 'foo' ]
+            },
+            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 6 } ]
+        }, {
+            code: [
+              'foo(function() {',
+              '    before(function() {});',
+              '    foo(function() {',
+              '        before(function() {});',
+              '    });',
+              '    before(function() {});',
+              '});'
+            ].join('\n'),
+            settings: {
+                mocha: {
+                   additionalSuiteNames: [ 'foo' ]
+               }
+           },
+           errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 6 } ]
+         }
     ]
 
 });

@@ -128,6 +128,32 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '});'
             ].join('\n'),
             options: [ { allow: [ 'after', 'afterEach' ] } ]
+        },
+        {
+            code: [
+                'foo(function() {',
+                '    before(function() {});',
+                '    it(function() {});',
+                '    it(function() {});',
+                '});'
+            ].join('\n'),
+            settings: {
+                mocha: {
+                   additionalSuiteNames: [ 'foo' ]
+               }
+            }
+        },
+        {
+            code: [
+                'foo(function() {',
+                '    before(function() {});',
+                '    it(function() {});',
+                '    it(function() {});',
+                '});'
+            ].join('\n'),
+            settings: {
+                'mocha/additionalSuiteNames': [ 'foo' ]
+            }
         }
     ],
 
@@ -258,6 +284,30 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
             ].join('\n'),
             options: [ { allow: [ 'before' ] } ],
             errors: [ { message: 'Unexpected use of Mocha `after` hook for a single test case', column: 5, line: 2 } ]
+        },
+        {
+            code: [
+                'foo(function() {',
+                '    before(function() {});',
+                '});'
+            ].join('\n'),
+            settings: {
+                mocha: {
+                   additionalSuiteNames: [ 'foo' ]
+               }
+            },
+            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 } ]
+        },
+        {
+            code: [
+                'foo(function() {',
+                '    before(function() {});',
+                '});'
+            ].join('\n'),
+            settings: {
+                'mocha/additionalSuiteNames': [ 'foo' ]
+            },
+            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 } ]
         }
     ]
 

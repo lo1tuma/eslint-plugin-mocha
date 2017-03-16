@@ -9,7 +9,20 @@ ruleTester.run('no-nested-tests', rule, {
         'it()',
         'it(); it(); it()',
         'describe("", function () { it(); })',
-        'describe("", function () { describe("", function () { it(); }); it(); })'
+        'describe("", function () { describe("", function () { it(); }); it(); })',
+        {
+            code: 'foo("", function () { it(); })',
+            settings: {
+                'mocha/additionalSuiteNames': [ 'foo' ]
+            }
+        }, {
+            code: 'foo("", function () { it(); })',
+            settings: {
+                mocha: {
+                   additionalSuiteNames: [ 'foo' ]
+               }
+           }
+        }
     ],
 
     invalid: [
@@ -104,6 +117,30 @@ ruleTester.run('no-nested-tests', rule, {
                     column: 55
                 }
             ]
+        },
+        {
+            code: 'it("", function () { foo() });',
+            settings: {
+                'mocha/additionalSuiteNames': [ 'foo' ]
+            },
+            errors: [ {
+                message: 'Unexpected suite nested within a test.',
+                line: 1,
+                column: 22
+            } ]
+        },
+        {
+            code: 'it("", function () { foo() });',
+            settings: {
+                mocha: {
+                   additionalSuiteNames: [ 'foo' ]
+               }
+            },
+            errors: [ {
+                message: 'Unexpected suite nested within a test.',
+                line: 1,
+                column: 22
+            } ]
         }
     ]
 });

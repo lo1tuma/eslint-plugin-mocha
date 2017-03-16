@@ -21,9 +21,21 @@ ruleTester.run('no-top-level-hooks', rules['no-top-level-hooks'], {
         'after.foo()',
         'beforeEach.foo()',
         'afterEach.foo()',
-        'var before = 2; before + 3;'
+        'var before = 2; before + 3;',
+        {
+            code: 'foo(function() { before(function() {}); });',
+            settings: {
+                'mocha/additionalSuiteNames': [ 'foo' ]
+            }
+        }, {
+            code: 'foo(function() { before(function() {}); });',
+            settings: {
+                mocha: {
+                   additionalSuiteNames: [ 'foo' ]
+               }
+           }
+         }
     ],
-
     invalid: [
         {
             code: 'before(function() {});',
@@ -70,6 +82,14 @@ ruleTester.run('no-top-level-hooks', rules['no-top-level-hooks'], {
             errors: [ {
                 message: 'Unexpected use of Mocha `before` hook outside of a test suite',
                 column: 1,
+                line: 1
+            } ]
+        },
+        {
+            code: 'foo(function() {}); before(function() {});',
+            errors: [ {
+                message: 'Unexpected use of Mocha `before` hook outside of a test suite',
+                column: 21,
                 line: 1
             } ]
         }
