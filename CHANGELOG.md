@@ -1,3 +1,17 @@
+## 4.9.0 (March 17, 2017)
+
+### Dependency Upgrades
+
+* Update ramda to version 0.23.0 🚀 (#121)
+
+### Enhancements
+
+* Add settings to support additional suite function names (#126)
+
+### Documentation
+
+* Organize alphabetically (#123)
+
 ## 4.8.0 (December 23, 2016)
 
 ### Enhancements
