@@ -6,6 +6,8 @@
 
 # eslint-plugin-mocha
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/lo1tuma/eslint-plugin-mocha.svg)](https://greenkeeper.io/)
+
 ESLint rules for [mocha](http://mochajs.org/).
 
 ## Install and configure
