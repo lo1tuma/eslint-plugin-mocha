@@ -1,3 +1,18 @@
+## 4.10.0 (June 12, 2017)
+
+### Build-Related
+
+* Add node 8 to build environments (#135)
+
+### Enhancements
+
+* Support ESLint 4.x (#134)
+
+### Dependency Upgrades
+
+* Update ramda to the latest version 🚀 (#130)
+* Update pr-log to version 2.0.0 🚀 (#127)
+
 ## 4.9.0 (March 17, 2017)
 
 ### Dependency Upgrades
