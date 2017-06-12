@@ -1,3 +1,9 @@
+## 4.10.1 (June 12, 2017)
+
+### Bug Fixes
+
+* don't drop support for eslint 3.x (#137)
+
 ## 4.10.0 (June 12, 2017)
 
 ### Build-Related
