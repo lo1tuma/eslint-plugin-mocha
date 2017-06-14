@@ -1,10 +1,53 @@
 # Disallow Synchronous Tests (no-synchronous-tests)
 
-Mocha automatically determines whether a test is synchronous or asynchronous based on the arity of the function passed into it. When writing tests for a asynchronous function, omitting the `done` callback or forgetting to return a promise can often lead to false-positive test cases. This rule warns against the implicit synchronous feature, and should be combined with `handle-done-callback` for best results.
+Mocha automatically determines whether a test is synchronous or asynchronous based on the arity of the function passed into it. When writing tests for an asynchronous function, omitting the `done` callback or forgetting to return a promise can often lead to false-positive test cases. This rule warns against the implicit synchronous feature, and should be combined with `handle-done-callback` for best results.
 
 ## Rule Details
 
-This rule looks for either an asynchronous callback or a return statement within the function body of any mocha test statement. If the mocha callback is not used and a promise is not returned, this rule will raise a warning.
+By default, this rule looks for the presence of one of:
+
+- An asynchronous callback.
+- An async function provided to a mocha test statement.
+- A return statement within the function body of any mocha test statement.
+
+If none of these three options is used in a test method, the rule will raise a warning.
+
+The following patterns are considered warnings:
+
+```js
+it('should do foo', function () {
+    return;
+});
+
+it('should do foo', function () {
+    callback();
+});
+```
+
+These patterns would not be considered warnings:
+
+```js
+it('should do foo', function (done) {
+    done();
+});
+
+it('should do foo', async function () {
+    await something();
+});
+
+it('should do foo', function () {
+    return promise;
+}
+```
+
+You can change the acceptable asynchronous test methods to only allow a combination of async functions/callbacks/promises:
+
+```js
+rules: {
+   "mocha/no-synchronous-tests": ["warning", {allowed: ['async', 'callback', 'promise']}]
+},
+```
+
 
 ### Caveats:
 
@@ -21,7 +64,7 @@ it('test name', myTestFn);
 
 ## When Not To Use It
 
-* If you are primarily writing synchronous tests, and rarely need the `done` callback or promise functionality.
+* If you are primarily writing synchronous tests, and rarely need the `done` callback, promise functionality or async functions.
 
 ## Further Reading
 
