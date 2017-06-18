@@ -114,6 +114,10 @@ ruleTester.run('no-synchronous-tests', rules['no-synchronous-tests'], {
             errors: [ { message: 'Unexpected synchronous test.', column: 18, line: 1 } ]
         },
         {
+            code: 'before("", function () {});',
+            errors: [ { message: 'Unexpected synchronous test.', column: 12, line: 1 } ]
+        },
+        {
             options: [ { allowed: [ 'callback', 'async' ] } ],
             code: 'it("", function () { return promise(); });',
             errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1 } ]
