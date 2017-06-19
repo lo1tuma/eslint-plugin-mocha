@@ -44,6 +44,42 @@ ruleTester.run('no-synchronous-tests', rules['no-synchronous-tests'], {
         {
             code: 'it("", () => promise.then() );',
             parserOptions: { ecmaVersion: 6 }
+        },
+        {
+            code: 'it("", async function () { });',
+            parserOptions: { ecmaVersion: 8 }
+        },
+        {
+            code: 'it("", async function () { return true; });',
+            parserOptions: { ecmaVersion: 8 }
+        },
+        {
+            code: 'it("", async function (val) { return await new Promise((resolve) => { resolve(val); }); });',
+            parserOptions: { ecmaVersion: 8 }
+        },
+        {
+            code: 'before("", async function () { });',
+            parserOptions: { ecmaVersion: 8 }
+        },
+        {
+            code: 'beforeEach("", async function () { });',
+            parserOptions: { ecmaVersion: 8 }
+        },
+        {
+            code: 'after("", async function () { });',
+            parserOptions: { ecmaVersion: 8 }
+        },
+        {
+            code: 'afterEach("", async function () { });',
+            parserOptions: { ecmaVersion: 8 }
+        },
+        {
+            code: 'it("", function (done) { done(); });',
+            options: []
+        },
+        {
+            code: 'it("", function (done) { done(); });',
+            options: [ { } ]
         }
     ],
 
@@ -76,7 +112,15 @@ ruleTester.run('no-synchronous-tests', rules['no-synchronous-tests'], {
         {
             code: 'specify.only("", function () {});',
             errors: [ { message: 'Unexpected synchronous test.', column: 18, line: 1 } ]
+        },
+        {
+            code: 'before("", function () {});',
+            errors: [ { message: 'Unexpected synchronous test.', column: 12, line: 1 } ]
+        },
+        {
+            options: [ { allowed: [ 'callback', 'async' ] } ],
+            code: 'it("", function () { return promise(); });',
+            errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1 } ]
         }
-
     ]
 });
