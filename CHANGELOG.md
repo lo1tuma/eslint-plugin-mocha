@@ -1,3 +1,9 @@
+## 4.11.0 (June 19, 2017)
+
+### Enhancements
+
+* Added support for async functions in no-synchronous-tests (#138)
+
 ## 4.10.1 (June 12, 2017)
 
 ### Bug Fixes
