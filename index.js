@@ -18,7 +18,8 @@ module.exports = {
         'no-top-level-hooks': require('./lib/rules/no-top-level-hooks'),
         'no-identical-title': require('./lib/rules/no-identical-title'),
         'max-top-level-suites': require('./lib/rules/max-top-level-suites'),
-        'no-nested-tests': require('./lib/rules/no-nested-tests')
+        'no-nested-tests': require('./lib/rules/no-nested-tests'),
+        'padding-between-test-functions': require('./lib/rules/padding-between-test-functions')
     },
     configs: {
         recommended: {
