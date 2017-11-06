@@ -1,12 +1,12 @@
 # Padding Between Test Functions (padding-between-test-functions)
 
-This is a stylistic rule that enforces or disallows spaces between test functions.
+This is a stylistic rule that enforces consistent empty line padding before and after mocha functions.
 
 **Fixable:** Problems detected by this rule are automatically fixable using the `--fix` flag on the command line.
 
 ## Rule Details
 
-This rule looks for every call to  `describe`, `context`, `it`, `specify`, `before`,  `after`, `beforeEach`, `afterEach`, `suite`, `test`, `suiteSetup`, `suiteTeardown`, `setup`, `teardown` and will ensure consistent spacing between the nearest token.
+This rule looks for every call to  `describe`, `context`, `it`, `specify`, `before`,  `after`, `beforeEach`, `afterEach`, `suite`, `test`, `suiteSetup`, `suiteTeardown`, `setup`, `teardown` and will ensure consistent spacing between it and the nearest token.
 
 ## Options
 
