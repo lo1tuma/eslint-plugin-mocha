@@ -14,6 +14,17 @@ ruleTester.run('padding-between-tests', rules['padding-between-test-functions'],
             code: [
                 'describe(function(){',
                 '',
+                '',
+                'it("", function () {})',
+                '',
+                '',
+                '})'
+            ].join('\n')
+        },
+        {
+            code: [
+                'describe(function(){',
+                '',
                 'it("", function () {})',
                 '',
                 '})'
@@ -100,7 +111,19 @@ ruleTester.run('padding-between-tests', rules['padding-between-test-functions'],
                 '})'
             ].join('\n'),
             options: [ 'never' ],
-            errors: [ { message: NEVER_MESSAGE }, { message: NEVER_MESSAGE } ],
+            errors: [ {
+                message: NEVER_MESSAGE,
+                line: 1,
+                column: 21,
+                endLine: 3,
+                endColumn: 1
+            }, {
+                message: NEVER_MESSAGE,
+                line: 3,
+                column: 23,
+                endLine: 5,
+                endColumn: 1
+            } ],
             output: [
                 'describe(function(){',
                 'it("", function () {})',
@@ -114,7 +137,19 @@ ruleTester.run('padding-between-tests', rules['padding-between-test-functions'],
                 '})'
             ].join('\n'),
             options: [ 'always' ],
-            errors: [ { message: ALWAYS_MESSAGE }, { message: ALWAYS_MESSAGE } ],
+            errors: [ {
+                message: ALWAYS_MESSAGE,
+                line: 1,
+                column: 21,
+                endLine: 2,
+                endColumn: 1
+            }, {
+                message: ALWAYS_MESSAGE,
+                line: 2,
+                column: 23,
+                endLine: 3,
+                endColumn: 1
+            } ],
             output: [
                 'describe(function(){',
                 '',
@@ -127,30 +162,54 @@ ruleTester.run('padding-between-tests', rules['padding-between-test-functions'],
             code: [
                 '[1,2,3].forEach(function () {',
                 '',
-                'it("foo", function () {});',
+                'it("", function () {})',
                 '',
                 '});'
             ].join('\n'),
             options: [ 'never' ],
-            errors: [ { message: NEVER_MESSAGE }, { message: NEVER_MESSAGE } ],
+            errors: [ {
+                message: NEVER_MESSAGE,
+                line: 1,
+                column: 30,
+                endLine: 3,
+                endColumn: 1
+            }, {
+                message: NEVER_MESSAGE,
+                line: 3,
+                column: 23,
+                endLine: 5,
+                endColumn: 1
+            } ],
             output: [
                 '[1,2,3].forEach(function () {',
-                'it("foo", function () {});',
+                'it("", function () {})',
                 '});'
             ].join('\n')
         },
         {
             code: [
                 '[1,2,3].forEach(function () {',
-                'it("foo", function () {});',
+                'it("", function () {})',
                 '});'
             ].join('\n'),
             options: [ 'always' ],
-            errors: [ { message: ALWAYS_MESSAGE }, { message: ALWAYS_MESSAGE } ],
+            errors: [ {
+                message: ALWAYS_MESSAGE,
+                line: 1,
+                column: 30,
+                endLine: 2,
+                endColumn: 1
+            }, {
+                message: ALWAYS_MESSAGE,
+                line: 2,
+                column: 23,
+                endLine: 3,
+                endColumn: 1
+            } ],
             output: [
                 '[1,2,3].forEach(function () {',
                 '',
-                'it("foo", function () {});',
+                'it("", function () {})',
                 '',
                 '});'
             ].join('\n')
@@ -164,11 +223,25 @@ ruleTester.run('padding-between-tests', rules['padding-between-test-functions'],
                 '})'
             ].join('\n'),
             options: [ 'always' ],
-            errors: [
-                { message: ALWAYS_MESSAGE },
-                { message: ALWAYS_MESSAGE },
-                { message: ALWAYS_MESSAGE }
-            ],
+            errors: [ {
+                message: ALWAYS_MESSAGE,
+                line: 2,
+                column: 18,
+                endLine: 3,
+                endColumn: 1
+            }, {
+                message: ALWAYS_MESSAGE,
+                line: 3,
+                column: 42,
+                endLine: 4,
+                endColumn: 1
+            }, {
+                message: ALWAYS_MESSAGE,
+                line: 4,
+                column: 40,
+                endLine: 5,
+                endColumn: 1
+            } ],
             output: [
                 'describe(function(){',
                 'var someVar=null;',
