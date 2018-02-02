@@ -11,10 +11,10 @@
 * [no-nested-tests](no-nested-tests.md) - disallow tests to be nested within other tests
 * [no-pending-tests](no-pending-tests.md) - disallow pending/unimplemented mocha tests
 * [no-return-and-callback](no-return-and-callback.md) - disallow returning in a test or hook function that uses a callback
+* [no-setup-in-describe](no-setup-in-describe.md) - disallow calling functions and dot operaters directly in describe blocks
 * [no-sibling-hooks](no-sibling-hooks.md) - disallow duplicate uses of a hook at the same level inside a describe
 * [no-skipped-tests](no-skipped-tests.md) - disallow skipped mocha tests (fixable)
 * [no-synchronous-tests](no-synchronous-tests.md) - disallow synchronous tests
 * [no-top-level-hooks](no-top-level-hooks.md) - disallow top-level hooks
-* [pure-describe](pure-describe.md) - only allow hooks or test cases to execute in describe blocks
 * [valid-suite-description](valid-suite-description.md) - match suite descriptions against a pre-configured regular expression
 * [valid-test-description](valid-test-description.md) - match test descriptions against a pre-configured regular expression
