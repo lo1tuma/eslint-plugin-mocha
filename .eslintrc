@@ -103,6 +103,7 @@
         "comma-dangle": [ 2, "never" ],
         "comma-spacing": [ 2, { "before": false, "after": true } ],
         "comma-style": [ 2, "last" ],
+        "complexity": [ 2, 8 ],
         "consistent-return": 2,
         "consistent-this": [ 2, "self" ],
         "curly": [ 2, "all" ],
