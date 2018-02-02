@@ -19,7 +19,7 @@ module.exports = {
         'no-identical-title': require('./lib/rules/no-identical-title'),
         'max-top-level-suites': require('./lib/rules/max-top-level-suites'),
         'no-nested-tests': require('./lib/rules/no-nested-tests'),
-        'pure-describe': require('./lib/rules/pure-describe')
+        'no-setup-in-describe': require('./lib/rules/no-setup-in-describe')
     },
     configs: {
         recommended: {

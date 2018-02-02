@@ -1,10 +1,10 @@
 'use strict';
 
 var RuleTester = require('eslint').RuleTester,
-    rule = require('../../lib/rules/pure-describe'),
+    rule = require('../../lib/rules/no-setup-in-describe'),
     ruleTester = new RuleTester();
 
-ruleTester.run('pure-describe', rule, {
+ruleTester.run('no-setup-in-describe', rule, {
     valid: [
         'it()',
         'it(); it(); it()',
