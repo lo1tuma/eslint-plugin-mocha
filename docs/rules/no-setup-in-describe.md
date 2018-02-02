@@ -1,7 +1,7 @@
 
-# Disallow setup in describe blocs (no-setup-in-describe)
+# Disallow setup in describe blocks (no-setup-in-describe)
 
-Setup for test cases in mocha should be done in `before` and `beforeEach` blocks. Unfortunately there is nothing stopping you from doing setup inside a `describe` block.
+Setup for test cases in mocha should be done in `before`, `beforeEach`, or `it` blocks. Unfortunately there is nothing stopping you from doing setup directly inside a `describe` block.
 
 ```js
 describe('something', function () {
@@ -13,9 +13,9 @@ describe('something', function () {
 });
 ```
 
-Any setup directly in a describe is run before all tests execute. This is undesirable primarily for two reasons:
+Any setup directly in a `describe` is run before all tests execute. This is undesirable primarily for two reasons:
 
-1. When doing TDD in a large codebase, all setup is run for tests that don't have `only` set.
+1. When doing TDD in a large codebase, all setup is run for tests that don't have `only` set. This can add a substantial amount of time per iteration.
 2. If global state is altered by the setup of another describe block, your test may be affected.
 
 This rule reports all function calls and use of the dot operator (due to getters and setters) directly in describe blocks.
