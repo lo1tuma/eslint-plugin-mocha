@@ -14,9 +14,13 @@ ruleTester.run('no-setup-in-describe', rule, {
         { code: '() => { a.b }', parserOptions: { ecmaVersion: 6 } },
         'it("", function () { b(); })',
         'it("", function () { a.b; })',
+        'it("", function () { a[b]; })',
+        'it("", function () { a["b"]; })',
         'describe("", function () { it(); })',
         'describe("", function () { it("", function () { b(); }); })',
         'describe("", function () { it("", function () { a.b; }); })',
+        'describe("", function () { it("", function () { a[b]; }); })',
+        'describe("", function () { it("", function () { a["b"]; }); })',
         'describe("", function () { function a() { b(); }; it(); })',
         'describe("", function () { function a() { b.c; }; it(); })',
         { code: 'describe("", function () { var a = () => b(); it(); })', parserOptions: { ecmaVersion: 6 } },
@@ -64,11 +68,35 @@ ruleTester.run('no-setup-in-describe', rule, {
                 line: 1,
                 column: 23
             } ]
+        }, {
+            code: 'foo("", function () { a[b]; });',
+            settings: {
+                mocha: {
+                   additionalSuiteNames: [ 'foo' ]
+               }
+            },
+            errors: [ {
+                message: 'Unexpected member expression in describe block. Member expressions may call functions via getters.',
+                line: 1,
+                column: 23
+            } ]
+        }, {
+            code: 'foo("", function () { a["b"]; });',
+            settings: {
+                mocha: {
+                   additionalSuiteNames: [ 'foo' ]
+               }
+            },
+            errors: [ {
+                message: 'Unexpected member expression in describe block. Member expressions may call functions via getters.',
+                line: 1,
+                column: 23
+            } ]
         },
         {
             code: 'describe("", function () { a.b; });',
             errors: [ {
-                message: 'Unexpected dot operator in describe block.',
+                message: 'Unexpected member expression in describe block. Member expressions may call functions via getters.',
                 line: 1,
                 column: 28
             } ]
@@ -80,7 +108,7 @@ ruleTester.run('no-setup-in-describe', rule, {
                }
             },
             errors: [ {
-                message: 'Unexpected dot operator in describe block.',
+                message: 'Unexpected member expression in describe block. Member expressions may call functions via getters.',
                 line: 1,
                 column: 23
             } ]
