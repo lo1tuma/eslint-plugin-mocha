@@ -4,6 +4,9 @@ var RuleTester = require('eslint').RuleTester,
     rule = require('../../lib/rules/no-setup-in-describe'),
     ruleTester = new RuleTester();
 
+var memberExpressionError = 'Unexpected member expression in describe block. ' +
+    'Member expressions may call functions via getters.';
+
 ruleTester.run('no-setup-in-describe', rule, {
     valid: [
         'it()',
@@ -76,7 +79,7 @@ ruleTester.run('no-setup-in-describe', rule, {
                }
             },
             errors: [ {
-                message: 'Unexpected member expression in describe block. Member expressions may call functions via getters.',
+                message: memberExpressionError,
                 line: 1,
                 column: 23
             } ]
@@ -88,7 +91,7 @@ ruleTester.run('no-setup-in-describe', rule, {
                }
             },
             errors: [ {
-                message: 'Unexpected member expression in describe block. Member expressions may call functions via getters.',
+                message: memberExpressionError,
                 line: 1,
                 column: 23
             } ]
@@ -96,7 +99,7 @@ ruleTester.run('no-setup-in-describe', rule, {
         {
             code: 'describe("", function () { a.b; });',
             errors: [ {
-                message: 'Unexpected member expression in describe block. Member expressions may call functions via getters.',
+                message: memberExpressionError,
                 line: 1,
                 column: 28
             } ]
@@ -108,7 +111,7 @@ ruleTester.run('no-setup-in-describe', rule, {
                }
             },
             errors: [ {
-                message: 'Unexpected member expression in describe block. Member expressions may call functions via getters.',
+                message: memberExpressionError,
                 line: 1,
                 column: 23
             } ]
