@@ -1,3 +1,19 @@
+## 4.12.0 (March 2, 2018)
+
+### Features
+
+* Adds rule "no setup in describe" (#147)
+
+### Dependency Upgrades
+
+* Update coveralls to the latest version 🚀 (#142)
+* chore(package): update mocha to version 5.0.1 (#150)
+* Update ramda to the latest version 🚀 (#144)
+
+### Bug Fixes
+
+* Fix complexity problems (#149)
+
 ## 4.11.0 (June 19, 2017)
 
 ### Enhancements
