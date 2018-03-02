@@ -1,3 +1,9 @@
+## 4.12.1 (March 3, 2018)
+
+### Bug Fixes
+
+* Fix: skip template strings in valid-test-description and valid-suite-description
+
 ## 4.12.0 (March 2, 2018)
 
 ### Features
