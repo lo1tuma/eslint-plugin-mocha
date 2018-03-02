@@ -1,9 +1,9 @@
 'use strict';
 
-var RuleTester = require('eslint').RuleTester,
-    rule = require('../../lib/rules/no-global-tests'),
-    ruleTester = new RuleTester(),
-    expectedErrorMessage = 'Unexpected global mocha test.';
+const RuleTester = require('eslint').RuleTester;
+const rule = require('../../lib/rules/no-global-tests');
+const ruleTester = new RuleTester();
+const expectedErrorMessage = 'Unexpected global mocha test.';
 
 ruleTester.run('no-global-tests', rule, {
 

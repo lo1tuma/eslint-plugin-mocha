@@ -1,8 +1,8 @@
 'use strict';
 
-var RuleTester = require('eslint').RuleTester,
-    rules = require('../../').rules,
-    ruleTester = new RuleTester();
+const RuleTester = require('eslint').RuleTester;
+const rules = require('../../').rules;
+const ruleTester = new RuleTester();
 
 ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
     valid: [
@@ -49,9 +49,9 @@ ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
             code: 'foo("This is a test", function () { });',
             settings: {
                 mocha: {
-                   additionalSuiteNames: [ 'foo' ]
-               }
-           }
+                    additionalSuiteNames: [ 'foo' ]
+                }
+            }
         },
         'someOtherFunction();'
     ],
@@ -179,12 +179,12 @@ ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
                   'foo("this is a different test", function () { });',
             settings: {
                 mocha: {
-                   additionalSuiteNames: [ 'foo' ]
-               }
-           },
-           errors: [
-               { message: 'The number of top-level suites is more than 1.' }
-           ]
+                    additionalSuiteNames: [ 'foo' ]
+                }
+            },
+            errors: [
+                { message: 'The number of top-level suites is more than 1.' }
+            ]
         }
     ]
 });

@@ -1,8 +1,8 @@
 'use strict';
 
-var RuleTester = require('eslint').RuleTester,
-    rules = require('../../').rules,
-    ruleTester = new RuleTester();
+const RuleTester = require('eslint').RuleTester;
+const rules = require('../../').rules;
+const ruleTester = new RuleTester();
 
 ruleTester.run('no-hooks', rules['no-hooks'], {
 

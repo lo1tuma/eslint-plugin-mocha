@@ -1,8 +1,8 @@
 'use strict';
 
-var RuleTester = require('eslint').RuleTester,
-    rules = require('../../').rules,
-    ruleTester = new RuleTester();
+const RuleTester = require('eslint').RuleTester;
+const rules = require('../../').rules;
+const ruleTester = new RuleTester();
 
 ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
 
@@ -139,8 +139,8 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
             ].join('\n'),
             settings: {
                 mocha: {
-                   additionalSuiteNames: [ 'foo' ]
-               }
+                    additionalSuiteNames: [ 'foo' ]
+                }
             }
         },
         {
@@ -293,8 +293,8 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
             ].join('\n'),
             settings: {
                 mocha: {
-                   additionalSuiteNames: [ 'foo' ]
-               }
+                    additionalSuiteNames: [ 'foo' ]
+                }
             },
             errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 } ]
         },

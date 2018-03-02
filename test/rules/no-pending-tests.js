@@ -1,9 +1,9 @@
 'use strict';
 
-var RuleTester = require('eslint').RuleTester,
-    rules = require('../../').rules,
-    ruleTester = new RuleTester(),
-    expectedErrorMessage = 'Unexpected pending mocha test.';
+const RuleTester = require('eslint').RuleTester;
+const rules = require('../../').rules;
+const ruleTester = new RuleTester();
+const expectedErrorMessage = 'Unexpected pending mocha test.';
 
 ruleTester.run('no-pending-tests', rules['no-pending-tests'], {
 

@@ -1,8 +1,8 @@
 'use strict';
 
-var RuleTester = require('eslint').RuleTester,
-    rules = require('../../').rules,
-    ruleTester = new RuleTester();
+const RuleTester = require('eslint').RuleTester;
+const rules = require('../../').rules;
+const ruleTester = new RuleTester();
 
 ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
 
@@ -17,60 +17,60 @@ ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
         'before(function() {}); beforeEach(function() {});',
         'foo.before(function() {}); foo.before(function() {});',
         [
-          'describe(function() {',
-          '    before(function() {});',
-          '    describe(function() {',
-          '        before(function() {});',
-          '    });',
-          '});'
+            'describe(function() {',
+            '    before(function() {});',
+            '    describe(function() {',
+            '        before(function() {});',
+            '    });',
+            '});'
         ].join('\n'),
         [
-          'describe(function() {',
-          '    describe(function() {',
-          '        before(function() {});',
-          '    });',
-          '    before(function() {});',
-          '});'
+            'describe(function() {',
+            '    describe(function() {',
+            '        before(function() {});',
+            '    });',
+            '    before(function() {});',
+            '});'
         ].join('\n'),
         [
-          'describe(function() {',
-          '    describe.only(function() {',
-          '        before(function() {});',
-          '    });',
-          '    before(function() {});',
-          '});'
+            'describe(function() {',
+            '    describe.only(function() {',
+            '        before(function() {});',
+            '    });',
+            '    before(function() {});',
+            '});'
         ].join('\n'),
         [
-          'describe(function() {',
-          '    describe.skip(function() {',
-          '        before(function() {});',
-          '    });',
-          '    before(function() {});',
-          '});'
+            'describe(function() {',
+            '    describe.skip(function() {',
+            '        before(function() {});',
+            '    });',
+            '    before(function() {});',
+            '});'
         ].join('\n'),
         [
-          'describe(function() {',
-          '    xdescribe(function() {',
-          '        before(function() {});',
-          '    });',
-          '    before(function() {});',
-          '});'
+            'describe(function() {',
+            '    xdescribe(function() {',
+            '        before(function() {});',
+            '    });',
+            '    before(function() {});',
+            '});'
         ].join('\n'),
         [
-          'describe(function() {',
-          '    context(function() {',
-          '        before(function() {});',
-          '    });',
-          '    before(function() {});',
-          '});'
+            'describe(function() {',
+            '    context(function() {',
+            '        before(function() {});',
+            '    });',
+            '    before(function() {});',
+            '});'
         ].join('\n'),
         [
-          'describe(function() {',
-          '    xcontext(function() {',
-          '        before(function() {});',
-          '    });',
-          '    before(function() {});',
-          '});'
+            'describe(function() {',
+            '    xcontext(function() {',
+            '        before(function() {});',
+            '    });',
+            '    before(function() {});',
+            '});'
         ].join('\n'),
         {
             code: [
@@ -80,7 +80,7 @@ ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
                 '    });',
                 '    before(function() {});',
                 '});'
-                ].join('\n'),
+            ].join('\n'),
             settings: {
                 'mocha/additionalSuiteNames': [ 'foo' ]
             }
@@ -92,13 +92,13 @@ ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
                 '    });',
                 '    before(function() {});',
                 '});'
-                ].join('\n'),
+            ].join('\n'),
             settings: {
                 mocha: {
-                   additionalSuiteNames: [ 'foo' ]
-               }
-           }
-         }
+                    additionalSuiteNames: [ 'foo' ]
+                }
+            }
+        }
     ],
 
     invalid: [
@@ -120,37 +120,37 @@ ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
         },
         {
             code: [
-              'describe(function() {',
-              '    before(function() {});',
-              '    describe(function() {',
-              '        before(function() {});',
-              '        before(function() {});',
-              '    });',
-              '});'
+                'describe(function() {',
+                '    before(function() {});',
+                '    describe(function() {',
+                '        before(function() {});',
+                '        before(function() {});',
+                '    });',
+                '});'
             ].join('\n'),
             errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 9, line: 5 } ]
         },
         {
             code: [
-              'describe(function() {',
-              '    before(function() {});',
-              '    describe(function() {',
-              '        before(function() {});',
-              '    });',
-              '    before(function() {});',
-              '});'
+                'describe(function() {',
+                '    before(function() {});',
+                '    describe(function() {',
+                '        before(function() {});',
+                '    });',
+                '    before(function() {});',
+                '});'
             ].join('\n'),
             errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 6 } ]
         },
         {
             code: [
-              'foo(function() {',
-              '    before(function() {});',
-              '    foo(function() {',
-              '        before(function() {});',
-              '    });',
-              '    before(function() {});',
-              '});'
+                'foo(function() {',
+                '    before(function() {});',
+                '    foo(function() {',
+                '        before(function() {});',
+                '    });',
+                '    before(function() {});',
+                '});'
             ].join('\n'),
             settings: {
                 'mocha/additionalSuiteNames': [ 'foo' ]
@@ -158,21 +158,21 @@ ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
             errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 6 } ]
         }, {
             code: [
-              'foo(function() {',
-              '    before(function() {});',
-              '    foo(function() {',
-              '        before(function() {});',
-              '    });',
-              '    before(function() {});',
-              '});'
+                'foo(function() {',
+                '    before(function() {});',
+                '    foo(function() {',
+                '        before(function() {});',
+                '    });',
+                '    before(function() {});',
+                '});'
             ].join('\n'),
             settings: {
                 mocha: {
-                   additionalSuiteNames: [ 'foo' ]
-               }
-           },
-           errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 6 } ]
-         }
+                    additionalSuiteNames: [ 'foo' ]
+                }
+            },
+            errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 6 } ]
+        }
     ]
 
 });
