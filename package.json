@@ -3,6 +3,12 @@
     "version": "4.11.0",
     "description": "Eslint rules for mocha.",
     "main": "index.js",
+    "files": [
+        "index.js",
+        "lib/",
+        "LICENSE",
+        "README.md"
+    ],
     "scripts": {
         "pretest": "eslint .",
         "test": "npm run test:unit --coverage && npm run check-coverage",
