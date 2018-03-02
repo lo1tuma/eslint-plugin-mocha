@@ -1,9 +1,9 @@
 'use strict';
 
-var RuleTester = require('eslint').RuleTester,
-    rule = require('../../lib/rules/no-setup-in-describe'),
-    ruleTester = new RuleTester(),
-    memberExpressionError = 'Unexpected member expression in describe block. ' +
+const RuleTester = require('eslint').RuleTester;
+const rule = require('../../lib/rules/no-setup-in-describe');
+const ruleTester = new RuleTester();
+const memberExpressionError = 'Unexpected member expression in describe block. ' +
         'Member expressions may call functions via getters.';
 
 ruleTester.run('no-setup-in-describe', rule, {
@@ -37,16 +37,16 @@ ruleTester.run('no-setup-in-describe', rule, {
             code: 'foo("", function () { it(); })',
             settings: {
                 mocha: {
-                   additionalSuiteNames: [ 'foo' ]
-               }
-           }
+                    additionalSuiteNames: [ 'foo' ]
+                }
+            }
         }, {
             code: 'foo("", function () { it("", function () { b(); }); })',
             settings: {
                 mocha: {
-                   additionalSuiteNames: [ 'foo' ]
-               }
-           }
+                    additionalSuiteNames: [ 'foo' ]
+                }
+            }
         }
     ],
 
@@ -62,8 +62,8 @@ ruleTester.run('no-setup-in-describe', rule, {
             code: 'foo("", function () { a(); });',
             settings: {
                 mocha: {
-                   additionalSuiteNames: [ 'foo' ]
-               }
+                    additionalSuiteNames: [ 'foo' ]
+                }
             },
             errors: [ {
                 message: 'Unexpected function call in describe block.',
@@ -74,8 +74,8 @@ ruleTester.run('no-setup-in-describe', rule, {
             code: 'foo("", function () { a[b]; });',
             settings: {
                 mocha: {
-                   additionalSuiteNames: [ 'foo' ]
-               }
+                    additionalSuiteNames: [ 'foo' ]
+                }
             },
             errors: [ {
                 message: memberExpressionError,
@@ -86,8 +86,8 @@ ruleTester.run('no-setup-in-describe', rule, {
             code: 'foo("", function () { a["b"]; });',
             settings: {
                 mocha: {
-                   additionalSuiteNames: [ 'foo' ]
-               }
+                    additionalSuiteNames: [ 'foo' ]
+                }
             },
             errors: [ {
                 message: memberExpressionError,
@@ -106,8 +106,8 @@ ruleTester.run('no-setup-in-describe', rule, {
             code: 'foo("", function () { a.b; });',
             settings: {
                 mocha: {
-                   additionalSuiteNames: [ 'foo' ]
-               }
+                    additionalSuiteNames: [ 'foo' ]
+                }
             },
             errors: [ {
                 message: memberExpressionError,
