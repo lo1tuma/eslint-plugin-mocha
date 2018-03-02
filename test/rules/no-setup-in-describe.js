@@ -2,10 +2,9 @@
 
 var RuleTester = require('eslint').RuleTester,
     rule = require('../../lib/rules/no-setup-in-describe'),
-    ruleTester = new RuleTester();
-
-var memberExpressionError = 'Unexpected member expression in describe block. ' +
-    'Member expressions may call functions via getters.';
+    ruleTester = new RuleTester(),
+    memberExpressionError = 'Unexpected member expression in describe block. ' +
+        'Member expressions may call functions via getters.';
 
 ruleTester.run('no-setup-in-describe', rule, {
     valid: [
