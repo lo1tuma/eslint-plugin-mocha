@@ -1,5 +1,6 @@
 {
     "extends": "holidaycheck/es2015",
+    "plugins": [ "node" ],
 
     "env": {
         "node": true
@@ -8,6 +9,10 @@
     "parserOptions": {
         "sourceType": "script",
         "ecmaVersion": 2017
+    },
+
+    "rules": {
+        "node/no-unsupported-features": "error"
     },
 
     "overrides": [
