@@ -14,12 +14,15 @@ ruleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
         'it()',
         'it(function() { assert(something, false); })',
         'it("should be false", function() { assert(something, false); })',
-         // In this example, `it` is not a global.
-        'function it () {}; it(() => { console.log("okay") })',
         'it.only()',
         'it(function(done) { assert(something, false); done(); })',
         'it(function*() { assert(something, false) })',
-        'it(async function () { assert(something, false) })'
+        'it(async function () { assert(something, false) })',
+
+         // In those examples, `it` is not a global.
+        'function it () {}; it(() => { console.log("okay") })',
+        'function it () {}; it.only(() => { console.log("okay") })',
+        'function it () {}; it(() => {}); it(() => {});'
     ],
 
     invalid: [
