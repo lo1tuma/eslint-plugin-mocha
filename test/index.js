@@ -21,7 +21,7 @@ describe('eslint-plugin-mocha', function () {
         ruleFiles.forEach(function (file) {
             var ruleName = path.basename(file, '.js');
 
-            expect(plugin).to.have.deep.property('rules.' + ruleName)
+            expect(plugin).to.have.nested.property('rules.' + ruleName)
                 .that.equals(require(rulesDir + ruleName));
         });
     });
