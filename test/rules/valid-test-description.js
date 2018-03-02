@@ -31,7 +31,11 @@ ruleTester.run('valid-test-description', rules['valid-test-description'], {
             options: [ '^should', [ 'someFunction' ] ],
             code: 'someFunction("should do something", function () { });'
         },
-        'someOtherFunction();'
+        'someOtherFunction();',
+        {
+            parserOptions: { ecmaVersion: 2017 },
+            code: 'it(`should work with template strings`, function () {});'
+        }
     ],
 
     invalid: [

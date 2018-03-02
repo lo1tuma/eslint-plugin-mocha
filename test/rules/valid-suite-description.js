@@ -26,7 +26,13 @@ ruleTester.run('valid-suite-description', rules['valid-suite-description'], {
             options: [ '^[A-Z]', [ 'someFunction' ] ],
             code: 'someFunction("Should do something", function () { });'
         },
-        'someOtherFunction();'
+        'someOtherFunction();',
+        {
+            parserOptions: { ecmaVersion: 2017 },
+            options: [ '^Foo' ],
+            code: 'describe(`Foo with template strings`, function () {});'
+        }
+
     ],
 
     invalid: [
