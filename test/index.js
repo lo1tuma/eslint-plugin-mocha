@@ -1,14 +1,14 @@
 'use strict';
 
-var expect = require('chai').expect,
-    fs = require('fs'),
-    path = require('path'),
-    rulesDir = path.join(__dirname, '../lib/rules/'),
-    documentationDir = path.join(__dirname, '../docs/rules/'),
-    plugin = require('..');
+const { expect } = require('chai');
+const fs = require('fs');
+const path = require('path');
+const rulesDir = path.join(__dirname, '../lib/rules/');
+const documentationDir = path.join(__dirname, '../docs/rules/');
+const plugin = require('..');
 
 describe('eslint-plugin-mocha', function () {
-    var ruleFiles;
+    let ruleFiles;
 
     before(function (done) {
         fs.readdir(rulesDir, function (error, files) {
@@ -19,16 +19,16 @@ describe('eslint-plugin-mocha', function () {
 
     it('should expose all rules', function () {
         ruleFiles.forEach(function (file) {
-            var ruleName = path.basename(file, '.js');
+            const ruleName = path.basename(file, '.js');
 
-            expect(plugin).to.have.nested.property('rules.' + ruleName)
+            expect(plugin).to.have.nested.property(`rules.${ruleName}`)
                 .that.equals(require(rulesDir + ruleName));
         });
     });
 
     describe('documentation', function () {
-        var documentationFiles,
-            documentationIndex;
+        let documentationFiles;
+        let documentationIndex;
 
         before(function (done) {
             fs.readdir(documentationDir, function (readDirError, files) {
@@ -41,7 +41,7 @@ describe('eslint-plugin-mocha', function () {
                     return file !== 'README.md';
                 });
 
-                fs.readFile(documentationDir + 'README.md', function (error, data) {
+                fs.readFile(`${documentationDir }README.md`, function (error, data) {
                     documentationIndex = data.toString();
                     done(error);
                 });
@@ -50,8 +50,8 @@ describe('eslint-plugin-mocha', function () {
 
         it('should have each rule documented', function () {
             ruleFiles.forEach(function (file) {
-                var ruleName = path.basename(file, '.js'),
-                    expectedDocumentationFileName = ruleName + '.md';
+                const ruleName = path.basename(file, '.js');
+                const expectedDocumentationFileName = `${ruleName }.md`;
 
                 expect(documentationFiles).to.contain(expectedDocumentationFileName);
             });
@@ -59,8 +59,8 @@ describe('eslint-plugin-mocha', function () {
 
         it('should be linked in the documentation index', function () {
             documentationFiles.forEach(function (file) {
-                var ruleName = path.basename(file, '.md'),
-                    expectedLink = '* [' + ruleName + '](' + file + ')';
+                const ruleName = path.basename(file, '.md');
+                const expectedLink = `* [${ ruleName }](${ file })`;
 
                 expect(documentationIndex).to.contain(expectedLink);
             });

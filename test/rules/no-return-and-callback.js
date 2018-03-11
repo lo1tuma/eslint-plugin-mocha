@@ -1,13 +1,13 @@
 'use strict';
 
-var RuleTester = require('eslint').RuleTester,
-    rules = require('../../').rules,
-    ruleTester = new RuleTester(),
-    message = 'Unexpected use of `return` in a test with callback',
-    es6parserOptions = {
-        sourceType: 'module',
-        ecmaVersion: 6
-    };
+const RuleTester = require('eslint').RuleTester;
+const rules = require('../../').rules;
+const ruleTester = new RuleTester();
+const message = 'Unexpected use of `return` in a test with callback';
+const es6parserOptions = {
+    sourceType: 'module',
+    ecmaVersion: 6
+};
 
 ruleTester.run('no-return-and-callback', rules['no-return-and-callback'], {
 
@@ -59,19 +59,19 @@ ruleTester.run('no-return-and-callback', rules['no-return-and-callback'], {
     invalid: [
         {
             code: 'it("title", function(done) { return foo.then(done); });',
-            errors: [ { message: message, column: 30, line: 1 } ]
+            errors: [ { message, column: 30, line: 1 } ]
         },
         {
             code: 'it("title", function(done) { return foo.then(function() { done(); }).catch(done); });',
-            errors: [ { message: message, column: 30, line: 1 } ]
+            errors: [ { message, column: 30, line: 1 } ]
         },
         {
             code: 'it("title", function(done) { var foo = bar(); return foo.then(function() { done(); }); });',
-            errors: [ { message: message, column: 47, line: 1 } ]
+            errors: [ { message, column: 47, line: 1 } ]
         },
         {
             code: 'it("title", (done) => { return foo.then(function() { done(); }).catch(done); });',
-            errors: [ { message: message, column: 25, line: 1 } ],
+            errors: [ { message, column: 25, line: 1 } ],
             parserOptions: es6parserOptions
         },
         {
@@ -81,43 +81,43 @@ ruleTester.run('no-return-and-callback', rules['no-return-and-callback'], {
         },
         {
             code: 'it.only("title", function(done) { return foo.then(done); });',
-            errors: [ { message: message, column: 35, line: 1 } ]
+            errors: [ { message, column: 35, line: 1 } ]
         },
         {
             code: 'before("title", function(done) { return foo.then(done); });',
-            errors: [ { message: message, column: 34, line: 1 } ]
+            errors: [ { message, column: 34, line: 1 } ]
         },
         {
             code: 'beforeEach("title", function(done) { return foo.then(done); });',
-            errors: [ { message: message, column: 38, line: 1 } ]
+            errors: [ { message, column: 38, line: 1 } ]
         },
         {
             code: 'after("title", function(done) { return foo.then(done); });',
-            errors: [ { message: message, column: 33, line: 1 } ]
+            errors: [ { message, column: 33, line: 1 } ]
         },
         {
             code: 'afterEach("title", function(done) { return foo.then(done); });',
-            errors: [ { message: message, column: 37, line: 1 } ]
+            errors: [ { message, column: 37, line: 1 } ]
         },
         {
             code: 'afterEach("title", function(done) { return foo; });',
-            errors: [ { message: message, column: 37, line: 1 } ]
+            errors: [ { message, column: 37, line: 1 } ]
         },
         {
             code: 'afterEach("title", function(done) { return done; });',
-            errors: [ { message: message, column: 37, line: 1 } ]
+            errors: [ { message, column: 37, line: 1 } ]
         },
         {
             code: 'afterEach("title", function(done) { return done.foo(); });',
-            errors: [ { message: message, column: 37, line: 1 } ]
+            errors: [ { message, column: 37, line: 1 } ]
         },
         {
             code: 'afterEach("title", function(done) { return foo.done(); });',
-            errors: [ { message: message, column: 37, line: 1 } ]
+            errors: [ { message, column: 37, line: 1 } ]
         },
         {
             code: 'afterEach("title", function(end) { return done(); });',
-            errors: [ { message: message, column: 36, line: 1 } ]
+            errors: [ { message, column: 36, line: 1 } ]
         }
     ]
 

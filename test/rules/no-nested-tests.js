@@ -1,8 +1,8 @@
 'use strict';
 
-var RuleTester = require('eslint').RuleTester,
-    rule = require('../../lib/rules/no-nested-tests'),
-    ruleTester = new RuleTester();
+const RuleTester = require('eslint').RuleTester;
+const rule = require('../../lib/rules/no-nested-tests');
+const ruleTester = new RuleTester();
 
 ruleTester.run('no-nested-tests', rule, {
     valid: [
@@ -19,9 +19,9 @@ ruleTester.run('no-nested-tests', rule, {
             code: 'foo("", function () { it(); })',
             settings: {
                 mocha: {
-                   additionalSuiteNames: [ 'foo' ]
-               }
-           }
+                    additionalSuiteNames: [ 'foo' ]
+                }
+            }
         }
     ],
 
@@ -133,8 +133,8 @@ ruleTester.run('no-nested-tests', rule, {
             code: 'it("", function () { foo() });',
             settings: {
                 mocha: {
-                   additionalSuiteNames: [ 'foo' ]
-               }
+                    additionalSuiteNames: [ 'foo' ]
+                }
             },
             errors: [ {
                 message: 'Unexpected suite nested within a test.',

@@ -1,8 +1,8 @@
 'use strict';
 
-var RuleTester = require('eslint').RuleTester,
-    rules = require('../../').rules,
-    ruleTester = new RuleTester();
+const RuleTester = require('eslint').RuleTester;
+const rules = require('../../').rules;
+const ruleTester = new RuleTester();
 
 ruleTester.run('no-identical-title', rules['no-identical-title'], {
 
@@ -94,23 +94,23 @@ ruleTester.run('no-identical-title', rules['no-identical-title'], {
         ].join('\n'),
         {
             code: [
-                    'foo("describe1", function() {});',
-                    'foo("describe2", function() {});'
-                ].join('\n'),
+                'foo("describe1", function() {});',
+                'foo("describe2", function() {});'
+            ].join('\n'),
             settings: {
                 'mocha/additionalSuiteNames': [ 'foo' ]
             }
         }, {
             code: [
-                    'foo("describe1", function() {});',
-                    'foo("describe2", function() {});'
-                ].join('\n'),
+                'foo("describe1", function() {});',
+                'foo("describe2", function() {});'
+            ].join('\n'),
             settings: {
                 mocha: {
-                   additionalSuiteNames: [ 'foo' ]
-               }
-           }
-         }
+                    additionalSuiteNames: [ 'foo' ]
+                }
+            }
+        }
     ],
 
     invalid: [
@@ -176,25 +176,25 @@ ruleTester.run('no-identical-title', rules['no-identical-title'], {
         },
         {
             code: [
-                    'foo("describe1", function() {});',
-                    'foo("describe1", function() {});'
-                ].join('\n'),
+                'foo("describe1", function() {});',
+                'foo("describe1", function() {});'
+            ].join('\n'),
             settings: {
                 'mocha/additionalSuiteNames': [ 'foo' ]
             },
             errors: [ { message: 'Test suite title is used multiple times.', column: 1, line: 2 } ]
         }, {
             code: [
-                    'foo("describe1", function() {});',
-                    'foo("describe1", function() {});'
-                ].join('\n'),
+                'foo("describe1", function() {});',
+                'foo("describe1", function() {});'
+            ].join('\n'),
             settings: {
                 mocha: {
-                   additionalSuiteNames: [ 'foo' ]
-               }
-           },
-           errors: [ { message: 'Test suite title is used multiple times.', column: 1, line: 2 } ]
-         }
+                    additionalSuiteNames: [ 'foo' ]
+                }
+            },
+            errors: [ { message: 'Test suite title is used multiple times.', column: 1, line: 2 } ]
+        }
     ]
 
 });

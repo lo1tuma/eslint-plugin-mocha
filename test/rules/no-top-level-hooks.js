@@ -1,8 +1,8 @@
 'use strict';
 
-var RuleTester = require('eslint').RuleTester,
-    rules = require('../../').rules,
-    ruleTester = new RuleTester();
+const RuleTester = require('eslint').RuleTester;
+const rules = require('../../').rules;
+const ruleTester = new RuleTester();
 
 ruleTester.run('no-top-level-hooks', rules['no-top-level-hooks'], {
 
@@ -31,10 +31,10 @@ ruleTester.run('no-top-level-hooks', rules['no-top-level-hooks'], {
             code: 'foo(function() { before(function() {}); });',
             settings: {
                 mocha: {
-                   additionalSuiteNames: [ 'foo' ]
-               }
-           }
-         }
+                    additionalSuiteNames: [ 'foo' ]
+                }
+            }
+        }
     ],
     invalid: [
         {

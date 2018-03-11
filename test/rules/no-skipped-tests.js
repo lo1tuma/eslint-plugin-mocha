@@ -1,9 +1,9 @@
 'use strict';
 
-var RuleTester = require('eslint').RuleTester,
-    rules = require('../../').rules,
-    ruleTester = new RuleTester(),
-    expectedErrorMessage = 'Unexpected skipped mocha test.';
+const RuleTester = require('eslint').RuleTester;
+const rules = require('../../').rules;
+const ruleTester = new RuleTester();
+const expectedErrorMessage = 'Unexpected skipped mocha test.';
 
 ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
 
