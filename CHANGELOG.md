@@ -1,3 +1,24 @@
+## 5.0.0 (March 24, 2018)
+
+### Breaking Changes
+
+* Remove support for ESLint versions < 4.0.0 ([#155](https://github.com/lo1tuma/eslint-plugin-mocha/pull/155))
+* Remove support for nodejs 4, 5 and 7 ([#154](https://github.com/lo1tuma/eslint-plugin-mocha/pull/154))
+
+### Dependency Upgrades
+
+* Update pr-log to the latest version 🚀 ([#159](https://github.com/lo1tuma/eslint-plugin-mocha/pull/159))
+* Update chai to version 4.1.2 ([#151](https://github.com/lo1tuma/eslint-plugin-mocha/pull/151))
+
+### Code Refactoring
+
+* Use new language features ([#156](https://github.com/lo1tuma/eslint-plugin-mocha/pull/156))
+
+### Build-Related
+
+* Use nyc instead of istanbul ([#153](https://github.com/lo1tuma/eslint-plugin-mocha/pull/153))
+* Whitelist files instead of using .npmignore ([#152](https://github.com/lo1tuma/eslint-plugin-mocha/pull/152))
+
 ## 4.12.1 (March 3, 2018)
 
 ### Bug Fixes
