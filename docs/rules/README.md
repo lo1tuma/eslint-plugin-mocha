@@ -16,5 +16,6 @@
 * [no-skipped-tests](no-skipped-tests.md) - disallow skipped mocha tests (fixable)
 * [no-synchronous-tests](no-synchronous-tests.md) - disallow synchronous tests
 * [no-top-level-hooks](no-top-level-hooks.md) - disallow top-level hooks
+* [prefer-arrow-callback](prefer-arrow-callback.md) - prefer arrow function callbacks (mocha-aware)
 * [valid-suite-description](valid-suite-description.md) - match suite descriptions against a pre-configured regular expression
 * [valid-test-description](valid-test-description.md) - match test descriptions against a pre-configured regular expression
