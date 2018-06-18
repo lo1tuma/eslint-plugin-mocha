@@ -42,8 +42,10 @@ ruleTester.run('prefer-arrow-callback', rules['prefer-arrow-callback'], {
         'foo(function bar() { arguments; }.bind(this));',
         'foo(function bar() { super.a; });',
         'foo(function bar() { super.a; }.bind(this));',
+        '() => super()',
         'foo(function bar() { new.target; });',
         'foo(function bar() { new.target; }.bind(this));',
+        '() => new.target',
         'foo(function bar() { this; }.bind(this, somethingElse));',
         // mocha-specific valid test cases
         'before(function bar() {});',
