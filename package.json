@@ -30,7 +30,7 @@
         "eslint-config-holidaycheck": "^0.12.1",
         "eslint-plugin-node": "^6.0.1",
         "mocha": "^5.0.1",
-        "nyc": "^11.4.1",
+        "nyc": "^12.0.1",
         "pr-log": "^3.0.0"
     },
     "peerDependencies": {
