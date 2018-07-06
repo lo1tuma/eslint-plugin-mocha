@@ -19,7 +19,8 @@ module.exports = {
         'no-identical-title': require('./lib/rules/no-identical-title'),
         'max-top-level-suites': require('./lib/rules/max-top-level-suites'),
         'no-nested-tests': require('./lib/rules/no-nested-tests'),
-        'no-setup-in-describe': require('./lib/rules/no-setup-in-describe')
+        'no-setup-in-describe': require('./lib/rules/no-setup-in-describe'),
+        'prefer-arrow-callback': require('./lib/rules/prefer-arrow-callback')
     },
     configs: {
         recommended: {
