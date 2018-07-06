@@ -1,6 +1,6 @@
 {
     "name": "eslint-plugin-mocha",
-    "version": "5.0.0",
+    "version": "5.1.0",
     "description": "Eslint rules for mocha.",
     "engines": {
         "node": ">=6.0.0"

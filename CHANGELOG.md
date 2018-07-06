@@ -1,3 +1,23 @@
+## 5.1.0 (July 6, 2018)
+
+### Bug Fixes
+
+* Issue #166: No setup in describe hooks ([#167](https://github.com/lo1tuma/eslint-plugin-mocha/pull/167))
+
+### Features
+
+* Adds mocha-aware prefer-arrow-callback rule ([#163](https://github.com/lo1tuma/eslint-plugin-mocha/pull/163))
+
+### Dependency Upgrades
+
+* Update eslint-config-holidaycheck to version 0.13.1 ([#170](https://github.com/lo1tuma/eslint-plugin-mocha/pull/170))
+* Update eslint to version 5.0.1 ([#169](https://github.com/lo1tuma/eslint-plugin-mocha/pull/169))
+* Update nyc to version 12.0.2 ([#168](https://github.com/lo1tuma/eslint-plugin-mocha/pull/168))
+
+### Build-Related
+
+* Add node 10 build environment ([#171](https://github.com/lo1tuma/eslint-plugin-mocha/pull/171))
+
 ## 5.0.0 (March 24, 2018)
 
 ### Breaking Changes
