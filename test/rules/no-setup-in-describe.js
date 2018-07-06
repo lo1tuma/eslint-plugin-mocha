@@ -25,6 +25,11 @@ ruleTester.run('no-setup-in-describe', rule, {
         'describe("", function () { it("", function () { a["b"]; }); })',
         'describe("", function () { function a() { b(); }; it(); })',
         'describe("", function () { function a() { b.c; }; it(); })',
+        'describe("", function () { afterEach(function() { b(); }); it(); })',
+        {
+            code: 'describe("", function () { before(() => { b(); }); it(); })',
+            parserOptions: { ecmaVersion: 6 }
+        },
         { code: 'describe("", function () { var a = () => b(); it(); })', parserOptions: { ecmaVersion: 6 } },
         { code: 'describe("", function () { var a = () => b.c; it(); })', parserOptions: { ecmaVersion: 6 } },
         'describe("", function () { describe("", function () { it(); }); it(); })',
