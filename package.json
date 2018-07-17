@@ -28,7 +28,7 @@
         "coveralls": "^3.0.0",
         "eslint": "^5.0.1",
         "eslint-config-holidaycheck": "^0.13.1",
-        "eslint-plugin-node": "^6.0.1",
+        "eslint-plugin-node": "^7.0.0",
         "mocha": "^5.0.1",
         "nyc": "^12.0.2",
         "pr-log": "^3.0.0"
