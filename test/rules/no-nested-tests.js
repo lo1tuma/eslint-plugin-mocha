@@ -141,6 +141,22 @@ ruleTester.run('no-nested-tests', rule, {
                 line: 1,
                 column: 22
             } ]
+        },
+        {
+            code: 'beforeEach(function () { it("foo", function () {}); });',
+            errors: [ {
+                message: 'Unexpected test nested within another test.',
+                line: 1,
+                column: 26
+            } ]
+        },
+        {
+            code: 'beforeEach(function () { beforeEach("foo", function () {}); });',
+            errors: [ {
+                message: 'Unexpected test nested within another test.',
+                line: 1,
+                column: 26
+            } ]
         }
     ]
 });
