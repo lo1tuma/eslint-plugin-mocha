@@ -1,3 +1,9 @@
+## 5.2.0 (August 13, 2018)
+
+### Enhancements
+
+* Prohibit tests in beforeEach etc. hook calls ([#174](https://github.com/lo1tuma/eslint-plugin-mocha/pull/174))
+
 ## 5.1.0 (July 6, 2018)
 
 ### Bug Fixes
