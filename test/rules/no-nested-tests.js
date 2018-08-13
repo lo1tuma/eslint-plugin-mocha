@@ -145,7 +145,7 @@ ruleTester.run('no-nested-tests', rule, {
         {
             code: 'beforeEach(function () { it("foo", function () {}); });',
             errors: [ {
-                message: 'Unexpected test nested within another test.',
+                message: 'Unexpected test nested within a test hook.',
                 line: 1,
                 column: 26
             } ]
@@ -153,7 +153,7 @@ ruleTester.run('no-nested-tests', rule, {
         {
             code: 'beforeEach(function () { beforeEach("foo", function () {}); });',
             errors: [ {
-                message: 'Unexpected test nested within another test.',
+                message: 'Unexpected test nested within a test hook.',
                 line: 1,
                 column: 26
             } ]
