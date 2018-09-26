@@ -1,3 +1,9 @@
+## 5.2.1 (?? ??, 2018)
+
+### Enhancements
+
+* Enable Disallow Exclusive Tests support for CodeceptJS based tests ([#179](https://github.com/lo1tuma/eslint-plugin-mocha/issues/179))
+
 ## 5.2.0 (August 13, 2018)
 
 ### Enhancements
