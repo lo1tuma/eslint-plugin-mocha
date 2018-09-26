@@ -63,6 +63,10 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
             errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ]
         },
         {
+            code: 'Scenario.only()',
+            errors: [ { message: expectedErrorMessage, column: 10, line: 1 } ]
+        },
+        {
             code: 'suite["only"]()',
             errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ]
         },
