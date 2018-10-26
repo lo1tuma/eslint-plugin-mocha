@@ -11,13 +11,13 @@ Example of a custom rule configuration:
 
 ```js
 rules: {
-   "mocha/valid-suite-description": ["warning", "^[A-Z]"]
+   "mocha/valid-suite-description": ["warn", "^[A-Z]"]
 },
 ```
 
 where:
 
- * `warning` is a rule error level (see [Configuring Rules](http://eslint.org/docs/user-guide/configuring#configuring-rules))
+ * `warn` is a rule error level (see [Configuring Rules](http://eslint.org/docs/user-guide/configuring#configuring-rules))
  * `^[A-Z]` is a custom regular expression pattern to match suite names against; `^[A-Z]` enforces a suite name to start with an upper-case letter
 
 The following patterns are considered warnings (with the example rule configuration posted above):
@@ -46,6 +46,6 @@ There is also possible to configure a custom list of suite names via the second 
 
 ```js
 rules: {
-   "mocha/valid-suite-description": ["warning", "^[A-Z]", ["describe", "context", "suite", "mysuitename"]]
+   "mocha/valid-suite-description": ["warn", "^[A-Z]", ["describe", "context", "suite", "mysuitename"]]
 },
 ```

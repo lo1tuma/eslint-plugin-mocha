@@ -44,7 +44,7 @@ You can change the acceptable asynchronous test methods to only allow a combinat
 
 ```js
 rules: {
-   "mocha/no-synchronous-tests": ["warning", {allowed: ['async', 'callback', 'promise']}]
+   "mocha/no-synchronous-tests": ["warn", {allowed: ['async', 'callback', 'promise']}]
 },
 ```
 
