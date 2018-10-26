@@ -45,7 +45,6 @@ ruleTester.run('prefer-arrow-callback', rules['prefer-arrow-callback'], {
         '() => super()',
         'foo(function bar() { new.target; });',
         'foo(function bar() { new.target; }.bind(this));',
-        '() => new.target',
         'foo(function bar() { this; }.bind(this, somethingElse));',
         // mocha-specific valid test cases
         'before(function bar() {});',
