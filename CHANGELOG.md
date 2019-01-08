@@ -1,3 +1,20 @@
+## 5.2.1 (January 8, 2019)
+
+### Bug Fixes
+
+* Remove invalid test-cases and unreachable code from prefer-arrow-callback ([#186](https://github.com/lo1tuma/eslint-plugin-mocha/pull/186))
+* Fix invalid syntax in test case ([#182](https://github.com/lo1tuma/eslint-plugin-mocha/pull/182))
+
+### Documentation
+
+* Fixing typo ([#184](https://github.com/lo1tuma/eslint-plugin-mocha/pull/184))
+* Replace `warning` with `warn` ([#181](https://github.com/lo1tuma/eslint-plugin-mocha/pull/181))
+
+### Dependency Upgrades
+
+* Update dependencies ([#187](https://github.com/lo1tuma/eslint-plugin-mocha/pull/187))
+* Update eslint-plugin-node to the latest version 🚀 ([#173](https://github.com/lo1tuma/eslint-plugin-mocha/pull/173))
+
 ## 5.2.0 (August 13, 2018)
 
 ### Enhancements
