@@ -19,3 +19,4 @@
 * [prefer-arrow-callback](prefer-arrow-callback.md) - prefer arrow function callbacks (mocha-aware)
 * [valid-suite-description](valid-suite-description.md) - match suite descriptions against a pre-configured regular expression
 * [valid-test-description](valid-test-description.md) - match test descriptions against a pre-configured regular expression
+* [no-async-describe](no-async-describe.md) - disallow async functions passed to describe
