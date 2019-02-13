@@ -1,3 +1,9 @@
+## 5.3.0 (February 13, 2019)
+
+### Features
+
+* Implement no-async-describe rule ([#188](https://github.com/lo1tuma/eslint-plugin-mocha/pull/188))
+
 ## 5.2.1 (January 8, 2019)
 
 ### Bug Fixes
