@@ -20,7 +20,8 @@ module.exports = {
         'max-top-level-suites': require('./lib/rules/max-top-level-suites'),
         'no-nested-tests': require('./lib/rules/no-nested-tests'),
         'no-setup-in-describe': require('./lib/rules/no-setup-in-describe'),
-        'prefer-arrow-callback': require('./lib/rules/prefer-arrow-callback')
+        'prefer-arrow-callback': require('./lib/rules/prefer-arrow-callback'),
+        'no-async-describe': require('./lib/rules/no-async-describe')
     },
     configs: {
         recommended: {
