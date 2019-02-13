@@ -22,7 +22,7 @@ ruleTester.run('no-async-describe', rule, {
             code: 'describe("hello", async function () {})',
             output: 'describe("hello", function () {})',
             parserOptions: { ecmaVersion: 8 }, errors: [ {
-                message: 'Do not pass an async function to describe()',
+                message: 'Unexpected async function in describe()',
                 line: 1,
                 column: 19
             } ]
@@ -36,7 +36,7 @@ ruleTester.run('no-async-describe', rule, {
                 }
             },
             parserOptions: { ecmaVersion: 8 }, errors: [ {
-                message: 'Do not pass an async function to foo()',
+                message: 'Unexpected async function in foo()',
                 line: 1,
                 column: 14
             } ]
@@ -46,7 +46,7 @@ ruleTester.run('no-async-describe', rule, {
             output: 'describe("hello", () => {})',
             parserOptions: { ecmaVersion: 8 },
             errors: [ {
-                message: 'Do not pass an async function to describe()',
+                message: 'Unexpected async function in describe()',
                 line: 1,
                 column: 19
             } ]
@@ -57,7 +57,7 @@ ruleTester.run('no-async-describe', rule, {
             output: null,
             parserOptions: { ecmaVersion: 8 },
             errors: [ {
-                message: 'Do not pass an async function to describe()',
+                message: 'Unexpected async function in describe()',
                 line: 1,
                 column: 19
             } ]
@@ -68,7 +68,7 @@ ruleTester.run('no-async-describe', rule, {
             output: 'describe("hello", () => {async function bar() {await foo;}})',
             parserOptions: { ecmaVersion: 8 },
             errors: [ {
-                message: 'Do not pass an async function to describe()',
+                message: 'Unexpected async function in describe()',
                 line: 1,
                 column: 19
             } ]
