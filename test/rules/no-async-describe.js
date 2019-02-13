@@ -7,26 +7,29 @@ const ruleTester = new RuleTester();
 ruleTester.run('no-async-describe', rule, {
     valid: [
         'describe()',
+        'describe("hello")',
         'describe(function () {})',
+        'describe("hello", function () {})',
         { code: '() => { a.b }', parserOptions: { ecmaVersion: 6 } },
+        { code: 'describe("hello", () => { a.b })', parserOptions: { ecmaVersion: 6 } },
         'it()',
-        { code: 'it(async function () {})', parserOptions: { ecmaVersion: 8 } },
-        { code: 'it(async () => {})', parserOptions: { ecmaVersion: 8 } }
+        { code: 'it("hello", async function () {})', parserOptions: { ecmaVersion: 8 } },
+        { code: 'it("hello", async () => {})', parserOptions: { ecmaVersion: 8 } }
     ],
 
     invalid: [
         {
-            code: 'describe(async function () {})',
-            output: 'describe(function () {})',
+            code: 'describe("hello", async function () {})',
+            output: 'describe("hello", function () {})',
             parserOptions: { ecmaVersion: 8 }, errors: [ {
                 message: 'Do not pass an async function to describe()',
                 line: 1,
-                column: 10
+                column: 19
             } ]
         },
         {
-            code: 'foo(async function () {})',
-            output: 'foo(function () {})',
+            code: 'foo("hello", async function () {})',
+            output: 'foo("hello", function () {})',
             settings: {
                 mocha: {
                     additionalSuiteNames: [ 'foo' ]
@@ -35,39 +38,39 @@ ruleTester.run('no-async-describe', rule, {
             parserOptions: { ecmaVersion: 8 }, errors: [ {
                 message: 'Do not pass an async function to foo()',
                 line: 1,
-                column: 5
+                column: 14
             } ]
         },
         {
-            code: 'describe(async () => {})',
-            output: 'describe(() => {})',
+            code: 'describe("hello", async () => {})',
+            output: 'describe("hello", () => {})',
             parserOptions: { ecmaVersion: 8 },
             errors: [ {
                 message: 'Do not pass an async function to describe()',
                 line: 1,
-                column: 10
+                column: 19
             } ]
         },
         {
-            code: 'describe(async () => {await foo;})',
+            code: 'describe("hello", async () => {await foo;})',
             // Do not offer a fix for an async function that contains await
             output: null,
             parserOptions: { ecmaVersion: 8 },
             errors: [ {
                 message: 'Do not pass an async function to describe()',
                 line: 1,
-                column: 10
+                column: 19
             } ]
         },
         {
-            code: 'describe(async () => {async function bar() {await foo;}})',
+            code: 'describe("hello", async () => {async function bar() {await foo;}})',
             // Do offer a fix despite a nested async function containing await
-            output: 'describe(() => {async function bar() {await foo;}})',
+            output: 'describe("hello", () => {async function bar() {await foo;}})',
             parserOptions: { ecmaVersion: 8 },
             errors: [ {
                 message: 'Do not pass an async function to describe()',
                 line: 1,
-                column: 10
+                column: 19
             } ]
         }
     ]
