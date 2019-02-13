@@ -5,7 +5,7 @@ This rule disallows the use of an async function with `describe`. It usually ind
 Example:
 
 ```js
-describe(async function () {
+describe('the thing', async function () {
     // This work should happen in a beforeEach:
     const theThing = await getTheThing();
 
@@ -22,23 +22,26 @@ The rule supports "describe", "context" and "suite" suite function names and dif
 The following patterns are considered problems, whether or not the function uses `await`:
 
 ```js
-describe'something', async function () {
+describe('something', async function () {
     it('should work', function () {});
 });
 
-describe'something', async () => {
+describe('something', async () => {
     it('should work', function () {});
 });
 ```
 
 If the `describe` function does not contain `await`, a fix of removing `async` will be suggested.
 
-This rule looks for every `describe.only`, `it.only`, `suite.only`, `test.only`, `context.only` and `specify.only` occurrences within the source code.
-Of course there are some edge-cases which can’t be detected by this rule, eg.:
+The rule won't be able to detect the (hopefully uncommon) cases where the async
+function is defined before the `describe` call and passed by reference:
 
 ```js
-var describeOnly = describe.only;
-describeOnly.apply(describe);
+async function mySuite() {
+    it('my test', () => {});
+}
+
+describe('my suite', mySuite);
 ```
 
 ## When Not To Use It
