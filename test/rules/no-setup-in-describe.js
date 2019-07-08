@@ -64,6 +64,14 @@ ruleTester.run('no-setup-in-describe', rule, {
                 column: 28
             } ]
         }, {
+            code: 'describe("", () => { a(); });',
+            parserOptions: { ecmaVersion: 2015 },
+            errors: [ {
+                message: 'Unexpected function call in describe block.',
+                line: 1,
+                column: 22
+            } ]
+        }, {
             code: 'foo("", function () { a(); });',
             settings: {
                 mocha: {
