@@ -52,6 +52,16 @@ ruleTester.run('no-setup-in-describe', rule, {
                     additionalSuiteNames: [ 'foo' ]
                 }
             }
+        },
+        {
+            code: `describe('', () => {
+              it('', () =>{
+                  foo()();
+                  foo()();
+                  bar();
+              });
+            });`,
+            parserOptions: { ecmaVersion: 2015 }
         }
     ],
 
