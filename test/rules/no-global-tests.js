@@ -104,7 +104,8 @@ ruleTester.run('no-global-tests', rule, {
         {
             code: 'import foo from "bar"; it("");',
             parserOptions: {
-                sourceType: 'module'
+                sourceType: 'module',
+                ecmaVersion: 2015
             },
             errors: [ { message: expectedErrorMessage, column: 24, line: 1 } ]
         }
