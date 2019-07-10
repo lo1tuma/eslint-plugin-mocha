@@ -45,7 +45,7 @@ module.exports = {
                 'mocha/prefer-arrow-callback': 'off',
                 'mocha/valid-suite-description': 'off',
                 'mocha/valid-test-description': 'off',
-                'mocha/no-async-describe': 'error',
+                'mocha/no-async-describe': 'error'
             }
         }
     }
