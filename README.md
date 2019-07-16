@@ -12,7 +12,9 @@ ESLint rules for [mocha](http://mochajs.org/).
 
 This plugin requires ESLint `4.0.0` or later.
 
-`npm install --save-dev eslint-plugin-mocha`
+```bash
+npm install --save-dev eslint-plugin-mocha
+```
 
 Then add a reference to this plugin and selected rules in your eslint config:
 
@@ -21,16 +23,28 @@ Then add a reference to this plugin and selected rules in your eslint config:
   "plugins": [
     "mocha"
   ],
-  "rules": {
-    "mocha/no-exclusive-tests": "error"
-  }
 }
 ```
+
+### Recommended config
+
+This plugin exports a recommended config that enforces good practices.
+
+Enable it with the extends option:
+
+```json
+{
+  "extends": [
+    "plugin:mocha/recommended"
+  ],
+}
+```
+
 See [Configuring Eslint](http://eslint.org/docs/user-guide/configuring) on [eslint.org](http://eslint.org) for more info.
 
 ## Rules documentation
 
-The documentation of the rules can be found [here](docs/rules).
+The documentation of the rules [can be found here](docs/rules).
 
 ## When Not To Use It
 
