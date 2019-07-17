@@ -1,3 +1,27 @@
+## 6.0.0 (July 17, 2019)
+
+### Breaking Changes
+
+* Revamped recommended ruleset ([#200](https://github.com/lo1tuma/eslint-plugin-mocha/pull/200))
+* Drop nodejs 6 support ([#197](https://github.com/lo1tuma/eslint-plugin-mocha/pull/197))
+
+### Bug Fixes
+
+* Fix no-setup-in-describe to correctly detect describe calls ([#196](https://github.com/lo1tuma/eslint-plugin-mocha/pull/196))
+* Fix no-setup-in-describe to work with arrow functions ([#195](https://github.com/lo1tuma/eslint-plugin-mocha/pull/195))
+
+### Features
+
+* Implement no-return-from-async rule ([#190](https://github.com/lo1tuma/eslint-plugin-mocha/pull/190))
+
+### Dependency Upgrades
+
+* Update dev dependencies ([#199](https://github.com/lo1tuma/eslint-plugin-mocha/pull/199))
+
+### Build-Related
+
+* Add nodejs to travis build environments ([#198](https://github.com/lo1tuma/eslint-plugin-mocha/pull/198))
+
 ## 5.3.0 (February 13, 2019)
 
 ### Features
