@@ -31,6 +31,22 @@ ruleTester.run('valid-test-description', rules['valid-test-description'], {
             options: [ '^should', [ 'someFunction' ] ],
             code: 'someFunction("should do something", function () { });'
         },
+        {
+            options: [ '^should', [ 'someFunction' ], 'some error message' ],
+            code: 'someFunction("should do something", function () { });'
+        },
+        {
+            options: [ /^should/, [ 'someFunction' ], 'some error message' ],
+            code: 'someFunction("should do something", function () { });'
+        },
+        {
+            options: [ { pattern: '^should', testNames: [ 'someFunction' ], message: 'some error message' } ],
+            code: 'someFunction("should do something", function () { });'
+        },
+        {
+            options: [ { pattern: /^should/, testNames: [ 'someFunction' ], message: 'some error message' } ],
+            code: 'someFunction("should do something", function () { });'
+        },
         'someOtherFunction();',
         {
             parserOptions: { ecmaVersion: 2017 },
@@ -83,6 +99,27 @@ ruleTester.run('valid-test-description', rules['valid-test-description'], {
             code: 'customFunction("this is a test", function () { });',
             errors: [
                 { message: 'Invalid "customFunction()" description found.' }
+            ]
+        },
+        {
+            options: [ 'required', [ 'customFunction' ], 'some error message' ],
+            code: 'customFunction("this is a test", function () { });',
+            errors: [
+                { message: 'some error message' }
+            ]
+        },
+        {
+            options: [ { pattern: 'required', testNames: [ 'customFunction' ], message: 'some error message' } ],
+            code: 'customFunction("this is a test", function () { });',
+            errors: [
+                { message: 'some error message' }
+            ]
+        },
+        {
+            options: [ {} ],
+            code: 'it("this is a test", function () { });',
+            errors: [
+                { message: 'Invalid "it()" description found.' }
             ]
         }
     ]
