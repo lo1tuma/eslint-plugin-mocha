@@ -1,10 +1,10 @@
 # Match suite descriptions against a pre-configured regular expression (valid-suite-description)
 
-This rule enforces the suite descriptions to follow the desired format. 
+This rule enforces the suite descriptions to follow the desired format.
 
 ## Rule Details
 
-By default, the regular expression is not configured and would be required if rule is enabled. 
+By default, the regular expression is not configured and would be required if rule is enabled.
 By default, the rule supports "describe", "context" and "suite" suite function names, but it can be configured to look for different suite names via rule configuration.
 
 Example of a custom rule configuration:
@@ -42,10 +42,14 @@ context("Test suite", function() { });
 suite("Test suite", function() { });
 ```
 
-There is also possible to configure a custom list of suite names via the second rule configuration option:
+There is also possible to configure a custom list of suite names and a custom error message via the second and third rule configuration option:
 
 ```js
 rules: {
-   "mocha/valid-suite-description": ["warn", "^[A-Z]", ["describe", "context", "suite", "mysuitename"]]
+   "mocha/valid-suite-description": ["warn", "^[A-Z]", ["describe", "context", "suite", "mysuitename"], "custom error message"]
+},
+// OR
+rules: {
+   "mocha/valid-suite-description": ["warn", { pattern: "^[A-Z]", suiteNames: ["describe", "context", "suite", "mysuitename"], message: "custom error message" }]
 },
 ```
