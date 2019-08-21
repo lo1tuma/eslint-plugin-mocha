@@ -26,6 +26,26 @@ ruleTester.run('valid-suite-description', rules['valid-suite-description'], {
             options: [ '^[A-Z]', [ 'someFunction' ] ],
             code: 'someFunction("Should do something", function () { });'
         },
+        {
+            options: [ '^[A-Z]', [ 'someFunction' ], 'some error message' ],
+            code: 'someFunction("Should do something", function () { });'
+        },
+        {
+            options: [ /^[A-Z]/, [ 'someFunction' ], 'some error message' ],
+            code: 'someFunction("Should do something", function () { });'
+        },
+        {
+            options: [ { pattern: '^[A-Z]', suiteNames: [ 'someFunction' ], message: 'some error message' } ],
+            code: 'someFunction("Should do something", function () { });'
+        },
+        {
+            options: [ { pattern: /^[A-Z]/, suiteNames: [ 'someFunction' ], message: 'some error message' } ],
+            code: 'someFunction("Should do something", function () { });'
+        },
+        {
+            options: [ {} ],
+            code: 'someFunction("Should do something", function () { });'
+        },
         'someOtherFunction();',
         {
             parserOptions: { ecmaVersion: 2017 },
@@ -62,6 +82,20 @@ ruleTester.run('valid-suite-description', rules['valid-suite-description'], {
             code: 'customFunction("this is a test", function () { });',
             errors: [
                 { message: 'Invalid "customFunction()" description found.' }
+            ]
+        },
+        {
+            options: [ '^[A-Z]', [ 'customFunction' ], 'some error message' ],
+            code: 'customFunction("this is a test", function () { });',
+            errors: [
+                { message: 'some error message' }
+            ]
+        },
+        {
+            options: [ { pattern: '^[A-Z]', suiteNames: [ 'customFunction' ], message: 'some error message' } ],
+            code: 'customFunction("this is a test", function () { });',
+            errors: [
+                { message: 'some error message' }
             ]
         }
     ]
