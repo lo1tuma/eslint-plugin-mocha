@@ -1,3 +1,10 @@
+## 6.1.0 (August 22, 2019)
+
+### Enhancements
+
+* Add custom message for valid-suite-description ([#207](https://github.com/lo1tuma/eslint-plugin-mocha/pull/207))
+* Add custom message for valid-test-description rule ([#206](https://github.com/lo1tuma/eslint-plugin-mocha/pull/206))
+
 ## 6.0.0 (July 17, 2019)
 
 ### Breaking Changes
