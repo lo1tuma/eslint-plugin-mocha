@@ -132,6 +132,28 @@ ruleTester.run('no-setup-in-describe', rule, {
                 column: 28
             } ]
         }, {
+            code: 'describe("", function () { this.a(); });',
+            errors: [ {
+                message: 'Unexpected function call in describe block.',
+                line: 1,
+                column: 28
+            }, {
+                message: memberExpressionError,
+                line: 1,
+                column: 28
+            } ]
+        }, {
+            code: 'describe("", function () { this["retries"](); });',
+            errors: [ {
+                message: 'Unexpected function call in describe block.',
+                line: 1,
+                column: 28
+            }, {
+                message: memberExpressionError,
+                line: 1,
+                column: 28
+            } ]
+        }, {
             code: 'foo("", function () { a.b; });',
             settings: {
                 mocha: {
