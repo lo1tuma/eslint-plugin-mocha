@@ -1,3 +1,9 @@
+## 6.1.1 (September 11, 2019)
+
+### Bug Fixes
+
+* Fix no-setup-in-describe to allow Mocha suite config ([#209](https://github.com/lo1tuma/eslint-plugin-mocha/pull/209))
+
 ## 6.1.0 (August 22, 2019)
 
 ### Enhancements
