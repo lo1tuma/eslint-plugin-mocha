@@ -19,10 +19,18 @@ ruleTester.run('no-setup-in-describe', rule, {
         'it("", function () { a[b]; })',
         'it("", function () { a["b"]; })',
         'describe("", function () { it(); })',
+        'describe("", function () { this.slow(1); it(); })',
+        'describe("", function () { this.timeout(1); it(); })',
+        'describe("", function () { this.retries(1); it(); })',
+        'describe("", function () { this["retries"](1); it(); })',
         'describe("", function () { it("", function () { b(); }); })',
         'describe("", function () { it("", function () { a.b; }); })',
         'describe("", function () { it("", function () { a[b]; }); })',
         'describe("", function () { it("", function () { a["b"]; }); })',
+        'describe("", function () { it("", function () { this.slow(1); }); })',
+        'describe("", function () { it("", function () { this.timeout(1); }); })',
+        'describe("", function () { it("", function () { this.retries(1); }); })',
+        'describe("", function () { it("", function () { this["retries"](1); }); })',
         'describe("", function () { function a() { b(); }; it(); })',
         'describe("", function () { function a() { b.c; }; it(); })',
         'describe("", function () { afterEach(function() { b(); }); it(); })',
@@ -121,6 +129,17 @@ ruleTester.run('no-setup-in-describe', rule, {
         {
             code: 'describe("", function () { a.b; });',
             errors: [ {
+                message: memberExpressionError,
+                line: 1,
+                column: 28
+            } ]
+        }, {
+            code: 'describe("", function () { this.a(); });',
+            errors: [ {
+                message: 'Unexpected function call in describe block.',
+                line: 1,
+                column: 28
+            }, {
                 message: memberExpressionError,
                 line: 1,
                 column: 28

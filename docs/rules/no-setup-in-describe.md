@@ -18,7 +18,7 @@ Any setup directly in a `describe` is run before all tests execute. This is unde
 1. When doing TDD in a large codebase, all setup is run for tests that don't have `only` set. This can add a substantial amount of time per iteration.
 2. If global state is altered by the setup of another describe block, your test may be affected.
 
-This rule reports all function calls and use of the dot operator (due to getters and setters) directly in describe blocks.
+This rule reports all function calls and use of the dot operator (due to getters and setters) directly in describe blocks. An exception is made for Mocha's suite configuration methods, like `this.timeout();`, which do not represent setup logic.
 
 If you're using [dynamically generated tests](https://mochajs.org/#dynamically-generating-tests), you should disable this rule.
 
@@ -67,5 +67,9 @@ describe('something', function () {
     it('should work', function () {
         const { a, b } = setup();
     });
+});
+describe('something', function () {
+    this.timeout(5000);
+    it('should take awhile', function () {});
 });
 ```
