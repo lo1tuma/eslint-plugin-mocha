@@ -51,14 +51,6 @@ ruleTester.run('no-nested-tests', rule, {
             } ]
         },
         {
-            code: 'test("", function () { it() });',
-            errors: [ {
-                message: 'Unexpected test nested within another test.',
-                line: 1,
-                column: 24
-            } ]
-        },
-        {
             code: 'specify("", function () { it() });',
             errors: [ {
                 message: 'Unexpected test nested within another test.',

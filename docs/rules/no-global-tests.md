@@ -25,11 +25,7 @@ The following patterns are considered problems:
 ```js
 it('foo');
 
-test('bar');
-
 it.only('foo');
-
-test.skip('bar');
 ```
 
 These patterns would not be considered problems:
@@ -37,10 +33,6 @@ These patterns would not be considered problems:
 ```js
 describe('foo', function () {
     it('bar');
-});
-
-suite('foo', function () {
-    test('bar');
 });
 ```
 

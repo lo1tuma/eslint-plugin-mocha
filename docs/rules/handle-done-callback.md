@@ -20,7 +20,7 @@ In this example the `done` callback was never called and test will time out.
 
 ## Rule Details
 
-This rule checks each `FunctionExpression` or `ArrowFunctionExpression` inside of `it`, `it.only`, `test`, `test.only`, `specify`, `specify.only`, `before`, `after`, `beforeEach` and `afterEach`.
+This rule checks each `FunctionExpression` or `ArrowFunctionExpression` inside of `it`, `it.only`, `specify`, `specify.only`, `before`, `after`, `beforeEach` and `afterEach`.
 
 The following patterns are considered warnings:
 

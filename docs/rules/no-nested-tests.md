@@ -14,7 +14,7 @@ This rule reports such nested test cases in order to prevent problems where thos
 
 ## Rule Details
 
-This rule looks for all test cases (`it`, `specify` and `test`) or suites (`describe`, `context` and `suite`) which are nested within another test case.
+This rule looks for all test cases (`it` and `specify`) or suites (`describe`, `context` and `suite`) which are nested within another test case.
 
 The following patterns are considered problems:
 
@@ -23,7 +23,7 @@ it('something', function () {
     it('should work', function () {});
 });
 
-test('something', function () {
+it('something', function () {
     specify('should work', function () {});
 });
 

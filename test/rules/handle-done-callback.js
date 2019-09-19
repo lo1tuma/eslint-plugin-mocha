@@ -21,8 +21,6 @@ ruleTester.run('handle-done-callback', rules['handle-done-callback'], {
         'it("", function (done) { done(new Error("foo")); });',
         'it("", function (done) { promise.then(done).catch(done); });',
         'it.only("", function (done) { done(); });',
-        'test("", function (done) { done(); });',
-        'test.only("", function (done) { done(); });',
         'before(function (done) { done(); });',
         'after(function (done) { done(); });',
         'beforeEach(function (done) { done(); });',
@@ -54,14 +52,6 @@ ruleTester.run('handle-done-callback', rules['handle-done-callback'], {
         {
             code: 'it.only("", function (done) { });',
             errors: [ { message: 'Expected "done" callback to be handled.', column: 23, line: 1 } ]
-        },
-        {
-            code: 'test("", function (done) { });',
-            errors: [ { message: 'Expected "done" callback to be handled.', column: 20, line: 1 } ]
-        },
-        {
-            code: 'test.only("", function (done) { });',
-            errors: [ { message: 'Expected "done" callback to be handled.', column: 25, line: 1 } ]
         },
         {
             code: 'specify("", function (done) { });',

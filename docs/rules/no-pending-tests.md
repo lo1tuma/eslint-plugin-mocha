@@ -6,14 +6,13 @@ This rule allows you to raise ESLint warnings or errors on pending tests. This c
 
 ## Rule Details
 
-This rule looks for `it`, `test`, and `specify` function calls with only one argument, where the argument is a string literal.
+This rule looks for `it`, and `specify` function calls with only one argument, where the argument is a string literal.
 
 The following patterns are considered warnings:
 
 ```js
 it("foo");
 specify("foo");
-test("foo");
 ```
 
 These patterns are not considered warnings:
@@ -21,7 +20,6 @@ These patterns are not considered warnings:
 ```js
 it("foo", function() {});
 specify("foo", function() {});
-test("foo", function() {});
 ```
 
 ## When Not To Use It
