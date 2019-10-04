@@ -14,7 +14,7 @@
     ],
     "scripts": {
         "pretest": "eslint .",
-        "test": "npm run test:unit:with-coverage",
+        "test": "npm run test:unit:with-coverage && npm run test:bench",
         "test:unit": "mocha test --recursive --reporter dot",
         "test:unit:with-coverage": "nyc npm run test:unit",
         "test:bench": "mocha benchmarks",
