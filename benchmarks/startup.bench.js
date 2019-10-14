@@ -8,7 +8,7 @@ const [ { speed: cpuSpeed } ] = os.cpus();
 
 describe('startup / require time', () => {
     it('should not take longer as the defined budget to require the plugin', () => {
-        const budget = 75000 / cpuSpeed;
+        const budget = 85000 / cpuSpeed;
 
         const startTime = performance.now();
         require('../index');
