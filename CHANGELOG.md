@@ -1,3 +1,9 @@
+## 6.2.0 (October 14, 2019)
+
+### Enhancements
+
+* Startup Performance Optimization ([#214](https://github.com/lo1tuma/eslint-plugin-mocha/pull/214))
+
 ## 6.1.1 (September 11, 2019)
 
 ### Bug Fixes
