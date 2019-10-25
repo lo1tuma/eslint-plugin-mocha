@@ -42,6 +42,10 @@ ruleTester.run('no-synchronous-tests', rules['no-synchronous-tests'], {
             parserOptions: { ecmaVersion: 6 }
         },
         {
+            code: 'it("", () => promise );',
+            parserOptions: { ecmaVersion: 6 }
+        },
+        {
             code: 'it("", () => promise.then() );',
             parserOptions: { ecmaVersion: 6 }
         },
