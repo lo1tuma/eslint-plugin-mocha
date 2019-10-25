@@ -45,7 +45,3 @@ See [Configuring Eslint](http://eslint.org/docs/user-guide/configuring) on [esli
 ## Rules documentation
 
 The documentation of the rules [can be found here](docs/rules).
-
-## When Not To Use It
-
-If you are not using mocha you should not use this plugin.

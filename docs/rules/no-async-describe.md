@@ -46,5 +46,5 @@ describe('my suite', mySuite);
 
 ## When Not To Use It
 
-- If you use another library which exposes a similar API as mocha (e.g. `describe.only`), you should turn this rule off because it would raise warnings.
+- If you use another library which exposes a similar API as mocha, you should turn this rule off because it would raise warnings.
 - In environments that have not yet adopted ES6 language features (ES3/5).

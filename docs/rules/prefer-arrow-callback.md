@@ -116,7 +116,6 @@ someArray.map(function(itm) { return this.doSomething(itm); }, someObject);
 ## When Not To Use It
 
 - In environments that have not yet adopted ES6 language features (ES3/5).
-
 - In ES6+ environments that allow the use of function expressions when describing callbacks or function arguments.
 
 ## Further Reading
