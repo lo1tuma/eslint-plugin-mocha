@@ -1,3 +1,18 @@
+## 6.2.1 (October 28, 2019)
+
+### Bug Fixes
+
+* Fix no-setup-in-describe to allow mocha config calls ([#215](https://github.com/lo1tuma/eslint-plugin-mocha/pull/215))
+* Relax no-synchronous-tests to allow non literals from concise arrows ([#216](https://github.com/lo1tuma/eslint-plugin-mocha/pull/216))
+
+### Documentation
+
+* Minor documentation tweaks ([#217](https://github.com/lo1tuma/eslint-plugin-mocha/pull/217))
+
+### Dependency Upgrades
+
+* Update devDependencies ([#218](https://github.com/lo1tuma/eslint-plugin-mocha/pull/218))
+
 ## 6.2.0 (October 14, 2019)
 
 ### Enhancements
