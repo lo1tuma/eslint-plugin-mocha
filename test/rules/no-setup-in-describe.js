@@ -29,6 +29,11 @@ ruleTester.run('no-setup-in-describe', rule, {
         'describe("", function () { it("", function () { a["b"]; }); })',
         'describe("", function () { it("", function () { this.slow(1); }); })',
         'describe("", function () { it("", function () { this.timeout(1); }); })',
+        'describe("", function () { it("", function () {}).timeout(1); })',
+        'describe("", function () { it("", function () {}).slow(1); })',
+        'describe("", function () { it.only("", function () {}).timeout(1); })',
+        'describe("", function () { it.skip("", function () {}).timeout(1); })',
+        'describe("", function () { xspecify("", function () {}).timeout(1); })',
         'describe("", function () { it("", function () { this.retries(1); }); })',
         'describe("", function () { it("", function () { this["retries"](1); }); })',
         'describe("", function () { function a() { b(); }; it(); })',
@@ -155,6 +160,32 @@ ruleTester.run('no-setup-in-describe', rule, {
                 message: memberExpressionError,
                 line: 1,
                 column: 23
+            } ]
+        }, {
+            code: 'describe("", function () { it("", function () {}).a(); });',
+            errors: [ {
+                message: 'Unexpected function call in describe block.',
+                line: 1,
+                column: 28
+            }, {
+                message: memberExpressionError,
+                line: 1,
+                column: 28
+            } ]
+        }, {
+            code: 'describe("", function () { something("", function () {}).timeout(); });',
+            errors: [ {
+                message: 'Unexpected function call in describe block.',
+                line: 1,
+                column: 28
+            }, {
+                messagee: memberExpressionError,
+                line: 1,
+                column: 28
+            }, {
+                message: 'Unexpected function call in describe block.',
+                line: 1,
+                column: 28
             } ]
         }
     ]
