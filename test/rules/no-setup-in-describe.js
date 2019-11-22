@@ -39,6 +39,10 @@ ruleTester.run('no-setup-in-describe', rule, {
         'describe("", function () { function a() { b(); }; it(); })',
         'describe("", function () { function a() { b.c; }; it(); })',
         'describe("", function () { afterEach(function() { b(); }); it(); })',
+        'suite("", function () { teardown(function() { b(); }); test(); })',
+        'suite("", function () { suiteTeardown(function() { b(); }); test(); })',
+        'suite("", function () { setup(function() { b(); }); test(); })',
+        'suite("", function () { suiteSetup(function() { b(); }); test(); })',
         {
             code: 'describe("", function () { before(() => { b(); }); it(); })',
             parserOptions: { ecmaVersion: 6 }
@@ -80,6 +84,13 @@ ruleTester.run('no-setup-in-describe', rule, {
 
     invalid: [
         {
+            code: 'suite("", function () { a(); });',
+            errors: [ {
+                message: 'Unexpected function call in describe block.',
+                line: 1,
+                column: 25
+            } ]
+        }, {
             code: 'describe("", function () { a(); });',
             errors: [ {
                 message: 'Unexpected function call in describe block.',
