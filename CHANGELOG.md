@@ -1,3 +1,13 @@
+## 6.2.2 (November 22, 2019)
+
+### Bug Fixes
+
+* Support TDD interface in no-setup-in-describe ([#220](https://github.com/lo1tuma/eslint-plugin-mocha/pull/220))
+
+### Build-Related
+
+* 🚀 Use GitHub Actions instead of Travis ([#221](https://github.com/lo1tuma/eslint-plugin-mocha/pull/221))
+
 ## 6.2.1 (October 28, 2019)
 
 ### Bug Fixes
