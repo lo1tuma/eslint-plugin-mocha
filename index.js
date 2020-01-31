@@ -26,6 +26,7 @@ module.exports = {
     },
     configs: {
         recommended: {
+            plugins: [ 'mocha' ],
             rules: {
                 'mocha/handle-done-callback': 'error',
                 'mocha/max-top-level-suites': [ 'error', { limit: 1 } ],
