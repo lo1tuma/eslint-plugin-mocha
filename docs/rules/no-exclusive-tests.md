@@ -49,9 +49,9 @@ suite.skip("bar", function () {});
 test.skip("bar", function () {});
 ```
 
-# Options
+## Settings
 
-This rule supports the following shared configuration options:
+This rule supports the following shared configuration setting:
 
 * `additionalTestFunctions`: An array of extra test functions to protect.  This might be used with a custom Mocha extension, such as [`ember-mocha`](https://github.com/switchfly/ember-mocha)
 

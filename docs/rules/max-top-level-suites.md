@@ -33,6 +33,8 @@ describe('foo', function () {
 });
 ```
 
+## Options
+
 If you want to change the suite limit to, for instance, 2 suites per file:
 
 ```js

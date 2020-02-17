@@ -10,7 +10,7 @@ By default, this rule looks for the presence of one of:
 - An async function provided to a mocha test statement.
 - A return statement within the function body of any mocha test statement.
 
-If none of these three options is used in a test method, the rule will raise a warning.
+If none of these three alternatives is used in a test method, the rule will raise a warning.
 
 The following patterns are considered warnings:
 
@@ -40,6 +40,8 @@ it('should do foo', function () {
 });
 ```
 
+## Options
+
 You can change the acceptable asynchronous test methods to only allow a combination of async functions/callbacks/promises:
 
 ```js
@@ -47,7 +49,6 @@ rules: {
    "mocha/no-synchronous-tests": ["warn", {allowed: ['async', 'callback', 'promise']}]
 },
 ```
-
 
 ### Caveats:
 

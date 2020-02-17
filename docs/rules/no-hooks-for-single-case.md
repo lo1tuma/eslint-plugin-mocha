@@ -58,7 +58,7 @@ describe('foo', function () {
 });
 ```
 
-# Options
+## Options
 
 This rule supports the following options:
 

@@ -42,6 +42,8 @@ context("Test suite", function() { });
 suite("Test suite", function() { });
 ```
 
+## Options
+
 There is also possible to configure a custom list of suite names and a custom error message via the second and third rule configuration option:
 
 ```js
