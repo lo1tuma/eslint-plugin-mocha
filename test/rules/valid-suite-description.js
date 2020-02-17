@@ -31,19 +31,9 @@ ruleTester.run('valid-suite-description', rules['valid-suite-description'], {
             code: 'someFunction("Should do something", function () { });'
         },
         {
-            options: [ /^[A-Z]/, [ 'someFunction' ], 'some error message' ],
-            code: 'someFunction("Should do something", function () { });'
-        },
-        {
             options: [ { pattern: '^[A-Z]', suiteNames: [ 'someFunction' ], message: 'some error message' } ],
             code: 'someFunction("Should do something", function () { });'
         },
-        /*
-        {
-            options: [ { pattern: /^[A-Z]/, suiteNames: [ 'someFunction' ], message: 'some error message' } ],
-            code: 'someFunction("Should do something", function () { });'
-        },
-        */
         {
             options: [ {} ],
             code: 'someFunction("Should do something", function () { });'

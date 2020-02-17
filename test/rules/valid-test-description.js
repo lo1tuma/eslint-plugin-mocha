@@ -36,19 +36,9 @@ ruleTester.run('valid-test-description', rules['valid-test-description'], {
             code: 'someFunction("should do something", function () { });'
         },
         {
-            options: [ /^should/, [ 'someFunction' ], 'some error message' ],
-            code: 'someFunction("should do something", function () { });'
-        },
-        {
             options: [ { pattern: '^should', testNames: [ 'someFunction' ], message: 'some error message' } ],
             code: 'someFunction("should do something", function () { });'
         },
-        /*
-        {
-            options: [ { pattern: /^should/, testNames: [ 'someFunction' ], message: 'some error message' } ],
-            code: 'someFunction("should do something", function () { });'
-        },
-        */
         'someOtherFunction();',
         {
             parserOptions: { ecmaVersion: 2017 },
