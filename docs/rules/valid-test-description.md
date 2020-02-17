@@ -7,6 +7,8 @@ This rule enforces the test descriptions to follow the desired format.
 By default, the regular expression is configured to be "^should" which requires test descriptions to start with "should".
 By default, the rule supports "it", "specify" and "test" test function names, but it can be configured to look for different test names via rule configuration.
 
+## Options
+
 Example of a custom rule configuration:
 
 ```js
