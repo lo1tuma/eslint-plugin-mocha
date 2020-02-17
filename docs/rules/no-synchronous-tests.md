@@ -37,7 +37,7 @@ it('should do foo', async function () {
 
 it('should do foo', function () {
     return promise;
-}
+});
 ```
 
 You can change the acceptable asynchronous test methods to only allow a combination of async functions/callbacks/promises:
