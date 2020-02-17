@@ -15,6 +15,8 @@ describe('the thing', async function () {
 });
 ```
 
+**Fixable:** Problems detected by this rule are automatically fixable using the `--fix` flag on the command line.
+
 ## Rule Details
 
 The rule supports "describe", "context" and "suite" suite function names and different valid suite name prefixes like "skip" or "only".

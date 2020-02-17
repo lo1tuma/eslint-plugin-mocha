@@ -2,6 +2,8 @@
 
 Mocha [discourages](http://mochajs.org/#arrow-functions) passing it arrow functions as arguments. This rule prevents their use on the Mocha globals.
 
+**Fixable:** Problems detected by this rule are automatically fixable using the `--fix` flag on the command line.
+
 ## Rule Details
 
 This rule looks for occurrences of the Mocha functions (`describe`, `it`, `beforeEach`, etc.) within the source code.

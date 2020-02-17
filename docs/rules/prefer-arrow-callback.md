@@ -13,6 +13,8 @@ You will want to disable the original `prefer-arrow-callback` rule and configure
 }
 ```
 
+**Fixable:** Problems detected by this rule are automatically fixable using the `--fix` flag on the command line.
+
 ## Rule Overview
 
 Arrow functions can be an attractive alternative to function expressions for callbacks or function arguments.
