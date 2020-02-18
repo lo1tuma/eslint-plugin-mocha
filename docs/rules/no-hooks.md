@@ -43,6 +43,21 @@ describe('foo', function () {
 });
 ```
 
+## Options
+
+This rule supports the following options:
+
+* `allow`: An array containing the names of hooks to allow. Defaults to an empty array.
+
+```json
+{
+    "rules": {
+        "mocha/no-hooks": ["error", {"allow": ["after"]}]
+    }
+}
+```
+
+
 ## When Not To Use It
 
 * If you use another library which exposes a similar API as mocha (e.g. `before`, `after`), you should turn this rule off, because it would raise warnings.
