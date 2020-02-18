@@ -43,6 +43,16 @@ ruleTester.run('valid-suite-description', rules['valid-suite-description'], {
             parserOptions: { ecmaVersion: 2017 },
             options: [ '^Foo' ],
             code: 'describe(`Foo with template strings`, function () {});'
+        },
+        {
+            parserOptions: { ecmaVersion: 2019 },
+            options: [ '^Foo' ],
+            code: 'describe(anyTag`with template strings`, function () {});'
+        },
+        {
+            parserOptions: { ecmaVersion: 2019 },
+            options: [ '^Foo' ],
+            code: 'describe(`${dynamicVar} with template strings`, function () {});'
         }
 
     ],
@@ -88,6 +98,26 @@ ruleTester.run('valid-suite-description', rules['valid-suite-description'], {
             code: 'customFunction("this is a test", function () { });',
             errors: [
                 { message: 'some error message' }
+            ]
+        },
+        {
+            options: [ '^[A-Z]' ],
+            code: 'describe(`this is a test`, function () { });',
+            parserOptions: {
+                ecmaVersion: 2019
+            },
+            errors: [
+                { message: 'Invalid "describe()" description found.', line: 1, column: 1 }
+            ]
+        },
+        {
+            options: [ '^[A-Z]' ],
+            code: 'const foo = "this"; describe(`${foo} is a test`, function () { });',
+            parserOptions: {
+                ecmaVersion: 2019
+            },
+            errors: [
+                { message: 'Invalid "describe()" description found.', line: 1, column: 21 }
             ]
         }
     ]

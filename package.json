@@ -22,6 +22,7 @@
         "changelog": "pr-log"
     },
     "dependencies": {
+        "eslint-utils": "^2.0.0",
         "ramda": "^0.26.1"
     },
     "devDependencies": {

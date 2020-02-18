@@ -43,6 +43,14 @@ ruleTester.run('valid-test-description', rules['valid-test-description'], {
         {
             parserOptions: { ecmaVersion: 2017 },
             code: 'it(`should work with template strings`, function () {});'
+        },
+        {
+            parserOptions: { ecmaVersion: 2019 },
+            code: 'it(foo`work with template strings`, function () {});'
+        },
+        {
+            parserOptions: { ecmaVersion: 2019 },
+            code: 'it(`${foo} work with template strings`, function () {});'
         }
     ],
 
@@ -112,6 +120,24 @@ ruleTester.run('valid-test-description', rules['valid-test-description'], {
             code: 'it("this is a test", function () { });',
             errors: [
                 { message: 'Invalid "it()" description found.' }
+            ]
+        },
+        {
+            code: 'it(`this is a test`, function () { });',
+            parserOptions: {
+                ecmaVersion: 2019
+            },
+            errors: [
+                { message: 'Invalid "it()" description found.', line: 1, column: 1 }
+            ]
+        },
+        {
+            code: 'const foo = "this"; it(`${foo} is a test`, function () { });',
+            parserOptions: {
+                ecmaVersion: 2019
+            },
+            errors: [
+                { message: 'Invalid "it()" description found.', line: 1, column: 21 }
             ]
         }
     ]
