@@ -60,7 +60,7 @@ describe('eslint-plugin-mocha', function () {
         it('should be linked in the documentation index', function () {
             documentationFiles.forEach(function (file) {
                 const ruleName = path.basename(file, '.md');
-                const expectedLink = `* [${ ruleName }](${ file })`;
+                const expectedLink = `| [${ ruleName }](${ file }) |`;
 
                 expect(documentationIndex).to.contain(expectedLink);
             });
