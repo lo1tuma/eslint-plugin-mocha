@@ -84,6 +84,20 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
             '    });',
             '});'
         ].join('\n'),
+        [
+            'describe(function() {',
+            '    describe(function() {',
+            '        it(function() {});',
+            '        it(function() {});',
+            '    });',
+            '    afterEach(function() {});',
+            '});'
+        ].join('\n'),
+        [
+            'it(function() {});',
+            'it(function() {});',
+            'afterEach(function() {});'
+        ].join('\n'),
         {
             code: [
                 'describe(function() {',
@@ -261,19 +275,6 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '});'
             ].join('\n'),
             errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 9, line: 5 } ]
-        },
-        {
-            code: [
-                'describe(function() {',
-                '    before(function() {});',
-                '    describe(function() {',
-                '        before(function() {});',
-                '        it(function() {});',
-                '        it(function() {});',
-                '    });',
-                '});'
-            ].join('\n'),
-            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 } ]
         },
         {
             code: [
