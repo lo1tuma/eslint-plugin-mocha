@@ -53,7 +53,8 @@ ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
                 }
             }
         },
-        'someOtherFunction();'
+        'someOtherFunction();',
+        'describe("top", function () {}); function foo() { describe("not necessarily top", function () {}); }'
     ],
 
     invalid: [
