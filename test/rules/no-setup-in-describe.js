@@ -190,7 +190,7 @@ ruleTester.run('no-setup-in-describe', rule, {
                 line: 1,
                 column: 28
             }, {
-                messagee: memberExpressionError,
+                message: memberExpressionError,
                 line: 1,
                 column: 28
             }, {
