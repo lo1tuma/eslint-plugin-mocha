@@ -1,3 +1,17 @@
+## 7.0.0 (May 13, 2020)
+
+### Breaking Changes
+
+* Drop support for ESLint &lt; v7 and Node.js &lt; v10 ([#247](https://github.com/lo1tuma/eslint-plugin-mocha/pull/247))
+
+### Enhancements
+
+* Add `meta.type` and missing `fixable: 'code'` ([#245](https://github.com/lo1tuma/eslint-plugin-mocha/pull/245))
+
+### Dependency Upgrades
+
+* Updates of devDependencies ([#246](https://github.com/lo1tuma/eslint-plugin-mocha/pull/246))
+
 ## 6.3.0 (February 19, 2020)
 
 ### Bug Fixes
