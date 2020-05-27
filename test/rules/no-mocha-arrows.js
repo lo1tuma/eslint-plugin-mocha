@@ -74,12 +74,12 @@ ruleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
         {
             code: 'it(async () => { assert(something, false) })',
             errors,
-            output: 'it(async function () { assert(something, false) })'
+            output: 'it(async function() { assert(something, false) })'
         },
         {
             code: 'it(async () => assert(something, false))',
             errors,
-            output: 'it(async function () { return assert(something, false); })'
+            output: 'it(async function() { return assert(something, false); })'
         },
         {
             code: 'it(async done => assert(something, false))',
@@ -95,6 +95,11 @@ ruleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
             code: 'it(async() => assert(something, false))',
             errors,
             output: 'it(async function() { return assert(something, false); })'
+        },
+        {
+            code: 'it(/*one*/async/*two*/(done)/*three*/=>/*four*/assert(something, false))',
+            errors,
+            output: 'it(/*one*/async function/*two*/(done)/*three*//*four*/ { return assert(something, false); })'
         }
     ]
 
