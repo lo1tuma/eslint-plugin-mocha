@@ -54,13 +54,38 @@ ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
             }
         },
         'someOtherFunction();',
-        'describe("top", function () {}); function foo() { describe("not necessarily top", function () {}); }'
+        'describe("top", function () {}); function foo() { describe("not necessarily top", function () {}); }',
+        {
+            code: 'describe("", function () { });',
+            parserOptions: {
+                sourceType: 'module',
+                ecmaVersion: 2015
+            }
+        },
+        {
+            code: 'describe("", function () { describe("", function () {}); });',
+            parserOptions: {
+                sourceType: 'module',
+                ecmaVersion: 2015
+            }
+        }
     ],
 
     invalid: [
         {
             code: 'describe("this is a test", function () { });' +
                   'describe("this is a different test", function () { });',
+            errors: [
+                { message: 'The number of top-level suites is more than 1.' }
+            ]
+        },
+        {
+            code: 'describe("", function () { });' +
+                  'describe("", function () { });',
+            parserOptions: {
+                sourceType: 'module',
+                ecmaVersion: 2015
+            },
             errors: [
                 { message: 'The number of top-level suites is more than 1.' }
             ]
