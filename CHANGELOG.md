@@ -1,3 +1,11 @@
+## 7.0.1 (May 30, 2020)
+
+### Bug Fixes
+
+* Fix no-setup-in-describe to not flag describe.skip() ([#256](https://github.com/lo1tuma/eslint-plugin-mocha/pull/256))
+* Fix max-top-level-suites to work with ES modules ([#255](https://github.com/lo1tuma/eslint-plugin-mocha/pull/255))
+* Support comments in arrow functions when fixing ([#253](https://github.com/lo1tuma/eslint-plugin-mocha/pull/253))
+
 ## 7.0.0 (May 13, 2020)
 
 ### Breaking Changes
