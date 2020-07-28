@@ -17,7 +17,7 @@
 ||| [no-return-from-async](no-return-from-async.md) | disallow returning from an async test or hook
 |:heavy_check_mark:|| [no-setup-in-describe](no-setup-in-describe.md) | disallow calling functions and dot operators directly in describe blocks
 |:heavy_check_mark:|| [no-sibling-hooks](no-sibling-hooks.md) | disallow duplicate uses of a hook at the same level inside a describe
-|:heavy_check_mark:|:wrench:| [no-skipped-tests](no-skipped-tests.md) | disallow skipped mocha tests
+|:heavy_check_mark:|| [no-skipped-tests](no-skipped-tests.md) | disallow skipped mocha tests
 ||| [no-synchronous-tests](no-synchronous-tests.md) | disallow synchronous tests
 |:heavy_check_mark:|| [no-top-level-hooks](no-top-level-hooks.md) | disallow top-level hooks
 ||:wrench:| [prefer-arrow-callback](prefer-arrow-callback.md) | prefer arrow function callbacks (mocha-aware)

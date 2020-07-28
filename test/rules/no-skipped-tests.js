@@ -27,77 +27,62 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
         {
             code: 'describe.skip()',
             errors: [ { message: expectedErrorMessage, column: 10, line: 1 } ],
-            output: 'describe()'
         },
         {
             code: 'describe["skip"]()',
             errors: [ { message: expectedErrorMessage, column: 10, line: 1 } ],
-            output: 'describe()'
         },
         {
             code: 'xdescribe()',
             errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
-            output: 'describe()'
         },
         {
             code: 'it.skip()',
             errors: [ { message: expectedErrorMessage, column: 4, line: 1 } ],
-            output: 'it()'
         },
         {
             code: 'it["skip"]()',
             errors: [ { message: expectedErrorMessage, column: 4, line: 1 } ],
-            output: 'it()'
         },
         {
             code: 'xit()',
             errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
-            output: 'it()'
         },
         {
             code: 'suite.skip()',
             errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ],
-            output: 'suite()'
         },
         {
             code: 'suite["skip"]()',
             errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ],
-            output: 'suite()'
         },
         {
             code: 'test.skip()',
             errors: [ { message: expectedErrorMessage, column: 6, line: 1 } ],
-            output: 'test()'
         },
         {
             code: 'test["skip"]()',
             errors: [ { message: expectedErrorMessage, column: 6, line: 1 } ],
-            output: 'test()'
         },
         {
             code: 'context.skip()',
             errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ],
-            output: 'context()'
         },
         {
             code: 'context["skip"]()',
             errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ],
-            output: 'context()'
         },
         {
             code: 'xcontext()',
             errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
-            output: 'context()'
         },
         {
             code: 'specify.skip()',
             errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ],
-            output: 'specify()'
         },
         {
             code: 'xspecify()',
             errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
-            output: 'specify()'
         },
         {
             code: 'custom.skip()',
@@ -105,7 +90,6 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
                 'mocha/additionalTestFunctions': [ 'custom' ]
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ],
-            output: 'custom()'
         },
         {
             code: 'custom["skip"]()',
@@ -113,7 +97,6 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
                 'mocha/additionalTestFunctions': [ 'custom' ]
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ],
-            output: 'custom()'
         },
         {
             code: 'xcustom()',
@@ -121,7 +104,6 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
                 'mocha/additionalXFunctions': [ 'xcustom' ]
             },
             errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
-            output: 'custom()'
         },
         {
             code: 'custom.skip()',
@@ -131,7 +113,6 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ],
-            output: 'custom()'
         },
         {
             code: 'custom["skip"]()',
@@ -141,7 +122,6 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ],
-            output: 'custom()'
         },
         {
             code: 'xcustom()',
@@ -151,7 +131,6 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
-            output: 'custom()'
         }
 
     ]
