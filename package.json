@@ -31,6 +31,7 @@
         "eslint": "^7.5.0",
         "eslint-config-holidaycheck": "^0.13.1",
         "eslint-plugin-node": "^11.1.0",
+        "eslint-plugin-unicorn": "^21.0.0",
         "mocha": "^8.1.0",
         "nyc": "^15.1.0",
         "pr-log": "^4.0.0"
