@@ -1,6 +1,6 @@
 {
     "extends": "holidaycheck/es2015",
-    "plugins": [ "node" ],
+    "plugins": [ "node", "unicorn" ],
 
     "env": {
         "node": true
@@ -12,7 +12,8 @@
     },
 
     "rules": {
-        "node/no-unsupported-features": "error"
+        "node/no-unsupported-features": "error",
+        "unicorn/prefer-includes": "error"
     },
 
     "overrides": [
