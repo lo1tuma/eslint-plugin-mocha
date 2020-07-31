@@ -27,7 +27,7 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
             code: 'a.b.c.skip()',
             settings: {
                 mocha: {
-                    additionalTestFunctions: [ 'a.b.c' ]
+                    additionalCustomNames: { exclusiveTestCases: [ 'a.b.c.only' ] }
                 }
             }
         },
@@ -35,7 +35,7 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
             code: 'a[b].c.skip()',
             settings: {
                 mocha: {
-                    additionalTestFunctions: [ 'a.b.c' ]
+                    additionalCustomNames: { exclusiveTestCases: [ 'a.b.c.only' ] }
                 }
             }
         }
@@ -93,14 +93,14 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
         {
             code: 'custom.only()',
             settings: {
-                'mocha/additionalTestFunctions': [ 'custom' ]
+                'mocha/additionalCustomNames': { exclusiveTestCases: [ 'custom.only' ] }
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
         },
         {
             code: 'custom["only"]()',
             settings: {
-                'mocha/additionalTestFunctions': [ 'custom' ]
+                'mocha/additionalCustomNames': { exclusiveTestCases: [ 'custom.only' ] }
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
         },
@@ -108,7 +108,7 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
             code: 'custom.only()',
             settings: {
                 mocha: {
-                    additionalTestFunctions: [ 'custom' ]
+                    additionalCustomNames: { exclusiveTestCases: [ 'custom.only' ] }
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
@@ -117,7 +117,7 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
             code: 'custom["only"]()',
             settings: {
                 mocha: {
-                    additionalTestFunctions: [ 'custom' ]
+                    additionalCustomNames: { exclusiveTestCases: [ 'custom.only' ] }
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
@@ -126,7 +126,7 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
             code: 'foo.bar.only()',
             settings: {
                 mocha: {
-                    additionalTestFunctions: [ 'foo.bar' ]
+                    additionalCustomNames: { exclusiveTestCases: [ 'foo.bar.only' ] }
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
@@ -135,7 +135,7 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
             code: 'foo.bar["only"]()',
             settings: {
                 mocha: {
-                    additionalTestFunctions: [ 'foo.bar' ]
+                    additionalCustomNames: { exclusiveTestCases: [ 'foo.bar.only' ] }
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
@@ -144,7 +144,7 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
             code: 'foo["bar"].only()',
             settings: {
                 mocha: {
-                    additionalTestFunctions: [ 'foo.bar' ]
+                    additionalCustomNames: { exclusiveTestCases: [ 'foo.bar.only' ] }
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 12, line: 1 } ]
@@ -153,7 +153,7 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
             code: 'foo["bar"]["only"]()',
             settings: {
                 mocha: {
-                    additionalTestFunctions: [ 'foo.bar' ]
+                    additionalCustomNames: { exclusiveTestCases: [ 'foo.bar.only' ] }
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 12, line: 1 } ]
@@ -162,7 +162,7 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
             code: 'a.b.c.only()',
             settings: {
                 mocha: {
-                    additionalTestFunctions: [ 'a.b.c' ]
+                    additionalCustomNames: { exclusiveTestCases: [ 'a.b.c.only' ] }
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ]

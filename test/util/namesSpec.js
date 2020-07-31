@@ -117,6 +117,54 @@ describe('mocha names', () => {
                 'specify.only'
             ]);
         });
+
+        it('returns the additional test case names', () => {
+            const testCaseNames = getTestCaseNames({ additionalTestCaseNames: [ 'myCustomIt' ] });
+
+            expect(testCaseNames).to.deep.equal([
+                'it',
+                'test',
+                'specify',
+                'myCustomIt'
+            ]);
+        });
+
+        it('doesn’t return the additional suite names when base names shouldn’t be included', () => {
+            const testCaseNames = getTestCaseNames({ additionalSuiteNames: [ 'myCustomIt' ], baseNames: false });
+
+            expect(testCaseNames).to.deep.equal([]);
+        });
+
+        it('returns the additional skip modifiers', () => {
+            const testCaseNames = getTestCaseNames({
+                additionalTestCaseModifiers: { skip: [ 'myCustomIt.skip' ] },
+                modifiers: [ 'skip' ],
+                baseNames: false
+            });
+
+            expect(testCaseNames).to.deep.equal([
+                'it.skip',
+                'test.skip',
+                'specify.skip',
+                'xit',
+                'xspecify',
+                'myCustomIt.skip'
+            ]);
+        });
+
+        it('doesn’t return additional skip modifiers when skip modifiers shouldn’t be included', () => {
+            const testCaseNames = getTestCaseNames({
+                additionalTestCaseModifiers: { skip: [ 'myCustomIt.skip' ] },
+                modifiers: [ 'only' ],
+                baseNames: false
+            });
+
+            expect(testCaseNames).to.deep.equal([
+                'it.only',
+                'test.only',
+                'specify.only'
+            ]);
+        });
     });
 
     describe('suite names', () => {
@@ -252,6 +300,38 @@ describe('mocha names', () => {
             const suiteNames = getSuiteNames({ additionalSuiteNames: [ 'myCustomDescribe' ], baseNames: false });
 
             expect(suiteNames).to.deep.equal([]);
+        });
+
+        it('returns the additional skip modifiers', () => {
+            const suiteNames = getSuiteNames({
+                additionalSuiteModifiers: { skip: [ 'myCustomDescribe.skip' ] },
+                modifiers: [ 'skip' ],
+                baseNames: false
+            });
+
+            expect(suiteNames).to.deep.equal([
+                'describe.skip',
+                'context.skip',
+                'suite.skip',
+                'xdescribe',
+                'xcontext',
+                'xsuite',
+                'myCustomDescribe.skip'
+            ]);
+        });
+
+        it('doesn’t return additional skip modifiers when skip modifiers shouldn’t be included', () => {
+            const suiteNames = getSuiteNames({
+                additionalSuiteModifiers: { skip: [ 'myCustomDescribe.skip' ] },
+                modifiers: [ 'only' ],
+                baseNames: false
+            });
+
+            expect(suiteNames).to.deep.equal([
+                'describe.only',
+                'context.only',
+                'suite.only'
+            ]);
         });
     });
 });

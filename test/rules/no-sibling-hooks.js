@@ -82,7 +82,7 @@ ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
                 '});'
             ].join('\n'),
             settings: {
-                'mocha/additionalSuiteNames': [ 'foo' ]
+                'mocha/additionalCustomNames': { suites: [ 'foo' ] }
             }
         }, {
             code: [
@@ -95,7 +95,7 @@ ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
             ].join('\n'),
             settings: {
                 mocha: {
-                    additionalSuiteNames: [ 'foo' ]
+                    additionalCustomNames: { suites: [ 'foo' ] }
                 }
             }
         }
@@ -153,7 +153,7 @@ ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
                 '});'
             ].join('\n'),
             settings: {
-                'mocha/additionalSuiteNames': [ 'foo' ]
+                'mocha/additionalCustomNames': { suites: [ 'foo' ] }
             },
             errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 6 } ]
         }, {
@@ -168,7 +168,7 @@ ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
             ].join('\n'),
             settings: {
                 mocha: {
-                    additionalSuiteNames: [ 'foo' ]
+                    additionalCustomNames: { suites: [ 'foo' ] }
                 }
             },
             errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 6 } ]

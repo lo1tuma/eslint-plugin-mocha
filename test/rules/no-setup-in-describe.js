@@ -56,20 +56,24 @@ ruleTester.run('no-setup-in-describe', rule, {
         {
             code: 'foo("", function () { it(); })',
             settings: {
-                'mocha/additionalSuiteNames': [ 'foo' ]
+                'mocha/additionalCustomNames': { suites: [ 'foo' ] }
             }
         }, {
             code: 'foo("", function () { it(); })',
             settings: {
                 mocha: {
-                    additionalSuiteNames: [ 'foo' ]
+                    additionalCustomNames: {
+                        suites: [ 'foo' ]
+                    }
                 }
             }
         }, {
             code: 'foo("", function () { it("", function () { b(); }); })',
             settings: {
                 mocha: {
-                    additionalSuiteNames: [ 'foo' ]
+                    additionalCustomNames: {
+                        suites: [ 'foo' ]
+                    }
                 }
             }
         },
@@ -112,7 +116,9 @@ ruleTester.run('no-setup-in-describe', rule, {
             code: 'foo("", function () { a(); });',
             settings: {
                 mocha: {
-                    additionalSuiteNames: [ 'foo' ]
+                    additionalCustomNames: {
+                        suites: [ 'foo' ]
+                    }
                 }
             },
             errors: [ {
@@ -124,7 +130,9 @@ ruleTester.run('no-setup-in-describe', rule, {
             code: 'foo("", function () { a[b]; });',
             settings: {
                 mocha: {
-                    additionalSuiteNames: [ 'foo' ]
+                    additionalCustomNames: {
+                        suites: [ 'foo' ]
+                    }
                 }
             },
             errors: [ {
@@ -136,7 +144,9 @@ ruleTester.run('no-setup-in-describe', rule, {
             code: 'foo("", function () { a["b"]; });',
             settings: {
                 mocha: {
-                    additionalSuiteNames: [ 'foo' ]
+                    additionalCustomNames: {
+                        suites: [ 'foo' ]
+                    }
                 }
             },
             errors: [ {
@@ -167,7 +177,9 @@ ruleTester.run('no-setup-in-describe', rule, {
             code: 'foo("", function () { a.b; });',
             settings: {
                 mocha: {
-                    additionalSuiteNames: [ 'foo' ]
+                    additionalCustomNames: {
+                        suites: [ 'foo' ]
+                    }
                 }
             },
             errors: [ {

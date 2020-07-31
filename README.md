@@ -20,9 +20,49 @@ Then add a reference to this plugin and selected rules in your eslint config:
 
 ```json
 {
-  "plugins": [
-    "mocha"
-  ],
+    "plugins": [
+        "mocha"
+    ]
+}
+```
+
+### Plugin Settings
+
+This plugin supports the following settings, which are used by multiple rules:
+
+* `additionalCustomNames`: This allows rules to check additional function names when looking for suites or test cases. This might be used with a custom Mocha extension, such as [`ember-mocha`](https://github.com/switchfly/ember-mocha)
+**Example:**
+
+```json
+{
+    "rules": {
+        "mocha/no-skipped-tests": "error",
+        "mocha/no-exclusive-tests": "error"
+    },
+    "settings": {
+        "mocha/additionalCustomNames": {
+            "suites": [
+                "describeModule"
+            ],
+            "suitesWithSkipModifier": [
+                "describeModule.skip",
+                "xdescribeModule"
+            ],
+            "exclusiveSuites": [
+                "describeModule.only"
+            ],
+            "testCases": [
+                "testModule"
+            ],
+            "testCasesWithSkipModifier": [
+                "testModule.customSkip",
+                "xtestModules"
+            ],
+            "exclusiveTestCases": [
+                "testModule.only"
+            ]
+        }
+    }
 }
 ```
 
@@ -34,9 +74,9 @@ Enable it with the extends option:
 
 ```json
 {
-  "extends": [
-    "plugin:mocha/recommended"
-  ],
+    "extends": [
+        "plugin:mocha/recommended"
+    ]
 }
 ```
 

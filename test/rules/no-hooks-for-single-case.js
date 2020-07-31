@@ -153,7 +153,7 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
             ].join('\n'),
             settings: {
                 mocha: {
-                    additionalSuiteNames: [ 'foo' ]
+                    additionalCustomNames: { suites: [ 'foo' ] }
                 }
             }
         },
@@ -166,7 +166,7 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '});'
             ].join('\n'),
             settings: {
-                'mocha/additionalSuiteNames': [ 'foo' ]
+                'mocha/additionalCustomNames': { suites: [ 'foo' ] }
             }
         }
     ],
@@ -294,7 +294,7 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
             ].join('\n'),
             settings: {
                 mocha: {
-                    additionalSuiteNames: [ 'foo' ]
+                    additionalCustomNames: { suites: [ 'foo' ] }
                 }
             },
             errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 } ]
@@ -306,7 +306,7 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '});'
             ].join('\n'),
             settings: {
-                'mocha/additionalSuiteNames': [ 'foo' ]
+                'mocha/additionalCustomNames': { suites: [ 'foo' ] }
             },
             errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 } ]
         }

@@ -25,13 +25,13 @@ ruleTester.run('no-top-level-hooks', rules['no-top-level-hooks'], {
         {
             code: 'foo(function() { before(function() {}); });',
             settings: {
-                'mocha/additionalSuiteNames': [ 'foo' ]
+                'mocha/additionalCustomNames': { suites: [ 'foo' ] }
             }
         }, {
             code: 'foo(function() { before(function() {}); });',
             settings: {
                 mocha: {
-                    additionalSuiteNames: [ 'foo' ]
+                    additionalCustomNames: { suites: [ 'foo' ] }
                 }
             }
         }

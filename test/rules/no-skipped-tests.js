@@ -87,21 +87,21 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
         {
             code: 'custom.skip()',
             settings: {
-                'mocha/additionalTestFunctions': [ 'custom' ]
+                'mocha/additionalCustomNames': { testCasesWithSkipModifier: [ 'custom.skip' ] }
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
         },
         {
             code: 'custom["skip"]()',
             settings: {
-                'mocha/additionalTestFunctions': [ 'custom' ]
+                'mocha/additionalCustomNames': { testCasesWithSkipModifier: [ 'custom.skip' ] }
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
         },
         {
             code: 'xcustom()',
             settings: {
-                'mocha/additionalXFunctions': [ 'xcustom' ]
+                'mocha/additionalCustomNames': { testCasesWithSkipModifier: [ 'xcustom' ] }
             },
             errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
         },
@@ -109,7 +109,7 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
             code: 'custom.skip()',
             settings: {
                 mocha: {
-                    additionalTestFunctions: [ 'custom' ]
+                    additionalCustomNames: { testCasesWithSkipModifier: [ 'custom.skip' ] }
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
@@ -118,7 +118,7 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
             code: 'custom["skip"]()',
             settings: {
                 mocha: {
-                    additionalTestFunctions: [ 'custom' ]
+                    additionalCustomNames: { testCasesWithSkipModifier: [ 'custom.skip' ] }
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
@@ -127,7 +127,7 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
             code: 'xcustom()',
             settings: {
                 mocha: {
-                    additionalXFunctions: [ 'xcustom' ]
+                    additionalCustomNames: { testCasesWithSkipModifier: [ 'xcustom' ] }
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
