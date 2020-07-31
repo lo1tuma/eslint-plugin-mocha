@@ -20,7 +20,8 @@
             "files": [ "test/**/*.js", "benchmarks/**/*.js" ],
             "env": { "mocha": true },
             "rules": {
-                "max-nested-callbacks": [ "error", 8 ]
+                "max-nested-callbacks": [ "error", 8 ],
+                "max-statements": [ "error", 30 ]
             }
         }
     ]

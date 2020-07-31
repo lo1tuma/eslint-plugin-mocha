@@ -59,6 +59,19 @@ before(function (done) {
     });
 });
 ```
+## Options
+
+This rule supports the following options:
+
+* `ignoreSkipped`: When set to `true` skipped test cases won’t be checked. Defaults to `false`.
+
+```json
+{
+    "rules": {
+        "mocha/handle-done-callback": ["error", {"ignoreSkipped": true}]
+    }
+}
+```
 
 ## When Not To Use It
 
