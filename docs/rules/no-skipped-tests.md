@@ -3,8 +3,6 @@
 Mocha has a feature that allows you to skip tests by appending `.skip` to a test-suite or a test-case, or by prepending it with an `x` (e.g., `xdescribe(...)` instead of `describe(...)`).
 Sometimes tests are skipped as part of a debugging process, and aren't intended to be committed.  This rule reminds you to remove `.skip` or the `x` prefix from your tests.
 
-**Fixable:** Problems detected by this rule are automatically fixable using the `--fix` flag on the command line.
-
 ## Rule Details
 
 This rule looks for `describe.skip`, `it.skip`, `suite.skip`, `test.skip`, `context.skip`, `specify.skip`, `xdescribe`, `xit`, `xcontext` and `xspecify` occurrences within the source code.

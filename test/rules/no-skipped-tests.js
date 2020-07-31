@@ -26,102 +26,84 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
     invalid: [
         {
             code: 'describe.skip()',
-            errors: [ { message: expectedErrorMessage, column: 10, line: 1 } ],
-            output: 'describe()'
+            errors: [ { message: expectedErrorMessage, column: 10, line: 1 } ]
         },
         {
             code: 'describe["skip"]()',
-            errors: [ { message: expectedErrorMessage, column: 10, line: 1 } ],
-            output: 'describe()'
+            errors: [ { message: expectedErrorMessage, column: 10, line: 1 } ]
         },
         {
             code: 'xdescribe()',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
-            output: 'describe()'
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
         },
         {
             code: 'it.skip()',
-            errors: [ { message: expectedErrorMessage, column: 4, line: 1 } ],
-            output: 'it()'
+            errors: [ { message: expectedErrorMessage, column: 4, line: 1 } ]
         },
         {
             code: 'it["skip"]()',
-            errors: [ { message: expectedErrorMessage, column: 4, line: 1 } ],
-            output: 'it()'
+            errors: [ { message: expectedErrorMessage, column: 4, line: 1 } ]
         },
         {
             code: 'xit()',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
-            output: 'it()'
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
         },
         {
             code: 'suite.skip()',
-            errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ],
-            output: 'suite()'
+            errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ]
         },
         {
             code: 'suite["skip"]()',
-            errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ],
-            output: 'suite()'
+            errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ]
         },
         {
             code: 'test.skip()',
-            errors: [ { message: expectedErrorMessage, column: 6, line: 1 } ],
-            output: 'test()'
+            errors: [ { message: expectedErrorMessage, column: 6, line: 1 } ]
         },
         {
             code: 'test["skip"]()',
-            errors: [ { message: expectedErrorMessage, column: 6, line: 1 } ],
-            output: 'test()'
+            errors: [ { message: expectedErrorMessage, column: 6, line: 1 } ]
         },
         {
             code: 'context.skip()',
-            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ],
-            output: 'context()'
+            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
         },
         {
             code: 'context["skip"]()',
-            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ],
-            output: 'context()'
+            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
         },
         {
             code: 'xcontext()',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
-            output: 'context()'
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
         },
         {
             code: 'specify.skip()',
-            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ],
-            output: 'specify()'
+            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
         },
         {
             code: 'xspecify()',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
-            output: 'specify()'
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
         },
         {
             code: 'custom.skip()',
             settings: {
                 'mocha/additionalTestFunctions': [ 'custom' ]
             },
-            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ],
-            output: 'custom()'
+            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
         },
         {
             code: 'custom["skip"]()',
             settings: {
                 'mocha/additionalTestFunctions': [ 'custom' ]
             },
-            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ],
-            output: 'custom()'
+            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
         },
         {
             code: 'xcustom()',
             settings: {
                 'mocha/additionalXFunctions': [ 'xcustom' ]
             },
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
-            output: 'custom()'
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
         },
         {
             code: 'custom.skip()',
@@ -130,8 +112,7 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
                     additionalTestFunctions: [ 'custom' ]
                 }
             },
-            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ],
-            output: 'custom()'
+            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
         },
         {
             code: 'custom["skip"]()',
@@ -140,8 +121,7 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
                     additionalTestFunctions: [ 'custom' ]
                 }
             },
-            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ],
-            output: 'custom()'
+            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
         },
         {
             code: 'xcustom()',
@@ -150,8 +130,7 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
                     additionalXFunctions: [ 'xcustom' ]
                 }
             },
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ],
-            output: 'custom()'
+            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
         }
 
     ]
