@@ -31,6 +31,10 @@ ruleTester.run('handle-done-callback', rules['handle-done-callback'], {
         {
             code: 'it("", (done) => { done(); });',
             parserOptions: { ecmaVersion: 6 }
+        },
+        {
+            code: 'it.skip("", function (done) { });',
+            options: [ { ignoreSkipped: true } ]
         }
     ],
 
@@ -38,6 +42,14 @@ ruleTester.run('handle-done-callback', rules['handle-done-callback'], {
         {
             code: 'it("", function (done) { });',
             errors: [ { message: 'Expected "done" callback to be handled.', column: 18, line: 1 } ]
+        },
+        {
+            code: 'it.skip("", function (done) { });',
+            errors: [ { message: 'Expected "done" callback to be handled.', column: 23, line: 1 } ]
+        },
+        {
+            code: 'xit("", function (done) { });',
+            errors: [ { message: 'Expected "done" callback to be handled.', column: 19, line: 1 } ]
         },
         {
             code: 'it("", function (done) { callback(); });',
