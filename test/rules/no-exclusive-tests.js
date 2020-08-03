@@ -27,7 +27,7 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
             code: 'a.b.c.skip()',
             settings: {
                 mocha: {
-                    additionalCustomNames: { exclusiveTestCases: [ 'a.b.c.only' ] }
+                    additionalCustomNames: [ { name: 'a.b.c', type: 'testCase', interfaces: [ 'BDD' ] } ]
                 }
             }
         },
@@ -35,7 +35,7 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
             code: 'a[b].c.skip()',
             settings: {
                 mocha: {
-                    additionalCustomNames: { exclusiveTestCases: [ 'a.b.c.only' ] }
+                    additionalCustomNames: [ { name: 'a.b.c', type: 'testCase', interfaces: [ 'BDD' ] } ]
                 }
             }
         }
@@ -93,14 +93,14 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
         {
             code: 'custom.only()',
             settings: {
-                'mocha/additionalCustomNames': { exclusiveTestCases: [ 'custom.only' ] }
+                'mocha/additionalCustomNames': [ { name: 'custom', type: 'testCase', interfaces: [ 'BDD' ] } ]
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
         },
         {
             code: 'custom["only"]()',
             settings: {
-                'mocha/additionalCustomNames': { exclusiveTestCases: [ 'custom.only' ] }
+                'mocha/additionalCustomNames': [ { name: 'custom', type: 'testCase', interfaces: [ 'BDD' ] } ]
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
         },
@@ -108,7 +108,7 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
             code: 'custom.only()',
             settings: {
                 mocha: {
-                    additionalCustomNames: { exclusiveTestCases: [ 'custom.only' ] }
+                    additionalCustomNames: [ { name: 'custom', type: 'testCase', interfaces: [ 'BDD' ] } ]
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
@@ -117,7 +117,7 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
             code: 'custom["only"]()',
             settings: {
                 mocha: {
-                    additionalCustomNames: { exclusiveTestCases: [ 'custom.only' ] }
+                    additionalCustomNames: [ { name: 'custom', type: 'testCase', interfaces: [ 'BDD' ] } ]
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
@@ -126,7 +126,7 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
             code: 'foo.bar.only()',
             settings: {
                 mocha: {
-                    additionalCustomNames: { exclusiveTestCases: [ 'foo.bar.only' ] }
+                    additionalCustomNames: [ { name: 'foo.bar', type: 'testCase', interfaces: [ 'BDD' ] } ]
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
@@ -135,7 +135,7 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
             code: 'foo.bar["only"]()',
             settings: {
                 mocha: {
-                    additionalCustomNames: { exclusiveTestCases: [ 'foo.bar.only' ] }
+                    additionalCustomNames: [ { name: 'foo.bar', type: 'testCase', interfaces: [ 'BDD' ] } ]
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
@@ -144,7 +144,7 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
             code: 'foo["bar"].only()',
             settings: {
                 mocha: {
-                    additionalCustomNames: { exclusiveTestCases: [ 'foo.bar.only' ] }
+                    additionalCustomNames: [ { name: 'foo.bar', type: 'testCase', interfaces: [ 'BDD' ] } ]
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 12, line: 1 } ]
@@ -153,7 +153,7 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
             code: 'foo["bar"]["only"]()',
             settings: {
                 mocha: {
-                    additionalCustomNames: { exclusiveTestCases: [ 'foo.bar.only' ] }
+                    additionalCustomNames: [ { name: 'foo.bar', type: 'testCase', interfaces: [ 'BDD' ] } ]
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 12, line: 1 } ]
@@ -162,7 +162,7 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
             code: 'a.b.c.only()',
             settings: {
                 mocha: {
-                    additionalCustomNames: { exclusiveTestCases: [ 'a.b.c.only' ] }
+                    additionalCustomNames: [ { name: 'a.b.c', type: 'testCase', interfaces: [ 'BDD' ] } ]
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ]

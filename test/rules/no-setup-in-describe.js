@@ -56,24 +56,20 @@ ruleTester.run('no-setup-in-describe', rule, {
         {
             code: 'foo("", function () { it(); })',
             settings: {
-                'mocha/additionalCustomNames': { suites: [ 'foo' ] }
+                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
             }
         }, {
             code: 'foo("", function () { it(); })',
             settings: {
                 mocha: {
-                    additionalCustomNames: {
-                        suites: [ 'foo' ]
-                    }
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
                 }
             }
         }, {
             code: 'foo("", function () { it("", function () { b(); }); })',
             settings: {
                 mocha: {
-                    additionalCustomNames: {
-                        suites: [ 'foo' ]
-                    }
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
                 }
             }
         },
@@ -116,9 +112,7 @@ ruleTester.run('no-setup-in-describe', rule, {
             code: 'foo("", function () { a(); });',
             settings: {
                 mocha: {
-                    additionalCustomNames: {
-                        suites: [ 'foo' ]
-                    }
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
                 }
             },
             errors: [ {
@@ -130,9 +124,7 @@ ruleTester.run('no-setup-in-describe', rule, {
             code: 'foo("", function () { a[b]; });',
             settings: {
                 mocha: {
-                    additionalCustomNames: {
-                        suites: [ 'foo' ]
-                    }
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
                 }
             },
             errors: [ {
@@ -144,9 +136,7 @@ ruleTester.run('no-setup-in-describe', rule, {
             code: 'foo("", function () { a["b"]; });',
             settings: {
                 mocha: {
-                    additionalCustomNames: {
-                        suites: [ 'foo' ]
-                    }
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
                 }
             },
             errors: [ {
@@ -177,9 +167,7 @@ ruleTester.run('no-setup-in-describe', rule, {
             code: 'foo("", function () { a.b; });',
             settings: {
                 mocha: {
-                    additionalCustomNames: {
-                        suites: [ 'foo' ]
-                    }
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
                 }
             },
             errors: [ {

@@ -98,7 +98,7 @@ ruleTester.run('no-identical-title', rules['no-identical-title'], {
                 'foo("describe2", function() {});'
             ].join('\n'),
             settings: {
-                'mocha/additionalCustomNames': { suites: [ 'foo' ] }
+                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
             }
         }, {
             code: [
@@ -107,7 +107,7 @@ ruleTester.run('no-identical-title', rules['no-identical-title'], {
             ].join('\n'),
             settings: {
                 mocha: {
-                    additionalCustomNames: { suites: [ 'foo' ] }
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
                 }
             }
         }
@@ -180,7 +180,7 @@ ruleTester.run('no-identical-title', rules['no-identical-title'], {
                 'foo("describe1", function() {});'
             ].join('\n'),
             settings: {
-                'mocha/additionalCustomNames': { suites: [ 'foo' ] }
+                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
             },
             errors: [ { message: 'Test suite title is used multiple times.', column: 1, line: 2 } ]
         }, {
@@ -190,7 +190,7 @@ ruleTester.run('no-identical-title', rules['no-identical-title'], {
             ].join('\n'),
             settings: {
                 mocha: {
-                    additionalCustomNames: { suites: [ 'foo' ] }
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
                 }
             },
             errors: [ { message: 'Test suite title is used multiple times.', column: 1, line: 2 } ]

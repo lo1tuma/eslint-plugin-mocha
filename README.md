@@ -40,27 +40,9 @@ This plugin supports the following settings, which are used by multiple rules:
         "mocha/no-exclusive-tests": "error"
     },
     "settings": {
-        "mocha/additionalCustomNames": {
-            "suites": [
-                "describeModule"
-            ],
-            "suitesWithSkipModifier": [
-                "describeModule.skip",
-                "xdescribeModule"
-            ],
-            "exclusiveSuites": [
-                "describeModule.only"
-            ],
-            "testCases": [
-                "testModule"
-            ],
-            "testCasesWithSkipModifier": [
-                "testModule.customSkip",
-                "xtestModules"
-            ],
-            "exclusiveTestCases": [
-                "testModule.only"
-            ]
+        "mocha/additionalCustomNames": [
+            { "name": "describeModule", "type": "suite", "interfaces": [ "BDD" ] },
+            { "name": "testModule", "type": "testCase", "interfaces": [ "TDD" ] }
         }
     }
 }

@@ -20,7 +20,15 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
         'context.only()',
         'var appliedOnly = describe.skip; appliedOnly.apply(describe)',
         'var calledOnly = it.skip; calledOnly.call(it)',
-        'var dynamicOnly = "skip"; suite[dynamicOnly]()'
+        'var dynamicOnly = "skip"; suite[dynamicOnly]()',
+        {
+            code: 'xcustom()',
+            settings: {
+                mocha: {
+                    additionalCustomNames: [ { name: 'custom', type: 'testCase', interfaces: [ 'TDD' ] } ]
+                }
+            }
+        }
     ],
 
     invalid: [
@@ -87,21 +95,21 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
         {
             code: 'custom.skip()',
             settings: {
-                'mocha/additionalCustomNames': { testCasesWithSkipModifier: [ 'custom.skip' ] }
+                'mocha/additionalCustomNames': [ { name: 'custom', type: 'testCase', interfaces: [ 'BDD' ] } ]
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
         },
         {
             code: 'custom["skip"]()',
             settings: {
-                'mocha/additionalCustomNames': { testCasesWithSkipModifier: [ 'custom.skip' ] }
+                'mocha/additionalCustomNames': [ { name: 'custom', type: 'testCase', interfaces: [ 'BDD' ] } ]
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
         },
         {
             code: 'xcustom()',
             settings: {
-                'mocha/additionalCustomNames': { testCasesWithSkipModifier: [ 'xcustom' ] }
+                'mocha/additionalCustomNames': [ { name: 'custom', type: 'testCase', interfaces: [ 'BDD' ] } ]
             },
             errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
         },
@@ -109,7 +117,7 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
             code: 'custom.skip()',
             settings: {
                 mocha: {
-                    additionalCustomNames: { testCasesWithSkipModifier: [ 'custom.skip' ] }
+                    additionalCustomNames: [ { name: 'custom', type: 'testCase', interfaces: [ 'BDD' ] } ]
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
@@ -118,7 +126,7 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
             code: 'custom["skip"]()',
             settings: {
                 mocha: {
-                    additionalCustomNames: { testCasesWithSkipModifier: [ 'custom.skip' ] }
+                    additionalCustomNames: [ { name: 'custom', type: 'testCase', interfaces: [ 'BDD' ] } ]
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
@@ -127,12 +135,11 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
             code: 'xcustom()',
             settings: {
                 mocha: {
-                    additionalCustomNames: { testCasesWithSkipModifier: [ 'xcustom' ] }
+                    additionalCustomNames: [ { name: 'custom', type: 'testCase', interfaces: [ 'BDD' ] } ]
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
         }
-
     ]
 
 });
