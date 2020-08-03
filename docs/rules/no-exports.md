@@ -33,3 +33,7 @@ beforeEach(function () { /* ... */ });
 
 afterEach(function () { /* ... */ });
 ```
+
+## When Not To Use It
+
+When you use the [`exports`](https://mochajs.org/#exports) interface it is not recommended to use this rule.
