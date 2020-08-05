@@ -43,7 +43,7 @@ This plugin supports the following settings, which are used by multiple rules:
         "mocha/additionalCustomNames": [
             { "name": "describeModule", "type": "suite", "interfaces": [ "BDD" ] },
             { "name": "testModule", "type": "testCase", "interfaces": [ "TDD" ] }
-        }
+        ]
     }
 }
 ```
