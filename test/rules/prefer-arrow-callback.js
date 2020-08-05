@@ -57,7 +57,6 @@ ruleTester.run('prefer-arrow-callback', rules['prefer-arrow-callback'], {
         'context.only("name", function bar() {});',
         'context.skip("name", function bar() {});',
         'suite("name", function bar() {});',
-        'xsuite("name", function bar() {});',
         'suite.only("name", function bar() {});',
         'suite.skip("name", function bar() {});',
         'it("name", function bar() {});',

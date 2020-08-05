@@ -13,13 +13,13 @@ ruleTester.run('no-nested-tests', rule, {
         {
             code: 'foo("", function () { it(); })',
             settings: {
-                'mocha/additionalSuiteNames': [ 'foo' ]
+                'mocha/additionalCustomNames': [ { name: 'foo', interfaces: [ 'BDD' ] } ]
             }
         }, {
             code: 'foo("", function () { it(); })',
             settings: {
                 mocha: {
-                    additionalSuiteNames: [ 'foo' ]
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
                 }
             }
         }
@@ -121,7 +121,7 @@ ruleTester.run('no-nested-tests', rule, {
         {
             code: 'it("", function () { foo() });',
             settings: {
-                'mocha/additionalSuiteNames': [ 'foo' ]
+                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
             },
             errors: [ {
                 message: 'Unexpected suite nested within a test.',
@@ -133,7 +133,7 @@ ruleTester.run('no-nested-tests', rule, {
             code: 'it("", function () { foo() });',
             settings: {
                 mocha: {
-                    additionalSuiteNames: [ 'foo' ]
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
                 }
             },
             errors: [ {

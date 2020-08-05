@@ -49,25 +49,6 @@ suite.skip("bar", function () {});
 test.skip("bar", function () {});
 ```
 
-## Settings
-
-This rule supports the following shared configuration setting:
-
-* `additionalTestFunctions`: An array of extra test functions to protect.  This might be used with a custom Mocha extension, such as [`ember-mocha`](https://github.com/switchfly/ember-mocha)
-
-```json
-{
-    "rules": {
-        "mocha/no-exclusive-tests": "error"
-    },
-    "settings": {
-       "mocha/additionalTestFunctions": [
-           "describeModule"
-       ]
-    }
-}
-```
-
 ## When Not To Use It
 
 * If you really want to execute only one test-suite or test-case because all other tests should not be executed, turn this rule off.

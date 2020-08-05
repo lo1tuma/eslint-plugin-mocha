@@ -10,27 +10,27 @@ describe('mocha names', () => {
 
             expect(testCaseNames).to.deep.equal([
                 'it',
-                'test',
-                'specify'
+                'specify',
+                'test'
             ]);
         });
 
         it('returns an empty list when no modifiers and no base names are wanted', () => {
-            const testCaseNames = getTestCaseNames({ baseNames: false });
+            const testCaseNames = getTestCaseNames({ modifiersOnly: true, modifiers: [] });
 
             expect(testCaseNames).to.deep.equal([]);
         });
 
         it('always returns a new array', () => {
-            const testCaseNames1 = getTestCaseNames({ baseNames: false });
-            const testCaseNames2 = getTestCaseNames({ baseNames: false });
+            const testCaseNames1 = getTestCaseNames({ modifiersOnly: true });
+            const testCaseNames2 = getTestCaseNames({ modifiersOnly: true });
 
             expect(testCaseNames1).to.deep.equal(testCaseNames2);
             expect(testCaseNames1).to.not.equal(testCaseNames2);
         });
 
         it('ignores invalid modifiers', () => {
-            const testCaseNames = getTestCaseNames({ modifiers: [ 'foo' ], baseNames: false });
+            const testCaseNames = getTestCaseNames({ modifiers: [ 'foo' ], modifiersOnly: true });
 
             expect(testCaseNames).to.deep.equal([]);
         });
@@ -40,23 +40,23 @@ describe('mocha names', () => {
 
             expect(testCaseNames).to.deep.equal([
                 'it',
-                'test',
                 'specify',
+                'test',
                 'it.skip',
-                'test.skip',
                 'specify.skip',
+                'test.skip',
                 'xit',
                 'xspecify'
             ]);
         });
 
         it('returns the list of test case names only with "skip" modifiers applied', () => {
-            const testCaseNames = getTestCaseNames({ modifiers: [ 'skip' ], baseNames: false });
+            const testCaseNames = getTestCaseNames({ modifiers: [ 'skip' ], modifiersOnly: true });
 
             expect(testCaseNames).to.deep.equal([
                 'it.skip',
-                'test.skip',
                 'specify.skip',
+                'test.skip',
                 'xit',
                 'xspecify'
             ]);
@@ -67,21 +67,21 @@ describe('mocha names', () => {
 
             expect(testCaseNames).to.deep.equal([
                 'it',
-                'test',
                 'specify',
+                'test',
                 'it.only',
-                'test.only',
-                'specify.only'
+                'specify.only',
+                'test.only'
             ]);
         });
 
         it('returns the list of test case names only with "only" modifiers applied', () => {
-            const testCaseNames = getTestCaseNames({ modifiers: [ 'only' ], baseNames: false });
+            const testCaseNames = getTestCaseNames({ modifiers: [ 'only' ], modifiersOnly: true });
 
             expect(testCaseNames).to.deep.equal([
                 'it.only',
-                'test.only',
-                'specify.only'
+                'specify.only',
+                'test.only'
             ]);
         });
 
@@ -90,31 +90,80 @@ describe('mocha names', () => {
 
             expect(testCaseNames).to.deep.equal([
                 'it',
-                'test',
                 'specify',
+                'test',
                 'it.skip',
-                'test.skip',
                 'specify.skip',
+                'test.skip',
                 'xit',
                 'xspecify',
                 'it.only',
-                'test.only',
-                'specify.only'
+                'specify.only',
+                'test.only'
             ]);
         });
 
         it('returns the list of test case names only with modifiers applied', () => {
-            const testCaseNames = getTestCaseNames({ modifiers: [ 'skip', 'only' ], baseNames: false });
+            const testCaseNames = getTestCaseNames({ modifiers: [ 'skip', 'only' ], modifiersOnly: true });
 
             expect(testCaseNames).to.deep.equal([
                 'it.skip',
-                'test.skip',
                 'specify.skip',
+                'test.skip',
                 'xit',
                 'xspecify',
                 'it.only',
-                'test.only',
-                'specify.only'
+                'specify.only',
+                'test.only'
+            ]);
+        });
+
+        it('returns the additional test case names', () => {
+            const testCaseNames = getTestCaseNames({
+                additionalCustomNames: [
+                    { name: 'myCustomIt', type: 'testCase', interfaces: [ 'BDD' ] }
+                ]
+            });
+
+            expect(testCaseNames).to.deep.equal([
+                'it',
+                'specify',
+                'test',
+                'myCustomIt'
+            ]);
+        });
+
+        it('doesn’t return the additional suite names when base names shouldn’t be included', () => {
+            const testCaseNames = getTestCaseNames({
+                additionalCustomNames: [
+                    { name: 'myCustomIt', type: 'testCase', interfaces: [ 'BDD' ] }
+                ],
+                modifiersOnly: true
+            });
+
+            expect(testCaseNames).to.deep.equal([]);
+        });
+
+        it('returns the additional skip modifiers', () => {
+            const testCaseNames = getTestCaseNames({
+                additionalCustomNames: [
+                    { name: 'myCustomIt', type: 'testCase', interfaces: [ 'BDD' ] },
+                    { name: 'myCustomTest', type: 'testCase', interfaces: [ 'TDD' ] }
+
+                ],
+                modifiersOnly: true,
+                modifiers: [ 'skip' ]
+            });
+
+            expect(testCaseNames).to.deep.equal([
+                'it.skip',
+                'specify.skip',
+                'test.skip',
+                'myCustomIt.skip',
+                'myCustomTest.skip',
+                'xit',
+                'xspecify',
+                'xmyCustomIt'
             ]);
         });
     });
@@ -131,21 +180,21 @@ describe('mocha names', () => {
         });
 
         it('returns an empty list when no modifiers and no base names are wanted', () => {
-            const suiteNames = getSuiteNames({ baseNames: false });
+            const suiteNames = getSuiteNames({ modifiersOnly: true });
 
             expect(suiteNames).to.deep.equal([]);
         });
 
         it('always returns a new array', () => {
-            const suiteNames1 = getSuiteNames({ baseNames: false });
-            const suiteNames2 = getSuiteNames({ baseNames: false });
+            const suiteNames1 = getSuiteNames({ modifiersOnly: true });
+            const suiteNames2 = getSuiteNames({ modifiersOnly: true });
 
             expect(suiteNames1).to.deep.equal(suiteNames2);
             expect(suiteNames1).to.not.equal(suiteNames2);
         });
 
         it('ignores invalid modifiers', () => {
-            const suiteNames = getSuiteNames({ modifiers: [ 'foo' ], baseNames: false });
+            const suiteNames = getSuiteNames({ modifiers: [ 'foo' ], modifiersOnly: true });
 
             expect(suiteNames).to.deep.equal([]);
         });
@@ -161,21 +210,19 @@ describe('mocha names', () => {
                 'context.skip',
                 'suite.skip',
                 'xdescribe',
-                'xcontext',
-                'xsuite'
+                'xcontext'
             ]);
         });
 
         it('returns the list of suite names only with "skip" modifiers applied', () => {
-            const suiteNames = getSuiteNames({ modifiers: [ 'skip' ], baseNames: false });
+            const suiteNames = getSuiteNames({ modifiers: [ 'skip' ], modifiersOnly: true });
 
             expect(suiteNames).to.deep.equal([
                 'describe.skip',
                 'context.skip',
                 'suite.skip',
                 'xdescribe',
-                'xcontext',
-                'xsuite'
+                'xcontext'
             ]);
         });
 
@@ -193,7 +240,7 @@ describe('mocha names', () => {
         });
 
         it('returns the list of suite names only with "only" modifiers applied', () => {
-            const suiteNames = getSuiteNames({ modifiers: [ 'only' ], baseNames: false });
+            const suiteNames = getSuiteNames({ modifiers: [ 'only' ], modifiersOnly: true });
 
             expect(suiteNames).to.deep.equal([
                 'describe.only',
@@ -214,15 +261,14 @@ describe('mocha names', () => {
                 'suite.skip',
                 'xdescribe',
                 'xcontext',
-                'xsuite',
                 'describe.only',
                 'context.only',
                 'suite.only'
             ]);
         });
 
-        it('returns the list of suite names names only with modifiers applied', () => {
-            const suiteNames = getSuiteNames({ modifiers: [ 'skip', 'only' ], baseNames: false });
+        it('returns the list of suite names only with modifiers applied', () => {
+            const suiteNames = getSuiteNames({ modifiers: [ 'skip', 'only' ], modifiersOnly: true });
 
             expect(suiteNames).to.deep.equal([
                 'describe.skip',
@@ -230,7 +276,6 @@ describe('mocha names', () => {
                 'suite.skip',
                 'xdescribe',
                 'xcontext',
-                'xsuite',
                 'describe.only',
                 'context.only',
                 'suite.only'
@@ -238,7 +283,11 @@ describe('mocha names', () => {
         });
 
         it('returns the additional suite names', () => {
-            const suiteNames = getSuiteNames({ additionalSuiteNames: [ 'myCustomDescribe' ] });
+            const suiteNames = getSuiteNames({
+                additionalCustomNames: [
+                    { name: 'myCustomDescribe', type: 'suite', interfaces: [ 'BDD' ] }
+                ]
+            });
 
             expect(suiteNames).to.deep.equal([
                 'describe',
@@ -249,9 +298,31 @@ describe('mocha names', () => {
         });
 
         it('doesn’t return the additional suite names when base names shouldn’t be included', () => {
-            const suiteNames = getSuiteNames({ additionalSuiteNames: [ 'myCustomDescribe' ], baseNames: false });
+            const suiteNames = getSuiteNames({ additionalSuiteNames: [ 'myCustomDescribe' ], modifiersOnly: true });
 
             expect(suiteNames).to.deep.equal([]);
+        });
+
+        it('returns the additional skip modifiers', () => {
+            const suiteNames = getSuiteNames({
+                additionalCustomNames: [
+                    { name: 'myCustomDescribe', type: 'suite', interfaces: [ 'BDD' ] },
+                    { name: 'myCustomSuite', type: 'suite', interfaces: [ 'TDD' ] }
+                ],
+                modifiers: [ 'skip' ],
+                modifiersOnly: true
+            });
+
+            expect(suiteNames).to.deep.equal([
+                'describe.skip',
+                'context.skip',
+                'suite.skip',
+                'myCustomDescribe.skip',
+                'myCustomSuite.skip',
+                'xdescribe',
+                'xcontext',
+                'xmyCustomDescribe'
+            ]);
         });
     });
 });

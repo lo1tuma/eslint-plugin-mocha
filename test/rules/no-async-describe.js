@@ -32,7 +32,7 @@ ruleTester.run('no-async-describe', rule, {
             output: 'foo("hello", function () {})',
             settings: {
                 mocha: {
-                    additionalSuiteNames: [ 'foo' ]
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
                 }
             },
             parserOptions: { ecmaVersion: 8 }, errors: [ {

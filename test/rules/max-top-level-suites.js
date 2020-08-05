@@ -43,13 +43,13 @@ ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
         {
             code: 'foo("This is a test", function () { });',
             settings: {
-                'mocha/additionalSuiteNames': [ 'foo' ]
+                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
             }
         }, {
             code: 'foo("This is a test", function () { });',
             settings: {
                 mocha: {
-                    additionalSuiteNames: [ 'foo' ]
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
                 }
             }
         },
@@ -195,7 +195,7 @@ ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
             code: 'foo("this is a test", function () { });' +
                   'foo("this is a different test", function () { });',
             settings: {
-                'mocha/additionalSuiteNames': [ 'foo' ]
+                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
             },
             errors: [
                 { message: 'The number of top-level suites is more than 1.' }
@@ -205,7 +205,7 @@ ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
                   'foo("this is a different test", function () { });',
             settings: {
                 mocha: {
-                    additionalSuiteNames: [ 'foo' ]
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
                 }
             },
             errors: [

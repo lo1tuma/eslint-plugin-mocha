@@ -82,7 +82,7 @@ ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
                 '});'
             ].join('\n'),
             settings: {
-                'mocha/additionalSuiteNames': [ 'foo' ]
+                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
             }
         }, {
             code: [
@@ -95,7 +95,7 @@ ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
             ].join('\n'),
             settings: {
                 mocha: {
-                    additionalSuiteNames: [ 'foo' ]
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
                 }
             }
         }
@@ -153,7 +153,7 @@ ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
                 '});'
             ].join('\n'),
             settings: {
-                'mocha/additionalSuiteNames': [ 'foo' ]
+                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
             },
             errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 6 } ]
         }, {
@@ -168,7 +168,7 @@ ruleTester.run('no-sibling-hooks', rules['no-sibling-hooks'], {
             ].join('\n'),
             settings: {
                 mocha: {
-                    additionalSuiteNames: [ 'foo' ]
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
                 }
             },
             errors: [ { message: 'Unexpected use of duplicate Mocha `before` hook', column: 5, line: 6 } ]
