@@ -6,6 +6,7 @@
 |:heavy_check_mark:|| [max-top-level-suites](max-top-level-suites.md) | limit the number of top-level suites in a single file
 |:heavy_check_mark:|:wrench:| [no-async-describe](no-async-describe.md) | disallow async functions passed to describe
 |:heavy_check_mark:|| [no-exclusive-tests](no-exclusive-tests.md) | disallow exclusive mocha tests
+||| [no-exports](no-exports.md) | disallow exports from test files
 |:heavy_check_mark:|| [no-global-tests](no-global-tests.md) | disallow global tests
 ||| [no-hooks](no-hooks.md) | disallow hooks
 |:heavy_check_mark:|| [no-hooks-for-single-case](no-hooks-for-single-case.md) | disallow hooks for a single test or test suite
