@@ -1,3 +1,30 @@
+## 8.0.0 (August 6, 2020)
+
+### Breaking Changes
+
+* Consistently use shared settings in all rules ([#262](https://github.com/lo1tuma/eslint-plugin-mocha/pull/262))
+* remove autofix from no-skipped-tests rule fix ([#258](https://github.com/lo1tuma/eslint-plugin-mocha/pull/258))
+
+### Features
+
+* New rule no-exports ([#263](https://github.com/lo1tuma/eslint-plugin-mocha/pull/263))
+
+### Enhancements
+
+* New option `ignoreSkipped` for `handle-done-callback` rule ([#260](https://github.com/lo1tuma/eslint-plugin-mocha/pull/260))
+
+### Documentation
+
+* Add meta.docs.description to all rules ([#257](https://github.com/lo1tuma/eslint-plugin-mocha/pull/257))
+
+### Dependency Upgrades
+
+* Update dependencies ([#259](https://github.com/lo1tuma/eslint-plugin-mocha/pull/259))
+
+### Code Refactoring
+
+* Use includes instead of indexOf ([#261](https://github.com/lo1tuma/eslint-plugin-mocha/pull/261))
+
 ## 7.0.1 (May 30, 2020)
 
 ### Bug Fixes
