@@ -43,6 +43,13 @@ ruleTester.run('prefer-arrow-callback', rules['prefer-arrow-callback'], {
         'foo(function bar() { new.target; });',
         'foo(function bar() { new.target; }.bind(this));',
         'foo(function bar() { this; }.bind(this, somethingElse));',
+        {
+            code: 'import.meta.url',
+            parserOptions: {
+                ecmaVersion: 2020,
+                sourceType: 'module'
+            }
+        },
         // mocha-specific valid test cases
         'before(function bar() {});',
         'after(function bar() {});',
