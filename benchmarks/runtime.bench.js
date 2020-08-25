@@ -3,6 +3,8 @@
 const { expect } = require('chai');
 const { Linter } = require('eslint');
 const times = require('ramda/src/times');
+const toPairs = require('ramda/src/toPairs');
+const fromPairs = require('ramda/src/fromPairs');
 const { runBenchmark, cpuSpeed } = require('./measure');
 const mochaPlugin = require('../');
 
@@ -14,7 +16,7 @@ function lintManyFilesWithAllRecommendedRules({ numberOfFiles }) {
     linter.defineRules(mochaPlugin.rules);
 
     const config = {
-        rules: Object.fromEntries(Object.entries(recommendedRules).map(([ ruleName, ruleSettings ]) => {
+        rules: fromPairs(toPairs(recommendedRules).map(([ ruleName, ruleSettings ]) => {
             const [ , ruleNameWithoutPrefix ] = ruleName.split('/');
 
             return [ ruleNameWithoutPrefix, ruleSettings ];
