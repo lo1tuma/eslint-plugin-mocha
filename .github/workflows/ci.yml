@@ -19,6 +19,7 @@ jobs:
               run: npm install
             - name: Run tests
               run: npm test
+              timeout-minutes: 20
             - name: Coveralls
               uses: coverallsapp/github-action@master
               with:
