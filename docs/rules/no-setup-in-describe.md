@@ -1,4 +1,3 @@
-
 # Disallow setup in describe blocks (no-setup-in-describe)
 
 Setup for test cases in mocha should be done in `before`, `beforeEach`, or `it` blocks. Unfortunately there is nothing stopping you from doing setup directly inside a `describe` block.
