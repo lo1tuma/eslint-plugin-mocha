@@ -85,7 +85,7 @@ function lintManyFilesWithAllRecommendedRules({ numberOfFiles }) {
 
 describe('runtime', () => {
     it('should not take longer as the defined budget to lint many files with the recommended config', () => {
-        const budget = 60000000 / cpuSpeed;
+        const budget = 80000000 / cpuSpeed;
 
         const { medianDuration } = runBenchmark(() => {
             lintManyFilesWithAllRecommendedRules({ numberOfFiles: 350 });
