@@ -5,7 +5,7 @@ const { Linter } = require('eslint');
 const times = require('ramda/src/times');
 const toPairs = require('ramda/src/toPairs');
 const fromPairs = require('ramda/src/fromPairs');
-const { runBenchmark, cpuSpeed } = require('./measure');
+const { runBenchmark, cpuSpeed, getNodeVersionMultiplier } = require('./measure');
 const mochaPlugin = require('../');
 
 const recommendedRules = mochaPlugin.configs.recommended.rules;
@@ -85,7 +85,8 @@ function lintManyFilesWithAllRecommendedRules({ numberOfFiles }) {
 
 describe('runtime', () => {
     it('should not take longer as the defined budget to lint many files with the recommended config', () => {
-        const budget = 80000000 / cpuSpeed;
+        const nodeVersionMultiplier = getNodeVersionMultiplier();
+        const budget = 80000000 / cpuSpeed * nodeVersionMultiplier;
 
         const { medianDuration } = runBenchmark(() => {
             lintManyFilesWithAllRecommendedRules({ numberOfFiles: 350 });

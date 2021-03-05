@@ -6,8 +6,23 @@ const times = require('ramda/src/times');
 const median = require('ramda/src/median');
 const map = require('ramda/src/map');
 const prop = require('ramda/src/prop');
+const semver = require('semver');
 
 const [ { speed: cpuSpeed } ] = os.cpus();
+
+function getNodeVersionMultiplier() {
+    const currentNodeVersion = process.version;
+
+    if (semver.lt(currentNodeVersion, '14.0.0') && semver.gte(currentNodeVersion, '12.0.0')) {
+        return 1.5;
+    }
+
+    if (semver.lt(currentNodeVersion, '12.0.0')) {
+        return 2;
+    }
+
+    return 1;
+}
 
 function clearRequireCache() {
     Object.keys(require.cache).forEach(function (key) {
@@ -36,4 +51,4 @@ function runBenchmark(fn, count) {
     return { medianDuration, medianMemory };
 }
 
-module.exports = { runBenchmark, clearRequireCache, cpuSpeed };
+module.exports = { runBenchmark, clearRequireCache, cpuSpeed, getNodeVersionMultiplier };
