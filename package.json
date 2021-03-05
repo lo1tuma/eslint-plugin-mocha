@@ -34,7 +34,8 @@
         "eslint-plugin-unicorn": "^21.0.0",
         "mocha": "^8.1.0",
         "nyc": "^15.1.0",
-        "pr-log": "^4.0.0"
+        "pr-log": "^4.0.0",
+        "semver": "^7.3.4"
     },
     "peerDependencies": {
         "eslint": ">=7.0.0"
