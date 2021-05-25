@@ -1,3 +1,13 @@
+## 8.2.0 (May 25, 2021)
+
+### Enhancements
+
+* Memoize names (increases speed by 10x) ([#280](https://github.com/lo1tuma/eslint-plugin-mocha/pull/280))
+
+### Code Refactoring
+
+* - Avoid passing superfluous argument ([#278](https://github.com/lo1tuma/eslint-plugin-mocha/pull/278))
+
 ## 8.1.0 (March 5, 2021)
 
 ### Bug Fixes
