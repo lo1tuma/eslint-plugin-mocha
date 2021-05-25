@@ -21,14 +21,6 @@ describe('mocha names', () => {
             expect(testCaseNames).to.deep.equal([]);
         });
 
-        it('always returns a new array', () => {
-            const testCaseNames1 = getTestCaseNames({ modifiersOnly: true });
-            const testCaseNames2 = getTestCaseNames({ modifiersOnly: true });
-
-            expect(testCaseNames1).to.deep.equal(testCaseNames2);
-            expect(testCaseNames1).to.not.equal(testCaseNames2);
-        });
-
         it('ignores invalid modifiers', () => {
             const testCaseNames = getTestCaseNames({ modifiers: [ 'foo' ], modifiersOnly: true });
 
@@ -183,14 +175,6 @@ describe('mocha names', () => {
             const suiteNames = getSuiteNames({ modifiersOnly: true });
 
             expect(suiteNames).to.deep.equal([]);
-        });
-
-        it('always returns a new array', () => {
-            const suiteNames1 = getSuiteNames({ modifiersOnly: true });
-            const suiteNames2 = getSuiteNames({ modifiersOnly: true });
-
-            expect(suiteNames1).to.deep.equal(suiteNames2);
-            expect(suiteNames1).to.not.equal(suiteNames2);
         });
 
         it('ignores invalid modifiers', () => {
