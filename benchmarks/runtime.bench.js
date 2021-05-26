@@ -5,10 +5,14 @@ const { Linter } = require('eslint');
 const times = require('ramda/src/times');
 const toPairs = require('ramda/src/toPairs');
 const fromPairs = require('ramda/src/fromPairs');
-const { runBenchmark, cpuSpeed, getNodeVersionMultiplier } = require('./measure');
+const {
+    runBenchmark,
+    cpuSpeed,
+    getNodeVersionMultiplier
+} = require('./measure');
 const mochaPlugin = require('../');
 
-const recommendedRules = mochaPlugin.configs.recommended.rules;
+const allRules = mochaPlugin.configs.all.rules;
 
 function lintManyFilesWithAllRecommendedRules({ numberOfFiles }) {
     const linter = new Linter();
@@ -16,11 +20,13 @@ function lintManyFilesWithAllRecommendedRules({ numberOfFiles }) {
     linter.defineRules(mochaPlugin.rules);
 
     const config = {
-        rules: fromPairs(toPairs(recommendedRules).map(([ ruleName, ruleSettings ]) => {
-            const [ , ruleNameWithoutPrefix ] = ruleName.split('/');
+        rules: fromPairs(
+            toPairs(allRules).map(([ ruleName, ruleSettings ]) => {
+                const [ , ruleNameWithoutPrefix ] = ruleName.split('/');
 
-            return [ ruleNameWithoutPrefix, ruleSettings ];
-        })),
+                return [ ruleNameWithoutPrefix, ruleSettings ];
+            })
+        ),
         parserOptions: {
             ecmaVersion: 2018
         }
