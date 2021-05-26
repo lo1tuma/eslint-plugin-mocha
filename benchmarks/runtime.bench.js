@@ -92,7 +92,7 @@ function lintManyFilesWithAllRecommendedRules({ numberOfFiles }) {
 describe('runtime', () => {
     it('should not take longer as the defined budget to lint many files with the recommended config', () => {
         const nodeVersionMultiplier = getNodeVersionMultiplier();
-        const budget = 3500000 / cpuSpeed * nodeVersionMultiplier;
+        const budget = 3750000 / cpuSpeed * nodeVersionMultiplier;
 
         const { medianDuration } = runBenchmark(() => {
             lintManyFilesWithAllRecommendedRules({ numberOfFiles: 350 });
@@ -102,7 +102,7 @@ describe('runtime', () => {
     });
 
     it('should not consume more memory as the defined budget to lint many files with the recommended config', () => {
-        const budget = 2500000;
+        const budget = 2750000;
 
         const { medianMemory } = runBenchmark(() => {
             lintManyFilesWithAllRecommendedRules({ numberOfFiles: 350 });
