@@ -3,8 +3,9 @@
 const RuleTester = require('eslint').RuleTester;
 const rule = require('../../lib/rules/no-setup-in-describe');
 const ruleTester = new RuleTester();
-const memberExpressionError = 'Unexpected member expression in describe block. ' +
-        'Member expressions may call functions via getters.';
+const memberExpressionError =
+    'Unexpected member expression in describe block. ' +
+    'Member expressions may call functions via getters.';
 
 ruleTester.run('no-setup-in-describe', rule, {
     valid: [
@@ -50,26 +51,40 @@ ruleTester.run('no-setup-in-describe', rule, {
             code: 'describe("", function () { before(() => { b(); }); it(); })',
             parserOptions: { ecmaVersion: 6 }
         },
-        { code: 'describe("", function () { var a = () => b(); it(); })', parserOptions: { ecmaVersion: 6 } },
-        { code: 'describe("", function () { var a = () => b.c; it(); })', parserOptions: { ecmaVersion: 6 } },
+        {
+            code: 'describe("", function () { var a = () => b(); it(); })',
+            parserOptions: { ecmaVersion: 6 }
+        },
+        {
+            code: 'describe("", function () { var a = () => b.c; it(); })',
+            parserOptions: { ecmaVersion: 6 }
+        },
         'describe("", function () { describe("", function () { it(); }); it(); })',
         {
             code: 'foo("", function () { it(); })',
             settings: {
-                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
+                'mocha/additionalCustomNames': [
+                    { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                ]
             }
-        }, {
+        },
+        {
             code: 'foo("", function () { it(); })',
             settings: {
                 mocha: {
-                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
+                    additionalCustomNames: [
+                        { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                    ]
                 }
             }
-        }, {
+        },
+        {
             code: 'foo("", function () { it("", function () { b(); }); })',
             settings: {
                 mocha: {
-                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
+                    additionalCustomNames: [
+                        { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                    ]
                 }
             }
         },
@@ -82,125 +97,176 @@ ruleTester.run('no-setup-in-describe', rule, {
               });
             });`,
             parserOptions: { ecmaVersion: 2015 }
-        }
+        },
+        'describe("", function () { function bar() { a.b = "c"; } it(); })',
+        {
+            code:
+                'describe("", function () { const bar = () => { a.b = "c"; }; it(); })',
+            parserOptions: { ecmaVersion: 2015 }
+        },
+        'describe("", function () { var bar = function () { a.b = "c"; }; it(); })'
     ],
 
     invalid: [
         {
             code: 'suite("", function () { a(); });',
-            errors: [ {
-                message: 'Unexpected function call in describe block.',
-                line: 1,
-                column: 25
-            } ]
-        }, {
+            errors: [
+                {
+                    message: 'Unexpected function call in describe block.',
+                    line: 1,
+                    column: 25
+                }
+            ]
+        },
+        {
             code: 'describe("", function () { a(); });',
-            errors: [ {
-                message: 'Unexpected function call in describe block.',
-                line: 1,
-                column: 28
-            } ]
-        }, {
+            errors: [
+                {
+                    message: 'Unexpected function call in describe block.',
+                    line: 1,
+                    column: 28
+                }
+            ]
+        },
+        {
             code: 'describe("", () => { a(); });',
             parserOptions: { ecmaVersion: 2015 },
-            errors: [ {
-                message: 'Unexpected function call in describe block.',
-                line: 1,
-                column: 22
-            } ]
-        }, {
+            errors: [
+                {
+                    message: 'Unexpected function call in describe block.',
+                    line: 1,
+                    column: 22
+                }
+            ]
+        },
+        {
             code: 'foo("", function () { a(); });',
             settings: {
                 mocha: {
-                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
+                    additionalCustomNames: [
+                        { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                    ]
                 }
             },
-            errors: [ {
-                message: 'Unexpected function call in describe block.',
-                line: 1,
-                column: 23
-            } ]
-        }, {
+            errors: [
+                {
+                    message: 'Unexpected function call in describe block.',
+                    line: 1,
+                    column: 23
+                }
+            ]
+        },
+        {
             code: 'foo("", function () { a[b]; });',
             settings: {
                 mocha: {
-                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
+                    additionalCustomNames: [
+                        { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                    ]
                 }
             },
-            errors: [ {
-                message: memberExpressionError,
-                line: 1,
-                column: 23
-            } ]
-        }, {
+            errors: [
+                {
+                    message: memberExpressionError,
+                    line: 1,
+                    column: 23
+                }
+            ]
+        },
+        {
             code: 'foo("", function () { a["b"]; });',
             settings: {
                 mocha: {
-                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
+                    additionalCustomNames: [
+                        { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                    ]
                 }
             },
-            errors: [ {
-                message: memberExpressionError,
-                line: 1,
-                column: 23
-            } ]
+            errors: [
+                {
+                    message: memberExpressionError,
+                    line: 1,
+                    column: 23
+                }
+            ]
         },
         {
             code: 'describe("", function () { a.b; });',
-            errors: [ {
-                message: memberExpressionError,
-                line: 1,
-                column: 28
-            } ]
-        }, {
+            errors: [
+                {
+                    message: memberExpressionError,
+                    line: 1,
+                    column: 28
+                }
+            ]
+        },
+        {
             code: 'describe("", function () { this.a(); });',
-            errors: [ {
-                message: 'Unexpected function call in describe block.',
-                line: 1,
-                column: 28
-            }, {
-                message: memberExpressionError,
-                line: 1,
-                column: 28
-            } ]
-        }, {
+            errors: [
+                {
+                    message: 'Unexpected function call in describe block.',
+                    line: 1,
+                    column: 28
+                },
+                {
+                    message: memberExpressionError,
+                    line: 1,
+                    column: 28
+                }
+            ]
+        },
+        {
             code: 'foo("", function () { a.b; });',
             settings: {
                 mocha: {
-                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
+                    additionalCustomNames: [
+                        { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                    ]
                 }
             },
-            errors: [ {
-                message: memberExpressionError,
-                line: 1,
-                column: 23
-            } ]
-        }, {
+            errors: [
+                {
+                    message: memberExpressionError,
+                    line: 1,
+                    column: 23
+                }
+            ]
+        },
+        {
             code: 'describe("", function () { it("", function () {}).a(); });',
-            errors: [ {
-                message: 'Unexpected function call in describe block.',
-                line: 1,
-                column: 28
-            }, {
-                message: memberExpressionError,
-                line: 1,
-                column: 28
-            } ]
-        }, {
-            code: 'describe("", function () { something("", function () {}).timeout(); });',
-            errors: [ {
-                message: 'Unexpected function call in describe block.',
-                line: 1,
-                column: 28
-            }, {
-                message: memberExpressionError,
-                line: 1,
-                column: 28
-            }, {
-                message: 'Unexpected function call in describe block.',
-                line: 1,
-                column: 28
-            } ]
+            errors: [
+                {
+                    message: 'Unexpected function call in describe block.',
+                    line: 1,
+                    column: 28
+                },
+                {
+                    message: memberExpressionError,
+                    line: 1,
+                    column: 28
+                }
+            ]
+        },
+        {
+            code:
+                'describe("", function () { something("", function () {}).timeout(); });',
+            errors: [
+                {
+                    message: 'Unexpected function call in describe block.',
+                    line: 1,
+                    column: 28
+                },
+                {
+                    message: memberExpressionError,
+                    line: 1,
+                    column: 28
+                },
+                {
+                    message: 'Unexpected function call in describe block.',
+                    line: 1,
+                    column: 28
+                }
+            ]
         }
     ]
 });
