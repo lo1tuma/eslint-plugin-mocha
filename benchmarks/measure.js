@@ -13,12 +13,8 @@ const [ { speed: cpuSpeed } ] = os.cpus();
 function getNodeVersionMultiplier() {
     const currentNodeVersion = process.version;
 
-    if (semver.lt(currentNodeVersion, '14.0.0') && semver.gte(currentNodeVersion, '12.0.0')) {
+    if (semver.lt(currentNodeVersion, '14.0.0')) {
         return 1.5;
-    }
-
-    if (semver.lt(currentNodeVersion, '12.0.0')) {
-        return 2;
     }
 
     return 1;
@@ -51,4 +47,9 @@ function runBenchmark(fn, count) {
     return { medianDuration, medianMemory };
 }
 
-module.exports = { runBenchmark, clearRequireCache, cpuSpeed, getNodeVersionMultiplier };
+module.exports = {
+    runBenchmark,
+    clearRequireCache,
+    cpuSpeed,
+    getNodeVersionMultiplier
+};
