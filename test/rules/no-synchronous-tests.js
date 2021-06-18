@@ -9,7 +9,6 @@ ruleTester.run('no-synchronous-tests', rules['no-synchronous-tests'], {
         'it();',
         'it("");',
         'it("", function () { return promise(); });',
-        'it("", function () { return promise(); });',
         'it("", function () { var promise = myFn(); return promise; });',
         'var someFn = function(){ }; it("", someFn);',
         'it("", function (done) { });',
