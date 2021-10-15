@@ -1,6 +1,13 @@
 {
-    "extends": "holidaycheck/es2015",
-    "plugins": [ "node", "unicorn" ],
+    "extends": [
+        "holidaycheck/es2015",
+        "plugin:eslint-plugin/recommended"
+    ],
+    "plugins": [
+        "eslint-plugin",
+        "node",
+        "unicorn"
+    ],
 
     "env": {
         "node": true
@@ -12,6 +19,11 @@
     },
 
     "rules": {
+        "eslint-plugin/require-meta-docs-url": [
+            "error",
+            { "pattern": "https://github.com/lo1tuma/eslint-plugin-mocha/blob/master/docs/rules/{{name}}.md" }
+        ],
+
         "node/no-unsupported-features": "error",
         "unicorn/prefer-includes": "error"
     },

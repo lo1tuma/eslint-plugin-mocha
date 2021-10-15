@@ -32,11 +32,6 @@ ruleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
             output: 'it(function() { assert(something, false); })'
         },
         {
-            code: 'it(() => { assert(something, false); })',
-            errors,
-            output: 'it(function() { assert(something, false); })'
-        },
-        {
             code: 'it(() => assert(something, false))',
             errors,
             output: 'it(function() { return assert(something, false); })'

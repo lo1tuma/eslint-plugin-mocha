@@ -30,6 +30,7 @@
         "coveralls": "^3.1.0",
         "eslint": "^7.27.0",
         "eslint-config-holidaycheck": "^0.13.1",
+        "eslint-plugin-eslint-plugin": "^4.0.1",
         "eslint-plugin-node": "^11.1.0",
         "eslint-plugin-unicorn": "^32.0.1",
         "mocha": "^8.4.0",
