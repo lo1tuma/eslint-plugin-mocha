@@ -17,7 +17,7 @@
         "test": "npm run test:unit:with-coverage && npm run test:bench",
         "test:unit": "mocha test --recursive --reporter dot",
         "test:unit:with-coverage": "nyc npm run test:unit",
-        "test:bench": "mocha -t 1200000 benchmarks",
+        "test:bench": "mocha -t 2400000 benchmarks",
         "coveralls": "cat ./build/coverage/lcov.info | coveralls",
         "changelog": "pr-log"
     },
@@ -29,7 +29,6 @@
         "chai": "^4.3.4",
         "coveralls": "^3.1.0",
         "eslint": "^7.27.0",
-        "eslint-config-holidaycheck": "^0.13.1",
         "eslint-plugin-eslint-plugin": "^4.0.1",
         "eslint-plugin-node": "^11.1.0",
         "eslint-plugin-unicorn": "^32.0.1",
