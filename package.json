@@ -17,7 +17,7 @@
         "test": "npm run test:unit:with-coverage && npm run test:bench",
         "test:unit": "mocha test --recursive --reporter dot",
         "test:unit:with-coverage": "nyc npm run test:unit",
-        "test:bench": "mocha -t 1200000 benchmarks",
+        "test:bench": "mocha -t 2400000 benchmarks",
         "coveralls": "cat ./build/coverage/lcov.info | coveralls",
         "changelog": "pr-log"
     },

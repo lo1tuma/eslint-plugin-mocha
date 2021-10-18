@@ -96,7 +96,7 @@ describe('runtime', () => {
 
         const { medianDuration } = runBenchmark(() => {
             lintManyFilesWithAllRecommendedRules({ numberOfFiles: 350 });
-        }, 5);
+        }, 50);
 
         expect(medianDuration).to.be.below(budget);
     });
@@ -106,7 +106,7 @@ describe('runtime', () => {
 
         const { medianMemory } = runBenchmark(() => {
             lintManyFilesWithAllRecommendedRules({ numberOfFiles: 350 });
-        }, 5);
+        }, 50);
 
         expect(medianMemory).to.be.below(budget);
     });
