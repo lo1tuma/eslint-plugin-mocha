@@ -24,3 +24,4 @@
 ||:wrench:| [prefer-arrow-callback](prefer-arrow-callback.md) | prefer arrow function callbacks (mocha-aware)
 ||| [valid-suite-description](valid-suite-description.md) | match suite descriptions against a pre-configured regular expression
 ||| [valid-test-description](valid-test-description.md) | match test descriptions against a pre-configured regular expression
+|:heavy_check_mark:|| [no-empty-description](no-empty-description.md) | Disallow empty test descriptions
