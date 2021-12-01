@@ -14,7 +14,7 @@
 
     "parserOptions": {
         "sourceType": "script",
-        "ecmaVersion": 2017,
+        "ecmaVersion": 2019,
         "ecmaFeatures": {
             "jsx": false,
             "globalReturn": false,

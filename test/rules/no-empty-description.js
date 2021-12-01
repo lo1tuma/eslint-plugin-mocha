@@ -29,10 +29,6 @@ ruleTester.run('no-empty-description', rules['no-empty-description'], {
         'test.only("some text")',
         'test("some text", function() { })',
 
-        'suite("some text")',
-        'suite.only("some text")',
-        'suite("some text", function() { })',
-
         'notTest()',
 
         {
@@ -56,30 +52,30 @@ ruleTester.run('no-empty-description', rules['no-empty-description'], {
     invalid: [
         {
             code: 'test()',
-            errors: [ { message: defaultErrorMessage, ...firstLine } ],
+            errors: [ { message: defaultErrorMessage, ...firstLine } ]
         },
         {
             code: 'test(function() { })',
-            errors: [ { message: defaultErrorMessage, ...firstLine } ],
+            errors: [ { message: defaultErrorMessage, ...firstLine } ]
         },
         {
             code: 'test("", function() { })',
-            errors: [ { message: defaultErrorMessage, ...firstLine } ],
+            errors: [ { message: defaultErrorMessage, ...firstLine } ]
         },
         {
             code: 'test("      ", function() { })',
-            errors: [ { message: defaultErrorMessage, ...firstLine } ],
+            errors: [ { message: defaultErrorMessage, ...firstLine } ]
         },
 
         {
             options: [ { testNames: [ 'someFunction' ], message: 'Custom Error' } ],
             code: 'someFunction(function() { })',
-            errors: [ { message: 'Custom Error', ...firstLine } ],
+            errors: [ { message: 'Custom Error', ...firstLine } ]
         },
         {
             parserOptions: { ecmaVersion: 2019 },
             code: 'it(` `, function () { });',
-            errors: [ { message: defaultErrorMessage, ...firstLine } ],
+            errors: [ { message: defaultErrorMessage, ...firstLine } ]
         }
     ]
 
