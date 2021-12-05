@@ -17,8 +17,8 @@ rules: {
 
 where:
 
- * `warn` is a rule error level (see [Configuring Rules](http://eslint.org/docs/user-guide/configuring#configuring-rules))
- * `^[A-Z]` is a custom regular expression pattern to match suite names against; `^[A-Z]` enforces a suite name to start with an upper-case letter
+* `warn` is a rule error level (see [Configuring Rules](http://eslint.org/docs/user-guide/configuring#configuring-rules))
+* `^[A-Z]` is a custom regular expression pattern to match suite names against; `^[A-Z]` enforces a suite name to start with an upper-case letter
 
 The following patterns are considered warnings (with the example rule configuration posted above):
 

@@ -23,10 +23,10 @@ Example of a custom rule configuration:
 
 where:
 
- * `warn` is a rule error level (see [Configuring Rules](http://eslint.org/docs/user-guide/configuring#configuring-rules))
- * `mypattern$` is a custom regular expression pattern to match test names against
- * `["it", "specify", "test", "mytestname"]` is an array of custom test names
- * `custom error message` a custom error message to describe your pattern
+* `warn` is a rule error level (see [Configuring Rules](http://eslint.org/docs/user-guide/configuring#configuring-rules))
+* `mypattern$` is a custom regular expression pattern to match test names against
+* `["it", "specify", "test", "mytestname"]` is an array of custom test names
+* `custom error message` a custom error message to describe your pattern
 
 The following patterns are considered warnings (with the default rule configuration):
 

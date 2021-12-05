@@ -57,7 +57,6 @@ This rule supports the following options:
 }
 ```
 
-
 ## When Not To Use It
 
 * If you use another library which exposes a similar API as mocha (e.g. `before`, `after`), you should turn this rule off, because it would raise warnings.

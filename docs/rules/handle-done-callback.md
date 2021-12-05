@@ -59,6 +59,7 @@ before(function (done) {
     });
 });
 ```
+
 ## Options
 
 This rule supports the following options:

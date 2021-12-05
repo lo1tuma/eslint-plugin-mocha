@@ -50,7 +50,7 @@ rules: {
 },
 ```
 
-### Caveats:
+### Caveats
 
 This rule cannot guarantee that a returned function call is actually a promise, it only confirms that the return was made.
 
@@ -65,10 +65,10 @@ it('test name', myTestFn);
 
 ## When Not To Use It
 
-* If you are primarily writing synchronous tests, and rarely need the `done` callback, promise functionality or async functions.
+- If you are primarily writing synchronous tests, and rarely need the `done` callback, promise functionality or async functions.
 
 ## Further Reading
 
-* [Synchronous Code](http://mochajs.org/#synchronous-code)
-* [Asynchronous Code](http://mochajs.org/#asynchronous-code)
-* [Working with Promises](http://mochajs.org/#working-with-promises)
+- [Synchronous Code](http://mochajs.org/#synchronous-code)
+- [Asynchronous Code](http://mochajs.org/#asynchronous-code)
+- [Working with Promises](http://mochajs.org/#working-with-promises)
