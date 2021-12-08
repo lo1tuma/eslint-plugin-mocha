@@ -83,7 +83,7 @@ module.exports = {
                 'mocha/prefer-arrow-callback': 'off',
                 'mocha/valid-suite-description': 'off',
                 'mocha/valid-test-description': 'off',
-                'no-empty-description': 'error'
+                'mocha/no-empty-description': 'error'
             }
         }
     }
