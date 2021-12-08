@@ -9,6 +9,7 @@ it('something', function () {
     });
 });
 ```
+
 Something like this could easily happen by accident where the outer test case was actually meant to be a suite instead of a test.
 This rule reports such nested test cases in order to prevent problems where those nested tests are skipped silently.
 
