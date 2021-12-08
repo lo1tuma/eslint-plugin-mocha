@@ -1,3 +1,34 @@
+## 10.0.0 (December 8, 2021)
+
+### Breaking Changes
+
+* Turn off no-hooks-for-single-case in recommended ([#307](https://github.com/lo1tuma/eslint-plugin-mocha/pull/307))
+* Drop support for node v12 ([#299](https://github.com/lo1tuma/eslint-plugin-mocha/pull/299))
+
+### Features
+
+* Add `no-empty-description` rule. closes #302 ([#304](https://github.com/lo1tuma/eslint-plugin-mocha/pull/304))
+
+### Enhancements
+
+* Add rule documentation URLs (and eslint-plugin-eslint-plugin) ([#294](https://github.com/lo1tuma/eslint-plugin-mocha/pull/294))
+
+### Documentation
+
+* Remove unavailable badge from README ([#305](https://github.com/lo1tuma/eslint-plugin-mocha/pull/305))
+
+### Dependency Upgrades
+
+* Update devDependencies ([#301](https://github.com/lo1tuma/eslint-plugin-mocha/pull/301))
+
+### Code Refactoring
+
+* Remove eslint-config-holidaycheck dev dependency ([#300](https://github.com/lo1tuma/eslint-plugin-mocha/pull/300))
+
+### Build-Related
+
+* Add `markdownlint` and fix linting issues ([#306](https://github.com/lo1tuma/eslint-plugin-mocha/pull/306))
+
 ## 9.0.0 (May 26, 2021)
 
 ### Breaking Changes
