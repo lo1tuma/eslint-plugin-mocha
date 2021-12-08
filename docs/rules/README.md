@@ -9,7 +9,7 @@
 |:heavy_check_mark:|| [no-exports](no-exports.md) | disallow exports from test files
 |:heavy_check_mark:|| [no-global-tests](no-global-tests.md) | disallow global tests
 ||| [no-hooks](no-hooks.md) | disallow hooks
-|:heavy_check_mark:|| [no-hooks-for-single-case](no-hooks-for-single-case.md) | disallow hooks for a single test or test suite
+||| [no-hooks-for-single-case](no-hooks-for-single-case.md) | disallow hooks for a single test or test suite
 |:heavy_check_mark:|| [no-identical-title](no-identical-title.md) | disallow identical titles
 |:heavy_check_mark:|:wrench:| [no-mocha-arrows](no-mocha-arrows.md) | disallow arrow functions as arguments to mocha globals
 |:heavy_check_mark:|| [no-nested-tests](no-nested-tests.md) | disallow tests to be nested within other tests
