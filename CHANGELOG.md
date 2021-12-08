@@ -1,3 +1,13 @@
+## 10.0.1 (December 8, 2021)
+
+### Bug Fixes
+
+* Add `mocha` prefix to "no-empty-description" rule name in rec config ([#310](https://github.com/lo1tuma/eslint-plugin-mocha/pull/310))
+
+### Build-Related
+
+* chore: use `npm-run-all` to run lint/test scripts ([#308](https://github.com/lo1tuma/eslint-plugin-mocha/pull/308))
+
 ## 10.0.0 (December 8, 2021)
 
 ### Breaking Changes
