@@ -18,7 +18,7 @@ jobs:
             - name: Install dependencies
               run: npm ci
             - name: Run linters
-              run: yarn pretest && yarn lint:docs
+              run: yarn lint
             - name: Run tests
               run: npm test
               timeout-minutes: 20
