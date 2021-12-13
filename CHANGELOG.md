@@ -1,3 +1,13 @@
+## 10.0.2 (December 13, 2021)
+
+### Bug Fixes
+
+* Fix no-empty-description rule to not report on dynamic values ([#315](https://github.com/lo1tuma/eslint-plugin-mocha/pull/315))
+
+### Code Refactoring
+
+* chore: switch yarn command to npm ([#309](https://github.com/lo1tuma/eslint-plugin-mocha/pull/309))
+
 ## 10.0.1 (December 8, 2021)
 
 ### Bug Fixes
