@@ -29,6 +29,9 @@ ruleTester.run('no-empty-description', rules['no-empty-description'], {
         'test.only("some text")',
         'test("some text", function() { })',
 
+        'var dynamicTitle = "foo"; it(dynamicTitle, function() {});',
+        'it(dynamicTitle, function() {});',
+
         'notTest()',
 
         {
@@ -46,6 +49,10 @@ ruleTester.run('no-empty-description', rules['no-empty-description'], {
         {
             options: [ { testNames: [ 'someFunction' ] } ],
             code: 'someFunction("this is a test", function () { });'
+        },
+        {
+            parserOptions: { ecmaVersion: 2019 },
+            code: 'const dynamicTitle = "foo"; it(dynamicTitle, function() {});'
         }
     ],
 
@@ -76,6 +83,11 @@ ruleTester.run('no-empty-description', rules['no-empty-description'], {
             parserOptions: { ecmaVersion: 2019 },
             code: 'it(` `, function () { });',
             errors: [ { message: defaultErrorMessage, ...firstLine } ]
+        },
+        {
+            parserOptions: { ecmaVersion: 2019 },
+            code: 'const foo = ""; it(foo);',
+            errors: [ { message: defaultErrorMessage, line: 1, column: 17 } ]
         }
     ]
 
