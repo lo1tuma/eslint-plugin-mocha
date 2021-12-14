@@ -1,3 +1,9 @@
+## 10.0.3 (December 14, 2021)
+
+### Bug Fixes
+
+* Allow dynamic expressions as description argument in no-empty-description ([#316](https://github.com/lo1tuma/eslint-plugin-mocha/pull/316))
+
 ## 10.0.2 (December 13, 2021)
 
 ### Bug Fixes
