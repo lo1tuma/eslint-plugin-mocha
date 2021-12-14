@@ -31,6 +31,36 @@ ruleTester.run('no-empty-description', rules['no-empty-description'], {
 
         'var dynamicTitle = "foo"; it(dynamicTitle, function() {});',
         'it(dynamicTitle, function() {});',
+        'var dynamicTitle = "foo"; it(dynamicTitle.replace("foo", ""), function() {});',
+        'it(dynamicTitle.replace("foo", ""), function() {});',
+        'it(42, function() { })',
+        'it(true, function() { })',
+        'it(null, function() { })',
+        'it(new Foo(), function() { })',
+        'it(foo.bar, function() { })',
+        'it("foo".toUpperCase(), function() { })',
+        {
+            parserOptions: { ecmaVersion: 2020 },
+            code: 'it(foo ?? "bar", function() { })'
+        },
+        'it(foo || "bar", function() { })',
+        'it(foo ? "bar" : "baz", function() { })',
+        'it(foo ? bar : baz, function() { })',
+        'it(typeof foo, function() { })',
+        'it(foo + bar, function() { })',
+        'it("foo" + "bar", function() { })',
+        {
+            parserOptions: { ecmaVersion: 2019 },
+            code: 'it(...args)'
+        },
+        {
+            parserOptions: { ecmaVersion: 2019 },
+            code: 'async function a() { it(await foo, function () {}); }'
+        },
+        {
+            parserOptions: { ecmaVersion: 2019 },
+            code: 'function* g() { it(yield foo, function () {}); }'
+        },
 
         'notTest()',
 
@@ -53,6 +83,10 @@ ruleTester.run('no-empty-description', rules['no-empty-description'], {
         {
             parserOptions: { ecmaVersion: 2019 },
             code: 'const dynamicTitle = "foo"; it(dynamicTitle, function() {});'
+        },
+        {
+            parserOptions: { ecmaVersion: 2019 },
+            code: 'const dynamicTitle = "foo"; it(dynamicTitle.replace("foo", ""), function() {});'
         }
     ],
 
@@ -88,6 +122,16 @@ ruleTester.run('no-empty-description', rules['no-empty-description'], {
             parserOptions: { ecmaVersion: 2019 },
             code: 'const foo = ""; it(foo);',
             errors: [ { message: defaultErrorMessage, line: 1, column: 17 } ]
+        },
+        {
+            parserOptions: { ecmaVersion: 2019 },
+            code: 'const foo = { bar: "" }; it(foo.bar);',
+            errors: [ { message: defaultErrorMessage, line: 1, column: 26 } ]
+        },
+        {
+            parserOptions: { ecmaVersion: 2020 },
+            code: 'it(foo?.bar);',
+            errors: [ { message: defaultErrorMessage, line: 1, column: 1 } ]
         }
     ]
 
