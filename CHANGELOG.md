@@ -1,3 +1,13 @@
+## 10.0.4 (April 11, 2022)
+
+### Documentation
+
+* Document recommended error level ([#317](https://github.com/lo1tuma/eslint-plugin-mocha/pull/317))
+
+### Dependency Upgrades
+
+* Bump package versions due to vulnerability issues ([#320](https://github.com/lo1tuma/eslint-plugin-mocha/pull/320))
+
 ## 10.0.3 (December 14, 2021)
 
 ### Bug Fixes
