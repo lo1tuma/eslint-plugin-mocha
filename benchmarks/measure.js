@@ -1,7 +1,7 @@
 'use strict';
 
 const os = require('os');
-const { performance } = require('perf_hooks');
+const { performance: performanceHooks } = require('perf_hooks');
 const times = require('ramda/src/times');
 const median = require('ramda/src/median');
 const map = require('ramda/src/map');
@@ -30,10 +30,10 @@ function runBenchmark(fn, count) {
     const results = [];
 
     times(() => {
-        const startTime = performance.now();
+        const startTime = performanceHooks.now();
         const startMemory = process.memoryUsage().rss;
         fn();
-        const endTime = performance.now();
+        const endTime = performanceHooks.now();
         const endMemory = process.memoryUsage().rss;
         const duration = endTime - startTime;
         const memory = endMemory - startMemory;
