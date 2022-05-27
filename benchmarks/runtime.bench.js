@@ -2,9 +2,7 @@
 
 const { expect } = require('chai');
 const { Linter } = require('eslint');
-const times = require('ramda/src/times');
-const toPairs = require('ramda/src/toPairs');
-const fromPairs = require('ramda/src/fromPairs');
+const { times, toPairs, fromPairs } = require('rambda');
 const {
     runBenchmark,
     cpuSpeed,

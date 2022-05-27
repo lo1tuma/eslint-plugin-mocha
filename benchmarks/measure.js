@@ -2,10 +2,7 @@
 
 const os = require('os');
 const { performance: performanceHooks } = require('perf_hooks');
-const times = require('ramda/src/times');
-const median = require('ramda/src/median');
-const map = require('ramda/src/map');
-const prop = require('ramda/src/prop');
+const { times, median, map, prop } = require('rambda');
 const semver = require('semver');
 
 const [ { speed: cpuSpeed } ] = os.cpus();
