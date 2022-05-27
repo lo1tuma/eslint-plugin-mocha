@@ -1,3 +1,13 @@
+## 10.0.5 (May 27, 2022)
+
+### Bug Fixes
+
+* Support Node 18 + switch from ramda to rambda ([#326](https://github.com/lo1tuma/eslint-plugin-mocha/pull/326))
+
+### Code Refactoring
+
+* Add unit tests to verify the correct reference is analyzed for shadowing ([#328](https://github.com/lo1tuma/eslint-plugin-mocha/pull/328))
+
 ## 10.0.4 (April 11, 2022)
 
 ### Documentation
