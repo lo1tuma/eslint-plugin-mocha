@@ -22,7 +22,8 @@ ruleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
         // In those examples, `it` is not a global.
         'function it () {}; it(() => { console.log("okay") })',
         'function it () {}; it.only(() => { console.log("okay") })',
-        'function it () {}; it(() => {}); it(() => {});'
+        'function it () {}; it(() => {}); it(() => {});',
+        'foo("", () => {}); const it = () => {}; it("", () => {});'
     ],
 
     invalid: [
@@ -95,6 +96,11 @@ ruleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
             code: 'it(/*one*/async/*two*/(done)/*three*/=>/*four*/assert(something, false))',
             errors,
             output: 'it(/*one*/async function/*two*/(done)/*three*//*four*/ { return assert(something, false); })'
+        },
+        {
+            code: 'const foo = () => {}; foo("", () => {}); it(() => { assert(something, false); })',
+            errors: [ { message: expectedErrorMessage, column: 42, line: 1 } ],
+            output: 'const foo = () => {}; foo("", () => {}); it(function() { assert(something, false); })'
         }
     ]
 
