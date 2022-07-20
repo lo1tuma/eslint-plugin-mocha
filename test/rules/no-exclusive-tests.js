@@ -166,6 +166,15 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ]
+        },
+        {
+            code: 'this.it.only()',
+            settings: {
+                mocha: {
+                    additionalCustomNames: [ { name: 'this.it', type: 'testCase', interfaces: [ 'BDD' ] } ]
+                }
+            },
+            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
         }
     ]
 });
