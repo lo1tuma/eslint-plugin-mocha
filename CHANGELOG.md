@@ -1,3 +1,9 @@
+## 10.1.0 (July 20, 2022)
+
+### Enhancements
+
+* Support this for additionalCustomNames ([#329](https://github.com/lo1tuma/eslint-plugin-mocha/pull/329))
+
 ## 10.0.5 (May 27, 2022)
 
 ### Bug Fixes
