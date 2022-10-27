@@ -1,4 +1,8 @@
-# Disallow global tests (no-global-tests)
+# Disallow global tests (`mocha/no-global-tests`)
+
+💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
+
+<!-- end auto-generated rule header -->
 
 Mocha gives you the possibility to structure your tests inside of suites using `describe`, `suite` or `context`.
 

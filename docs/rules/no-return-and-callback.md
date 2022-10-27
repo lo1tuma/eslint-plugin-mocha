@@ -1,4 +1,8 @@
-# Disallow returning in a test or hook function that uses a callback (no-return-and-callback)
+# Disallow returning in a test or hook function that uses a callback (`mocha/no-return-and-callback`)
+
+💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
+
+<!-- end auto-generated rule header -->
 
 Mocha's tests or hooks (like `before`) may be asynchronous by either returning a Promise or specifying a callback parameter for the function. It can be confusing to have both methods used in a test or hook, and from Mocha v3 on, causes the test to fail in order to force developers to remove this source of confusion.
 

@@ -15,13 +15,15 @@
     "scripts": {
         "lint": "run-p --continue-on-error lint:*",
         "lint:docs": "markdownlint \"**/*.md\"",
+        "lint:eslint-docs": "npm-run-all \"update:eslint-docs -- --check\"",
         "lint:js": "eslint .",
         "test": "npm-run-all test:unit:with-coverage test:bench",
         "test:unit": "mocha test --recursive --reporter dot",
         "test:unit:with-coverage": "nyc npm run test:unit",
         "test:bench": "mocha -t 2400000 benchmarks",
         "coveralls": "cat ./build/coverage/lcov.info | coveralls",
-        "changelog": "pr-log"
+        "changelog": "pr-log",
+        "update:eslint-docs": "eslint-doc-generator --ignore-config all --url-configs \"https://github.com/lo1tuma/eslint-plugin-mocha#configs\""
     },
     "dependencies": {
         "eslint-utils": "^3.0.0",
@@ -31,6 +33,7 @@
         "chai": "^4.3.6",
         "coveralls": "^3.1.1",
         "eslint": "^8.13.0",
+        "eslint-doc-generator": "^1.0.2",
         "eslint-plugin-eslint-plugin": "^4.1.0",
         "eslint-plugin-node": "^11.1.0",
         "eslint-plugin-unicorn": "^37.0.1",

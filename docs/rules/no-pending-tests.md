@@ -1,4 +1,8 @@
-# Disallow Pending Tests (no-pending-tests)
+# Disallow pending tests (`mocha/no-pending-tests`)
+
+⚠️ This rule _warns_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
+
+<!-- end auto-generated rule header -->
 
 Mocha allows specification of pending tests, which represent tests that aren't yet implemented, but are intended to be implemented eventually. These are designated like a normal mocha test, but with only the first argument provided (no callback for the actual implementation). For example: `it('unimplemented test');`
 

@@ -298,6 +298,7 @@
             "files": ["lib/rules/**/*.js", "test/rules/**/*.js"],
             "extends": [ "plugin:eslint-plugin/recommended" ],
             "rules": {
+                "eslint-plugin/require-meta-docs-description": ["error", { "pattern": "^(Enforce|Require|Disallow)" }],
                 "eslint-plugin/require-meta-docs-url": [
                     "error",
                     { "pattern": "https://github.com/lo1tuma/eslint-plugin-mocha/blob/master/docs/rules/{{name}}.md" }

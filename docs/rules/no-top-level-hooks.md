@@ -1,4 +1,8 @@
-# Disallow top-level hooks (no-top-level-hooks)
+# Disallow top-level hooks (`mocha/no-top-level-hooks`)
+
+⚠️ This rule _warns_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
+
+<!-- end auto-generated rule header -->
 
 Mocha proposes hooks that allow code to be run before or after every or all tests. This helps define a common setup or teardown process for every test.
 These hooks should only be declared inside test suites, as they would otherwise be run before or after every test or test suite of the project, even if the test suite of the file they were declared in was skipped. This can lead to very confusing and unwanted effects.

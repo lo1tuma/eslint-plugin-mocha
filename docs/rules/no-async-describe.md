@@ -1,4 +1,10 @@
-# Disallow async functions passed to describe (no-async-describe)
+# Disallow async functions passed to describe (`mocha/no-async-describe`)
+
+💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
+
+🔧 This rule is automatically fixable by the [`--fix` CLI option](https://eslint.org/docs/latest/user-guide/command-line-interface#--fix).
+
+<!-- end auto-generated rule header -->
 
 This rule disallows the use of an async function with `describe`. It usually indicates a copy/paste error or that you're trying to use `describe` for setup code, which should happen in `before` or `beforeEach`. Also, it can lead to [the contained `it` blocks not being picked up](https://github.com/mochajs/mocha/issues/2975).
 
@@ -14,8 +20,6 @@ describe('the thing', async function () {
     });
 });
 ```
-
-**Fixable:** Problems detected by this rule are automatically fixable using the `--fix` flag on the command line.
 
 ## Rule Details
 

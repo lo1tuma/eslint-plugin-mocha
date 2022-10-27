@@ -1,4 +1,8 @@
-# Limit the number of top-level suites in a single file (max-top-level-suites)
+# Enforce the number of top-level suites in a single file (`mocha/max-top-level-suites`)
+
+💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
+
+<!-- end auto-generated rule header -->
 
 This rule enforces having a limited amount of top-level suites in a file - by default a single suite per file is allowed.
 

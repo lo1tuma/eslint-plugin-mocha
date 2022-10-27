@@ -1,4 +1,8 @@
-# Match test descriptions against a pre-configured regular expression (valid-test-description)
+# Require test descriptions to match a pre-configured regular expression (`mocha/valid-test-description`)
+
+🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
+
+<!-- end auto-generated rule header -->
 
 This rule enforces the test descriptions to follow the desired format.
 

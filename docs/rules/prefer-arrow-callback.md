@@ -1,4 +1,10 @@
-# Require using arrow functions for callbacks (prefer-arrow-callback)
+# Require using arrow functions for callbacks (`mocha/prefer-arrow-callback`)
+
+🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
+
+🔧 This rule is automatically fixable by the [`--fix` CLI option](https://eslint.org/docs/latest/user-guide/command-line-interface#--fix).
+
+<!-- end auto-generated rule header -->
 
 This rule is a variation of the core eslint `prefer-arrow-callback` rule that is mocha-aware and does not flag non-arrow callbacks within mocha functions.
 
@@ -12,8 +18,6 @@ You will want to disable the original `prefer-arrow-callback` rule and configure
     }
 }
 ```
-
-**Fixable:** Problems detected by this rule are automatically fixable using the `--fix` flag on the command line.
 
 ## Rule Overview
 

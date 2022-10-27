@@ -1,4 +1,8 @@
-# Disallow setup in describe blocks (no-setup-in-describe)
+# Disallow setup in describe blocks (`mocha/no-setup-in-describe`)
+
+💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
+
+<!-- end auto-generated rule header -->
 
 Setup for test cases in mocha should be done in `before`, `beforeEach`, or `it` blocks. Unfortunately there is nothing stopping you from doing setup directly inside a `describe` block.
 

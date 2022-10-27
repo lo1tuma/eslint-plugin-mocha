@@ -1,4 +1,8 @@
-# Disallow tests to be nested within other tests (no-nested-tests)
+# Disallow tests to be nested within other tests (`mocha/no-nested-tests`)
+
+💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
+
+<!-- end auto-generated rule header -->
 
 Test cases in mocha can be either global or within a suite but they can’t be nested within other tests. Unfortunately there is nothing stopping you from creating a test case within another test case but mocha will simply ignore those tests.
 
