@@ -1,5 +1,4 @@
 {
     "first-line-h1": false,
-    "line-length": false,
-    "no-inline-html": { "allowed_elements": ["sup"] }
+    "line-length": false
   }
