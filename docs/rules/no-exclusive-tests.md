@@ -1,4 +1,8 @@
-# Disallow Exclusive Tests (no-exclusive-tests)
+# Disallow exclusive tests (`mocha/no-exclusive-tests`)
+
+⚠️ This rule _warns_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
+
+<!-- end auto-generated rule header -->
 
 Mocha has a feature that allows you to run tests exclusively by appending `.only` to a test-suite or a test-case.
 This feature is really helpful to debug a failing test, so you don’t have to execute all of your tests.

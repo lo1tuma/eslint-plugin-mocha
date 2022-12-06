@@ -1,8 +1,12 @@
-# Disallow Arrow Functions as Arguments to Mocha Functions (no-mocha-arrows)
+# Disallow arrow functions as arguments to mocha functions (`mocha/no-mocha-arrows`)
+
+💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
+
+🔧 This rule is automatically fixable by the [`--fix` CLI option](https://eslint.org/docs/latest/user-guide/command-line-interface#--fix).
+
+<!-- end auto-generated rule header -->
 
 Mocha [discourages](http://mochajs.org/#arrow-functions) passing it arrow functions as arguments. This rule prevents their use on the Mocha globals.
-
-**Fixable:** Problems detected by this rule are automatically fixable using the `--fix` flag on the command line.
 
 ## Rule Details
 

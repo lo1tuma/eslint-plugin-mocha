@@ -1,4 +1,8 @@
-# Enforces handling of callbacks for async tests (handle-done-callback)
+# Enforces handling of callbacks for async tests (`mocha/handle-done-callback`)
+
+💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
+
+<!-- end auto-generated rule header -->
 
 Mocha allows you to write asynchronous tests by adding a `done` callback to the parameters of your test function.
 It is easy to forget calling this callback after the asynchronous operation is done.

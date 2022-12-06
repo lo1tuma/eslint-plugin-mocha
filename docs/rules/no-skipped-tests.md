@@ -1,4 +1,8 @@
-# Disallow Skipped Tests (no-skipped-tests)
+# Disallow skipped tests (`mocha/no-skipped-tests`)
+
+⚠️ This rule _warns_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
+
+<!-- end auto-generated rule header -->
 
 Mocha has a feature that allows you to skip tests by appending `.skip` to a test-suite or a test-case, or by prepending it with an `x` (e.g., `xdescribe(...)` instead of `describe(...)`).
 Sometimes tests are skipped as part of a debugging process, and aren't intended to be committed.  This rule reminds you to remove `.skip` or the `x` prefix from your tests.

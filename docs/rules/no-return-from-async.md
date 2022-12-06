@@ -1,4 +1,8 @@
-# Disallow returning from an async test or hook (no-return-from-async)
+# Disallow returning from an async test or hook (`mocha/no-return-from-async`)
+
+🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
+
+<!-- end auto-generated rule header -->
 
 Mocha's tests or hooks (like `before`) may be asynchronous by returning a Promise. When such a Promise-returning function is defined using [an ES7 `async` function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function) it can be confusing when combined with an explicit `return` of a Promise, as it's mixing the two styles.
 

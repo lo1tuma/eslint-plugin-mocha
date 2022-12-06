@@ -1,4 +1,8 @@
-# Disallow hooks (no-hooks)
+# Disallow hooks (`mocha/no-hooks`)
+
+🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
+
+<!-- end auto-generated rule header -->
 
 Mocha proposes hooks that allow code to be run before or after every or all tests. This helps define a common setup or teardown process for every test. The use of these hooks promotes the use of shared state between the tests, and defeats the purpose of having isolated unit tests.
 

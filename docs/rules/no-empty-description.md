@@ -1,4 +1,8 @@
-# Disallow empty test descriptions (no-empty-description)
+# Disallow empty test descriptions (`mocha/no-empty-description`)
+
+💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
+
+<!-- end auto-generated rule header -->
 
 This rule enforces you to specify the suite/test descriptions for each test.
 

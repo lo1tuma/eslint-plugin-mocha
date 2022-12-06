@@ -1,4 +1,8 @@
-# Disallow Synchronous Tests (no-synchronous-tests)
+# Disallow synchronous tests (`mocha/no-synchronous-tests`)
+
+🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
+
+<!-- end auto-generated rule header -->
 
 Mocha automatically determines whether a test is synchronous or asynchronous based on the arity of the function passed into it. When writing tests for an asynchronous function, omitting the `done` callback or forgetting to return a promise can often lead to false-positive test cases. This rule warns against the implicit synchronous feature, and should be combined with `handle-done-callback` for best results.
 

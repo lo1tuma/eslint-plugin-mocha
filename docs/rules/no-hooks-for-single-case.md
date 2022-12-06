@@ -1,4 +1,8 @@
-# Disallow hooks for a single test or test suite (no-hooks-for-single-case)
+# Disallow hooks for a single test or test suite (`mocha/no-hooks-for-single-case`)
+
+🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
+
+<!-- end auto-generated rule header -->
 
 Mocha proposes hooks that allow code to be run before or after every or all tests. This helps define a common setup or teardown process for every test. These hooks are not useful when there is only one test case, as it would then make more sense to move the hooks' operations in the test directly.
 

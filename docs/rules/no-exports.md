@@ -1,4 +1,8 @@
-# Disallow exports from test files (no-exports)
+# Disallow exports from test files (`mocha/no-exports`)
+
+💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
+
+<!-- end auto-generated rule header -->
 
 Test files should have only one purpose, which is testing a specific unit. Using exports could mean the test file is also used to provide and expose utility or library functionalities, instead those should be moved to separate files.
 

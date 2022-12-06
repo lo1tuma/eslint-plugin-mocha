@@ -28,7 +28,6 @@ describe('eslint-plugin-mocha', function () {
 
     describe('documentation', function () {
         let documentationFiles;
-        let documentationIndex;
 
         before(function (done) {
             fs.readdir(documentationDir, function (readDirError, files) {
@@ -41,10 +40,7 @@ describe('eslint-plugin-mocha', function () {
                     return file !== 'README.md';
                 });
 
-                fs.readFile(`${documentationDir }README.md`, function (error, data) {
-                    documentationIndex = data.toString();
-                    done(error);
-                });
+                done();
             });
         });
 
@@ -54,15 +50,6 @@ describe('eslint-plugin-mocha', function () {
                 const expectedDocumentationFileName = `${ruleName }.md`;
 
                 expect(documentationFiles).to.contain(expectedDocumentationFileName);
-            });
-        });
-
-        it('should be linked in the documentation index', function () {
-            documentationFiles.forEach(function (file) {
-                const ruleName = path.basename(file, '.md');
-                const expectedLink = `| [${ ruleName }](${ file }) |`;
-
-                expect(documentationIndex).to.contain(expectedLink);
             });
         });
     });
