@@ -298,6 +298,7 @@
             "files": ["lib/rules/**/*.js", "test/rules/**/*.js"],
             "extends": [ "plugin:eslint-plugin/recommended" ],
             "rules": {
+                "eslint-plugin/prefer-message-ids": "off",
                 "eslint-plugin/require-meta-docs-description": ["error", { "pattern": "^(Enforce|Require|Disallow)" }],
                 "eslint-plugin/require-meta-docs-url": [
                     "error",
