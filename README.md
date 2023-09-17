@@ -47,28 +47,33 @@ This plugin supports the following settings, which are used by multiple rules:
         }
     }
     ```
-    The `name` property can be in any of the following forms:
-    * A plain name e.g. `describeModule`, which allows:
-        ```
-        describeModule("example", function() { ... });
-        ```
 
-    * A dotted name, e.g. `describe.modifier`, which allows:
-      ```
-      describe.modifier("example", function() { ... });
-      ```
+  The `name` property can be in any of the following forms:
+  * A plain name e.g. `describeModule`, which allows:
 
-    * A name with parentheses, e.g. `forEach().describe`, which allows:
-      ```
-      forEach([ 1, 2, 3 ])
-          .describe("example", function(n) { ... });
-      ```
+    ```javascript
+    describeModule("example", function() { ... });
+    ```
 
-    * Any combination of the above, e.g. `forEach().describeModule.modifier`, which allows:
-      ```
-      forEach([ 1, 2, 3 ])
-          .describeModule.modifier("example", function(n) { ... });
-      ```
+  * A dotted name, e.g. `describe.modifier`, which allows:
+
+    ```javascript
+    describe.modifier("example", function() { ... });
+    ```
+
+  * A name with parentheses, e.g. `forEach().describe`, which allows:
+
+    ```javascript
+    forEach([ 1, 2, 3 ])
+        .describe("example", function(n) { ... });
+    ```
+
+  * Any combination of the above, e.g. `forEach().describeModule.modifier`, which allows:
+
+    ```javascript
+    forEach([ 1, 2, 3 ])
+        .describeModule.modifier("example", function(n) { ... });
+    ```
 
 ## Configs
 
