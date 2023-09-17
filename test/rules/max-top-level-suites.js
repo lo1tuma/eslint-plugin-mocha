@@ -68,6 +68,40 @@ ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
                 sourceType: 'module',
                 ecmaVersion: 2015
             }
+        },
+        {
+            code: [
+                'describe.foo("", function () {',
+                '    describe("", function () {});',
+                '    describe("", function () {});',
+                '});'
+            ].join('\n'),
+            parserOptions: {
+                sourceType: 'module',
+                ecmaVersion: 2015
+            },
+            settings: {
+                mocha: {
+                    additionalCustomNames: [ { name: 'describe.foo', type: 'suite', interfaces: [ 'BDD' ] } ]
+                }
+            }
+        },
+        {
+            code: [
+                'describe.foo("bar")("", function () {',
+                '    describe("", function () {});',
+                '    describe("", function () {});',
+                '});'
+            ].join('\n'),
+            parserOptions: {
+                sourceType: 'module',
+                ecmaVersion: 2015
+            },
+            settings: {
+                mocha: {
+                    additionalCustomNames: [ { name: 'describe.foo()', type: 'suite', interfaces: [ 'BDD' ] } ]
+                }
+            }
         }
     ],
 
@@ -206,6 +240,34 @@ ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
+                }
+            },
+            errors: [
+                { message: 'The number of top-level suites is more than 1.' }
+            ]
+        }, {
+            code: 'describe.foo("bar")("this is a test", function () { });' +
+                  'context.foo("this is a different test", function () { });',
+            settings: {
+                mocha: {
+                    additionalCustomNames: [
+                        { name: 'describe.foo()', type: 'suite', interfaces: [ 'BDD' ] },
+                        { name: 'context.foo', type: 'suite', interfaces: [ 'BDD' ] }
+                    ]
+                }
+            },
+            errors: [
+                { message: 'The number of top-level suites is more than 1.' }
+            ]
+        }, {
+            code: 'forEach([ 1, 2, 3 ]).describe("this is a test", function () { });' +
+                  'context.foo("this is a different test", function () { });',
+            settings: {
+                mocha: {
+                    additionalCustomNames: [
+                        { name: 'forEach().describe', type: 'suite', interfaces: [ 'BDD' ] },
+                        { name: 'context.foo', type: 'suite', interfaces: [ 'BDD' ] }
+                    ]
                 }
             },
             errors: [

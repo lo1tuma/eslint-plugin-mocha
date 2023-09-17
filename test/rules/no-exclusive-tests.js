@@ -38,6 +38,14 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
                     additionalCustomNames: [ { name: 'a.b.c', type: 'testCase', interfaces: [ 'BDD' ] } ]
                 }
             }
+        },
+        {
+            code: 'a.b().c.skip()',
+            settings: {
+                mocha: {
+                    additionalCustomNames: [ { name: 'a.b().c', type: 'testCase', interfaces: [ 'BDD' ] } ]
+                }
+            }
         }
     ],
 
@@ -175,6 +183,15 @@ ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
+        },
+        {
+            code: 'foo("bar").it.only()',
+            settings: {
+                mocha: {
+                    additionalCustomNames: [ { name: 'foo().it', type: 'testCase', interfaces: [ 'BDD' ] } ]
+                }
+            },
+            errors: [ { message: expectedErrorMessage, column: 15, line: 1 } ]
         }
     ]
 });

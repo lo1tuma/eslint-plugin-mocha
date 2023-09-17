@@ -139,6 +139,15 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
                 }
             },
             errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+        },
+        {
+            code: 'custom("bar").it.skip()',
+            settings: {
+                mocha: {
+                    additionalCustomNames: [ { name: 'custom().it', type: 'testCase', interfaces: [ 'BDD' ] } ]
+                }
+            },
+            errors: [ { message: expectedErrorMessage, column: 18, line: 1 } ]
         }
     ]
 

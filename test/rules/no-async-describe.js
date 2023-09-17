@@ -72,6 +72,40 @@ ruleTester.run('no-async-describe', rule, {
                 line: 1,
                 column: 19
             } ]
+        },
+        {
+            code: 'describe.foo("bar")("hello", async () => {})',
+            output: 'describe.foo("bar")("hello", () => {})',
+            settings: {
+                mocha: {
+                    additionalCustomNames: [
+                        { name: 'describe.foo()', type: 'suite', interfaces: [ 'BDD' ] }
+                    ]
+                }
+            },
+            parserOptions: { ecmaVersion: 8 },
+            errors: [ {
+                message: 'Unexpected async function in describe.foo()()',
+                line: 1,
+                column: 30
+            } ]
+        },
+        {
+            code: 'forEach([ 1, 2, 3 ]).describe.foo("hello", async () => {})',
+            output: 'forEach([ 1, 2, 3 ]).describe.foo("hello", () => {})',
+            settings: {
+                mocha: {
+                    additionalCustomNames: [
+                        { name: 'forEach().describe.foo', type: 'suite', interfaces: [ 'BDD' ] }
+                    ]
+                }
+            },
+            parserOptions: { ecmaVersion: 8 },
+            errors: [ {
+                message: 'Unexpected async function in forEach().describe.foo()',
+                line: 1,
+                column: 44
+            } ]
         }
     ]
 });
