@@ -29,23 +29,46 @@ Then add a reference to this plugin and selected rules in your eslint config:
 
 This plugin supports the following settings, which are used by multiple rules:
 
-* `additionalCustomNames`: This allows rules to check additional function names when looking for suites or test cases. This might be used with a custom Mocha extension, such as [`ember-mocha`](https://github.com/switchfly/ember-mocha)
-**Example:**
+* `additionalCustomNames`: This allows rules to check additional function names when looking for suites or test cases. This might be used with a custom Mocha extension, such as [`ember-mocha`](https://github.com/switchfly/ember-mocha) or [`mocha-each`](https://github.com/ryym/mocha-each).
 
-```json
-{
-    "rules": {
-        "mocha/no-skipped-tests": "error",
-        "mocha/no-exclusive-tests": "error"
-    },
-    "settings": {
-        "mocha/additionalCustomNames": [
-            { "name": "describeModule", "type": "suite", "interfaces": [ "BDD" ] },
-            { "name": "testModule", "type": "testCase", "interfaces": [ "TDD" ] }
-        ]
+   **Example:**
+
+    ```json
+    {
+        "rules": {
+            "mocha/no-skipped-tests": "error",
+            "mocha/no-exclusive-tests": "error"
+        },
+        "settings": {
+            "mocha/additionalCustomNames": [
+                { "name": "describeModule", "type": "suite", "interfaces": [ "BDD" ] },
+                { "name": "testModule", "type": "testCase", "interfaces": [ "TDD" ] }
+            ]
+        }
     }
-}
-```
+    ```
+    The `name` property can be in any of the following forms:
+    * A plain name e.g. `describeModule`, which allows:
+        ```
+        describeModule("example", function() { ... });
+        ```
+
+    * A dotted name, e.g. `describe.modifier`, which allows:
+      ```
+      describe.modifier("example", function() { ... });
+      ```
+
+    * A name with parentheses, e.g. `forEach().describe`, which allows:
+      ```
+      forEach([ 1, 2, 3 ])
+          .describe("example", function(n) { ... });
+      ```
+
+    * Any combination of the above, e.g. `forEach().describeModule.modifier`, which allows:
+      ```
+      forEach([ 1, 2, 3 ])
+          .describeModule.modifier("example", function(n) { ... });
+      ```
 
 ## Configs
 
