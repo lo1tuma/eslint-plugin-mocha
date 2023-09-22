@@ -23,7 +23,8 @@
         "test:bench": "mocha -t 2400000 benchmarks",
         "coveralls": "cat ./build/coverage/lcov.info | coveralls",
         "changelog": "pr-log",
-        "update:eslint-docs": "eslint-doc-generator --ignore-config all --url-configs \"https://github.com/lo1tuma/eslint-plugin-mocha#configs\""
+        "update:eslint-docs": "eslint-doc-generator --ignore-config all --url-configs \"https://github.com/lo1tuma/eslint-plugin-mocha#configs\"",
+        "release": "release-it"
     },
     "dependencies": {
         "eslint-utils": "^3.0.0",
