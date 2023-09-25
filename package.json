@@ -55,7 +55,8 @@
     },
     "author": "Mathias Schreck <schreck.mathias@gmail.com>",
     "contributors": [
-        "Alexander Schmidt <alexanderschmidt1@gmail.com>"
+        "Alexander Schmidt <alexanderschmidt1@gmail.com>",
+        "Christian Rackerseder <github@echooff.de>"
     ],
     "license": "MIT",
     "bugs": {
