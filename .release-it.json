@@ -1,16 +1,17 @@
 {
     "git": {
-        "requireBranch": "master"
+        "requireBranch": "master",
+        "changelog": false
     },
     "github": {
         "release": true,
-        "releaseName": "v${version}"
+        "releaseName": "${version}"
     },
     "npm": {
         "publish": true
     },
     "hooks": {
         "before:init": ["npm run lint", "npm run test"],
-        "after:bump": ["npm run changelog"]
+        "after:bump": ["npm run changelog ${version}"]
     }
 }
