@@ -1,3 +1,22 @@
+## 10.2.0 (September 25, 2023)
+
+### Features
+
+* Support function calls as custom names (to stop false warnings) ([#336](https://github.com/lo1tuma/eslint-plugin-mocha/pull/336))
+
+### Documentation
+
+* Automate docs with eslint-doc-generator ([#330](https://github.com/lo1tuma/eslint-plugin-mocha/pull/330))
+
+### Dependency Upgrades
+
+* Update all dependencies ([#334](https://github.com/lo1tuma/eslint-plugin-mocha/pull/334))
+
+### Build-Related
+
+* Include Node.js v20 in continuous integration pipeline ([#338](https://github.com/lo1tuma/eslint-plugin-mocha/pull/338))
+* Introduce "release-it" to make releases more comfortable ([#337](https://github.com/lo1tuma/eslint-plugin-mocha/pull/337))
+
 ## 10.1.0 (July 20, 2022)
 
 ### Enhancements
