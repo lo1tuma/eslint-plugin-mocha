@@ -10,50 +10,50 @@ ruleTester.run('require-spacing-between-mocha-calls', rule, {
     valid: [
         // Basic describe block
         `describe('My Test', () => {
-      it('does something', () => {});
-    });`,
+            it('does something', () => {});
+        });`,
 
         // Proper line break before each block within describe
         `describe('My Test', () => {
-      it('performs action one', () => {});
-      
-      it('performs action two', () => {});
-    });`,
+            it('performs action one', () => {});
+
+            it('performs action two', () => {});
+        });`,
 
         // Nested describe blocks with proper spacing
         `describe('Outer block', () => {
-      describe('Inner block', () => {
-        it('performs an action', () => {});
-      });
+            describe('Inner block', () => {
+                it('performs an action', () => {});
+            });
 
-      afterEach(() => {});
-    });`,
+            afterEach(() => {});
+        });`,
 
         // Describe block with comments
         `describe('My Test With Comments', () => {
-      it('does something', () => {});
-      
-      // Some comment
-      afterEach(() => {});
-    });`,
+            it('does something', () => {});
+
+            // Some comment
+            afterEach(() => {});
+        });`,
 
         // Mocha functions outside of a describe block
         `it('does something outside a describe block', () => {});
-    afterEach(() => {});`
+        afterEach(() => {});`
     ],
 
     invalid: [
         // Missing line break between it and afterEach
         {
             code: `describe('My Test', function () {
-        it('does something', () => {});
-        afterEach(() => {});
-      });`,
+                it('does something', () => {});
+                afterEach(() => {});
+            });`,
             output: `describe('My Test', function () {
-        it('does something', () => {});
+                it('does something', () => {});
 
-        afterEach(() => {});
-      });`,
+                afterEach(() => {});
+            });`,
             errors: [
                 {
                     message: 'Expected line break before this statement.',
@@ -65,14 +65,14 @@ ruleTester.run('require-spacing-between-mocha-calls', rule, {
         // Missing line break between beforeEach and it
         {
             code: `describe('My Test', () => {
-        beforeEach(() => {});
-        it('does something', () => {});
-      });`,
+                beforeEach(() => {});
+                it('does something', () => {});
+            });`,
             output: `describe('My Test', () => {
-        beforeEach(() => {});
+                beforeEach(() => {});
 
-        it('does something', () => {});
-      });`,
+                it('does something', () => {});
+            });`,
             errors: [
                 {
                     message: 'Expected line break before this statement.',
@@ -84,14 +84,35 @@ ruleTester.run('require-spacing-between-mocha-calls', rule, {
         // Missing line break after a variable declaration
         {
             code: `describe('Variable declaration', () => {
-        const a = 1;
-        it('uses a variable', () => {});
-      });`,
+                const a = 1;
+                it('uses a variable', () => {});
+            });`,
             output: `describe('Variable declaration', () => {
-        const a = 1;
+                const a = 1;
 
-        it('uses a variable', () => {});
-      });`,
+                it('uses a variable', () => {});
+            });`,
+            errors: [
+                {
+                    message: 'Expected line break before this statement.',
+                    type: 'CallExpression'
+                }
+            ]
+        },
+
+        // Blocks on the same line
+        {
+            code:
+                'describe(\'Same line blocks\', () => {' +
+                'it(\'block one\', () => {});' +
+                'it(\'block two\', () => {});' +
+                '});',
+            output:
+                'describe(\'Same line blocks\', () => {' +
+                'it(\'block one\', () => {});' +
+                '\n\n' +
+                'it(\'block two\', () => {});' +
+                '});',
             errors: [
                 {
                     message: 'Expected line break before this statement.',
