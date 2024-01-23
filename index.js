@@ -24,7 +24,8 @@ module.exports = {
         'prefer-arrow-callback': require('./lib/rules/prefer-arrow-callback'),
         'valid-suite-description': require('./lib/rules/valid-suite-description'),
         'valid-test-description': require('./lib/rules/valid-test-description'),
-        'no-empty-description': require('./lib/rules/no-empty-description.js')
+        'no-empty-description': require('./lib/rules/no-empty-description.js'),
+        'consistent-spacing-between-blocks': require('./lib/rules/consistent-spacing-between-blocks.js')
     },
     configs: {
         all: {
@@ -53,7 +54,8 @@ module.exports = {
                 'mocha/prefer-arrow-callback': 'error',
                 'mocha/valid-suite-description': 'error',
                 'mocha/valid-test-description': 'error',
-                'mocha/no-empty-description': 'error'
+                'mocha/no-empty-description': 'error',
+                'mocha/consistent-spacing-between-blocks': 'error'
             }
         },
 
@@ -83,7 +85,8 @@ module.exports = {
                 'mocha/prefer-arrow-callback': 'off',
                 'mocha/valid-suite-description': 'off',
                 'mocha/valid-test-description': 'off',
-                'mocha/no-empty-description': 'error'
+                'mocha/no-empty-description': 'error',
+                'mocha/consistent-spacing-between-blocks': 'error'
             }
         }
     }

@@ -107,30 +107,31 @@ See [Configuring Eslint](http://eslint.org/docs/user-guide/configuring) on [esli
 ✅ Set in the `recommended` [configuration](https://github.com/lo1tuma/eslint-plugin-mocha#configs).\
 🔧 Automatically fixable by the [`--fix` CLI option](https://eslint.org/docs/user-guide/command-line-interface#--fix).
 
-| Name                                                               | Description                                                             | 💼 | ⚠️ | 🚫 | 🔧 |
-| :----------------------------------------------------------------- | :---------------------------------------------------------------------- | :- | :- | :- | :- |
-| [handle-done-callback](docs/rules/handle-done-callback.md)         | Enforces handling of callbacks for async tests                          | ✅  |    |    |    |
-| [max-top-level-suites](docs/rules/max-top-level-suites.md)         | Enforce the number of top-level suites in a single file                 | ✅  |    |    |    |
-| [no-async-describe](docs/rules/no-async-describe.md)               | Disallow async functions passed to describe                             | ✅  |    |    | 🔧 |
-| [no-empty-description](docs/rules/no-empty-description.md)         | Disallow empty test descriptions                                        | ✅  |    |    |    |
-| [no-exclusive-tests](docs/rules/no-exclusive-tests.md)             | Disallow exclusive tests                                                |    | ✅  |    |    |
-| [no-exports](docs/rules/no-exports.md)                             | Disallow exports from test files                                        | ✅  |    |    |    |
-| [no-global-tests](docs/rules/no-global-tests.md)                   | Disallow global tests                                                   | ✅  |    |    |    |
-| [no-hooks](docs/rules/no-hooks.md)                                 | Disallow hooks                                                          |    |    | ✅  |    |
-| [no-hooks-for-single-case](docs/rules/no-hooks-for-single-case.md) | Disallow hooks for a single test or test suite                          |    |    | ✅  |    |
-| [no-identical-title](docs/rules/no-identical-title.md)             | Disallow identical titles                                               | ✅  |    |    |    |
-| [no-mocha-arrows](docs/rules/no-mocha-arrows.md)                   | Disallow arrow functions as arguments to mocha functions                | ✅  |    |    | 🔧 |
-| [no-nested-tests](docs/rules/no-nested-tests.md)                   | Disallow tests to be nested within other tests                          | ✅  |    |    |    |
-| [no-pending-tests](docs/rules/no-pending-tests.md)                 | Disallow pending tests                                                  |    | ✅  |    |    |
-| [no-return-and-callback](docs/rules/no-return-and-callback.md)     | Disallow returning in a test or hook function that uses a callback      | ✅  |    |    |    |
-| [no-return-from-async](docs/rules/no-return-from-async.md)         | Disallow returning from an async test or hook                           |    |    | ✅  |    |
-| [no-setup-in-describe](docs/rules/no-setup-in-describe.md)         | Disallow setup in describe blocks                                       | ✅  |    |    |    |
-| [no-sibling-hooks](docs/rules/no-sibling-hooks.md)                 | Disallow duplicate uses of a hook at the same level inside a describe   | ✅  |    |    |    |
-| [no-skipped-tests](docs/rules/no-skipped-tests.md)                 | Disallow skipped tests                                                  |    | ✅  |    |    |
-| [no-synchronous-tests](docs/rules/no-synchronous-tests.md)         | Disallow synchronous tests                                              |    |    | ✅  |    |
-| [no-top-level-hooks](docs/rules/no-top-level-hooks.md)             | Disallow top-level hooks                                                |    | ✅  |    |    |
-| [prefer-arrow-callback](docs/rules/prefer-arrow-callback.md)       | Require using arrow functions for callbacks                             |    |    | ✅  | 🔧 |
-| [valid-suite-description](docs/rules/valid-suite-description.md)   | Require suite descriptions to match a pre-configured regular expression |    |    | ✅  |    |
-| [valid-test-description](docs/rules/valid-test-description.md)     | Require test descriptions to match a pre-configured regular expression  |    |    | ✅  |    |
+| Name                                                                                 | Description                                                             | 💼 | ⚠️ | 🚫 | 🔧 |
+| :----------------------------------------------------------------------------------- | :---------------------------------------------------------------------- | :- | :- | :- | :- |
+| [consistent-spacing-between-blocks](docs/rules/consistent-spacing-between-blocks.md) | Require consistent spacing between blocks                               | ✅  |    |    | 🔧 |
+| [handle-done-callback](docs/rules/handle-done-callback.md)                           | Enforces handling of callbacks for async tests                          | ✅  |    |    |    |
+| [max-top-level-suites](docs/rules/max-top-level-suites.md)                           | Enforce the number of top-level suites in a single file                 | ✅  |    |    |    |
+| [no-async-describe](docs/rules/no-async-describe.md)                                 | Disallow async functions passed to describe                             | ✅  |    |    | 🔧 |
+| [no-empty-description](docs/rules/no-empty-description.md)                           | Disallow empty test descriptions                                        | ✅  |    |    |    |
+| [no-exclusive-tests](docs/rules/no-exclusive-tests.md)                               | Disallow exclusive tests                                                |    | ✅  |    |    |
+| [no-exports](docs/rules/no-exports.md)                                               | Disallow exports from test files                                        | ✅  |    |    |    |
+| [no-global-tests](docs/rules/no-global-tests.md)                                     | Disallow global tests                                                   | ✅  |    |    |    |
+| [no-hooks](docs/rules/no-hooks.md)                                                   | Disallow hooks                                                          |    |    | ✅  |    |
+| [no-hooks-for-single-case](docs/rules/no-hooks-for-single-case.md)                   | Disallow hooks for a single test or test suite                          |    |    | ✅  |    |
+| [no-identical-title](docs/rules/no-identical-title.md)                               | Disallow identical titles                                               | ✅  |    |    |    |
+| [no-mocha-arrows](docs/rules/no-mocha-arrows.md)                                     | Disallow arrow functions as arguments to mocha functions                | ✅  |    |    | 🔧 |
+| [no-nested-tests](docs/rules/no-nested-tests.md)                                     | Disallow tests to be nested within other tests                          | ✅  |    |    |    |
+| [no-pending-tests](docs/rules/no-pending-tests.md)                                   | Disallow pending tests                                                  |    | ✅  |    |    |
+| [no-return-and-callback](docs/rules/no-return-and-callback.md)                       | Disallow returning in a test or hook function that uses a callback      | ✅  |    |    |    |
+| [no-return-from-async](docs/rules/no-return-from-async.md)                           | Disallow returning from an async test or hook                           |    |    | ✅  |    |
+| [no-setup-in-describe](docs/rules/no-setup-in-describe.md)                           | Disallow setup in describe blocks                                       | ✅  |    |    |    |
+| [no-sibling-hooks](docs/rules/no-sibling-hooks.md)                                   | Disallow duplicate uses of a hook at the same level inside a describe   | ✅  |    |    |    |
+| [no-skipped-tests](docs/rules/no-skipped-tests.md)                                   | Disallow skipped tests                                                  |    | ✅  |    |    |
+| [no-synchronous-tests](docs/rules/no-synchronous-tests.md)                           | Disallow synchronous tests                                              |    |    | ✅  |    |
+| [no-top-level-hooks](docs/rules/no-top-level-hooks.md)                               | Disallow top-level hooks                                                |    | ✅  |    |    |
+| [prefer-arrow-callback](docs/rules/prefer-arrow-callback.md)                         | Require using arrow functions for callbacks                             |    |    | ✅  | 🔧 |
+| [valid-suite-description](docs/rules/valid-suite-description.md)                     | Require suite descriptions to match a pre-configured regular expression |    |    | ✅  |    |
+| [valid-test-description](docs/rules/valid-test-description.md)                       | Require test descriptions to match a pre-configured regular expression  |    |    | ✅  |    |
 
 <!-- end auto-generated rules list -->
