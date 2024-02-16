@@ -1,3 +1,13 @@
+## 10.3.0 (February 16, 2024)
+
+### Features
+
+* Add `consistent-spacing-between-blocks` rule ([#340](https://github.com/lo1tuma/eslint-plugin-mocha/pull/340))
+
+### Documentation
+
+* Add screendriver to contributors ([#339](https://github.com/lo1tuma/eslint-plugin-mocha/pull/339))
+
 ## 10.2.0 (September 25, 2023)
 
 ### Features
