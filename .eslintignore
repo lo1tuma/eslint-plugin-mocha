@@ -1,4 +1,1 @@
-.idea/**
 build/**
-node_modules/**
-!*.js
