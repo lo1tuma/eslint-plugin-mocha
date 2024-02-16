@@ -1,6 +1,6 @@
 {
     "git": {
-        "requireBranch": "master",
+        "requireBranch": "main",
         "changelog": false
     },
     "github": {
