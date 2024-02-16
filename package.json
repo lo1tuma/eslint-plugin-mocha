@@ -3,7 +3,7 @@
     "version": "10.3.0",
     "description": "Eslint rules for mocha.",
     "engines": {
-        "node": ">=14.0.0"
+        "node": ">=20.0.0"
     },
     "main": "index.js",
     "files": [

@@ -3,19 +3,8 @@
 const os = require('os');
 const { performance: performanceHooks } = require('perf_hooks');
 const { times, median, map, prop } = require('rambda');
-const semver = require('semver');
 
 const [ { speed: cpuSpeed } ] = os.cpus();
-
-function getNodeVersionMultiplier() {
-    const currentNodeVersion = process.version;
-
-    if (semver.lt(currentNodeVersion, '14.0.0')) {
-        return 1.5;
-    }
-
-    return 1;
-}
 
 function clearRequireCache() {
     Object.keys(require.cache).forEach(function (key) {
@@ -47,6 +36,5 @@ function runBenchmark(fn, count) {
 module.exports = {
     runBenchmark,
     clearRequireCache,
-    cpuSpeed,
-    getNodeVersionMultiplier
+    cpuSpeed
 };
