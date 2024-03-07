@@ -1,3 +1,9 @@
+## 10.4.0 (March 7, 2024)
+
+### Features
+
+* Add support for eslint flat config format ([#349](https://github.com/lo1tuma/eslint-plugin-mocha/pull/349))
+
 ## 10.3.0 (February 16, 2024)
 
 ### Features
