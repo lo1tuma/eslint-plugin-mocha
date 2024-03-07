@@ -15,6 +15,8 @@ This plugin requires ESLint `4.0.0` or later.
 npm install --save-dev eslint-plugin-mocha
 ```
 
+### `.eslintrc.json`
+
 Then add a reference to this plugin and selected rules in your eslint config:
 
 ```json
@@ -23,6 +25,19 @@ Then add a reference to this plugin and selected rules in your eslint config:
         "mocha"
     ]
 }
+```
+
+### `eslint.config.js` (requires eslint >= 8.23.0)
+
+To use this plugin with [the new eslint configuration format (flat config)](https://eslint.org/docs/latest/use/configure/configuration-files-new):
+
+```js
+import mochaPlugin from 'eslint-plugin-mocha';
+
+export default [
+    mochaPlugin.configs.flat.recommended // or `mochaPlugin.configs.flat.all` to enable all
+    // ... Your configurations here
+];
 ```
 
 ### Plugin Settings
