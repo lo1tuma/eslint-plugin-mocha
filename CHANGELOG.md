@@ -1,3 +1,9 @@
+## 10.4.1 (March 8, 2024)
+
+### Bug Fixes
+
+* Downgrade `globals` package to support node versions < v18
+
 ## 10.4.0 (March 7, 2024)
 
 ### Features
