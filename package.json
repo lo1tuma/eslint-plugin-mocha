@@ -28,7 +28,7 @@
     },
     "dependencies": {
         "eslint-utils": "^3.0.0",
-        "globals": "^14.0.0",
+        "globals": "^13.24.0",
         "rambda": "^7.4.0"
     },
     "devDependencies": {
