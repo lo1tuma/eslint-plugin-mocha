@@ -1,3 +1,9 @@
+## 10.4.2 (April 10, 2024)
+
+### Bug Fixes
+
+* Stop using deprecated ESLint context methods
+
 ## 10.4.1 (March 8, 2024)
 
 ### Bug Fixes
