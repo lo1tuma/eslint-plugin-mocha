@@ -99,11 +99,13 @@ const mod = {
 
 mod.configs.flat = {
     all: {
+        name: 'mocha/all',
         plugins: { mocha: mod },
         languageOptions: { globals: globals.mocha },
         rules: allRules
     },
     recommended: {
+        name: 'mocha/recommended',
         plugins: { mocha: mod },
         languageOptions: { globals: globals.mocha },
         rules: recommendedRules
