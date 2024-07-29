@@ -1,3 +1,9 @@
+## 10.4.3 (April 19, 2024)
+
+### Bug Fixes
+
+* Fix support for ESLint versions < 8.40.0
+
 ## 10.4.2 (April 10, 2024)
 
 ### Bug Fixes
