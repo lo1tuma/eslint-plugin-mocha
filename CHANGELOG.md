@@ -1,3 +1,9 @@
+## 10.5.0 (July 29, 2024)
+
+### Enhancements
+
+* Add name to flat configs ([#356](https://github.com/lo1tuma/eslint-plugin-mocha/pull/356))
+
 ## 10.4.3 (April 19, 2024)
 
 ### Bug Fixes
