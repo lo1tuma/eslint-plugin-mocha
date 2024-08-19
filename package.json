@@ -27,7 +27,7 @@
         "release": "release-it"
     },
     "dependencies": {
-        "eslint-utils": "^3.0.0",
+        "@eslint-community/eslint-utils": "^4.4.0",
         "globals": "^14.0.0",
         "rambda": "^7.4.0"
     },
