@@ -13,29 +13,29 @@ This rule looks for CommonJS or ESM export statements and flags them as a proble
 The following patterns are considered warnings:
 
 ```js
-describe(function () { /* ... */ });
+describe(function () {/* ... */});
 module.exports = 'foo';
 
-it('works', function () { /* ... */ });
+it('works', function () {/* ... */});
 exports.foo = 'bar';
 
-beforeEach(function () { /* ... */ });
+beforeEach(function () {/* ... */});
 export default 'foo';
 
-afterEach(function () { /* ... */ });
+afterEach(function () {/* ... */});
 export const foo = 'bar';
 ```
 
 These patterns would not be considered warnings:
 
 ```js
-describe(function () { /* ... */ });
+describe(function () {/* ... */});
 
-it('works', function () { /* ... */ });
+it('works', function () {/* ... */});
 
-beforeEach(function () { /* ... */ });
+beforeEach(function () {/* ... */});
 
-afterEach(function () { /* ... */ });
+afterEach(function () {/* ... */});
 ```
 
 ## When Not To Use It

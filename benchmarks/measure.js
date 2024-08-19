@@ -1,13 +1,11 @@
-'use strict';
-
-const os = require('os');
-const { performance: performanceHooks } = require('perf_hooks');
+const os = require('node:os');
+const { performance: performanceHooks } = require('node:perf_hooks');
 const { times, median, map, prop } = require('rambda');
 
-const [ { speed: cpuSpeed } ] = os.cpus();
+const [{ speed: cpuSpeed }] = os.cpus();
 
 function clearRequireCache() {
-    Object.keys(require.cache).forEach(function (key) {
+    Object.keys(require.cache).forEach((key) => {
         delete require.cache[key];
     });
 }

@@ -24,40 +24,39 @@ The following patterns are considered warnings:
 
 ```js
 // bdd
-describe.only("foo", function () {});
-it.only("foo", function () {});
-describe["only"]("bar", function () {});
-it["only"]("bar", function () {});
+describe.only('foo', function () {});
+it.only('foo', function () {});
+describe['only']('bar', function () {});
+it['only']('bar', function () {});
 
 // tdd
-suite.only("foo", function () {});
-test.only("foo", function () {});
-suite["only"]("bar", function () {});
-test["only"]("bar", function () {});
-
+suite.only('foo', function () {});
+test.only('foo', function () {});
+suite['only']('bar', function () {});
+test['only']('bar', function () {});
 ```
 
 These patterns would not be considered warnings:
 
 ```js
 // bdd
-describe("foo", function () {});
-it("foo", function () {});
-describe.skip("bar", function () {});
-it.skip("bar", function () {});
+describe('foo', function () {});
+it('foo', function () {});
+describe.skip('bar', function () {});
+it.skip('bar', function () {});
 
 // tdd
-suite("foo", function () {});
-test("foo", function () {});
-suite.skip("bar", function () {});
-test.skip("bar", function () {});
+suite('foo', function () {});
+test('foo', function () {});
+suite.skip('bar', function () {});
+test.skip('bar', function () {});
 ```
 
 ## When Not To Use It
 
-* If you really want to execute only one test-suite or test-case because all other tests should not be executed, turn this rule off.
-* If you use another library which exposes a similar API as mocha (e.g. `describe.only`), you should turn this rule off, because it would raise warnings.
+- If you really want to execute only one test-suite or test-case because all other tests should not be executed, turn this rule off.
+- If you use another library which exposes a similar API as mocha (e.g. `describe.only`), you should turn this rule off, because it would raise warnings.
 
 ## Further Reading
 
-* [Exclusive Tests](http://mochajs.org/#exclusive-tests)
+- [Exclusive Tests](http://mochajs.org/#exclusive-tests)

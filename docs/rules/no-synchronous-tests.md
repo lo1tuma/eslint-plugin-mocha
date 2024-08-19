@@ -61,9 +61,9 @@ This rule cannot guarantee that a returned function call is actually a promise, 
 If a dynamic function is passed into the test call, it cannot be inspected because the function is only defined at runtime. Example:
 
 ```js
-var myTestFn = function(){
-  // it cannot verify this
-}
+var myTestFn = function () {
+    // it cannot verify this
+};
 it('test name', myTestFn);
 ```
 

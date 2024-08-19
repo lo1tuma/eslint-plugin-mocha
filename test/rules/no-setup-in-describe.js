@@ -1,10 +1,7 @@
-'use strict';
-
-const RuleTester = require('eslint').RuleTester;
+const { RuleTester } = require('eslint');
 const rule = require('../../lib/rules/no-setup-in-describe');
 const ruleTester = new RuleTester();
-const memberExpressionError =
-    'Unexpected member expression in describe block. ' +
+const memberExpressionError = 'Unexpected member expression in describe block. ' +
     'Member expressions may call functions via getters.';
 
 ruleTester.run('no-setup-in-describe', rule, {
@@ -64,7 +61,7 @@ ruleTester.run('no-setup-in-describe', rule, {
             code: 'foo("", function () { it(); })',
             settings: {
                 'mocha/additionalCustomNames': [
-                    { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                    { name: 'foo', type: 'suite', interfaces: ['BDD'] }
                 ]
             }
         },
@@ -73,7 +70,7 @@ ruleTester.run('no-setup-in-describe', rule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                        { name: 'foo', type: 'suite', interfaces: ['BDD'] }
                     ]
                 }
             }
@@ -83,7 +80,7 @@ ruleTester.run('no-setup-in-describe', rule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                        { name: 'foo', type: 'suite', interfaces: ['BDD'] }
                     ]
                 }
             }
@@ -100,8 +97,7 @@ ruleTester.run('no-setup-in-describe', rule, {
         },
         'describe("", function () { function bar() { a.b = "c"; } it(); })',
         {
-            code:
-                'describe("", function () { const bar = () => { a.b = "c"; }; it(); })',
+            code: 'describe("", function () { const bar = () => { a.b = "c"; }; it(); })',
             parserOptions: { ecmaVersion: 2015 }
         },
         'describe("", function () { var bar = function () { a.b = "c"; }; it(); })'
@@ -144,7 +140,7 @@ ruleTester.run('no-setup-in-describe', rule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                        { name: 'foo', type: 'suite', interfaces: ['BDD'] }
                     ]
                 }
             },
@@ -161,7 +157,7 @@ ruleTester.run('no-setup-in-describe', rule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                        { name: 'foo', type: 'suite', interfaces: ['BDD'] }
                     ]
                 }
             },
@@ -178,7 +174,7 @@ ruleTester.run('no-setup-in-describe', rule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                        { name: 'foo', type: 'suite', interfaces: ['BDD'] }
                     ]
                 }
             },
@@ -220,7 +216,7 @@ ruleTester.run('no-setup-in-describe', rule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                        { name: 'foo', type: 'suite', interfaces: ['BDD'] }
                     ]
                 }
             },
@@ -248,8 +244,7 @@ ruleTester.run('no-setup-in-describe', rule, {
             ]
         },
         {
-            code:
-                'describe("", function () { something("", function () {}).timeout(); });',
+            code: 'describe("", function () { something("", function () {}).timeout(); });',
             errors: [
                 {
                     message: 'Unexpected function call in describe block.',

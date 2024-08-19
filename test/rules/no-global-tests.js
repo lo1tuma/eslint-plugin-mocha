@@ -1,12 +1,9 @@
-'use strict';
-
-const RuleTester = require('eslint').RuleTester;
+const { RuleTester } = require('eslint');
 const rule = require('../../lib/rules/no-global-tests');
 const ruleTester = new RuleTester();
 const expectedErrorMessage = 'Unexpected global mocha test.';
 
 ruleTester.run('no-global-tests', rule, {
-
     valid: [
         'describe();',
         'suite();',
@@ -43,63 +40,63 @@ ruleTester.run('no-global-tests', rule, {
     invalid: [
         {
             code: 'it();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'it.only();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'it["only"]();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'it.skip();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'it["skip"]();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'test();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'test.only();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'test["only"]();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'test.skip();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'test["skip"]();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'specify();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'specify.only();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'specify["only"]();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'specify.skip();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'specify["skip"]();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'import foo from "bar"; it("");',
@@ -107,9 +104,7 @@ ruleTester.run('no-global-tests', rule, {
                 sourceType: 'module',
                 ecmaVersion: 2015
             },
-            errors: [ { message: expectedErrorMessage, column: 24, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 24, line: 1 }]
         }
-
     ]
-
 });

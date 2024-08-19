@@ -1,6 +1,4 @@
-'use strict';
-
-const assert = require('assert');
+const assert = require('node:assert');
 const { Linter } = require('eslint');
 const { times, toPairs, fromPairs } = require('rambda');
 const {
@@ -18,10 +16,10 @@ function lintManyFilesWithAllRecommendedRules({ numberOfFiles }) {
 
     const config = {
         rules: fromPairs(
-            toPairs(allRules).map(([ ruleName, ruleSettings ]) => {
-                const [ , ruleNameWithoutPrefix ] = ruleName.split('/');
+            toPairs(allRules).map(([ruleName, ruleSettings]) => {
+                const [, ruleNameWithoutPrefix] = ruleName.split('/');
 
-                return [ ruleNameWithoutPrefix, ruleSettings ];
+                return [ruleNameWithoutPrefix, ruleSettings];
             })
         ),
         parserOptions: {
@@ -86,9 +84,9 @@ function lintManyFilesWithAllRecommendedRules({ numberOfFiles }) {
     }, numberOfFiles);
 }
 
-describe('runtime', () => {
-    it('should not take longer as the defined budget to lint many files with the recommended config', () => {
-        const budget = 3750000 / cpuSpeed;
+describe('runtime', function () {
+    it('should not take longer as the defined budget to lint many files with the recommended config', function () {
+        const budget = 3_750_000 / cpuSpeed;
 
         const { medianDuration } = runBenchmark(() => {
             lintManyFilesWithAllRecommendedRules({ numberOfFiles: 350 });
@@ -97,8 +95,8 @@ describe('runtime', () => {
         assert.strictEqual(medianDuration < budget, true);
     });
 
-    it('should not consume more memory as the defined budget to lint many files with the recommended config', () => {
-        const budget = 2750000;
+    it('should not consume more memory as the defined budget to lint many files with the recommended config', function () {
+        const budget = 2_750_000;
 
         const { medianMemory } = runBenchmark(() => {
             lintManyFilesWithAllRecommendedRules({ numberOfFiles: 350 });

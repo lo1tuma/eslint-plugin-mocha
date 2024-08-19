@@ -14,24 +14,24 @@ This rule looks for every call to `before`, `after`, `beforeEach` and `afterEach
 The following patterns are considered warnings:
 
 ```js
-before(function () { /* ... */ }); // Not allowed
-after(function () { /* ... */ }); // Not allowed
-beforeEach(function () { /* ... */ }); // Not allowed
-afterEach(function () { /* ... */ }); // Not allowed
+before(function () {/* ... */}); // Not allowed
+after(function () {/* ... */}); // Not allowed
+beforeEach(function () {/* ... */}); // Not allowed
+afterEach(function () {/* ... */}); // Not allowed
 ```
 
 These patterns would not be considered warnings:
 
 ```js
 describe('foo', function () {
-    before(function () { /* ... */ });
-    after(function () { /* ... */ });
-    beforeEach(function () { /* ... */ });
-    afterEach(function () { /* ... */ });
+    before(function () {/* ... */});
+    after(function () {/* ... */});
+    beforeEach(function () {/* ... */});
+    afterEach(function () {/* ... */});
 });
 ```
 
 ## When Not To Use It
 
-* If you use another library which exposes a similar API as mocha (e.g. `before`, `after`), you should turn this rule off, because it would raise warnings.
-* If you turned `no-hooks` on, you should turn this rule off, because it would raise several warnings for the same root cause.
+- If you use another library which exposes a similar API as mocha (e.g. `before`, `after`), you should turn this rule off, because it would raise warnings.
+- If you turned `no-hooks` on, you should turn this rule off, because it would raise several warnings for the same root cause.

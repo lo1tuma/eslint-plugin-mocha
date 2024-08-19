@@ -11,11 +11,11 @@ Mocha testing framework provides a structured way of writing tests using functio
 Example:
 
 ```js
-describe("MyComponent", function () {
+describe('MyComponent', function () {
     beforeEach(function () {
         // setup code
     });
-    it("should behave correctly", function () {
+    it('should behave correctly', function () {
         // test code
     });
     afterEach(function () {
@@ -33,11 +33,11 @@ This rule enforces a line break between calls to Mocha functions (before, after,
 The following patterns are considered errors:
 
 ```javascript
-describe("MyComponent", function () {
+describe('MyComponent', function () {
     beforeEach(function () {
         // setup code
     });
-    it("should behave correctly", function () {
+    it('should behave correctly', function () {
         // test code
     });
 });
@@ -46,12 +46,12 @@ describe("MyComponent", function () {
 These patterns would not be considered errors:
 
 ```javascript
-describe("MyComponent", function () {
+describe('MyComponent', function () {
     beforeEach(function () {
         // setup code
     });
 
-    it("should behave correctly", function () {
+    it('should behave correctly', function () {
         // test code
     });
 

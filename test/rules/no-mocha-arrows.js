@@ -1,15 +1,12 @@
-'use strict';
-
-const RuleTester = require('eslint').RuleTester;
-const rules = require('../../').rules;
+const { RuleTester } = require('eslint');
+const { rules } = require('../../');
 const ruleTester = new RuleTester({
     parserOptions: { ecmaVersion: 2017 }
 });
 const expectedErrorMessage = 'Do not pass arrow functions to it()';
-const errors = [ { message: expectedErrorMessage, column: 1, line: 1 } ];
+const errors = [{ message: expectedErrorMessage, column: 1, line: 1 }];
 
 ruleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
-
     valid: [
         'it()',
         'it(function() { assert(something, false); })',
@@ -49,7 +46,7 @@ ruleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
         },
         {
             code: 'it.only(() => { assert(something, false); })',
-            errors: [ { message: 'Do not pass arrow functions to it.only()', column: 1, line: 1 } ],
+            errors: [{ message: 'Do not pass arrow functions to it.only()', column: 1, line: 1 }],
             output: 'it.only(function() { assert(something, false); })'
         },
         {
@@ -99,9 +96,8 @@ ruleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
         },
         {
             code: 'const foo = () => {}; foo("", () => {}); it(() => { assert(something, false); })',
-            errors: [ { message: expectedErrorMessage, column: 42, line: 1 } ],
+            errors: [{ message: expectedErrorMessage, column: 42, line: 1 }],
             output: 'const foo = () => {}; foo("", () => {}); it(function() { assert(something, false); })'
         }
     ]
-
 });

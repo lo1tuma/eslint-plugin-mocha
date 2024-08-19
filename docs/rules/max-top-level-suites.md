@@ -17,11 +17,11 @@ The following patterns are considered warnings:
 
 ```js
 describe('foo', function () {
-    it('should do foo', function() {});
+    it('should do foo', function () {});
 });
 
-describe('bar', function() {
-    it('should do bar', function() {});
+describe('bar', function () {
+    it('should do bar', function () {});
 });
 ```
 
@@ -29,10 +29,10 @@ These patterns would not be considered warnings:
 
 ```js
 describe('foo', function () {
-    it('should do foo', function() {});
+    it('should do foo', function () {});
 
-    describe('bar', function() {
-        it('should do bar', function() {});
+    describe('bar', function () {
+        it('should do bar', function () {});
     });
 });
 ```

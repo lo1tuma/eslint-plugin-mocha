@@ -1,5 +1,3 @@
-'use strict';
-
 const globals = require('globals');
 
 const allRules = {
@@ -31,7 +29,7 @@ const allRules = {
 
 const recommendedRules = {
     'mocha/handle-done-callback': 'error',
-    'mocha/max-top-level-suites': [ 'error', { limit: 1 } ],
+    'mocha/max-top-level-suites': ['error', { limit: 1 }],
     'mocha/no-async-describe': 'error',
     'mocha/no-exclusive-tests': 'warn',
     'mocha/no-exports': 'error',
@@ -86,12 +84,12 @@ const mod = {
     configs: {
         all: {
             env: { mocha: true },
-            plugins: [ 'mocha' ],
+            plugins: ['mocha'],
             rules: allRules
         },
         recommended: {
             env: { mocha: true },
-            plugins: [ 'mocha' ],
+            plugins: ['mocha'],
             rules: recommendedRules
         }
     }

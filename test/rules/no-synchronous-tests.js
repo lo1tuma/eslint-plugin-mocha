@@ -1,7 +1,5 @@
-'use strict';
-
-const RuleTester = require('eslint').RuleTester;
-const rules = require('../../').rules;
+const { RuleTester } = require('eslint');
+const { rules } = require('../../');
 const ruleTester = new RuleTester();
 
 ruleTester.run('no-synchronous-tests', rules['no-synchronous-tests'], {
@@ -82,48 +80,48 @@ ruleTester.run('no-synchronous-tests', rules['no-synchronous-tests'], {
         },
         {
             code: 'it("", function (done) { done(); });',
-            options: [ { } ]
+            options: [{}]
         }
     ],
 
     invalid: [
         {
             code: 'it("", function () {});',
-            errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1 } ]
+            errors: [{ message: 'Unexpected synchronous test.', column: 8, line: 1 }]
         },
         {
             code: 'it("", function () { callback(); });',
-            errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1 } ]
+            errors: [{ message: 'Unexpected synchronous test.', column: 8, line: 1 }]
         },
         {
             code: 'it(function () { return; });',
-            errors: [ { message: 'Unexpected synchronous test.', column: 4, line: 1 } ]
+            errors: [{ message: 'Unexpected synchronous test.', column: 4, line: 1 }]
         },
         {
             code: 'it("", function () { return "a string" });',
-            errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1 } ]
+            errors: [{ message: 'Unexpected synchronous test.', column: 8, line: 1 }]
         },
         {
             code: 'it("", () => "not-a-promise" );',
             parserOptions: { ecmaVersion: 6 },
-            errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1 } ]
+            errors: [{ message: 'Unexpected synchronous test.', column: 8, line: 1 }]
         },
         {
             code: 'specify("", function () {});',
-            errors: [ { message: 'Unexpected synchronous test.', column: 13, line: 1 } ]
+            errors: [{ message: 'Unexpected synchronous test.', column: 13, line: 1 }]
         },
         {
             code: 'specify.only("", function () {});',
-            errors: [ { message: 'Unexpected synchronous test.', column: 18, line: 1 } ]
+            errors: [{ message: 'Unexpected synchronous test.', column: 18, line: 1 }]
         },
         {
             code: 'before("", function () {});',
-            errors: [ { message: 'Unexpected synchronous test.', column: 12, line: 1 } ]
+            errors: [{ message: 'Unexpected synchronous test.', column: 12, line: 1 }]
         },
         {
-            options: [ { allowed: [ 'callback', 'async' ] } ],
+            options: [{ allowed: ['callback', 'async'] }],
             code: 'it("", function () { return promise(); });',
-            errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1 } ]
+            errors: [{ message: 'Unexpected synchronous test.', column: 8, line: 1 }]
         }
     ]
 });

@@ -1,7 +1,5 @@
-'use strict';
-
-const RuleTester = require('eslint').RuleTester;
-const rules = require('../../').rules;
+const { RuleTester } = require('eslint');
+const { rules } = require('../../');
 const ruleTester = new RuleTester();
 
 ruleTester.run('valid-test-description', rules['valid-test-description'], {
@@ -16,27 +14,27 @@ ruleTester.run('valid-test-description', rules['valid-test-description'], {
         'specify();',
         'test();',
         {
-            options: [ 'test' ],
+            options: ['test'],
             code: 'it("this is a test", function () { });'
         },
         {
-            options: [ 'test' ],
+            options: ['test'],
             code: 'test("this is a test", function () { });'
         },
         {
-            options: [ '^should', [ 'someFunction' ] ],
+            options: ['^should', ['someFunction']],
             code: 'it("this is a test", function () { });'
         },
         {
-            options: [ '^should', [ 'someFunction' ] ],
+            options: ['^should', ['someFunction']],
             code: 'someFunction("should do something", function () { });'
         },
         {
-            options: [ '^should', [ 'someFunction' ], 'some error message' ],
+            options: ['^should', ['someFunction'], 'some error message'],
             code: 'someFunction("should do something", function () { });'
         },
         {
-            options: [ { pattern: '^should', testNames: [ 'someFunction' ], message: 'some error message' } ],
+            options: [{ pattern: '^should', testNames: ['someFunction'], message: 'some error message' }],
             code: 'someFunction("should do something", function () { });'
         },
         'someOtherFunction();',
@@ -74,49 +72,49 @@ ruleTester.run('valid-test-description', rules['valid-test-description'], {
             ]
         },
         {
-            options: [ 'required' ],
+            options: ['required'],
             code: 'it("this is a test", function () { });',
             errors: [
                 { message: 'Invalid "it()" description found.' }
             ]
         },
         {
-            options: [ 'required' ],
+            options: ['required'],
             code: 'specify("this is a test", function () { });',
             errors: [
                 { message: 'Invalid "specify()" description found.' }
             ]
         },
         {
-            options: [ 'required' ],
+            options: ['required'],
             code: 'test("this is a test", function () { });',
             errors: [
                 { message: 'Invalid "test()" description found.' }
             ]
         },
         {
-            options: [ 'required', [ 'customFunction' ] ],
+            options: ['required', ['customFunction']],
             code: 'customFunction("this is a test", function () { });',
             errors: [
                 { message: 'Invalid "customFunction()" description found.' }
             ]
         },
         {
-            options: [ 'required', [ 'customFunction' ], 'some error message' ],
+            options: ['required', ['customFunction'], 'some error message'],
             code: 'customFunction("this is a test", function () { });',
             errors: [
                 { message: 'some error message' }
             ]
         },
         {
-            options: [ { pattern: 'required', testNames: [ 'customFunction' ], message: 'some error message' } ],
+            options: [{ pattern: 'required', testNames: ['customFunction'], message: 'some error message' }],
             code: 'customFunction("this is a test", function () { });',
             errors: [
                 { message: 'some error message' }
             ]
         },
         {
-            options: [ {} ],
+            options: [{}],
             code: 'it("this is a test", function () { });',
             errors: [
                 { message: 'Invalid "it()" description found.' }

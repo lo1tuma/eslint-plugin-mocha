@@ -41,7 +41,6 @@ describe('something', function () {
     const a = setup();
     it('should work', function () {});
 });
-
 ```
 
 These patterns would not be considered problems:
@@ -49,7 +48,7 @@ These patterns would not be considered problems:
 ```js
 describe('something', function () {
     var a;
-    beforeEach(function() {
+    beforeEach(function () {
         a = setup();
     });
     it('should work', function () {});
@@ -57,8 +56,8 @@ describe('something', function () {
 function getTest() {
     var a = setup(),
         b = a.someGetter;
-    describe('something', function() {
-        it ('should work', function() {});
+    describe('something', function () {
+        it('should work', function () {});
     });
 }
 describe('something', function () {

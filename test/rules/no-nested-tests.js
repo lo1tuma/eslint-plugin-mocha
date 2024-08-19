@@ -1,6 +1,4 @@
-'use strict';
-
-const RuleTester = require('eslint').RuleTester;
+const { RuleTester } = require('eslint');
 const rule = require('../../lib/rules/no-nested-tests');
 const ruleTester = new RuleTester();
 
@@ -13,13 +11,14 @@ ruleTester.run('no-nested-tests', rule, {
         {
             code: 'foo("", function () { it(); })',
             settings: {
-                'mocha/additionalCustomNames': [ { name: 'foo', interfaces: [ 'BDD' ] } ]
+                'mocha/additionalCustomNames': [{ name: 'foo', interfaces: ['BDD'] }]
             }
-        }, {
+        },
+        {
             code: 'foo("", function () { it(); })',
             settings: {
                 mocha: {
-                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
+                    additionalCustomNames: [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
                 }
             }
         }
@@ -28,75 +27,75 @@ ruleTester.run('no-nested-tests', rule, {
     invalid: [
         {
             code: 'it("", function () { it() });',
-            errors: [ {
+            errors: [{
                 message: 'Unexpected test nested within another test.',
                 line: 1,
                 column: 22
-            } ]
+            }]
         },
         {
             code: 'it.only("", function () { it() });',
-            errors: [ {
+            errors: [{
                 message: 'Unexpected test nested within another test.',
                 line: 1,
                 column: 27
-            } ]
+            }]
         },
         {
             code: 'it.skip("", function () { it() });',
-            errors: [ {
+            errors: [{
                 message: 'Unexpected test nested within another test.',
                 line: 1,
                 column: 27
-            } ]
+            }]
         },
         {
             code: 'test("", function () { it() });',
-            errors: [ {
+            errors: [{
                 message: 'Unexpected test nested within another test.',
                 line: 1,
                 column: 24
-            } ]
+            }]
         },
         {
             code: 'specify("", function () { it() });',
-            errors: [ {
+            errors: [{
                 message: 'Unexpected test nested within another test.',
                 line: 1,
                 column: 27
-            } ]
+            }]
         },
         {
             code: 'it("", function () { describe() });',
-            errors: [ {
+            errors: [{
                 message: 'Unexpected suite nested within a test.',
                 line: 1,
                 column: 22
-            } ]
+            }]
         },
         {
             code: 'it("", function () { context() });',
-            errors: [ {
+            errors: [{
                 message: 'Unexpected suite nested within a test.',
                 line: 1,
                 column: 22
-            } ]
+            }]
         },
         {
             code: 'it("", function () { suite() });',
-            errors: [ {
+            errors: [{
                 message: 'Unexpected suite nested within a test.',
                 line: 1,
                 column: 22
-            } ]
+            }]
         },
         {
             code: 'it("", function () { describe.skip() });',
-            errors: [ {
+            errors: [{
                 message: 'Unexpected suite nested within a test.',
                 line: 1,
                 column: 22
-            } ]
+            }]
         },
         {
             code: 'it("", function () { describe("", function () { it(); it(); }); });',
@@ -121,42 +120,42 @@ ruleTester.run('no-nested-tests', rule, {
         {
             code: 'it("", function () { foo() });',
             settings: {
-                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
+                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
             },
-            errors: [ {
+            errors: [{
                 message: 'Unexpected suite nested within a test.',
                 line: 1,
                 column: 22
-            } ]
+            }]
         },
         {
             code: 'it("", function () { foo() });',
             settings: {
                 mocha: {
-                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
+                    additionalCustomNames: [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
                 }
             },
-            errors: [ {
+            errors: [{
                 message: 'Unexpected suite nested within a test.',
                 line: 1,
                 column: 22
-            } ]
+            }]
         },
         {
             code: 'beforeEach(function () { it("foo", function () {}); });',
-            errors: [ {
+            errors: [{
                 message: 'Unexpected test nested within a test hook.',
                 line: 1,
                 column: 26
-            } ]
+            }]
         },
         {
             code: 'beforeEach(function () { beforeEach("foo", function () {}); });',
-            errors: [ {
+            errors: [{
                 message: 'Unexpected test hook nested within a test hook.',
                 line: 1,
                 column: 26
-            } ]
+            }]
         }
     ]
 });

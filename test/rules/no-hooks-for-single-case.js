@@ -1,78 +1,85 @@
-'use strict';
-
-const RuleTester = require('eslint').RuleTester;
-const rules = require('../../').rules;
+const { RuleTester } = require('eslint');
+const { rules } = require('../../');
 const ruleTester = new RuleTester();
 
 ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
-
     valid: [
         [
             'describe(function() {',
             '    it(function() {});',
             '});'
-        ].join('\n'),
+        ]
+            .join('\n'),
         [
             'describe(function() {',
             '    before(function() {});',
             '    it(function() {});',
             '    it(function() {});',
             '});'
-        ].join('\n'),
+        ]
+            .join('\n'),
         [
             'describe(function() {',
             '    after(function() {});',
             '    it(function() {});',
             '    it(function() {});',
             '});'
-        ].join('\n'),
+        ]
+            .join('\n'),
         [
             'describe(function() {',
             '    beforeEach(function() {});',
             '    it(function() {});',
             '    it(function() {});',
             '});'
-        ].join('\n'),
+        ]
+            .join('\n'),
         [
             'describe(function() {',
             '    afterEach(function() {});',
             '    it(function() {});',
             '    it(function() {});',
             '});'
-        ].join('\n'),
+        ]
+            .join('\n'),
         [
             'before(function() {});',
             'it(function() {});',
             'it(function() {});'
-        ].join('\n'),
+        ]
+            .join('\n'),
         [
             'describe(function() {',
             '    before(function() {});',
             '    it(function() {});',
             '    describe(function() {});',
             '});'
-        ].join('\n'),
+        ]
+            .join('\n'),
         [
             'describe(function() {',
             '    before(function() {});',
             '    it(function() {});',
             '    xdescribe(function() {});',
             '});'
-        ].join('\n'),
+        ]
+            .join('\n'),
         [
             'describe(function() {',
             '    before(function() {});',
             '    describe(function() {});',
             '    describe(function() {});',
             '});'
-        ].join('\n'),
+        ]
+            .join('\n'),
         [
             'describe(function() {',
             '    before(function() {});',
             '    it.only(function() {});',
             '    it(function() {});',
             '});'
-        ].join('\n'),
+        ]
+            .join('\n'),
         [
             'describe(function() {',
             '    before(function() {});',
@@ -83,7 +90,8 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
             '        it(function() {});',
             '    });',
             '});'
-        ].join('\n'),
+        ]
+            .join('\n'),
         [
             'describe(function() {',
             '    describe(function() {',
@@ -92,20 +100,23 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
             '    });',
             '    afterEach(function() {});',
             '});'
-        ].join('\n'),
+        ]
+            .join('\n'),
         [
             'it(function() {});',
             'it(function() {});',
             'afterEach(function() {});'
-        ].join('\n'),
+        ]
+            .join('\n'),
         {
             code: [
                 'describe(function() {',
                 '    before(function() {});',
                 '    it(function() {});',
                 '});'
-            ].join('\n'),
-            options: [ { allow: [ 'before' ] } ]
+            ]
+                .join('\n'),
+            options: [{ allow: ['before'] }]
         },
         {
             code: [
@@ -113,8 +124,9 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    after(function() {});',
                 '    it(function() {});',
                 '});'
-            ].join('\n'),
-            options: [ { allow: [ 'after' ] } ]
+            ]
+                .join('\n'),
+            options: [{ allow: ['after'] }]
         },
         {
             code: [
@@ -122,8 +134,9 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    beforeEach(function() {});',
                 '    it(function() {});',
                 '});'
-            ].join('\n'),
-            options: [ { allow: [ 'beforeEach' ] } ]
+            ]
+                .join('\n'),
+            options: [{ allow: ['beforeEach'] }]
         },
         {
             code: [
@@ -131,8 +144,9 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    afterEach(function() {});',
                 '    it(function() {});',
                 '});'
-            ].join('\n'),
-            options: [ { allow: [ 'afterEach' ] } ]
+            ]
+                .join('\n'),
+            options: [{ allow: ['afterEach'] }]
         },
         {
             code: [
@@ -140,8 +154,9 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    after(function() {});',
                 '    it(function() {});',
                 '});'
-            ].join('\n'),
-            options: [ { allow: [ 'after', 'afterEach' ] } ]
+            ]
+                .join('\n'),
+            options: [{ allow: ['after', 'afterEach'] }]
         },
         {
             code: [
@@ -150,10 +165,11 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    it(function() {});',
                 '    it(function() {});',
                 '});'
-            ].join('\n'),
+            ]
+                .join('\n'),
             settings: {
                 mocha: {
-                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
+                    additionalCustomNames: [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
                 }
             }
         },
@@ -164,9 +180,10 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    it(function() {});',
                 '    it(function() {});',
                 '});'
-            ].join('\n'),
+            ]
+                .join('\n'),
             settings: {
-                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
+                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
             }
         }
     ],
@@ -177,8 +194,9 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 'describe(function() {',
                 '    before(function() {});',
                 '});'
-            ].join('\n'),
-            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 } ]
+            ]
+                .join('\n'),
+            errors: [{ message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 }]
         },
         {
             code: [
@@ -186,8 +204,9 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    before(function() {});',
                 '    it(function() {});',
                 '});'
-            ].join('\n'),
-            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 } ]
+            ]
+                .join('\n'),
+            errors: [{ message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 }]
         },
         {
             code: [
@@ -195,8 +214,9 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    it(function() {});',
                 '    before(function() {});',
                 '});'
-            ].join('\n'),
-            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 3 } ]
+            ]
+                .join('\n'),
+            errors: [{ message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 3 }]
         },
         {
             code: [
@@ -204,8 +224,9 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    after(function() {});',
                 '    it(function() {});',
                 '});'
-            ].join('\n'),
-            errors: [ { message: 'Unexpected use of Mocha `after` hook for a single test case', column: 5, line: 2 } ]
+            ]
+                .join('\n'),
+            errors: [{ message: 'Unexpected use of Mocha `after` hook for a single test case', column: 5, line: 2 }]
         },
         {
             code: [
@@ -213,7 +234,8 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    beforeEach(function() {});',
                 '    it(function() {});',
                 '});'
-            ].join('\n'),
+            ]
+                .join('\n'),
             errors: [
                 { message: 'Unexpected use of Mocha `beforeEach` hook for a single test case', column: 5, line: 2 }
             ]
@@ -224,7 +246,8 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    afterEach(function() {});',
                 '    it(function() {});',
                 '});'
-            ].join('\n'),
+            ]
+                .join('\n'),
             errors: [
                 { message: 'Unexpected use of Mocha `afterEach` hook for a single test case', column: 5, line: 2 }
             ]
@@ -233,8 +256,9 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
             code: [
                 'before(function() {});',
                 'it(function() {});'
-            ].join('\n'),
-            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 1, line: 1 } ]
+            ]
+                .join('\n'),
+            errors: [{ message: 'Unexpected use of Mocha `before` hook for a single test case', column: 1, line: 1 }]
         },
         {
             code: [
@@ -242,8 +266,9 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    before(function() {});',
                 '    describe(function() {});',
                 '});'
-            ].join('\n'),
-            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 } ]
+            ]
+                .join('\n'),
+            errors: [{ message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 }]
         },
         {
             code: [
@@ -251,8 +276,9 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    before(function() {});',
                 '    xdescribe(function() {});',
                 '});'
-            ].join('\n'),
-            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 } ]
+            ]
+                .join('\n'),
+            errors: [{ message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 }]
         },
         {
             code: [
@@ -260,8 +286,9 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    before(function() {});',
                 '    it.only(function() {});',
                 '});'
-            ].join('\n'),
-            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 } ]
+            ]
+                .join('\n'),
+            errors: [{ message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 }]
         },
         {
             code: [
@@ -273,8 +300,9 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '        it(function() {});',
                 '    });',
                 '});'
-            ].join('\n'),
-            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 9, line: 5 } ]
+            ]
+                .join('\n'),
+            errors: [{ message: 'Unexpected use of Mocha `before` hook for a single test case', column: 9, line: 5 }]
         },
         {
             code: [
@@ -282,34 +310,36 @@ ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
                 '    after(function() {});',
                 '    it(function() {});',
                 '});'
-            ].join('\n'),
-            options: [ { allow: [ 'before' ] } ],
-            errors: [ { message: 'Unexpected use of Mocha `after` hook for a single test case', column: 5, line: 2 } ]
+            ]
+                .join('\n'),
+            options: [{ allow: ['before'] }],
+            errors: [{ message: 'Unexpected use of Mocha `after` hook for a single test case', column: 5, line: 2 }]
         },
         {
             code: [
                 'foo(function() {',
                 '    before(function() {});',
                 '});'
-            ].join('\n'),
+            ]
+                .join('\n'),
             settings: {
                 mocha: {
-                    additionalCustomNames: [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
+                    additionalCustomNames: [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
                 }
             },
-            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 } ]
+            errors: [{ message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 }]
         },
         {
             code: [
                 'foo(function() {',
                 '    before(function() {});',
                 '});'
-            ].join('\n'),
+            ]
+                .join('\n'),
             settings: {
-                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] } ]
+                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
             },
-            errors: [ { message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 } ]
+            errors: [{ message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 }]
         }
     ]
-
 });

@@ -60,5 +60,5 @@ function parameterizedTest(params) {
     });
 }
 
-parameterizedTest([1,2,3]);
+parameterizedTest([1, 2, 3]);
 ```
