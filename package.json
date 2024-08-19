@@ -32,7 +32,6 @@
         "rambda": "^7.4.0"
     },
     "devDependencies": {
-        "chai": "4.3.7",
         "coveralls": "3.1.1",
         "eslint": "8.56.0",
         "eslint-doc-generator": "1.6.2",

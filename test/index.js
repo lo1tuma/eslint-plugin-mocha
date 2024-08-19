@@ -1,6 +1,6 @@
 'use strict';
 
-const { expect } = require('chai');
+const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const rulesDir = path.join(__dirname, '../lib/rules/');
@@ -21,8 +21,7 @@ describe('eslint-plugin-mocha', function () {
         ruleFiles.forEach(function (file) {
             const ruleName = path.basename(file, '.js');
 
-            expect(plugin).to.have.nested.property(`rules.${ruleName}`)
-                .that.equals(require(rulesDir + ruleName));
+            assert.strictEqual(plugin.rules[ruleName], require(rulesDir + ruleName));
         });
     });
 
@@ -47,9 +46,12 @@ describe('eslint-plugin-mocha', function () {
         it('should have each rule documented', function () {
             ruleFiles.forEach(function (file) {
                 const ruleName = path.basename(file, '.js');
-                const expectedDocumentationFileName = `${ruleName }.md`;
+                const expectedDocumentationFileName = `${ruleName}.md`;
+                const matchingDocumentationFiles = documentationFiles.filter((documentationFile) => {
+                    return documentationFile === expectedDocumentationFileName;
+                });
 
-                expect(documentationFiles).to.contain(expectedDocumentationFileName);
+                assert.strictEqual(matchingDocumentationFiles.length, 1);
             });
         });
     });
