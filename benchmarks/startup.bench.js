@@ -1,6 +1,6 @@
 'use strict';
 
-const { expect } = require('chai');
+const assert = require('assert');
 const { runBenchmark, cpuSpeed, clearRequireCache } = require('./measure');
 
 describe('startup / require time', () => {
@@ -12,7 +12,7 @@ describe('startup / require time', () => {
             require('../index');
         }, 50);
 
-        expect(medianDuration).to.be.below(budget);
+        assert.strictEqual(medianDuration < budget, true);
     });
 
     it('should not consume more memory as the defined budget', () => {
@@ -23,6 +23,6 @@ describe('startup / require time', () => {
             require('../index');
         }, 50);
 
-        expect(medianMemory).to.be.below(budget);
+        assert.strictEqual(medianMemory < budget, true);
     });
 });

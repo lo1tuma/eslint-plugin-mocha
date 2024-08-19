@@ -1,6 +1,6 @@
 'use strict';
 
-const { expect } = require('chai');
+const assert = require('assert');
 const { Linter } = require('eslint');
 const { times, toPairs, fromPairs } = require('rambda');
 const {
@@ -94,7 +94,7 @@ describe('runtime', () => {
             lintManyFilesWithAllRecommendedRules({ numberOfFiles: 350 });
         }, 50);
 
-        expect(medianDuration).to.be.below(budget);
+        assert.strictEqual(medianDuration < budget, true);
     });
 
     it('should not consume more memory as the defined budget to lint many files with the recommended config', () => {
@@ -104,6 +104,6 @@ describe('runtime', () => {
             lintManyFilesWithAllRecommendedRules({ numberOfFiles: 350 });
         }, 50);
 
-        expect(medianMemory).to.be.below(budget);
+        assert.strictEqual(medianMemory < budget, true);
     });
 });
