@@ -1,14 +1,17 @@
 const assert = require('node:assert');
 const { runBenchmark, cpuSpeed, clearRequireCache } = require('./measure');
 
+const iterations = 50;
+
 describe('startup / require time', function () {
     it('should not take longer as the defined budget to require the plugin', function () {
-        const budget = 85_000 / cpuSpeed;
+        const cpuAgnosticBudget = 85_000;
+        const budget = cpuAgnosticBudget / cpuSpeed;
 
         const { medianDuration } = runBenchmark(() => {
             clearRequireCache();
             require('../index');
-        }, 50);
+        }, iterations);
 
         assert.strictEqual(medianDuration < budget, true);
     });
@@ -19,7 +22,7 @@ describe('startup / require time', function () {
         const { medianMemory } = runBenchmark(() => {
             clearRequireCache();
             require('../index');
-        }, 50);
+        }, iterations);
 
         assert.strictEqual(medianMemory < budget, true);
     });

@@ -9,7 +9,8 @@ const mochaPlugin = require('../');
 
 const allRules = mochaPlugin.configs.all.rules;
 
-function lintManyFilesWithAllRecommendedRules({ numberOfFiles }) {
+function lintManyFilesWithAllRecommendedRules(options) {
+    const { numberOfFiles } = options;
     const linter = new Linter();
 
     linter.defineRules(mochaPlugin.rules);
@@ -84,13 +85,16 @@ function lintManyFilesWithAllRecommendedRules({ numberOfFiles }) {
     }, numberOfFiles);
 }
 
+const iterations = 50;
+
 describe('runtime', function () {
     it('should not take longer as the defined budget to lint many files with the recommended config', function () {
-        const budget = 3_750_000 / cpuSpeed;
+        const cpuAgnosticBudget = 3_750_000;
+        const budget = cpuAgnosticBudget / cpuSpeed;
 
         const { medianDuration } = runBenchmark(() => {
             lintManyFilesWithAllRecommendedRules({ numberOfFiles: 350 });
-        }, 50);
+        }, iterations);
 
         assert.strictEqual(medianDuration < budget, true);
     });
@@ -100,7 +104,7 @@ describe('runtime', function () {
 
         const { medianMemory } = runBenchmark(() => {
             lintManyFilesWithAllRecommendedRules({ numberOfFiles: 350 });
-        }, 50);
+        }, iterations);
 
         assert.strictEqual(medianMemory < budget, true);
     });
