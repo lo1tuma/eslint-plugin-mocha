@@ -47,7 +47,7 @@
         "semver": "7.6.0"
     },
     "peerDependencies": {
-        "eslint": ">=7.0.0"
+        "eslint": ">=9.0.0"
     },
     "repository": {
         "type": "git",
