@@ -1,8 +1,8 @@
 const { RuleTester } = require('eslint');
 const { rules } = require('../../');
-const ruleTester = new RuleTester();
+const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const message = 'Unexpected use of `return` in a test with callback';
-const es6parserOptions = {
+const es6LanguageOptions = {
     sourceType: 'module',
     ecmaVersion: 6
 };
@@ -30,19 +30,19 @@ ruleTester.run('no-return-and-callback', rules['no-return-and-callback'], {
         'notMocha("title", function(done) { return foo.then(done); })',
         {
             code: 'it("title", (done) => { done(); });',
-            parserOptions: es6parserOptions
+            languageOptions: es6LanguageOptions
         },
         {
             code: 'it("title", (done) => { foo.then(function() { return done(); }); });',
-            parserOptions: es6parserOptions
+            languageOptions: es6LanguageOptions
         },
         {
             code: 'it("title", (done) => { foo(function() { return done(); }); });',
-            parserOptions: es6parserOptions
+            languageOptions: es6LanguageOptions
         },
         {
             code: 'it("title", () => { return foo(); });',
-            parserOptions: es6parserOptions
+            languageOptions: es6LanguageOptions
         },
         // Allowed return statements
         'it("title", function(done) { return; });',
@@ -69,12 +69,12 @@ ruleTester.run('no-return-and-callback', rules['no-return-and-callback'], {
         {
             code: 'it("title", (done) => { return foo.then(function() { done(); }).catch(done); });',
             errors: [{ message, column: 25, line: 1 }],
-            parserOptions: es6parserOptions
+            languageOptions: es6LanguageOptions
         },
         {
             code: 'it("title", (done) => foo.then(function() { done(); }));',
             errors: [{ message: 'Confusing implicit return in a test with callback', column: 23, line: 1 }],
-            parserOptions: es6parserOptions
+            languageOptions: es6LanguageOptions
         },
         {
             code: 'it.only("title", function(done) { return foo.then(done); });',

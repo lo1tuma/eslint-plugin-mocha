@@ -1,6 +1,6 @@
 const { RuleTester } = require('eslint');
 const { rules } = require('../../');
-const ruleTester = new RuleTester();
+const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
 ruleTester.run('no-hooks', rules['no-hooks'], {
     valid: [

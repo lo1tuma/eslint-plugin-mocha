@@ -1,6 +1,6 @@
 const { RuleTester } = require('eslint');
 const { rules } = require('../../');
-const ruleTester = new RuleTester();
+const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
 ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
     valid: [
@@ -56,14 +56,14 @@ ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
         'describe("top", function () {}); function foo() { describe("not necessarily top", function () {}); }',
         {
             code: 'describe("", function () { });',
-            parserOptions: {
+            languageOptions: {
                 sourceType: 'module',
                 ecmaVersion: 2015
             }
         },
         {
             code: 'describe("", function () { describe("", function () {}); });',
-            parserOptions: {
+            languageOptions: {
                 sourceType: 'module',
                 ecmaVersion: 2015
             }
@@ -76,7 +76,7 @@ ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
                 '});'
             ]
                 .join('\n'),
-            parserOptions: {
+            languageOptions: {
                 sourceType: 'module',
                 ecmaVersion: 2015
             },
@@ -94,7 +94,7 @@ ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
                 '});'
             ]
                 .join('\n'),
-            parserOptions: {
+            languageOptions: {
                 sourceType: 'module',
                 ecmaVersion: 2015
             },
@@ -117,7 +117,7 @@ ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
         {
             code: 'describe("", function () { });' +
                 'describe("", function () { });',
-            parserOptions: {
+            languageOptions: {
                 sourceType: 'module',
                 ecmaVersion: 2015
             },

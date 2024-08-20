@@ -1,6 +1,6 @@
 const { RuleTester } = require('eslint');
 const rule = require('../../lib/rules/no-global-tests');
-const ruleTester = new RuleTester();
+const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const expectedErrorMessage = 'Unexpected global mocha test.';
 
 ruleTester.run('no-global-tests', rule, {
@@ -30,7 +30,7 @@ ruleTester.run('no-global-tests', rule, {
         '[1,2,3].forEach(function () { it(); });',
         {
             code: 'import foo from "bar"; describe("", () => it());',
-            parserOptions: {
+            languageOptions: {
                 sourceType: 'module',
                 ecmaVersion: 6
             }
@@ -100,7 +100,7 @@ ruleTester.run('no-global-tests', rule, {
         },
         {
             code: 'import foo from "bar"; it("");',
-            parserOptions: {
+            languageOptions: {
                 sourceType: 'module',
                 ecmaVersion: 2015
             },

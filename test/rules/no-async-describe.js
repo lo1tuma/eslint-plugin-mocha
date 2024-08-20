@@ -1,6 +1,6 @@
 const { RuleTester } = require('eslint');
 const rule = require('../../lib/rules/no-async-describe');
-const ruleTester = new RuleTester();
+const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
 ruleTester.run('no-async-describe', rule, {
     valid: [
@@ -8,18 +8,18 @@ ruleTester.run('no-async-describe', rule, {
         'describe("hello")',
         'describe(function () {})',
         'describe("hello", function () {})',
-        { code: '() => { a.b }', parserOptions: { ecmaVersion: 6 } },
-        { code: 'describe("hello", () => { a.b })', parserOptions: { ecmaVersion: 6 } },
+        { code: '() => { a.b }', languageOptions: { ecmaVersion: 6 } },
+        { code: 'describe("hello", () => { a.b })', languageOptions: { ecmaVersion: 6 } },
         'it()',
-        { code: 'it("hello", async function () {})', parserOptions: { ecmaVersion: 8 } },
-        { code: 'it("hello", async () => {})', parserOptions: { ecmaVersion: 8 } }
+        { code: 'it("hello", async function () {})', languageOptions: { ecmaVersion: 8 } },
+        { code: 'it("hello", async () => {})', languageOptions: { ecmaVersion: 8 } }
     ],
 
     invalid: [
         {
             code: 'describe("hello", async function () {})',
             output: 'describe("hello", function () {})',
-            parserOptions: { ecmaVersion: 8 },
+            languageOptions: { ecmaVersion: 8 },
             errors: [{
                 message: 'Unexpected async function in describe()',
                 line: 1,
@@ -34,7 +34,7 @@ ruleTester.run('no-async-describe', rule, {
                     additionalCustomNames: [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
                 }
             },
-            parserOptions: { ecmaVersion: 8 },
+            languageOptions: { ecmaVersion: 8 },
             errors: [{
                 message: 'Unexpected async function in foo()',
                 line: 1,
@@ -44,7 +44,7 @@ ruleTester.run('no-async-describe', rule, {
         {
             code: 'describe("hello", async () => {})',
             output: 'describe("hello", () => {})',
-            parserOptions: { ecmaVersion: 8 },
+            languageOptions: { ecmaVersion: 8 },
             errors: [{
                 message: 'Unexpected async function in describe()',
                 line: 1,
@@ -55,7 +55,7 @@ ruleTester.run('no-async-describe', rule, {
             code: 'describe("hello", async () => {await foo;})',
             // Do not offer a fix for an async function that contains await
             output: null,
-            parserOptions: { ecmaVersion: 8 },
+            languageOptions: { ecmaVersion: 8 },
             errors: [{
                 message: 'Unexpected async function in describe()',
                 line: 1,
@@ -66,7 +66,7 @@ ruleTester.run('no-async-describe', rule, {
             code: 'describe("hello", async () => {async function bar() {await foo;}})',
             // Do offer a fix despite a nested async function containing await
             output: 'describe("hello", () => {async function bar() {await foo;}})',
-            parserOptions: { ecmaVersion: 8 },
+            languageOptions: { ecmaVersion: 8 },
             errors: [{
                 message: 'Unexpected async function in describe()',
                 line: 1,
@@ -83,7 +83,7 @@ ruleTester.run('no-async-describe', rule, {
                     ]
                 }
             },
-            parserOptions: { ecmaVersion: 8 },
+            languageOptions: { ecmaVersion: 8 },
             errors: [{
                 message: 'Unexpected async function in describe.foo()()',
                 line: 1,
@@ -100,7 +100,7 @@ ruleTester.run('no-async-describe', rule, {
                     ]
                 }
             },
-            parserOptions: { ecmaVersion: 8 },
+            languageOptions: { ecmaVersion: 8 },
             errors: [{
                 message: 'Unexpected async function in forEach().describe.foo()',
                 line: 1,

@@ -1,6 +1,6 @@
 const assert = require('node:assert');
 const { Linter } = require('eslint');
-const { times, toPairs, fromPairs } = require('rambda');
+const { times } = require('rambda');
 const {
     runBenchmark,
     cpuSpeed
@@ -13,17 +13,10 @@ function lintManyFilesWithAllRecommendedRules(options) {
     const { numberOfFiles } = options;
     const linter = new Linter();
 
-    linter.defineRules(mochaPlugin.rules);
-
     const config = {
-        rules: fromPairs(
-            toPairs(allRules).map(([ruleName, ruleSettings]) => {
-                const [, ruleNameWithoutPrefix] = ruleName.split('/');
-
-                return [ruleNameWithoutPrefix, ruleSettings];
-            })
-        ),
-        parserOptions: {
+        plugins: { mocha: mochaPlugin },
+        rules: allRules,
+        languageOptions: {
             ecmaVersion: 2018
         }
     };

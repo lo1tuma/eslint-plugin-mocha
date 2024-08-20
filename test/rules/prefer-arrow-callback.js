@@ -11,7 +11,7 @@
 const { RuleTester } = require('eslint');
 const { rules } = require('../../');
 const ruleTester = new RuleTester({
-    parserOptions: { ecmaVersion: 2017 }
+    languageOptions: { ecmaVersion: 2017, sourceType: 'script' }
 });
 
 // ------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ ruleTester.run('prefer-arrow-callback', rules['prefer-arrow-callback'], {
         'foo(function bar() { this; }.bind(this, somethingElse));',
         {
             code: 'import.meta.url',
-            parserOptions: {
+            languageOptions: {
                 ecmaVersion: 2020,
                 sourceType: 'module'
             }
@@ -202,13 +202,13 @@ ruleTester.run('prefer-arrow-callback', rules['prefer-arrow-callback'], {
         {
             code: 'qux(async function (foo = 1, bar = 2, baz = 3) { return baz; })',
             output: 'qux(async (foo = 1, bar = 2, baz = 3) => { return baz; })',
-            parserOptions: { ecmaVersion: 8 },
+            languageOptions: { ecmaVersion: 8 },
             errors
         },
         {
             code: 'qux(async function (foo = 1, bar = 2, baz = 3) { return this; }.bind(this))',
             output: 'qux(async (foo = 1, bar = 2, baz = 3) => { return this; })',
-            parserOptions: { ecmaVersion: 8 },
+            languageOptions: { ecmaVersion: 8 },
             errors
         }
     ]

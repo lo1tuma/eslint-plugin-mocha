@@ -1,6 +1,6 @@
 const { RuleTester } = require('eslint');
 const { rules } = require('../../');
-const ruleTester = new RuleTester();
+const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
 ruleTester.run('no-identical-title', rules['no-identical-title'], {
     valid: [
@@ -84,8 +84,8 @@ ruleTester.run('no-identical-title', rules['no-identical-title'], {
                 'it(`it${n}`, function() {});'
             ]
                 .join('\n'),
-            env: {
-                es6: true
+            languageOptions: {
+                ecmaVersion: 2017
             }
         },
         [

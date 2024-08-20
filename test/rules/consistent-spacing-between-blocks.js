@@ -2,7 +2,7 @@ const { RuleTester } = require('eslint');
 
 const rule = require('../../lib/rules/consistent-spacing-between-blocks.js');
 
-const ruleTester = new RuleTester({ parserOptions: { ecmaVersion: 2020 } });
+const ruleTester = new RuleTester({ languageOptions: { ecmaVersion: 2020, sourceType: 'script' } });
 
 ruleTester.run('require-spacing-between-mocha-calls', rule, {
     valid: [

@@ -1,6 +1,6 @@
 const { RuleTester } = require('eslint');
 const { rules } = require('../../');
-const ruleTester = new RuleTester();
+const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
 ruleTester.run('valid-suite-description', rules['valid-suite-description'], {
     valid: [
@@ -38,17 +38,17 @@ ruleTester.run('valid-suite-description', rules['valid-suite-description'], {
         },
         'someOtherFunction();',
         {
-            parserOptions: { ecmaVersion: 2017 },
+            languageOptions: { ecmaVersion: 2017 },
             options: ['^Foo'],
             code: 'describe(`Foo with template strings`, function () {});'
         },
         {
-            parserOptions: { ecmaVersion: 2019 },
+            languageOptions: { ecmaVersion: 2019 },
             options: ['^Foo'],
             code: 'describe(anyTag`with template strings`, function () {});'
         },
         {
-            parserOptions: { ecmaVersion: 2019 },
+            languageOptions: { ecmaVersion: 2019 },
             options: ['^Foo'],
             code: 'describe(`${dynamicVar} with template strings`, function () {});'
         }
@@ -100,7 +100,7 @@ ruleTester.run('valid-suite-description', rules['valid-suite-description'], {
         {
             options: ['^[A-Z]'],
             code: 'describe(`this is a test`, function () { });',
-            parserOptions: {
+            languageOptions: {
                 ecmaVersion: 2019
             },
             errors: [
@@ -110,7 +110,7 @@ ruleTester.run('valid-suite-description', rules['valid-suite-description'], {
         {
             options: ['^[A-Z]'],
             code: 'const foo = "this"; describe(`${foo} is a test`, function () { });',
-            parserOptions: {
+            languageOptions: {
                 ecmaVersion: 2019
             },
             errors: [

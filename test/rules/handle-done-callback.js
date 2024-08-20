@@ -1,6 +1,6 @@
 const { RuleTester } = require('eslint');
 const { rules } = require('../../');
-const ruleTester = new RuleTester();
+const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
 ruleTester.run('handle-done-callback', rules['handle-done-callback'], {
     valid: [
@@ -28,7 +28,7 @@ ruleTester.run('handle-done-callback', rules['handle-done-callback'], {
 
         {
             code: 'it("", (done) => { done(); });',
-            parserOptions: { ecmaVersion: 6 }
+            languageOptions: { ecmaVersion: 6 }
         },
         {
             code: 'it.skip("", function (done) { });',
@@ -99,7 +99,7 @@ ruleTester.run('handle-done-callback', rules['handle-done-callback'], {
         },
         {
             code: 'it("", (done) => { });',
-            parserOptions: { ecmaVersion: 6 },
+            languageOptions: { ecmaVersion: 6 },
             errors: [{ message: 'Expected "done" callback to be handled.', column: 9, line: 1 }]
         },
         {

@@ -1,6 +1,6 @@
 const { RuleTester } = require('eslint');
 const { rules } = require('../../');
-const ruleTester = new RuleTester();
+const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
 ruleTester.run('valid-test-description', rules['valid-test-description'], {
     valid: [
@@ -39,15 +39,15 @@ ruleTester.run('valid-test-description', rules['valid-test-description'], {
         },
         'someOtherFunction();',
         {
-            parserOptions: { ecmaVersion: 2017 },
+            languageOptions: { ecmaVersion: 2017 },
             code: 'it(`should work with template strings`, function () {});'
         },
         {
-            parserOptions: { ecmaVersion: 2019 },
+            languageOptions: { ecmaVersion: 2019 },
             code: 'it(foo`work with template strings`, function () {});'
         },
         {
-            parserOptions: { ecmaVersion: 2019 },
+            languageOptions: { ecmaVersion: 2019 },
             code: 'it(`${foo} work with template strings`, function () {});'
         }
     ],
@@ -122,7 +122,7 @@ ruleTester.run('valid-test-description', rules['valid-test-description'], {
         },
         {
             code: 'it(`this is a test`, function () { });',
-            parserOptions: {
+            languageOptions: {
                 ecmaVersion: 2019
             },
             errors: [
@@ -131,7 +131,7 @@ ruleTester.run('valid-test-description', rules['valid-test-description'], {
         },
         {
             code: 'const foo = "this"; it(`${foo} is a test`, function () { });',
-            parserOptions: {
+            languageOptions: {
                 ecmaVersion: 2019
             },
             errors: [

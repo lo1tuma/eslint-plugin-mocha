@@ -1,7 +1,7 @@
 const { RuleTester } = require('eslint');
 const { rules } = require('../../');
 const ruleTester = new RuleTester({
-    parserOptions: { ecmaVersion: 2017 }
+    languageOptions: { ecmaVersion: 2017, sourceType: 'script' }
 });
 const expectedErrorMessage = 'Do not pass arrow functions to it()';
 const errors = [{ message: expectedErrorMessage, column: 1, line: 1 }];

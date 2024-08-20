@@ -1,6 +1,6 @@
 const { RuleTester } = require('eslint');
 const { rules } = require('../../');
-const ruleTester = new RuleTester();
+const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
 ruleTester.run('no-synchronous-tests', rules['no-synchronous-tests'], {
     valid: [
@@ -28,51 +28,51 @@ ruleTester.run('no-synchronous-tests', rules['no-synchronous-tests'], {
         'var foo = function () { };',
         {
             code: 'it("", (done) => { done(); });',
-            parserOptions: { ecmaVersion: 6 }
+            languageOptions: { ecmaVersion: 6 }
         },
         {
             code: 'it("", () => { return promise(); });',
-            parserOptions: { ecmaVersion: 6 }
+            languageOptions: { ecmaVersion: 6 }
         },
         {
             code: 'it("", () => promise() );',
-            parserOptions: { ecmaVersion: 6 }
+            languageOptions: { ecmaVersion: 6 }
         },
         {
             code: 'it("", () => promise );',
-            parserOptions: { ecmaVersion: 6 }
+            languageOptions: { ecmaVersion: 6 }
         },
         {
             code: 'it("", () => promise.then() );',
-            parserOptions: { ecmaVersion: 6 }
+            languageOptions: { ecmaVersion: 6 }
         },
         {
             code: 'it("", async function () { });',
-            parserOptions: { ecmaVersion: 8 }
+            languageOptions: { ecmaVersion: 8 }
         },
         {
             code: 'it("", async function () { return true; });',
-            parserOptions: { ecmaVersion: 8 }
+            languageOptions: { ecmaVersion: 8 }
         },
         {
             code: 'it("", async function (val) { return await new Promise((resolve) => { resolve(val); }); });',
-            parserOptions: { ecmaVersion: 8 }
+            languageOptions: { ecmaVersion: 8 }
         },
         {
             code: 'before("", async function () { });',
-            parserOptions: { ecmaVersion: 8 }
+            languageOptions: { ecmaVersion: 8 }
         },
         {
             code: 'beforeEach("", async function () { });',
-            parserOptions: { ecmaVersion: 8 }
+            languageOptions: { ecmaVersion: 8 }
         },
         {
             code: 'after("", async function () { });',
-            parserOptions: { ecmaVersion: 8 }
+            languageOptions: { ecmaVersion: 8 }
         },
         {
             code: 'afterEach("", async function () { });',
-            parserOptions: { ecmaVersion: 8 }
+            languageOptions: { ecmaVersion: 8 }
         },
         {
             code: 'it("", function (done) { done(); });',
@@ -103,7 +103,7 @@ ruleTester.run('no-synchronous-tests', rules['no-synchronous-tests'], {
         },
         {
             code: 'it("", () => "not-a-promise" );',
-            parserOptions: { ecmaVersion: 6 },
+            languageOptions: { ecmaVersion: 6 },
             errors: [{ message: 'Unexpected synchronous test.', column: 8, line: 1 }]
         },
         {

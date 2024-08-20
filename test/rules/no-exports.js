@@ -1,6 +1,6 @@
 const { RuleTester } = require('eslint');
 const { rules } = require('../../');
-const ruleTester = new RuleTester();
+const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
 ruleTester.run('no-exports', rules['no-exports'], {
     valid: [
@@ -19,15 +19,15 @@ ruleTester.run('no-exports', rules['no-exports'], {
         'it("", function() {}); exports = "foo"',
         {
             code: 'describe(function () {})',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' }
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' }
         },
         {
             code: 'it("", function () {})',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' }
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' }
         },
         {
             code: 'beforeEach(function () {})',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' }
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' }
         }
     ],
 
@@ -58,7 +58,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'describe(function() {}); module.exports = "foo"',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 26,
@@ -67,7 +67,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'describe(function() {}); export default "foo"',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 26,
@@ -76,7 +76,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'describe(function() {}); export const bar = "foo";',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 26,
@@ -85,7 +85,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'describe(function() {}); let foo; export { foo }',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 35,
@@ -94,7 +94,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'describe(function() {}); let foo; export { foo as bar }',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 35,
@@ -103,7 +103,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'describe(function() {}); export * from "./foo"',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 26,
@@ -112,7 +112,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'describe(function() {}); export { bar } from "./foo"',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 26,
@@ -145,7 +145,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'it("", function() {}); module.exports = "foo"',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 24,
@@ -154,7 +154,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'it("", function() {}); export default "foo"',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 24,
@@ -163,7 +163,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'it("", function() {}); export const bar = "foo";',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 24,
@@ -172,7 +172,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'it("", function() {}); let foo; export { foo }',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 33,
@@ -181,7 +181,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'it("", function() {}); let foo; export { foo as bar }',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 33,
@@ -190,7 +190,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'it("", function() {}); export * from "./foo"',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 24,
@@ -199,7 +199,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'it("", function() {}); export { bar } from "./foo"',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 24,
@@ -232,7 +232,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'beforeEach(function() {}); module.exports = "foo"',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 28,
@@ -241,7 +241,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'beforeEach(function() {}); export default "foo"',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 28,
@@ -250,7 +250,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'beforeEach(function() {}); export const bar = "foo";',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 28,
@@ -259,7 +259,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'beforeEach(function() {}); let foo; export { foo }',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 37,
@@ -268,7 +268,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'beforeEach(function() {}); let foo; export { foo as bar }',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 37,
@@ -277,7 +277,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'beforeEach(function() {}); export * from "./foo"',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 28,
@@ -286,7 +286,7 @@ ruleTester.run('no-exports', rules['no-exports'], {
         },
         {
             code: 'beforeEach(function() {}); export { bar } from "./foo"',
-            parserOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
             errors: [{
                 message: 'Unexpected export from a test file',
                 column: 28,
