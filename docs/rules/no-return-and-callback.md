@@ -14,12 +14,12 @@ The following patterns are considered warnings:
 
 ```js
 describe('suite', function () {
-    before('title', function(done) {
+    before('title', function (done) {
         return foo(done);
     });
 
-    it('title', function(done) {
-        return bar().then(function() {
+    it('title', function (done) {
+        return bar().then(function () {
             done();
         });
     });
@@ -30,11 +30,11 @@ These patterns would not be considered warnings:
 
 ```js
 describe('suite', function () {
-    before('title', function(done) {
+    before('title', function (done) {
         foo(done);
     });
 
-    it('title', function() {
+    it('title', function () {
         return bar();
     });
 });
@@ -42,4 +42,4 @@ describe('suite', function () {
 
 ## When Not To Use It
 
-* If you use another library which exposes a similar API as mocha (e.g. `before`, `after`), you should turn this rule off, because it would raise warnings.
+- If you use another library which exposes a similar API as mocha (e.g. `before`, `after`), you should turn this rule off, because it would raise warnings.

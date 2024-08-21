@@ -1,8 +1,6 @@
-'use strict';
-
-const RuleTester = require('eslint').RuleTester;
-const rules = require('../../').rules;
-const ruleTester = new RuleTester();
+const { RuleTester } = require('eslint');
+const { rules } = require('../../');
+const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
 ruleTester.run('valid-test-description', rules['valid-test-description'], {
     valid: [
@@ -16,40 +14,40 @@ ruleTester.run('valid-test-description', rules['valid-test-description'], {
         'specify();',
         'test();',
         {
-            options: [ 'test' ],
+            options: ['test'],
             code: 'it("this is a test", function () { });'
         },
         {
-            options: [ 'test' ],
+            options: ['test'],
             code: 'test("this is a test", function () { });'
         },
         {
-            options: [ '^should', [ 'someFunction' ] ],
+            options: ['^should', ['someFunction']],
             code: 'it("this is a test", function () { });'
         },
         {
-            options: [ '^should', [ 'someFunction' ] ],
+            options: ['^should', ['someFunction']],
             code: 'someFunction("should do something", function () { });'
         },
         {
-            options: [ '^should', [ 'someFunction' ], 'some error message' ],
+            options: ['^should', ['someFunction'], 'some error message'],
             code: 'someFunction("should do something", function () { });'
         },
         {
-            options: [ { pattern: '^should', testNames: [ 'someFunction' ], message: 'some error message' } ],
+            options: [{ pattern: '^should', testNames: ['someFunction'], message: 'some error message' }],
             code: 'someFunction("should do something", function () { });'
         },
         'someOtherFunction();',
         {
-            parserOptions: { ecmaVersion: 2017 },
+            languageOptions: { ecmaVersion: 2017 },
             code: 'it(`should work with template strings`, function () {});'
         },
         {
-            parserOptions: { ecmaVersion: 2019 },
+            languageOptions: { ecmaVersion: 2019 },
             code: 'it(foo`work with template strings`, function () {});'
         },
         {
-            parserOptions: { ecmaVersion: 2019 },
+            languageOptions: { ecmaVersion: 2019 },
             code: 'it(`${foo} work with template strings`, function () {});'
         }
     ],
@@ -74,49 +72,49 @@ ruleTester.run('valid-test-description', rules['valid-test-description'], {
             ]
         },
         {
-            options: [ 'required' ],
+            options: ['required'],
             code: 'it("this is a test", function () { });',
             errors: [
                 { message: 'Invalid "it()" description found.' }
             ]
         },
         {
-            options: [ 'required' ],
+            options: ['required'],
             code: 'specify("this is a test", function () { });',
             errors: [
                 { message: 'Invalid "specify()" description found.' }
             ]
         },
         {
-            options: [ 'required' ],
+            options: ['required'],
             code: 'test("this is a test", function () { });',
             errors: [
                 { message: 'Invalid "test()" description found.' }
             ]
         },
         {
-            options: [ 'required', [ 'customFunction' ] ],
+            options: ['required', ['customFunction']],
             code: 'customFunction("this is a test", function () { });',
             errors: [
                 { message: 'Invalid "customFunction()" description found.' }
             ]
         },
         {
-            options: [ 'required', [ 'customFunction' ], 'some error message' ],
+            options: ['required', ['customFunction'], 'some error message'],
             code: 'customFunction("this is a test", function () { });',
             errors: [
                 { message: 'some error message' }
             ]
         },
         {
-            options: [ { pattern: 'required', testNames: [ 'customFunction' ], message: 'some error message' } ],
+            options: [{ pattern: 'required', testNames: ['customFunction'], message: 'some error message' }],
             code: 'customFunction("this is a test", function () { });',
             errors: [
                 { message: 'some error message' }
             ]
         },
         {
-            options: [ {} ],
+            options: [{}],
             code: 'it("this is a test", function () { });',
             errors: [
                 { message: 'Invalid "it()" description found.' }
@@ -124,7 +122,7 @@ ruleTester.run('valid-test-description', rules['valid-test-description'], {
         },
         {
             code: 'it(`this is a test`, function () { });',
-            parserOptions: {
+            languageOptions: {
                 ecmaVersion: 2019
             },
             errors: [
@@ -133,7 +131,7 @@ ruleTester.run('valid-test-description', rules['valid-test-description'], {
         },
         {
             code: 'const foo = "this"; it(`${foo} is a test`, function () { });',
-            parserOptions: {
+            languageOptions: {
                 ecmaVersion: 2019
             },
             errors: [

@@ -19,11 +19,11 @@ describe('foo', function () {
     var mockLocation;
 
     before(function () { // Is allowed this time
-        mockUser = {age: 50};
+        mockUser = { age: 50 };
     });
 
     before(function () { // Duplicate! Is not allowed this time
-        mockLocation = {city: 'New York'};
+        mockLocation = { city: 'New York' };
     });
 
     // Same for the other hooks
@@ -46,19 +46,19 @@ describe('foo', function () {
     var mockLocation;
 
     before(function () { // Is allowed this time
-        mockUser = {age: 50};
-        mockLocation = {city: 'New York'};
+        mockUser = { age: 50 };
+        mockLocation = { city: 'New York' };
     });
 
     describe('bar', function () {
-      before(function () { // Is allowed because it's nested in a new describe
-        // ...
-      });
+        before(function () { // Is allowed because it's nested in a new describe
+            // ...
+        });
     });
 });
 ```
 
 ## When Not To Use It
 
-* If you use another library which exposes a similar API as mocha (e.g. `before`, `after`), you should turn this rule off, because it would raise warnings.
-* If you turned `no-hooks` on, you should turn this rule off, because it would raise several warnings for the same root cause.
+- If you use another library which exposes a similar API as mocha (e.g. `before`, `after`), you should turn this rule off, because it would raise warnings.
+- If you turned `no-hooks` on, you should turn this rule off, because it would raise several warnings for the same root cause.

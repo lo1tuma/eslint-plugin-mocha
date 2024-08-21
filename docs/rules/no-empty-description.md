@@ -15,12 +15,11 @@ The following patterns are considered problems:
 ```js
 it();
 
-suite("");
+suite('');
 
-test(function() { })
+test(function () {});
 
-test.only(" ", function() { })
-
+test.only(' ', function () {});
 ```
 
 These patterns would not be considered problems:
@@ -40,10 +39,10 @@ suite('foo', function () {
 Example of a custom rule configuration:
 
 ```js
-   rules: {
-       "mocha/no-empty-description": [ "warn", {
-           testNames: ["it", "specify", "test", "mytestname"],
-           message: 'custom error message'
-       } ]
-   }
+rules: {
+    "mocha/no-empty-description": [ "warn", {
+        testNames: ["it", "specify", "test", "mytestname"],
+        message: 'custom error message'
+    } ]
+}
 ```

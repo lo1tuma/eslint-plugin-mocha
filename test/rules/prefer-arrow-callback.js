@@ -4,33 +4,31 @@
  * @author Michael Fields (mocha-aware additional tests)
  */
 
-'use strict';
-
 // ------------------------------------------------------------------------------
 // Requirements
 // ------------------------------------------------------------------------------
 
-const RuleTester = require('eslint').RuleTester;
-const rules = require('../../').rules;
+const { RuleTester } = require('eslint');
+const { rules } = require('../../');
 const ruleTester = new RuleTester({
-    parserOptions: { ecmaVersion: 2017 }
+    languageOptions: { ecmaVersion: 2017, sourceType: 'script' }
 });
 
 // ------------------------------------------------------------------------------
 // Tests
 // ------------------------------------------------------------------------------
 
-const errors = [ {
+const errors = [{
     message: 'Unexpected function expression.',
     type: 'FunctionExpression'
-} ];
+}];
 
 ruleTester.run('prefer-arrow-callback', rules['prefer-arrow-callback'], {
     valid: [
         'foo(a => a);',
         'foo(function*() {});',
         'foo(function() { this; });',
-        { code: 'foo(function bar() {});', options: [ { allowNamedFunctions: true } ] },
+        { code: 'foo(function bar() {});', options: [{ allowNamedFunctions: true }] },
         'foo(function() { (() => this); });',
         'foo(function() { this; }.bind(obj));',
         'foo(function() { this; }.call(this));',
@@ -45,7 +43,7 @@ ruleTester.run('prefer-arrow-callback', rules['prefer-arrow-callback'], {
         'foo(function bar() { this; }.bind(this, somethingElse));',
         {
             code: 'import.meta.url',
-            parserOptions: {
+            languageOptions: {
                 ecmaVersion: 2020,
                 sourceType: 'module'
             }
@@ -87,13 +85,13 @@ ruleTester.run('prefer-arrow-callback', rules['prefer-arrow-callback'], {
         {
             code: 'foo(function() {});',
             output: 'foo(() => {});',
-            options: [ { allowNamedFunctions: true } ],
+            options: [{ allowNamedFunctions: true }],
             errors
         },
         {
             code: 'foo(function bar() {});',
             output: 'foo(() => {});',
-            options: [ { allowNamedFunctions: false } ],
+            options: [{ allowNamedFunctions: false }],
             errors
         },
         {
@@ -109,7 +107,7 @@ ruleTester.run('prefer-arrow-callback', rules['prefer-arrow-callback'], {
         {
             code: 'foo(bar ? function() {} : function() {});',
             output: 'foo(bar ? () => {} : () => {});',
-            errors: [ errors[0], errors[0] ]
+            errors: [errors[0], errors[0]]
         },
         {
             code: 'foo(function() { (function() { this; }); });',
@@ -150,14 +148,14 @@ ruleTester.run('prefer-arrow-callback', rules['prefer-arrow-callback'], {
             code: 'foo(function() { this; });',
             // No fix applied
             output: null,
-            options: [ { allowUnboundThis: false } ],
+            options: [{ allowUnboundThis: false }],
             errors
         },
         {
             code: 'foo(function() { (() => this); });',
             // No fix applied
             output: null,
-            options: [ { allowUnboundThis: false } ],
+            options: [{ allowUnboundThis: false }],
             errors
         },
         {
@@ -181,8 +179,8 @@ ruleTester.run('prefer-arrow-callback', rules['prefer-arrow-callback'], {
             errors
         },
         {
-            code: 'qux(function(foo = 1, [bar = 2] = [], {qux: baz = 3} = {foo: \'bar\'}) { return foo + bar; });',
-            output: 'qux((foo = 1, [bar = 2] = [], {qux: baz = 3} = {foo: \'bar\'}) => { return foo + bar; });',
+            code: "qux(function(foo = 1, [bar = 2] = [], {qux: baz = 3} = {foo: 'bar'}) { return foo + bar; });",
+            output: "qux((foo = 1, [bar = 2] = [], {qux: baz = 3} = {foo: 'bar'}) => { return foo + bar; });",
             errors
         },
         {
@@ -204,13 +202,13 @@ ruleTester.run('prefer-arrow-callback', rules['prefer-arrow-callback'], {
         {
             code: 'qux(async function (foo = 1, bar = 2, baz = 3) { return baz; })',
             output: 'qux(async (foo = 1, bar = 2, baz = 3) => { return baz; })',
-            parserOptions: { ecmaVersion: 8 },
+            languageOptions: { ecmaVersion: 8 },
             errors
         },
         {
             code: 'qux(async function (foo = 1, bar = 2, baz = 3) { return this; }.bind(this))',
             output: 'qux(async (foo = 1, bar = 2, baz = 3) => { return this; })',
-            parserOptions: { ecmaVersion: 8 },
+            languageOptions: { ecmaVersion: 8 },
             errors
         }
     ]

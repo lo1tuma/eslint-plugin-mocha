@@ -15,23 +15,23 @@ This rule looks for `it`, `test`, and `specify` function calls with only one arg
 The following patterns are considered warnings:
 
 ```js
-it("foo");
-specify("foo");
-test("foo");
+it('foo');
+specify('foo');
+test('foo');
 ```
 
 These patterns are not considered warnings:
 
 ```js
-it("foo", function() {});
-specify("foo", function() {});
-test("foo", function() {});
+it('foo', function () {});
+specify('foo', function () {});
+test('foo', function () {});
 ```
 
 ## When Not To Use It
 
-* If the existence of pending/unimplemented tests isn't considered important enough to warrant raising lint warnings/errors.
+- If the existence of pending/unimplemented tests isn't considered important enough to warrant raising lint warnings/errors.
 
 ## Further Reading
 
-* [Pending Tests](http://mochajs.org/#pending-tests)
+- [Pending Tests](http://mochajs.org/#pending-tests)

@@ -37,7 +37,6 @@ it('something', function () {
         // …
     });
 });
-
 ```
 
 These patterns would not be considered problems:

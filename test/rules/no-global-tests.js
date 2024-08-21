@@ -1,12 +1,9 @@
-'use strict';
-
-const RuleTester = require('eslint').RuleTester;
+const { RuleTester } = require('eslint');
 const rule = require('../../lib/rules/no-global-tests');
-const ruleTester = new RuleTester();
+const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const expectedErrorMessage = 'Unexpected global mocha test.';
 
 ruleTester.run('no-global-tests', rule, {
-
     valid: [
         'describe();',
         'suite();',
@@ -33,7 +30,7 @@ ruleTester.run('no-global-tests', rule, {
         '[1,2,3].forEach(function () { it(); });',
         {
             code: 'import foo from "bar"; describe("", () => it());',
-            parserOptions: {
+            languageOptions: {
                 sourceType: 'module',
                 ecmaVersion: 6
             }
@@ -43,73 +40,71 @@ ruleTester.run('no-global-tests', rule, {
     invalid: [
         {
             code: 'it();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'it.only();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'it["only"]();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'it.skip();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'it["skip"]();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'test();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'test.only();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'test["only"]();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'test.skip();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'test["skip"]();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'specify();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'specify.only();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'specify["only"]();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'specify.skip();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'specify["skip"]();',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'import foo from "bar"; it("");',
-            parserOptions: {
+            languageOptions: {
                 sourceType: 'module',
                 ecmaVersion: 2015
             },
-            errors: [ { message: expectedErrorMessage, column: 24, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 24, line: 1 }]
         }
-
     ]
-
 });

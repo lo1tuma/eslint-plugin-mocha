@@ -10,7 +10,6 @@ It is easy to forget calling this callback after the asynchronous operation is d
 Example:
 
 ```js
-
 it('should work', function (done) {
     fetchData(options, function (error, data) {
         expect(error).not.to.be.ok;
@@ -29,7 +28,7 @@ This rule checks each `FunctionExpression` or `ArrowFunctionExpression` inside o
 The following patterns are considered warnings:
 
 ```js
-it('foo', function (done) { });
+it('foo', function (done) {});
 
 it('foo', function (done) {
     asyncFunction(function (err, result) {
@@ -47,7 +46,9 @@ before(function (done) {
 These patterns would not be considered warnings:
 
 ```js
-it('foo', function (done) { done(); });
+it('foo', function (done) {
+    done();
+});
 
 it('foo', function (done) {
     asyncFunction(function (err, result) {
@@ -68,12 +69,12 @@ before(function (done) {
 
 This rule supports the following options:
 
-* `ignoreSkipped`: When set to `true` skipped test cases won’t be checked. Defaults to `false`.
+- `ignoreSkipped`: When set to `true` skipped test cases won’t be checked. Defaults to `false`.
 
 ```json
 {
     "rules": {
-        "mocha/handle-done-callback": ["error", {"ignoreSkipped": true}]
+        "mocha/handle-done-callback": ["error", { "ignoreSkipped": true }]
     }
 }
 ```
@@ -84,4 +85,4 @@ If you don’t write asynchronous tests you can safely disable this rule.
 
 ## Further Reading
 
-* [Asynchronous test code](http://mochajs.org/#asynchronous-code)
+- [Asynchronous test code](http://mochajs.org/#asynchronous-code)

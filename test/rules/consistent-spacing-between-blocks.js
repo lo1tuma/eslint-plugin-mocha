@@ -1,10 +1,8 @@
-'use strict';
-
 const { RuleTester } = require('eslint');
 
 const rule = require('../../lib/rules/consistent-spacing-between-blocks.js');
 
-const ruleTester = new RuleTester({ parserOptions: { ecmaVersion: 2020 } });
+const ruleTester = new RuleTester({ languageOptions: { ecmaVersion: 2020, sourceType: 'script' } });
 
 ruleTester.run('require-spacing-between-mocha-calls', rule, {
     valid: [
@@ -102,16 +100,14 @@ ruleTester.run('require-spacing-between-mocha-calls', rule, {
 
         // Blocks on the same line
         {
-            code:
-                'describe(\'Same line blocks\', () => {' +
-                'it(\'block one\', () => {});' +
-                'it(\'block two\', () => {});' +
+            code: "describe('Same line blocks', () => {" +
+                "it('block one', () => {});" +
+                "it('block two', () => {});" +
                 '});',
-            output:
-                'describe(\'Same line blocks\', () => {' +
-                'it(\'block one\', () => {});' +
+            output: "describe('Same line blocks', () => {" +
+                "it('block one', () => {});" +
                 '\n\n' +
-                'it(\'block two\', () => {});' +
+                "it('block two', () => {});" +
                 '});',
             errors: [
                 {

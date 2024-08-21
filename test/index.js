@@ -1,23 +1,35 @@
-'use strict';
-
-const assert = require('assert');
-const fs = require('fs');
-const path = require('path');
+const assert = require('node:assert');
+const fs = require('node:fs');
+const path = require('node:path');
 const rulesDir = path.join(__dirname, '../lib/rules/');
 const documentationDir = path.join(__dirname, '../docs/rules/');
 const plugin = require('..');
 
-describe('eslint-plugin-mocha', function () {
-    let ruleFiles;
+async function determineAllRuleFiles() {
+    const ruleFiles = await fs.promises.readdir(rulesDir);
+    if (rulesDir.length === 0) {
+        throw new Error('Failed to read rules folder');
+    }
+    return ruleFiles;
+}
 
-    before(function (done) {
-        fs.readdir(rulesDir, function (error, files) {
-            ruleFiles = files;
-            done(error);
-        });
+async function determineAllDocumentationFiles() {
+    const documentationFiles = await fs.promises.readdir(documentationDir);
+    const documentationFilesWithoutReadme = documentationFiles.filter((file) => {
+        return file !== 'README.md';
     });
 
-    it('should expose all rules', function () {
+    if (documentationFilesWithoutReadme.length === 0) {
+        throw new Error('Failed to read documentation folder');
+    }
+
+    return documentationFilesWithoutReadme;
+}
+
+describe('eslint-plugin-mocha', function () {
+    it('should expose all rules', async function () {
+        const ruleFiles = await determineAllRuleFiles();
+
         ruleFiles.forEach(function (file) {
             const ruleName = path.basename(file, '.js');
 
@@ -26,24 +38,10 @@ describe('eslint-plugin-mocha', function () {
     });
 
     describe('documentation', function () {
-        let documentationFiles;
+        it('should have each rule documented', async function () {
+            const ruleFiles = await determineAllRuleFiles();
+            const documentationFiles = await determineAllDocumentationFiles();
 
-        before(function (done) {
-            fs.readdir(documentationDir, function (readDirError, files) {
-                if (readDirError) {
-                    done(readDirError);
-                    return;
-                }
-
-                documentationFiles = files.filter(function (file) {
-                    return file !== 'README.md';
-                });
-
-                done();
-            });
-        });
-
-        it('should have each rule documented', function () {
             ruleFiles.forEach(function (file) {
                 const ruleName = path.basename(file, '.js');
                 const expectedDocumentationFileName = `${ruleName}.md`;

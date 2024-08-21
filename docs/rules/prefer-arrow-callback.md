@@ -40,10 +40,15 @@ The following examples **will** be flagged:
 ```js
 /* eslint mocha/prefer-arrow-callback: "error" */
 
-foo(function(a) { return a; }); // ERROR
+foo(function (a) {
+    return a;
+}); // ERROR
 // prefer: foo(a => a)
 
-foo(function() { return this.a; }.bind(this)); // ERROR
+foo(function () {
+    return this.a;
+}
+    .bind(this)); // ERROR
 // prefer: foo(() => this.a)
 ```
 
@@ -56,28 +61,42 @@ The following examples **will not** be flagged:
 /* eslint-env es6 */
 
 // arrow function callback
-foo(a => a); // OK
+foo((a) => a); // OK
 
 // generator as callback
-foo(function*() { yield; }); // OK
+foo(function* () {
+    yield;
+}); // OK
 
 // function expression not used as callback or function argument
-var foo = function foo(a) { return a; }; // OK
+var foo = function foo(a) {
+    return a;
+}; // OK
 
 // unbound function expression callback
-foo(function() { return this.a; }); // OK
+foo(function () {
+    return this.a;
+}); // OK
 
 // recursive named function callback
-foo(function bar(n) { return n && n + bar(n - 1); }); // OK
+foo(function bar(n) {
+    return n && n + bar(n - 1);
+}); // OK
 
 // mocha suite definition callback
-describe('test suite', function() { return Promise.resolve(); }); // OK
+describe('test suite', function () {
+    return Promise.resolve();
+}); // OK
 
 // mocha hook callback
-beforeEach('before each test', function() { return Promise.resolve(); }); // OK
+beforeEach('before each test', function () {
+    return Promise.resolve();
+}); // OK
 
 // mocha test case callback
-it('should resolve', function() { return Promise.resolve(); }); // OK
+it('should resolve', function () {
+    return Promise.resolve();
+}); // OK
 ```
 
 ## Options
@@ -112,11 +131,17 @@ When set to `false` this option prohibits the use of function expressions as cal
 /* eslint mocha/prefer-arrow-callback: [ "error", { "allowUnboundThis": false } ] */
 /* eslint-env es6 */
 
-foo(function() { this.a; });
+foo(function () {
+    this.a;
+});
 
-foo(function() { (() => this); });
+foo(function () {
+    (() => this);
+});
 
-someArray.map(function(itm) { return this.doSomething(itm); }, someObject);
+someArray.map(function (itm) {
+    return this.doSomething(itm);
+}, someObject);
 ```
 
 ## When Not To Use It

@@ -1,27 +1,28 @@
-'use strict';
-
-const assert = require('assert');
+const assert = require('node:assert');
 const { runBenchmark, cpuSpeed, clearRequireCache } = require('./measure');
 
-describe('startup / require time', () => {
-    it('should not take longer as the defined budget to require the plugin', () => {
-        const budget = 85000 / cpuSpeed;
+const iterations = 50;
+
+describe('startup / require time', function () {
+    it('should not take longer as the defined budget to require the plugin', function () {
+        const cpuAgnosticBudget = 85_000;
+        const budget = cpuAgnosticBudget / cpuSpeed;
 
         const { medianDuration } = runBenchmark(() => {
             clearRequireCache();
             require('../index');
-        }, 50);
+        }, iterations);
 
         assert.strictEqual(medianDuration < budget, true);
     });
 
-    it('should not consume more memory as the defined budget', () => {
-        const budget = 600000;
+    it('should not consume more memory as the defined budget', function () {
+        const budget = 600_000;
 
         const { medianMemory } = runBenchmark(() => {
             clearRequireCache();
             require('../index');
-        }, 50);
+        }, iterations);
 
         assert.strictEqual(medianMemory < budget, true);
     });

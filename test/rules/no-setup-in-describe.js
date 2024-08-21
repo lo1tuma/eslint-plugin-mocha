@@ -1,10 +1,7 @@
-'use strict';
-
-const RuleTester = require('eslint').RuleTester;
+const { RuleTester } = require('eslint');
 const rule = require('../../lib/rules/no-setup-in-describe');
-const ruleTester = new RuleTester();
-const memberExpressionError =
-    'Unexpected member expression in describe block. ' +
+const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
+const memberExpressionError = 'Unexpected member expression in describe block. ' +
     'Member expressions may call functions via getters.';
 
 ruleTester.run('no-setup-in-describe', rule, {
@@ -14,7 +11,7 @@ ruleTester.run('no-setup-in-describe', rule, {
         'a.b',
         'b()',
         'function g() { a() }',
-        { code: '() => { a.b }', parserOptions: { ecmaVersion: 6 } },
+        { code: '() => { a.b }', languageOptions: { ecmaVersion: 6 } },
         'it("", function () { b(); })',
         'it("", function () { a.b; })',
         'it("", function () { a[b]; })',
@@ -49,22 +46,22 @@ ruleTester.run('no-setup-in-describe', rule, {
         'suite("", function () { suiteSetup(function() { b(); }); test(); })',
         {
             code: 'describe("", function () { before(() => { b(); }); it(); })',
-            parserOptions: { ecmaVersion: 6 }
+            languageOptions: { ecmaVersion: 6 }
         },
         {
             code: 'describe("", function () { var a = () => b(); it(); })',
-            parserOptions: { ecmaVersion: 6 }
+            languageOptions: { ecmaVersion: 6 }
         },
         {
             code: 'describe("", function () { var a = () => b.c; it(); })',
-            parserOptions: { ecmaVersion: 6 }
+            languageOptions: { ecmaVersion: 6 }
         },
         'describe("", function () { describe("", function () { it(); }); it(); })',
         {
             code: 'foo("", function () { it(); })',
             settings: {
                 'mocha/additionalCustomNames': [
-                    { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                    { name: 'foo', type: 'suite', interfaces: ['BDD'] }
                 ]
             }
         },
@@ -73,7 +70,7 @@ ruleTester.run('no-setup-in-describe', rule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                        { name: 'foo', type: 'suite', interfaces: ['BDD'] }
                     ]
                 }
             }
@@ -83,7 +80,7 @@ ruleTester.run('no-setup-in-describe', rule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                        { name: 'foo', type: 'suite', interfaces: ['BDD'] }
                     ]
                 }
             }
@@ -96,13 +93,12 @@ ruleTester.run('no-setup-in-describe', rule, {
                   bar();
               });
             });`,
-            parserOptions: { ecmaVersion: 2015 }
+            languageOptions: { ecmaVersion: 2015 }
         },
         'describe("", function () { function bar() { a.b = "c"; } it(); })',
         {
-            code:
-                'describe("", function () { const bar = () => { a.b = "c"; }; it(); })',
-            parserOptions: { ecmaVersion: 2015 }
+            code: 'describe("", function () { const bar = () => { a.b = "c"; }; it(); })',
+            languageOptions: { ecmaVersion: 2015 }
         },
         'describe("", function () { var bar = function () { a.b = "c"; }; it(); })'
     ],
@@ -130,7 +126,7 @@ ruleTester.run('no-setup-in-describe', rule, {
         },
         {
             code: 'describe("", () => { a(); });',
-            parserOptions: { ecmaVersion: 2015 },
+            languageOptions: { ecmaVersion: 2015 },
             errors: [
                 {
                     message: 'Unexpected function call in describe block.',
@@ -144,7 +140,7 @@ ruleTester.run('no-setup-in-describe', rule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                        { name: 'foo', type: 'suite', interfaces: ['BDD'] }
                     ]
                 }
             },
@@ -161,7 +157,7 @@ ruleTester.run('no-setup-in-describe', rule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                        { name: 'foo', type: 'suite', interfaces: ['BDD'] }
                     ]
                 }
             },
@@ -178,7 +174,7 @@ ruleTester.run('no-setup-in-describe', rule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                        { name: 'foo', type: 'suite', interfaces: ['BDD'] }
                     ]
                 }
             },
@@ -220,7 +216,7 @@ ruleTester.run('no-setup-in-describe', rule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'foo', type: 'suite', interfaces: [ 'BDD' ] }
+                        { name: 'foo', type: 'suite', interfaces: ['BDD'] }
                     ]
                 }
             },
@@ -248,8 +244,7 @@ ruleTester.run('no-setup-in-describe', rule, {
             ]
         },
         {
-            code:
-                'describe("", function () { something("", function () {}).timeout(); });',
+            code: 'describe("", function () { something("", function () {}).timeout(); });',
             errors: [
                 {
                     message: 'Unexpected function call in describe block.',

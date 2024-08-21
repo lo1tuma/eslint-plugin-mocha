@@ -1,12 +1,9 @@
-'use strict';
-
-const RuleTester = require('eslint').RuleTester;
-const rules = require('../../').rules;
-const ruleTester = new RuleTester();
+const { RuleTester } = require('eslint');
+const { rules } = require('../../');
+const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const expectedErrorMessage = 'Unexpected skipped mocha test.';
 
 ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
-
     valid: [
         'describe()',
         'it()',
@@ -25,7 +22,7 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
             code: 'xcustom()',
             settings: {
                 mocha: {
-                    additionalCustomNames: [ { name: 'custom', type: 'testCase', interfaces: [ 'TDD' ] } ]
+                    additionalCustomNames: [{ name: 'custom', type: 'testCase', interfaces: ['TDD'] }]
                 }
             }
         }
@@ -34,122 +31,120 @@ ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
     invalid: [
         {
             code: 'describe.skip()',
-            errors: [ { message: expectedErrorMessage, column: 10, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 10, line: 1 }]
         },
         {
             code: 'describe["skip"]()',
-            errors: [ { message: expectedErrorMessage, column: 10, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 10, line: 1 }]
         },
         {
             code: 'xdescribe()',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'it.skip()',
-            errors: [ { message: expectedErrorMessage, column: 4, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 4, line: 1 }]
         },
         {
             code: 'it["skip"]()',
-            errors: [ { message: expectedErrorMessage, column: 4, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 4, line: 1 }]
         },
         {
             code: 'xit()',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'suite.skip()',
-            errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 7, line: 1 }]
         },
         {
             code: 'suite["skip"]()',
-            errors: [ { message: expectedErrorMessage, column: 7, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 7, line: 1 }]
         },
         {
             code: 'test.skip()',
-            errors: [ { message: expectedErrorMessage, column: 6, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 6, line: 1 }]
         },
         {
             code: 'test["skip"]()',
-            errors: [ { message: expectedErrorMessage, column: 6, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 6, line: 1 }]
         },
         {
             code: 'context.skip()',
-            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 9, line: 1 }]
         },
         {
             code: 'context["skip"]()',
-            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 9, line: 1 }]
         },
         {
             code: 'xcontext()',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'specify.skip()',
-            errors: [ { message: expectedErrorMessage, column: 9, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 9, line: 1 }]
         },
         {
             code: 'xspecify()',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'custom.skip()',
             settings: {
-                'mocha/additionalCustomNames': [ { name: 'custom', type: 'testCase', interfaces: [ 'BDD' ] } ]
+                'mocha/additionalCustomNames': [{ name: 'custom', type: 'testCase', interfaces: ['BDD'] }]
             },
-            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 8, line: 1 }]
         },
         {
             code: 'custom["skip"]()',
             settings: {
-                'mocha/additionalCustomNames': [ { name: 'custom', type: 'testCase', interfaces: [ 'BDD' ] } ]
+                'mocha/additionalCustomNames': [{ name: 'custom', type: 'testCase', interfaces: ['BDD'] }]
             },
-            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 8, line: 1 }]
         },
         {
             code: 'xcustom()',
             settings: {
-                'mocha/additionalCustomNames': [ { name: 'custom', type: 'testCase', interfaces: [ 'BDD' ] } ]
+                'mocha/additionalCustomNames': [{ name: 'custom', type: 'testCase', interfaces: ['BDD'] }]
             },
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'custom.skip()',
             settings: {
                 mocha: {
-                    additionalCustomNames: [ { name: 'custom', type: 'testCase', interfaces: [ 'BDD' ] } ]
+                    additionalCustomNames: [{ name: 'custom', type: 'testCase', interfaces: ['BDD'] }]
                 }
             },
-            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 8, line: 1 }]
         },
         {
             code: 'custom["skip"]()',
             settings: {
                 mocha: {
-                    additionalCustomNames: [ { name: 'custom', type: 'testCase', interfaces: [ 'BDD' ] } ]
+                    additionalCustomNames: [{ name: 'custom', type: 'testCase', interfaces: ['BDD'] }]
                 }
             },
-            errors: [ { message: expectedErrorMessage, column: 8, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 8, line: 1 }]
         },
         {
             code: 'xcustom()',
             settings: {
                 mocha: {
-                    additionalCustomNames: [ { name: 'custom', type: 'testCase', interfaces: [ 'BDD' ] } ]
+                    additionalCustomNames: [{ name: 'custom', type: 'testCase', interfaces: ['BDD'] }]
                 }
             },
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'custom("bar").it.skip()',
             settings: {
                 mocha: {
-                    additionalCustomNames: [ { name: 'custom().it', type: 'testCase', interfaces: [ 'BDD' ] } ]
+                    additionalCustomNames: [{ name: 'custom().it', type: 'testCase', interfaces: ['BDD'] }]
                 }
             },
-            errors: [ { message: expectedErrorMessage, column: 18, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 18, line: 1 }]
         }
     ]
-
 });
-

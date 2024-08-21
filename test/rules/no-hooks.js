@@ -1,11 +1,8 @@
-'use strict';
-
-const RuleTester = require('eslint').RuleTester;
-const rules = require('../../').rules;
-const ruleTester = new RuleTester();
+const { RuleTester } = require('eslint');
+const { rules } = require('../../');
+const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
 ruleTester.run('no-hooks', rules['no-hooks'], {
-
     valid: [
         'describe(function() { it(function() {}); });',
         'describe(function() { it(function() {}); it(function() {}); });',
@@ -21,72 +18,71 @@ ruleTester.run('no-hooks', rules['no-hooks'], {
         'var before = 2; before + 3;',
         {
             code: 'describe(function() { before(function() {}); });',
-            options: [ { allow: [ 'before' ] } ]
+            options: [{ allow: ['before'] }]
         },
         {
             code: 'describe(function() { after(function() {}); });',
-            options: [ { allow: [ 'after' ] } ]
+            options: [{ allow: ['after'] }]
         },
         {
             code: 'describe(function() { beforeEach(function() {}); });',
-            options: [ { allow: [ 'beforeEach' ] } ]
+            options: [{ allow: ['beforeEach'] }]
         },
         {
             code: 'describe(function() { afterEach(function() {}); });',
-            options: [ { allow: [ 'afterEach' ] } ]
+            options: [{ allow: ['afterEach'] }]
         },
         {
             code: 'describe(function() { beforeAll(function() {}); });',
-            options: [ { allow: [ 'beforeAll' ] } ]
+            options: [{ allow: ['beforeAll'] }]
         },
         {
             code: 'describe(function() { afterAll(function() {}); });',
-            options: [ { allow: [ 'afterAll' ] } ]
+            options: [{ allow: ['afterAll'] }]
         },
         {
             code: 'describe(function() { setup(function() {}); });',
-            options: [ { allow: [ 'setup' ] } ]
+            options: [{ allow: ['setup'] }]
         },
         {
             code: 'describe(function() { teardown(function() {}); });',
-            options: [ { allow: [ 'teardown' ] } ]
+            options: [{ allow: ['teardown'] }]
         },
         {
             code: 'describe(function() { suiteSetup(function() {}); });',
-            options: [ { allow: [ 'suiteSetup' ] } ]
+            options: [{ allow: ['suiteSetup'] }]
         },
         {
             code: 'describe(function() { suiteTeardown(function() {}); });',
-            options: [ { allow: [ 'suiteTeardown' ] } ]
+            options: [{ allow: ['suiteTeardown'] }]
         }
     ],
 
     invalid: [
         {
             code: 'describe(function() { before(function() {}); });',
-            errors: [ { message: 'Unexpected use of Mocha `before` hook', column: 23, line: 1 } ]
+            errors: [{ message: 'Unexpected use of Mocha `before` hook', column: 23, line: 1 }]
         },
         {
             code: 'describe(function() { after(function() {}); });',
-            errors: [ { message: 'Unexpected use of Mocha `after` hook', column: 23, line: 1 } ]
+            errors: [{ message: 'Unexpected use of Mocha `after` hook', column: 23, line: 1 }]
         },
         {
             code: 'describe(function() { beforeEach(function() {}); });',
-            errors: [ { message: 'Unexpected use of Mocha `beforeEach` hook', column: 23, line: 1 } ]
+            errors: [{ message: 'Unexpected use of Mocha `beforeEach` hook', column: 23, line: 1 }]
         },
         {
             code: 'describe(function() { afterEach(function() {}); });',
-            errors: [ { message: 'Unexpected use of Mocha `afterEach` hook', column: 23, line: 1 } ]
+            errors: [{ message: 'Unexpected use of Mocha `afterEach` hook', column: 23, line: 1 }]
         },
         {
             code: 'describe(function() { describe(function() { before(function() {}); }); });',
-            errors: [ { message: 'Unexpected use of Mocha `before` hook', column: 45, line: 1 } ]
+            errors: [{ message: 'Unexpected use of Mocha `before` hook', column: 45, line: 1 }]
         },
         {
             code: 'describe(function() { after(function() {}); });',
-            options: [ { allow: [ 'before' ] } ],
-            errors: [ { message: 'Unexpected use of Mocha `after` hook', column: 23, line: 1 } ]
+            options: [{ allow: ['before'] }],
+            errors: [{ message: 'Unexpected use of Mocha `after` hook', column: 23, line: 1 }]
         }
     ]
-
 });

@@ -1,8 +1,6 @@
-'use strict';
-
-const RuleTester = require('eslint').RuleTester;
-const rules = require('../../').rules;
-const ruleTester = new RuleTester();
+const { RuleTester } = require('eslint');
+const { rules } = require('../../');
+const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
 ruleTester.run('no-synchronous-tests', rules['no-synchronous-tests'], {
     valid: [
@@ -30,51 +28,51 @@ ruleTester.run('no-synchronous-tests', rules['no-synchronous-tests'], {
         'var foo = function () { };',
         {
             code: 'it("", (done) => { done(); });',
-            parserOptions: { ecmaVersion: 6 }
+            languageOptions: { ecmaVersion: 6 }
         },
         {
             code: 'it("", () => { return promise(); });',
-            parserOptions: { ecmaVersion: 6 }
+            languageOptions: { ecmaVersion: 6 }
         },
         {
             code: 'it("", () => promise() );',
-            parserOptions: { ecmaVersion: 6 }
+            languageOptions: { ecmaVersion: 6 }
         },
         {
             code: 'it("", () => promise );',
-            parserOptions: { ecmaVersion: 6 }
+            languageOptions: { ecmaVersion: 6 }
         },
         {
             code: 'it("", () => promise.then() );',
-            parserOptions: { ecmaVersion: 6 }
+            languageOptions: { ecmaVersion: 6 }
         },
         {
             code: 'it("", async function () { });',
-            parserOptions: { ecmaVersion: 8 }
+            languageOptions: { ecmaVersion: 8 }
         },
         {
             code: 'it("", async function () { return true; });',
-            parserOptions: { ecmaVersion: 8 }
+            languageOptions: { ecmaVersion: 8 }
         },
         {
             code: 'it("", async function (val) { return await new Promise((resolve) => { resolve(val); }); });',
-            parserOptions: { ecmaVersion: 8 }
+            languageOptions: { ecmaVersion: 8 }
         },
         {
             code: 'before("", async function () { });',
-            parserOptions: { ecmaVersion: 8 }
+            languageOptions: { ecmaVersion: 8 }
         },
         {
             code: 'beforeEach("", async function () { });',
-            parserOptions: { ecmaVersion: 8 }
+            languageOptions: { ecmaVersion: 8 }
         },
         {
             code: 'after("", async function () { });',
-            parserOptions: { ecmaVersion: 8 }
+            languageOptions: { ecmaVersion: 8 }
         },
         {
             code: 'afterEach("", async function () { });',
-            parserOptions: { ecmaVersion: 8 }
+            languageOptions: { ecmaVersion: 8 }
         },
         {
             code: 'it("", function (done) { done(); });',
@@ -82,48 +80,48 @@ ruleTester.run('no-synchronous-tests', rules['no-synchronous-tests'], {
         },
         {
             code: 'it("", function (done) { done(); });',
-            options: [ { } ]
+            options: [{}]
         }
     ],
 
     invalid: [
         {
             code: 'it("", function () {});',
-            errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1 } ]
+            errors: [{ message: 'Unexpected synchronous test.', column: 8, line: 1 }]
         },
         {
             code: 'it("", function () { callback(); });',
-            errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1 } ]
+            errors: [{ message: 'Unexpected synchronous test.', column: 8, line: 1 }]
         },
         {
             code: 'it(function () { return; });',
-            errors: [ { message: 'Unexpected synchronous test.', column: 4, line: 1 } ]
+            errors: [{ message: 'Unexpected synchronous test.', column: 4, line: 1 }]
         },
         {
             code: 'it("", function () { return "a string" });',
-            errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1 } ]
+            errors: [{ message: 'Unexpected synchronous test.', column: 8, line: 1 }]
         },
         {
             code: 'it("", () => "not-a-promise" );',
-            parserOptions: { ecmaVersion: 6 },
-            errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1 } ]
+            languageOptions: { ecmaVersion: 6 },
+            errors: [{ message: 'Unexpected synchronous test.', column: 8, line: 1 }]
         },
         {
             code: 'specify("", function () {});',
-            errors: [ { message: 'Unexpected synchronous test.', column: 13, line: 1 } ]
+            errors: [{ message: 'Unexpected synchronous test.', column: 13, line: 1 }]
         },
         {
             code: 'specify.only("", function () {});',
-            errors: [ { message: 'Unexpected synchronous test.', column: 18, line: 1 } ]
+            errors: [{ message: 'Unexpected synchronous test.', column: 18, line: 1 }]
         },
         {
             code: 'before("", function () {});',
-            errors: [ { message: 'Unexpected synchronous test.', column: 12, line: 1 } ]
+            errors: [{ message: 'Unexpected synchronous test.', column: 12, line: 1 }]
         },
         {
-            options: [ { allowed: [ 'callback', 'async' ] } ],
+            options: [{ allowed: ['callback', 'async'] }],
             code: 'it("", function () { return promise(); });',
-            errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1 } ]
+            errors: [{ message: 'Unexpected synchronous test.', column: 8, line: 1 }]
         }
     ]
 });

@@ -1,12 +1,9 @@
-'use strict';
-
-const RuleTester = require('eslint').RuleTester;
-const rules = require('../../').rules;
-const ruleTester = new RuleTester();
+const { RuleTester } = require('eslint');
+const { rules } = require('../../');
+const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const expectedErrorMessage = 'Unexpected pending mocha test.';
 
 ruleTester.run('no-pending-tests', rules['no-pending-tests'], {
-
     valid: [
         'it()',
         'it("should be false", function() { assert(something, false); })',
@@ -21,16 +18,15 @@ ruleTester.run('no-pending-tests', rules['no-pending-tests'], {
     invalid: [
         {
             code: 'it("is pending")',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'test("is pending")',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'specify("is pending")',
-            errors: [ { message: expectedErrorMessage, column: 1, line: 1 } ]
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         }
     ]
-
 });

@@ -1,8 +1,6 @@
-'use strict';
-
-const assert = require('assert');
+const assert = require('node:assert');
 const { Linter } = require('eslint');
-const { times, toPairs, fromPairs } = require('rambda');
+const { times } = require('rambda');
 const {
     runBenchmark,
     cpuSpeed
@@ -11,20 +9,14 @@ const mochaPlugin = require('../');
 
 const allRules = mochaPlugin.configs.all.rules;
 
-function lintManyFilesWithAllRecommendedRules({ numberOfFiles }) {
+function lintManyFilesWithAllRecommendedRules(options) {
+    const { numberOfFiles } = options;
     const linter = new Linter();
 
-    linter.defineRules(mochaPlugin.rules);
-
     const config = {
-        rules: fromPairs(
-            toPairs(allRules).map(([ ruleName, ruleSettings ]) => {
-                const [ , ruleNameWithoutPrefix ] = ruleName.split('/');
-
-                return [ ruleNameWithoutPrefix, ruleSettings ];
-            })
-        ),
-        parserOptions: {
+        plugins: { mocha: mochaPlugin },
+        rules: allRules,
+        languageOptions: {
             ecmaVersion: 2018
         }
     };
@@ -86,23 +78,26 @@ function lintManyFilesWithAllRecommendedRules({ numberOfFiles }) {
     }, numberOfFiles);
 }
 
-describe('runtime', () => {
-    it('should not take longer as the defined budget to lint many files with the recommended config', () => {
-        const budget = 3750000 / cpuSpeed;
+const iterations = 50;
+
+describe('runtime', function () {
+    it('should not take longer as the defined budget to lint many files with the recommended config', function () {
+        const cpuAgnosticBudget = 3_750_000;
+        const budget = cpuAgnosticBudget / cpuSpeed;
 
         const { medianDuration } = runBenchmark(() => {
             lintManyFilesWithAllRecommendedRules({ numberOfFiles: 350 });
-        }, 50);
+        }, iterations);
 
         assert.strictEqual(medianDuration < budget, true);
     });
 
-    it('should not consume more memory as the defined budget to lint many files with the recommended config', () => {
-        const budget = 2750000;
+    it('should not consume more memory as the defined budget to lint many files with the recommended config', function () {
+        const budget = 2_750_000;
 
         const { medianMemory } = runBenchmark(() => {
             lintManyFilesWithAllRecommendedRules({ numberOfFiles: 350 });
-        }, 50);
+        }, iterations);
 
         assert.strictEqual(medianMemory < budget, true);
     });
