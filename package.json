@@ -23,9 +23,9 @@
         "fix:all": "npm run eslint -- --fix && npm run format:fix",
         "test": "npm run test:unit:with-coverage && npm run test:bench",
         "test:unit": "mocha test --recursive --reporter dot",
-        "test:unit:with-coverage": "nyc npm run test:unit",
+        "test:unit:with-coverage": "c8 npm run test:unit",
         "test:bench": "mocha -t 2400000 benchmarks",
-        "coveralls": "cat ./build/coverage/lcov.info | coveralls",
+        "coveralls": "cat ./target/coverage/lcov.info | coveralls",
         "changelog": "pr-log",
         "update:eslint-docs": "eslint-doc-generator --ignore-config all --url-configs \"https://github.com/lo1tuma/eslint-plugin-mocha#configs\"",
         "release": "release-it"
@@ -43,6 +43,7 @@
         "@enormora/eslint-config-base": "0.0.13",
         "@enormora/eslint-config-mocha": "0.0.6",
         "@enormora/eslint-config-node": "0.0.12",
+        "c8": "^10.1.2",
         "coveralls": "3.1.1",
         "dprint": "0.47.2",
         "eslint": "9.9.0",
@@ -50,7 +51,6 @@
         "eslint-plugin-eslint-plugin": "6.2.0",
         "markdownlint-cli": "0.41.0",
         "mocha": "10.7.3",
-        "nyc": "17.0.0",
         "pr-log": "6.1.1",
         "release-it": "17.6.0",
         "semver": "7.6.3"
@@ -77,25 +77,5 @@
         "eslintplugin",
         "eslint-plugin",
         "mocha"
-    ],
-    "nyc": {
-        "all": true,
-        "cache": false,
-        "lines": 100,
-        "statements": 100,
-        "functions": 100,
-        "branches": 100,
-        "exclude": [
-            "build",
-            "target",
-            "test",
-            "benchmarks/"
-        ],
-        "reporter": [
-            "lcov",
-            "text-summary"
-        ],
-        "check-coverage": true,
-        "report-dir": "build"
-    }
+    ]
 }

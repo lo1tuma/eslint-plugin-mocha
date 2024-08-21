@@ -71,11 +71,9 @@
     },
     "excludes": [
         "target/",
-        "build/",
         "CHANGELOG.md",
         "README.md",
         "docs/rules/*.md",
-        ".nyc_output/",
         "**/node_modules",
         "**/*-lock.json"
     ],
