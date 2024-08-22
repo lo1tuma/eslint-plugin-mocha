@@ -32,28 +32,28 @@
     },
     "dependencies": {
         "@eslint-community/eslint-utils": "^4.4.0",
-        "globals": "^14.0.0",
-        "rambda": "^7.4.0"
+        "globals": "^15.9.0",
+        "rambda": "^9.2.1"
     },
     "devDependencies": {
         "@ben_12/eslint-plugin-dprint": "0.13.6",
         "@dprint/json": "0.19.3",
-        "@dprint/markdown": "0.17.4",
-        "@dprint/typescript": "^0.91.6",
+        "@dprint/markdown": "0.17.5",
+        "@dprint/typescript": "0.91.6",
         "@enormora/eslint-config-base": "0.0.13",
         "@enormora/eslint-config-mocha": "0.0.6",
         "@enormora/eslint-config-node": "0.0.12",
         "coveralls": "3.1.1",
-        "dprint": "^0.47.2",
+        "dprint": "0.47.2",
         "eslint": "9.9.0",
-        "eslint-doc-generator": "1.6.2",
+        "eslint-doc-generator": "1.7.1",
         "eslint-plugin-eslint-plugin": "6.2.0",
-        "markdownlint-cli": "0.39.0",
-        "mocha": "10.3.0",
-        "nyc": "15.1.0",
-        "pr-log": "6.1.0",
-        "release-it": "17.0.5",
-        "semver": "7.6.0"
+        "markdownlint-cli": "0.41.0",
+        "mocha": "10.7.3",
+        "nyc": "17.0.0",
+        "pr-log": "6.1.1",
+        "release-it": "17.6.0",
+        "semver": "7.6.3"
     },
     "peerDependencies": {
         "eslint": ">=9.0.0"
