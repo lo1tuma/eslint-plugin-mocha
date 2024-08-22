@@ -7,7 +7,7 @@ import globals from 'globals';
 
 export default [
     {
-        ignores: ['target/**/*', 'build/**/*', '.nyc_output/**/*']
+        ignores: ['target/**/*']
     },
     {
         files: ['**/*.js', '**/*.mjs'],
