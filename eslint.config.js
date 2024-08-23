@@ -3,17 +3,10 @@ import { baseConfig } from '@enormora/eslint-config-base';
 import { mochaConfig } from '@enormora/eslint-config-mocha';
 import { nodeConfig, nodeConfigFileConfig, nodeEntryPointFileConfig } from '@enormora/eslint-config-node';
 import eslintPluginEslintPlugin from 'eslint-plugin-eslint-plugin';
-import globals from 'globals';
 
 export default [
     {
         ignores: ['target/**/*']
-    },
-    {
-        files: ['**/*.js', '**/*.mjs'],
-        languageOptions: {
-            globals: globals.node
-        }
     },
     baseConfig,
     nodeConfig,
@@ -33,6 +26,8 @@ export default [
             'import/newline-after-import': 'off',
             'import/no-amd': 'off',
             'import/no-commonjs': 'off',
+            'import/no-useless-path-segments': 'off',
+            'import/first': 'off',
 
             // incompatible with dprint
             '@stylistic/indent-binary-ops': 'off'
@@ -40,7 +35,7 @@ export default [
     },
     {
         ...nodeConfigFileConfig,
-        files: ['eslint.config.mjs']
+        files: ['eslint.config.js']
     },
     {
         ...mochaConfig,
@@ -74,6 +69,12 @@ export default [
     {
         ...nodeEntryPointFileConfig,
         files: ['index.js']
+    },
+    {
+        files: ['index.js'],
+        rules: {
+            'import/no-default-export': 'off'
+        }
     },
     {
         files: ['lib/rules/**/*.js', 'test/rules/**/*.js'],

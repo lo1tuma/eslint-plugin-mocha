@@ -1,5 +1,5 @@
-const assert = require('node:assert');
-const { getTestCaseNames, getSuiteNames } = require('../../lib/util/names');
+import assert from 'node:assert';
+import { getSuiteNames, getTestCaseNames } from '../../lib/util/names.js';
 
 describe('mocha names', function () {
     describe('test case names', function () {

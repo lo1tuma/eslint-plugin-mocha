@@ -1,9 +1,10 @@
-const { RuleTester } = require('eslint');
-const { rules } = require('../../');
+import { RuleTester } from 'eslint';
+import plugin from '../../index.js';
+
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const expectedErrorMessage = 'Unexpected skipped mocha test.';
 
-ruleTester.run('no-skipped-tests', rules['no-skipped-tests'], {
+ruleTester.run('no-skipped-tests', plugin.rules['no-skipped-tests'], {
     valid: [
         'describe()',
         'it()',

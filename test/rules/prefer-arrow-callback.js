@@ -8,8 +8,9 @@
 // Requirements
 // ------------------------------------------------------------------------------
 
-const { RuleTester } = require('eslint');
-const { rules } = require('../../');
+import { RuleTester } from 'eslint';
+import plugin from '../../index.js';
+
 const ruleTester = new RuleTester({
     languageOptions: { ecmaVersion: 2017, sourceType: 'script' }
 });
@@ -23,7 +24,7 @@ const errors = [{
     type: 'FunctionExpression'
 }];
 
-ruleTester.run('prefer-arrow-callback', rules['prefer-arrow-callback'], {
+ruleTester.run('prefer-arrow-callback', plugin.rules['prefer-arrow-callback'], {
     valid: [
         'foo(a => a);',
         'foo(function*() {});',

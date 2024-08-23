@@ -1,9 +1,10 @@
-const { RuleTester } = require('eslint');
-const rule = require('../../lib/rules/no-global-tests');
+import { RuleTester } from 'eslint';
+import { noGlobalTestsRule } from '../../lib/rules/no-global-tests.js';
+
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const expectedErrorMessage = 'Unexpected global mocha test.';
 
-ruleTester.run('no-global-tests', rule, {
+ruleTester.run('no-global-tests', noGlobalTestsRule, {
     valid: [
         'describe();',
         'suite();',

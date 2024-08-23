@@ -1,11 +1,12 @@
-const { RuleTester } = require('eslint');
-const { rules } = require('../..');
+import { RuleTester } from 'eslint';
+import plugin from '../../index.js';
+
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
 const defaultErrorMessage = 'Unexpected empty test description.';
 const firstLine = { column: 1, line: 1 };
 
-ruleTester.run('no-empty-description', rules['no-empty-description'], {
+ruleTester.run('no-empty-description', plugin.rules['no-empty-description'], {
     valid: [
         'describe("some text")',
         'describe.only("some text")',

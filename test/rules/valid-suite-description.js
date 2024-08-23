@@ -1,8 +1,9 @@
-const { RuleTester } = require('eslint');
-const { rules } = require('../../');
+import { RuleTester } from 'eslint';
+import plugin from '../../index.js';
+
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
-ruleTester.run('valid-suite-description', rules['valid-suite-description'], {
+ruleTester.run('valid-suite-description', plugin.rules['valid-suite-description'], {
     valid: [
         {
             options: ['^[A-Z]'],

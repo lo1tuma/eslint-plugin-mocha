@@ -1,9 +1,10 @@
-const { RuleTester } = require('eslint');
-const { rules } = require('../../');
+import { RuleTester } from 'eslint';
+import plugin from '../../index.js';
+
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const expectedErrorMessage = 'Unexpected exclusive mocha test.';
 
-ruleTester.run('no-exclusive-tests', rules['no-exclusive-tests'], {
+ruleTester.run('no-exclusive-tests', plugin.rules['no-exclusive-tests'], {
     valid: [
         'describe()',
         'it()',

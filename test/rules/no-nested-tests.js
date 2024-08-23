@@ -1,8 +1,9 @@
-const { RuleTester } = require('eslint');
-const rule = require('../../lib/rules/no-nested-tests');
+import { RuleTester } from 'eslint';
+import { noNestedTestsRule } from '../../lib/rules/no-nested-tests.js';
+
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
-ruleTester.run('no-nested-tests', rule, {
+ruleTester.run('no-nested-tests', noNestedTestsRule, {
     valid: [
         'it()',
         'it(); it(); it()',

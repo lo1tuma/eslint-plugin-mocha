@@ -1,8 +1,8 @@
-const { RuleTester } = require('eslint');
-const { rules } = require('../../');
+import { RuleTester } from 'eslint';
+import plugin from '../../index.js';
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
-ruleTester.run('no-identical-title', rules['no-identical-title'], {
+ruleTester.run('no-identical-title', plugin.rules['no-identical-title'], {
     valid: [
         [
             'describe("describe", function() {',

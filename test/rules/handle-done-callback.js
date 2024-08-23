@@ -1,8 +1,8 @@
-const { RuleTester } = require('eslint');
-const { rules } = require('../../');
+import { RuleTester } from 'eslint';
+import plugin from '../../index.js';
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
-ruleTester.run('handle-done-callback', rules['handle-done-callback'], {
+ruleTester.run('handle-done-callback', plugin.rules['handle-done-callback'], {
     valid: [
         'foo(function (done) { });',
         'var foo = function (done) { };',

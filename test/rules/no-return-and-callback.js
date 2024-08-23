@@ -1,5 +1,6 @@
-const { RuleTester } = require('eslint');
-const { rules } = require('../../');
+import { RuleTester } from 'eslint';
+import plugin from '../../index.js';
+
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const message = 'Unexpected use of `return` in a test with callback';
 const es6LanguageOptions = {
@@ -7,7 +8,7 @@ const es6LanguageOptions = {
     ecmaVersion: 6
 };
 
-ruleTester.run('no-return-and-callback', rules['no-return-and-callback'], {
+ruleTester.run('no-return-and-callback', plugin.rules['no-return-and-callback'], {
     valid: [
         'it("title", function(done) { done(); });',
         'it("title", function(done) { foo.then(function() { return done(); }); });',
