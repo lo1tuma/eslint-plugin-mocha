@@ -1,29 +1,35 @@
-const assert = require('node:assert');
-const { runBenchmark, cpuSpeed, clearRequireCache } = require('./measure');
+import assert from 'node:assert';
+import { cpuSpeed, importFresh, runAsyncBenchmark } from './measure.js';
 
 const iterations = 50;
 
 describe('startup / require time', function () {
-    it('should not take longer as the defined budget to require the plugin', function () {
-        const cpuAgnosticBudget = 85_000;
+    it('should not take longer as the defined budget to require the plugin', async function () {
+        const cpuAgnosticBudget = 20_000;
         const budget = cpuAgnosticBudget / cpuSpeed;
 
-        const { medianDuration } = runBenchmark(() => {
-            clearRequireCache();
-            require('../index');
+        const { medianDuration } = await runAsyncBenchmark(async () => {
+            await importFresh('../index.js');
         }, iterations);
 
-        assert.strictEqual(medianDuration < budget, true);
+        assert.strictEqual(
+            medianDuration < budget,
+            true,
+            `Expected duration ${medianDuration} to be lower than budget ${budget}`
+        );
     });
 
-    it('should not consume more memory as the defined budget', function () {
-        const budget = 600_000;
+    it('should not consume more memory as the defined budget', async function () {
+        const budget = 225_000;
 
-        const { medianMemory } = runBenchmark(() => {
-            clearRequireCache();
-            require('../index');
+        const { medianMemory } = await runAsyncBenchmark(async () => {
+            await importFresh('../index.js');
         }, iterations);
 
-        assert.strictEqual(medianMemory < budget, true);
+        assert.strictEqual(
+            medianMemory < budget,
+            true,
+            `Expected memory ${medianMemory} to be lower than budget ${budget}`
+        );
     });
 });

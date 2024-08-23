@@ -1,9 +1,10 @@
-const { RuleTester } = require('eslint');
-const { rules } = require('../../');
+import { RuleTester } from 'eslint';
+import plugin from '../../index.js';
+
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const expectedErrorMessage = 'Unexpected pending mocha test.';
 
-ruleTester.run('no-pending-tests', rules['no-pending-tests'], {
+ruleTester.run('no-pending-tests', plugin.rules['no-pending-tests'], {
     valid: [
         'it()',
         'it("should be false", function() { assert(something, false); })',

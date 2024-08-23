@@ -1,12 +1,12 @@
-const { RuleTester } = require('eslint');
-const { rules } = require('../../');
+import { RuleTester } from 'eslint';
+import plugin from '../../index.js';
 const ruleTester = new RuleTester({
     languageOptions: { ecmaVersion: 2017, sourceType: 'script' }
 });
 const expectedErrorMessage = 'Do not pass arrow functions to it()';
 const errors = [{ message: expectedErrorMessage, column: 1, line: 1 }];
 
-ruleTester.run('no-mocha-arrows', rules['no-mocha-arrows'], {
+ruleTester.run('no-mocha-arrows', plugin.rules['no-mocha-arrows'], {
     valid: [
         'it()',
         'it(function() { assert(something, false); })',

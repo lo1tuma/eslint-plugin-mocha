@@ -1,5 +1,6 @@
-const { RuleTester } = require('eslint');
-const { rules } = require('../../');
+import { RuleTester } from 'eslint';
+import plugin from '../../index.js';
+
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const message = 'Unexpected use of `return` in a test with an async function';
 const es6LanguageOptions = {
@@ -7,7 +8,7 @@ const es6LanguageOptions = {
     ecmaVersion: 8
 };
 
-ruleTester.run('no-return-from-async', rules['no-return-from-async'], {
+ruleTester.run('no-return-from-async', plugin.rules['no-return-from-async'], {
     valid: [
         {
             code: 'it("title", async function() {});',

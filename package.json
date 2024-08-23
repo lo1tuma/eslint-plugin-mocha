@@ -2,10 +2,12 @@
     "name": "eslint-plugin-mocha",
     "version": "10.4.0",
     "description": "Eslint rules for mocha.",
+    "type": "module",
     "engines": {
         "node": ">=20.0.0"
     },
     "main": "index.js",
+    "exports": "./index.js",
     "files": [
         "index.js",
         "lib/",
@@ -44,6 +46,7 @@
         "@enormora/eslint-config-mocha": "0.0.6",
         "@enormora/eslint-config-node": "0.0.12",
         "c8": "^10.1.2",
+        "change-case": "^5.4.4",
         "coveralls": "3.1.1",
         "dprint": "0.47.2",
         "eslint": "9.9.0",

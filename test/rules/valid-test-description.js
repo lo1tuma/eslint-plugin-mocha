@@ -1,8 +1,9 @@
-const { RuleTester } = require('eslint');
-const { rules } = require('../../');
+import { RuleTester } from 'eslint';
+import plugin from '../../index.js';
+
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
-ruleTester.run('valid-test-description', rules['valid-test-description'], {
+ruleTester.run('valid-test-description', plugin.rules['valid-test-description'], {
     valid: [
         'it("should respond to GET", function() { });',
         'it("should do something");',

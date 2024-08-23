@@ -1,8 +1,9 @@
-const { RuleTester } = require('eslint');
-const { rules } = require('../../');
+import { RuleTester } from 'eslint';
+import plugin from '../../index.js';
+
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
-ruleTester.run('no-synchronous-tests', rules['no-synchronous-tests'], {
+ruleTester.run('no-synchronous-tests', plugin.rules['no-synchronous-tests'], {
     valid: [
         'it();',
         'it("");',

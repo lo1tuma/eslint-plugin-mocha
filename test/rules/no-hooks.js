@@ -1,8 +1,8 @@
-const { RuleTester } = require('eslint');
-const { rules } = require('../../');
+import { RuleTester } from 'eslint';
+import plugin from '../../index.js';
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
-ruleTester.run('no-hooks', rules['no-hooks'], {
+ruleTester.run('no-hooks', plugin.rules['no-hooks'], {
     valid: [
         'describe(function() { it(function() {}); });',
         'describe(function() { it(function() {}); it(function() {}); });',

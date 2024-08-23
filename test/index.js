@@ -1,9 +1,13 @@
-const assert = require('node:assert');
-const fs = require('node:fs');
-const path = require('node:path');
-const rulesDir = path.join(__dirname, '../lib/rules/');
-const documentationDir = path.join(__dirname, '../docs/rules/');
-const plugin = require('..');
+import { camelCase } from 'change-case';
+import assert from 'node:assert';
+import fs from 'node:fs';
+import path from 'node:path';
+import plugin from '../index.js';
+
+const { pathname: currentFolderName } = new URL('.', import.meta.url);
+
+const rulesDir = path.join(currentFolderName, '../lib/rules/');
+const documentationDir = path.join(currentFolderName, '../docs/rules/');
 
 async function determineAllRuleFiles() {
     const ruleFiles = await fs.promises.readdir(rulesDir);
@@ -30,11 +34,14 @@ describe('eslint-plugin-mocha', function () {
     it('should expose all rules', async function () {
         const ruleFiles = await determineAllRuleFiles();
 
-        ruleFiles.forEach(function (file) {
+        for (const file of ruleFiles) {
             const ruleName = path.basename(file, '.js');
+            const importedRuleModule = await import(path.join(rulesDir, file));
+            const importedRule = importedRuleModule[`${camelCase(ruleName)}Rule`];
 
-            assert.strictEqual(plugin.rules[ruleName], require(rulesDir + ruleName));
-        });
+            assert.notStrictEqual(importedRule, undefined);
+            assert.strictEqual(plugin.rules[ruleName], importedRule);
+        }
     });
 
     describe('documentation', function () {

@@ -1,8 +1,8 @@
-const { RuleTester } = require('eslint');
-const rule = require('../../lib/rules/no-async-describe');
+import { RuleTester } from 'eslint';
+import { noAsyncDescribeRule } from '../../lib/rules/no-async-describe.js';
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
-ruleTester.run('no-async-describe', rule, {
+ruleTester.run('no-async-describe', noAsyncDescribeRule, {
     valid: [
         'describe()',
         'describe("hello")',

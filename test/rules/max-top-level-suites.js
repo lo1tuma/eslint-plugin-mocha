@@ -1,8 +1,8 @@
-const { RuleTester } = require('eslint');
-const { rules } = require('../../');
+import { RuleTester } from 'eslint';
+import plugin from '../../index.js';
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
-ruleTester.run('max-top-level-suites', rules['max-top-level-suites'], {
+ruleTester.run('max-top-level-suites', plugin.rules['max-top-level-suites'], {
     valid: [
         {
             code: 'describe("This is a test", function () { });'

@@ -1,24 +1,29 @@
-const os = require('node:os');
-const { performance: performanceHooks } = require('node:perf_hooks');
-const { times, median, map, prop } = require('rambda');
+import os from 'node:os';
+import { performance as performanceHooks } from 'node:perf_hooks';
+import { filter, lte as isLowerThanOrEquals, map, median, prop, times } from 'rambda';
 
 const [{ speed: cpuSpeed }] = os.cpus();
 
-function clearRequireCache() {
-    Object.keys(require.cache).forEach((key) => {
-        delete require.cache[key];
-    });
+export { cpuSpeed };
+
+export async function importFresh(modulePath) {
+    const cacheBuster = `${performanceHooks.now()}_${Math.random()}`;
+    const cacheBustingModulePath = `${modulePath}?buster=${cacheBuster}`;
+
+    await import(cacheBustingModulePath);
 }
 
-function runBenchmark(fn, count) {
+const isPositiveNumber = isLowerThanOrEquals(0);
+
+export function runSyncBenchmark(fn, count) {
     const results = [];
 
     times(() => {
         const startTime = performanceHooks.now();
-        const startMemory = process.memoryUsage().rss;
+        const startMemory = process.memoryUsage.rss();
         fn();
         const endTime = performanceHooks.now();
-        const endMemory = process.memoryUsage().rss;
+        const endMemory = process.memoryUsage.rss();
         const duration = endTime - startTime;
         const memory = endMemory - startMemory;
 
@@ -26,13 +31,33 @@ function runBenchmark(fn, count) {
     }, count);
 
     const medianDuration = median(map(prop('duration'), results));
-    const medianMemory = median(map(prop('memory'), results));
+    const medianMemory = median(filter(isPositiveNumber, map(prop('memory'), results)));
 
     return { medianDuration, medianMemory };
 }
 
-module.exports = {
-    runBenchmark,
-    clearRequireCache,
-    cpuSpeed
-};
+async function measureSingleAsyncTask(fn) {
+    const startTime = performanceHooks.now();
+    const startMemory = process.memoryUsage().rss;
+    await fn();
+    const endTime = performanceHooks.now();
+    const endMemory = process.memoryUsage().rss;
+    const duration = endTime - startTime;
+    const memory = endMemory - startMemory;
+
+    return { duration, memory };
+}
+
+export async function runAsyncBenchmark(fn, count) {
+    const results = [];
+
+    for (let iteration = 0; iteration < count; iteration += 1) {
+        const result = await measureSingleAsyncTask(fn);
+        results.push(result);
+    }
+
+    const medianDuration = median(map(prop('duration'), results));
+    const medianMemory = median(filter(isPositiveNumber, map(prop('memory'), results)));
+
+    return { medianDuration, medianMemory };
+}

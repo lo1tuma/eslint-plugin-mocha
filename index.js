@@ -1,4 +1,28 @@
-const globals = require('globals');
+import globals from 'globals';
+import { consistentSpacingBetweenBlocksRule } from './lib/rules/consistent-spacing-between-blocks.js';
+import { handleDoneCallbackRule } from './lib/rules/handle-done-callback.js';
+import { maxTopLevelSuitesRule } from './lib/rules/max-top-level-suites.js';
+import { noAsyncDescribeRule } from './lib/rules/no-async-describe.js';
+import { noEmptyDescriptionRule } from './lib/rules/no-empty-description.js';
+import { noExclusiveTestsRule } from './lib/rules/no-exclusive-tests.js';
+import { noExportsRule } from './lib/rules/no-exports.js';
+import { noGlobalTestsRule } from './lib/rules/no-global-tests.js';
+import { noHooksForSingleCaseRule } from './lib/rules/no-hooks-for-single-case.js';
+import { noHooksRule } from './lib/rules/no-hooks.js';
+import { noIdenticalTitleRule } from './lib/rules/no-identical-title.js';
+import { noMochaArrowsRule } from './lib/rules/no-mocha-arrows.js';
+import { noNestedTestsRule } from './lib/rules/no-nested-tests.js';
+import { noPendingTestsRule } from './lib/rules/no-pending-tests.js';
+import { noReturnAndCallbackRule } from './lib/rules/no-return-and-callback.js';
+import { noReturnFromAsyncRule } from './lib/rules/no-return-from-async.js';
+import { noSetupInDescribeRule } from './lib/rules/no-setup-in-describe.js';
+import { noSiblingHooksRule } from './lib/rules/no-sibling-hooks.js';
+import { noSkippedTestsRule } from './lib/rules/no-skipped-tests.js';
+import { noSynchronousTestsRule } from './lib/rules/no-synchronous-tests.js';
+import { noTopLevelHooksRule } from './lib/rules/no-top-level-hooks.js';
+import { preferArrowCallbackRule } from './lib/rules/prefer-arrow-callback.js';
+import { validSuiteDescriptionRule } from './lib/rules/valid-suite-description.js';
+import { validTestDescriptionRule } from './lib/rules/valid-test-description.js';
 
 const allRules = {
     'mocha/handle-done-callback': 'error',
@@ -54,32 +78,32 @@ const recommendedRules = {
     'mocha/consistent-spacing-between-blocks': 'error'
 };
 
-const mod = {
+const mochaPlugin = {
     rules: {
-        'handle-done-callback': require('./lib/rules/handle-done-callback'),
-        'max-top-level-suites': require('./lib/rules/max-top-level-suites'),
-        'no-async-describe': require('./lib/rules/no-async-describe'),
-        'no-exclusive-tests': require('./lib/rules/no-exclusive-tests'),
-        'no-exports': require('./lib/rules/no-exports'),
-        'no-global-tests': require('./lib/rules/no-global-tests'),
-        'no-hooks': require('./lib/rules/no-hooks'),
-        'no-hooks-for-single-case': require('./lib/rules/no-hooks-for-single-case'),
-        'no-identical-title': require('./lib/rules/no-identical-title'),
-        'no-mocha-arrows': require('./lib/rules/no-mocha-arrows'),
-        'no-nested-tests': require('./lib/rules/no-nested-tests'),
-        'no-pending-tests': require('./lib/rules/no-pending-tests'),
-        'no-return-and-callback': require('./lib/rules/no-return-and-callback'),
-        'no-return-from-async': require('./lib/rules/no-return-from-async'),
-        'no-setup-in-describe': require('./lib/rules/no-setup-in-describe'),
-        'no-sibling-hooks': require('./lib/rules/no-sibling-hooks'),
-        'no-skipped-tests': require('./lib/rules/no-skipped-tests'),
-        'no-synchronous-tests': require('./lib/rules/no-synchronous-tests'),
-        'no-top-level-hooks': require('./lib/rules/no-top-level-hooks'),
-        'prefer-arrow-callback': require('./lib/rules/prefer-arrow-callback'),
-        'valid-suite-description': require('./lib/rules/valid-suite-description'),
-        'valid-test-description': require('./lib/rules/valid-test-description'),
-        'no-empty-description': require('./lib/rules/no-empty-description.js'),
-        'consistent-spacing-between-blocks': require('./lib/rules/consistent-spacing-between-blocks.js')
+        'handle-done-callback': handleDoneCallbackRule,
+        'max-top-level-suites': maxTopLevelSuitesRule,
+        'no-async-describe': noAsyncDescribeRule,
+        'no-exclusive-tests': noExclusiveTestsRule,
+        'no-exports': noExportsRule,
+        'no-global-tests': noGlobalTestsRule,
+        'no-hooks': noHooksRule,
+        'no-hooks-for-single-case': noHooksForSingleCaseRule,
+        'no-identical-title': noIdenticalTitleRule,
+        'no-mocha-arrows': noMochaArrowsRule,
+        'no-nested-tests': noNestedTestsRule,
+        'no-pending-tests': noPendingTestsRule,
+        'no-return-and-callback': noReturnAndCallbackRule,
+        'no-return-from-async': noReturnFromAsyncRule,
+        'no-setup-in-describe': noSetupInDescribeRule,
+        'no-sibling-hooks': noSiblingHooksRule,
+        'no-skipped-tests': noSkippedTestsRule,
+        'no-synchronous-tests': noSynchronousTestsRule,
+        'no-top-level-hooks': noTopLevelHooksRule,
+        'prefer-arrow-callback': preferArrowCallbackRule,
+        'valid-suite-description': validSuiteDescriptionRule,
+        'valid-test-description': validTestDescriptionRule,
+        'no-empty-description': noEmptyDescriptionRule,
+        'consistent-spacing-between-blocks': consistentSpacingBetweenBlocksRule
     },
     configs: {
         all: {
@@ -95,19 +119,19 @@ const mod = {
     }
 };
 
-mod.configs.flat = {
+mochaPlugin.configs.flat = {
     all: {
         name: 'mocha/all',
-        plugins: { mocha: mod },
+        plugins: { mocha: mochaPlugin },
         languageOptions: { globals: globals.mocha },
         rules: allRules
     },
     recommended: {
         name: 'mocha/recommended',
-        plugins: { mocha: mod },
+        plugins: { mocha: mochaPlugin },
         languageOptions: { globals: globals.mocha },
         rules: recommendedRules
     }
 };
 
-module.exports = mod;
+export default mochaPlugin;

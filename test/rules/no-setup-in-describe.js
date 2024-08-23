@@ -1,10 +1,11 @@
-const { RuleTester } = require('eslint');
-const rule = require('../../lib/rules/no-setup-in-describe');
+import { RuleTester } from 'eslint';
+import { noSetupInDescribeRule } from '../../lib/rules/no-setup-in-describe.js';
+
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const memberExpressionError = 'Unexpected member expression in describe block. ' +
     'Member expressions may call functions via getters.';
 
-ruleTester.run('no-setup-in-describe', rule, {
+ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
     valid: [
         'it()',
         'it(); it(); it()',

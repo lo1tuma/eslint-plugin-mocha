@@ -1,8 +1,8 @@
-const { RuleTester } = require('eslint');
-const { rules } = require('../../');
+import { RuleTester } from 'eslint';
+import plugin from '../../index.js';
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
-ruleTester.run('no-hooks-for-single-case', rules['no-hooks-for-single-case'], {
+ruleTester.run('no-hooks-for-single-case', plugin.rules['no-hooks-for-single-case'], {
     valid: [
         [
             'describe(function() {',

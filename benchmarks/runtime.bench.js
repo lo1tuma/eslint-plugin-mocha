@@ -1,11 +1,8 @@
-const assert = require('node:assert');
-const { Linter } = require('eslint');
-const { times } = require('rambda');
-const {
-    runBenchmark,
-    cpuSpeed
-} = require('./measure');
-const mochaPlugin = require('../');
+import { Linter } from 'eslint';
+import assert from 'node:assert';
+import { times } from 'rambda';
+import mochaPlugin from '../index.js';
+import { cpuSpeed, runSyncBenchmark } from './measure.js';
 
 const allRules = mochaPlugin.configs.all.rules;
 
@@ -17,6 +14,7 @@ function lintManyFilesWithAllRecommendedRules(options) {
         plugins: { mocha: mochaPlugin },
         rules: allRules,
         languageOptions: {
+            sourceType: 'script',
             ecmaVersion: 2018
         }
     };
@@ -82,23 +80,31 @@ const iterations = 50;
 
 describe('runtime', function () {
     it('should not take longer as the defined budget to lint many files with the recommended config', function () {
-        const cpuAgnosticBudget = 3_750_000;
+        const cpuAgnosticBudget = 3_250_000;
         const budget = cpuAgnosticBudget / cpuSpeed;
 
-        const { medianDuration } = runBenchmark(() => {
+        const { medianDuration } = runSyncBenchmark(() => {
             lintManyFilesWithAllRecommendedRules({ numberOfFiles: 350 });
         }, iterations);
 
-        assert.strictEqual(medianDuration < budget, true);
+        assert.strictEqual(
+            medianDuration < budget,
+            true,
+            `Expected duration ${medianDuration} to be lower than budget ${budget}`
+        );
     });
 
     it('should not consume more memory as the defined budget to lint many files with the recommended config', function () {
-        const budget = 2_750_000;
+        const budget = 2_250_000;
 
-        const { medianMemory } = runBenchmark(() => {
+        const { medianMemory } = runSyncBenchmark(() => {
             lintManyFilesWithAllRecommendedRules({ numberOfFiles: 350 });
         }, iterations);
 
-        assert.strictEqual(medianMemory < budget, true);
+        assert.strictEqual(
+            medianMemory < budget,
+            true,
+            `Expected memory ${medianMemory} to be lower than budget ${budget}`
+        );
     });
 });
