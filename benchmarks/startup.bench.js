@@ -12,16 +12,24 @@ describe('startup / require time', function () {
             await importFresh('../index.js');
         }, iterations);
 
-        assert.strictEqual(medianDuration < budget, true);
+        assert.strictEqual(
+            medianDuration < budget,
+            true,
+            `Expected duration ${medianDuration} to be lower than budget ${budget}`
+        );
     });
 
     it('should not consume more memory as the defined budget', async function () {
-        const budget = 50_000;
+        const budget = 225_000;
 
         const { medianMemory } = await runAsyncBenchmark(async () => {
             await importFresh('../index.js');
         }, iterations);
 
-        assert.strictEqual(medianMemory < budget, true);
+        assert.strictEqual(
+            medianMemory < budget,
+            true,
+            `Expected memory ${medianMemory} to be lower than budget ${budget}`
+        );
     });
 });

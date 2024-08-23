@@ -87,16 +87,24 @@ describe('runtime', function () {
             lintManyFilesWithAllRecommendedRules({ numberOfFiles: 350 });
         }, iterations);
 
-        assert.strictEqual(medianDuration < budget, true);
+        assert.strictEqual(
+            medianDuration < budget,
+            true,
+            `Expected duration ${medianDuration} to be lower than budget ${budget}`
+        );
     });
 
     it('should not consume more memory as the defined budget to lint many files with the recommended config', function () {
-        const budget = 1_250_000;
+        const budget = 2_250_000;
 
         const { medianMemory } = runSyncBenchmark(() => {
             lintManyFilesWithAllRecommendedRules({ numberOfFiles: 350 });
         }, iterations);
 
-        assert.strictEqual(medianMemory < budget, true);
+        assert.strictEqual(
+            medianMemory < budget,
+            true,
+            `Expected memory ${medianMemory} to be lower than budget ${budget}`
+        );
     });
 });

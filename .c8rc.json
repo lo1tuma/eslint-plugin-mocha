@@ -5,11 +5,11 @@
     "functions": 100,
     "branches": 100,
     "check-coverage": true,
-    "extension": [".js", ".mjs"],
+    "extension": [".js"],
     "instrument": false,
     "src": ".",
     "reporter": ["lcov", "text-summary"],
     "reportDir": "./target/coverage",
     "tempDirectory": "./target/c8-temporary-output",
-    "exclude": ["target", "test", "benchmarks/", "eslint.config.mjs"]
+    "exclude": ["target", "test", "benchmarks/", "eslint.config.js"]
 }

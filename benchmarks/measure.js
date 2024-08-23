@@ -1,6 +1,6 @@
 import os from 'node:os';
 import { performance as performanceHooks } from 'node:perf_hooks';
-import { filter, lt as isLowerThan, map, median, prop, times } from 'rambda';
+import { filter, lte as isLowerThanOrEquals, map, median, prop, times } from 'rambda';
 
 const [{ speed: cpuSpeed }] = os.cpus();
 
@@ -13,7 +13,7 @@ export async function importFresh(modulePath) {
     await import(cacheBustingModulePath);
 }
 
-const isNegative = isLowerThan(0);
+const isPositiveNumber = isLowerThanOrEquals(0);
 
 export function runSyncBenchmark(fn, count) {
     const results = [];
@@ -31,7 +31,7 @@ export function runSyncBenchmark(fn, count) {
     }, count);
 
     const medianDuration = median(map(prop('duration'), results));
-    const medianMemory = median(filter(isNegative, map(prop('memory'), results)));
+    const medianMemory = median(filter(isPositiveNumber, map(prop('memory'), results)));
 
     return { medianDuration, medianMemory };
 }
@@ -57,7 +57,7 @@ export async function runAsyncBenchmark(fn, count) {
     }
 
     const medianDuration = median(map(prop('duration'), results));
-    const medianMemory = median(filter(isNegative, map(prop('memory'), results)));
+    const medianMemory = median(filter(isPositiveNumber, map(prop('memory'), results)));
 
     return { medianDuration, medianMemory };
 }
