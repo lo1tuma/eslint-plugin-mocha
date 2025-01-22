@@ -1,4 +1,4 @@
-# Disallow duplicate uses of a hook at the same level inside a describe (`mocha/no-sibling-hooks`)
+# Disallow duplicate uses of a hook at the same level inside a suite (`mocha/no-sibling-hooks`)
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

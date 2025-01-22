@@ -31,7 +31,7 @@ ruleTester.run('no-async-describe', noAsyncDescribeRule, {
             output: 'foo("hello", function () {})',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
                 }
             },
             languageOptions: { ecmaVersion: 8 },
@@ -79,7 +79,7 @@ ruleTester.run('no-async-describe', noAsyncDescribeRule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'describe.foo()', type: 'suite', interfaces: ['BDD'] }
+                        { name: 'describe.foo()', type: 'suite', interface: 'BDD' }
                     ]
                 }
             },
@@ -96,7 +96,7 @@ ruleTester.run('no-async-describe', noAsyncDescribeRule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'forEach().describe.foo', type: 'suite', interfaces: ['BDD'] }
+                        { name: 'forEach().describe.foo', type: 'suite', interface: 'BDD' }
                     ]
                 }
             },

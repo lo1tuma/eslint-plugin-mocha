@@ -32,7 +32,7 @@ ruleTester.run('handle-done-callback', plugin.rules['handle-done-callback'], {
         },
         {
             code: 'it.skip("", function (done) { });',
-            options: [{ ignoreSkipped: true }]
+            options: [{ ignorePending: true }]
         }
     ],
 

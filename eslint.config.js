@@ -44,8 +44,9 @@ export default [
     {
         files: ['test/index.js', '**/*.test.js', '**/*Spec.js', 'benchmarks/**/*.bench.js'],
         rules: {
-            'max-statements': ['error', { max: 15 }],
-            'max-nested-callbacks': ['error', { max: 8 }]
+            'max-statements': ['error', { max: 50 }],
+            'max-nested-callbacks': ['error', { max: 8 }],
+            'no-magic-numbers': 'off'
         }
     },
     {

@@ -15,28 +15,26 @@ ruleTester.run('valid-test-description', plugin.rules['valid-test-description'],
         'specify();',
         'test();',
         {
-            options: ['test'],
-            code: 'it("this is a test", function () { });'
-        },
-        {
-            options: ['test'],
+            options: [{ pattern: 'test' }],
             code: 'test("this is a test", function () { });'
         },
         {
-            options: ['^should', ['someFunction']],
-            code: 'it("this is a test", function () { });'
+            options: [{ pattern: '^should' }],
+            code: 'someFunction("should do something", function () { });',
+            settings: {
+                mocha: {
+                    additionalCustomNames: [{ name: 'someFunction', type: 'testCase', interface: 'BDD' }]
+                }
+            }
         },
         {
-            options: ['^should', ['someFunction']],
-            code: 'someFunction("should do something", function () { });'
-        },
-        {
-            options: ['^should', ['someFunction'], 'some error message'],
-            code: 'someFunction("should do something", function () { });'
-        },
-        {
-            options: [{ pattern: '^should', testNames: ['someFunction'], message: 'some error message' }],
-            code: 'someFunction("should do something", function () { });'
+            options: [{ pattern: '^should', message: 'some error message' }],
+            code: 'someFunction("should do something", function () { });',
+            settings: {
+                mocha: {
+                    additionalCustomNames: [{ name: 'someFunction', type: 'testCase', interface: 'BDD' }]
+                }
+            }
         },
         'someOtherFunction();',
         {
@@ -73,42 +71,45 @@ ruleTester.run('valid-test-description', plugin.rules['valid-test-description'],
             ]
         },
         {
-            options: ['required'],
+            options: [{ pattern: 'required' }],
             code: 'it("this is a test", function () { });',
             errors: [
                 { message: 'Invalid "it()" description found.' }
             ]
         },
         {
-            options: ['required'],
+            options: [{ pattern: 'required' }],
             code: 'specify("this is a test", function () { });',
             errors: [
                 { message: 'Invalid "specify()" description found.' }
             ]
         },
         {
-            options: ['required'],
+            options: [{ pattern: 'required' }],
             code: 'test("this is a test", function () { });',
             errors: [
                 { message: 'Invalid "test()" description found.' }
             ]
         },
         {
-            options: ['required', ['customFunction']],
+            options: [{ pattern: 'required' }],
             code: 'customFunction("this is a test", function () { });',
+            settings: {
+                mocha: {
+                    additionalCustomNames: [{ name: 'customFunction', type: 'testCase', interface: 'BDD' }]
+                }
+            },
             errors: [
                 { message: 'Invalid "customFunction()" description found.' }
             ]
         },
         {
-            options: ['required', ['customFunction'], 'some error message'],
-            code: 'customFunction("this is a test", function () { });',
-            errors: [
-                { message: 'some error message' }
-            ]
-        },
-        {
-            options: [{ pattern: 'required', testNames: ['customFunction'], message: 'some error message' }],
+            options: [{ pattern: 'required', message: 'some error message' }],
+            settings: {
+                mocha: {
+                    additionalCustomNames: [{ name: 'customFunction', type: 'testCase', interface: 'BDD' }]
+                }
+            },
             code: 'customFunction("this is a test", function () { });',
             errors: [
                 { message: 'some error message' }

@@ -9,13 +9,12 @@ This rule enforces the suite descriptions to follow the desired format.
 ## Rule Details
 
 By default, the regular expression is not configured and would be required if rule is enabled.
-By default, the rule supports "describe", "context" and "suite" suite function names, but it can be configured to look for different suite names via rule configuration.
 
 Example of a custom rule configuration:
 
 ```js
 rules: {
-   "mocha/valid-suite-description": ["warn", "^[A-Z]"]
+   "mocha/valid-suite-description": ["warn", { pattern: "^[A-Z]", message: 'custom error message' }]
 },
 ```
 

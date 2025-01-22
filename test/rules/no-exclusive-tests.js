@@ -18,14 +18,15 @@ ruleTester.run('no-exclusive-tests', plugin.rules['no-exclusive-tests'], {
         'context.skip()',
         'var appliedOnly = describe.only; appliedOnly.apply(describe)',
         'var calledOnly = it.only; calledOnly.call(it)',
-        'var dynamicOnly = "only"; suite[dynamicOnly]()',
+        'var dynamicOnly = "onl"; dynamicOnly += "y"; suite[dynamicOnly]()',
+        'function foo() { var it; it.only(); }',
         'specify()',
         'specify.skip()',
         {
             code: 'a.b.c.skip()',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'a.b.c', type: 'testCase', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'a.b.c', type: 'testCase', interface: 'BDD' }]
                 }
             }
         },
@@ -33,17 +34,25 @@ ruleTester.run('no-exclusive-tests', plugin.rules['no-exclusive-tests'], {
             code: 'a[b].c.skip()',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'a.b.c', type: 'testCase', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'a.b.c', type: 'testCase', interface: 'BDD' }]
                 }
             }
         },
         {
-            code: 'a.b().c.skip()',
-            settings: {
-                mocha: {
-                    additionalCustomNames: [{ name: 'a.b().c', type: 'testCase', interfaces: ['BDD'] }]
-                }
-            }
+            code: 'import { it} from "mocha"; it.only()',
+            languageOptions: {
+                ecmaVersion: 2018,
+                sourceType: 'module'
+            },
+            settings: { mocha: { interface: 'BDD' } }
+        },
+        {
+            code: 'import { it as foo } from "mocha"; foo.only()',
+            languageOptions: {
+                ecmaVersion: 2018,
+                sourceType: 'module'
+            },
+            settings: { mocha: { interface: 'BDD' } }
         }
     ],
 
@@ -59,6 +68,33 @@ ruleTester.run('no-exclusive-tests', plugin.rules['no-exclusive-tests'], {
         {
             code: 'it.only()',
             errors: [{ message: expectedErrorMessage, column: 4, line: 1 }]
+        },
+        {
+            code: 'import { it } from "mocha"; it.only()',
+            languageOptions: {
+                ecmaVersion: 2018,
+                sourceType: 'module'
+            },
+            settings: { mocha: { interface: 'exports' } },
+            errors: [{ message: expectedErrorMessage, column: 32, line: 1 }]
+        },
+        {
+            code: 'import { it as foo } from "mocha"; foo.only()',
+            languageOptions: {
+                ecmaVersion: 2018,
+                sourceType: 'module'
+            },
+            settings: { mocha: { interface: 'exports' } },
+            errors: [{ message: expectedErrorMessage, column: 40, line: 1 }]
+        },
+        {
+            code: 'import { it as foo } from "mocha"; const bar = foo; bar.only()',
+            languageOptions: {
+                ecmaVersion: 2018,
+                sourceType: 'module'
+            },
+            settings: { mocha: { interface: 'exports' } },
+            errors: [{ message: expectedErrorMessage, column: 57, line: 1 }]
         },
         {
             code: 'it["only"]()',
@@ -99,14 +135,14 @@ ruleTester.run('no-exclusive-tests', plugin.rules['no-exclusive-tests'], {
         {
             code: 'custom.only()',
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'custom', type: 'testCase', interfaces: ['BDD'] }]
+                'mocha/additionalCustomNames': [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
             },
             errors: [{ message: expectedErrorMessage, column: 8, line: 1 }]
         },
         {
             code: 'custom["only"]()',
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'custom', type: 'testCase', interfaces: ['BDD'] }]
+                'mocha/additionalCustomNames': [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
             },
             errors: [{ message: expectedErrorMessage, column: 8, line: 1 }]
         },
@@ -114,7 +150,7 @@ ruleTester.run('no-exclusive-tests', plugin.rules['no-exclusive-tests'], {
             code: 'custom.only()',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'custom', type: 'testCase', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
                 }
             },
             errors: [{ message: expectedErrorMessage, column: 8, line: 1 }]
@@ -123,7 +159,7 @@ ruleTester.run('no-exclusive-tests', plugin.rules['no-exclusive-tests'], {
             code: 'custom["only"]()',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'custom', type: 'testCase', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
                 }
             },
             errors: [{ message: expectedErrorMessage, column: 8, line: 1 }]
@@ -132,7 +168,7 @@ ruleTester.run('no-exclusive-tests', plugin.rules['no-exclusive-tests'], {
             code: 'foo.bar.only()',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo.bar', type: 'testCase', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'foo.bar', type: 'testCase', interface: 'BDD' }]
                 }
             },
             errors: [{ message: expectedErrorMessage, column: 9, line: 1 }]
@@ -141,7 +177,7 @@ ruleTester.run('no-exclusive-tests', plugin.rules['no-exclusive-tests'], {
             code: 'foo.bar["only"]()',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo.bar', type: 'testCase', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'foo.bar', type: 'testCase', interface: 'BDD' }]
                 }
             },
             errors: [{ message: expectedErrorMessage, column: 9, line: 1 }]
@@ -150,7 +186,7 @@ ruleTester.run('no-exclusive-tests', plugin.rules['no-exclusive-tests'], {
             code: 'foo["bar"].only()',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo.bar', type: 'testCase', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'foo.bar', type: 'testCase', interface: 'BDD' }]
                 }
             },
             errors: [{ message: expectedErrorMessage, column: 12, line: 1 }]
@@ -159,7 +195,7 @@ ruleTester.run('no-exclusive-tests', plugin.rules['no-exclusive-tests'], {
             code: 'foo["bar"]["only"]()',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo.bar', type: 'testCase', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'foo.bar', type: 'testCase', interface: 'BDD' }]
                 }
             },
             errors: [{ message: expectedErrorMessage, column: 12, line: 1 }]
@@ -168,28 +204,10 @@ ruleTester.run('no-exclusive-tests', plugin.rules['no-exclusive-tests'], {
             code: 'a.b.c.only()',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'a.b.c', type: 'testCase', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'a.b.c', type: 'testCase', interface: 'BDD' }]
                 }
             },
             errors: [{ message: expectedErrorMessage, column: 7, line: 1 }]
-        },
-        {
-            code: 'this.it.only()',
-            settings: {
-                mocha: {
-                    additionalCustomNames: [{ name: 'this.it', type: 'testCase', interfaces: ['BDD'] }]
-                }
-            },
-            errors: [{ message: expectedErrorMessage, column: 9, line: 1 }]
-        },
-        {
-            code: 'foo("bar").it.only()',
-            settings: {
-                mocha: {
-                    additionalCustomNames: [{ name: 'foo().it', type: 'testCase', interfaces: ['BDD'] }]
-                }
-            },
-            errors: [{ message: expectedErrorMessage, column: 15, line: 1 }]
         }
     ]
 });

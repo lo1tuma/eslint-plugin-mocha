@@ -5,10 +5,15 @@ const ruleTester = new RuleTester({ languageOptions: { ecmaVersion: 2020, source
 
 ruleTester.run('require-spacing-between-mocha-calls', consistentSpacingBetweenBlocksRule, {
     valid: [
-        // Basic describe block
-        `describe('My Test', () => {
+        `describe();
+
+        describe();`,
+
+        {
+            code: `describe('My Test', () => {
             it('does something', () => {});
-        });`,
+        });`
+        },
 
         // Proper line break before each block within describe
         `describe('My Test', () => {
@@ -34,8 +39,8 @@ ruleTester.run('require-spacing-between-mocha-calls', consistentSpacingBetweenBl
             afterEach(() => {});
         });`,
 
-        // Mocha functions outside of a describe block
         `it('does something outside a describe block', () => {});
+
         afterEach(() => {});`
     ],
 
@@ -108,6 +113,28 @@ ruleTester.run('require-spacing-between-mocha-calls', consistentSpacingBetweenBl
                 '\n\n' +
                 "it('block two', () => {});" +
                 '});',
+            errors: [
+                {
+                    message: 'Expected line break before this statement.',
+                    type: 'CallExpression'
+                }
+            ]
+        },
+
+        {
+            code: 'describe();describe();',
+            output: 'describe();\n\ndescribe();',
+            errors: [
+                {
+                    message: 'Expected line break before this statement.',
+                    type: 'CallExpression'
+                }
+            ]
+        },
+
+        {
+            code: 'describe();\ndescribe();',
+            output: 'describe();\n\ndescribe();',
             errors: [
                 {
                     message: 'Expected line break before this statement.',

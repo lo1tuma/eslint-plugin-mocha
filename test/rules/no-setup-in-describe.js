@@ -21,7 +21,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
         'describe.skip("", function () { it(); })',
         'describe.only("", function () { it(); })',
         'describe["only"]("", function () { it(); })',
-        'describe("", function () { this.slow(1); it(); })',
+        { code: 'describe("", function () { this.slow(1); it(); })' },
         'describe("", function () { this.timeout(1); it(); })',
         'describe("", function () { this.retries(1); it(); })',
         'describe("", function () { this["retries"](1); it(); })',
@@ -31,7 +31,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
         'describe("", function () { it("", function () { a["b"]; }); })',
         'describe("", function () { it("", function () { this.slow(1); }); })',
         'describe("", function () { it("", function () { this.timeout(1); }); })',
-        'describe("", function () { it("", function () {}).timeout(1); })',
+        { code: 'describe("", function () { it("", function () {}).timeout(1); })' },
         'describe("", function () { it("", function () {}).slow(1); })',
         'describe("", function () { it.only("", function () {}).timeout(1); })',
         'describe("", function () { it.skip("", function () {}).timeout(1); })',
@@ -62,7 +62,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
             code: 'foo("", function () { it(); })',
             settings: {
                 'mocha/additionalCustomNames': [
-                    { name: 'foo', type: 'suite', interfaces: ['BDD'] }
+                    { name: 'foo', type: 'suite', interface: 'BDD' }
                 ]
             }
         },
@@ -71,7 +71,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'foo', type: 'suite', interfaces: ['BDD'] }
+                        { name: 'foo', type: 'suite', interface: 'BDD' }
                     ]
                 }
             }
@@ -81,7 +81,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'foo', type: 'suite', interfaces: ['BDD'] }
+                        { name: 'foo', type: 'suite', interface: 'BDD' }
                     ]
                 }
             }
@@ -141,7 +141,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'foo', type: 'suite', interfaces: ['BDD'] }
+                        { name: 'foo', type: 'suite', interface: 'BDD' }
                     ]
                 }
             },
@@ -158,7 +158,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'foo', type: 'suite', interfaces: ['BDD'] }
+                        { name: 'foo', type: 'suite', interface: 'BDD' }
                     ]
                 }
             },
@@ -175,7 +175,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'foo', type: 'suite', interfaces: ['BDD'] }
+                        { name: 'foo', type: 'suite', interface: 'BDD' }
                     ]
                 }
             },
@@ -217,7 +217,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'foo', type: 'suite', interfaces: ['BDD'] }
+                        { name: 'foo', type: 'suite', interface: 'BDD' }
                     ]
                 }
             },
@@ -239,6 +239,11 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
                 },
                 {
                     message: memberExpressionError,
+                    line: 1,
+                    column: 28
+                },
+                {
+                    message: 'Unexpected function call in describe block.',
                     line: 1,
                     column: 28
                 }

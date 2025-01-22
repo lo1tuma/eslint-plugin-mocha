@@ -4,7 +4,7 @@
 
 <!-- end auto-generated rule header -->
 
-Mocha allows specification of pending tests, which represent tests that aren't yet implemented, but are intended to be implemented eventually. These are designated like a normal mocha test, but with only the first argument provided (no callback for the actual implementation). For example: `it('unimplemented test');`
+Mocha allows specification of pending tests, which represent tests that aren't yet implemented or explicitly skipped, but are intended to be implemented eventually. These are designated like a normal mocha test, but with only the first argument provided (no callback for the actual implementation). For example: `it('unimplemented test');` or `it.skip('foo', function () {});`
 
 This rule allows you to raise ESLint warnings or errors on pending tests. This can be useful, for example, for reminding developers that pending tests exist in the repository, so they're more likely to get implemented.
 
@@ -18,6 +18,18 @@ The following patterns are considered warnings:
 it('foo');
 specify('foo');
 test('foo');
+
+describe.skip('foo', function () {});
+it.skip('foo', function () {});
+describe['skip']('bar', function () {});
+it['skip']('bar', function () {});
+xdescribe('baz', function () {});
+xit('baz', function () {});
+
+suite.skip('foo', function () {});
+test.skip('foo', function () {});
+suite['skip']('bar', function () {});
+test['skip']('bar', function () {});
 ```
 
 These patterns are not considered warnings:
@@ -26,6 +38,16 @@ These patterns are not considered warnings:
 it('foo', function () {});
 specify('foo', function () {});
 test('foo', function () {});
+
+describe('foo', function () {});
+it('foo', function () {});
+describe.only('bar', function () {});
+it.only('bar', function () {});
+
+suite('foo', function () {});
+test('foo', function () {});
+suite.only('bar', function () {});
+test.only('bar', function () {});
 ```
 
 ## When Not To Use It

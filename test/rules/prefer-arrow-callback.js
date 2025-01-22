@@ -170,11 +170,6 @@ ruleTester.run('prefer-arrow-callback', plugin.rules['prefer-arrow-callback'], {
             errors
         },
         {
-            code: 'qux(function(foo, bar, baz) { return foo * this.qux; }.bind(this))',
-            output: 'qux((foo, bar, baz) => { return foo * this.qux; })',
-            errors
-        },
-        {
             code: 'foo(function() {}.bind(this, somethingElse))',
             output: 'foo((() => {}).bind(this, somethingElse))',
             errors

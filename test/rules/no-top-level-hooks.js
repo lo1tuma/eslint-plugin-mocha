@@ -23,14 +23,14 @@ ruleTester.run('no-top-level-hooks', plugins.rules['no-top-level-hooks'], {
         {
             code: 'foo(function() { before(function() {}); });',
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
+                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
             }
         },
         {
             code: 'foo(function() { before(function() {}); });',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
                 }
             }
         },
@@ -38,7 +38,7 @@ ruleTester.run('no-top-level-hooks', plugins.rules['no-top-level-hooks'], {
             code: 'describe.foo(function() { before(function() {}); });',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'describe.foo', type: 'suite', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'describe.foo', type: 'suite', interface: 'BDD' }]
                 }
             }
         },
@@ -46,16 +46,23 @@ ruleTester.run('no-top-level-hooks', plugins.rules['no-top-level-hooks'], {
             code: 'describe.foo()(function() { before(function() {}); });',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'describe.foo()', type: 'suite', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'describe.foo()', type: 'suite', interface: 'BDD' }]
                 }
             }
         },
         {
-            code: 'forEach([ 1, 2, 3 ]).describe(function() { before(function() {}); });',
+            code: 'forEach().describe(function() { before(function() {}); });',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'forEach().describe', type: 'suite', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'forEach().describe', type: 'suite', interface: 'BDD' }]
                 }
+            }
+        },
+        {
+            code: 'describe(function() { before(function() {}); });',
+            languageOptions: {
+                ecmaVersion: 2019,
+                sourceType: 'module'
             }
         }
     ],
@@ -133,12 +140,16 @@ ruleTester.run('no-top-level-hooks', plugins.rules['no-top-level-hooks'], {
             }]
         },
         {
-            code: 'forEach([ 1, 2, 3 ]).describe(function() {}); before(function() {});',
+            code: 'before(function() {});',
             errors: [{
                 message: 'Unexpected use of Mocha `before` hook outside of a test suite',
-                column: 47,
+                column: 1,
                 line: 1
-            }]
+            }],
+            languageOptions: {
+                ecmaVersion: 2019,
+                sourceType: 'module'
+            }
         }
     ]
 });

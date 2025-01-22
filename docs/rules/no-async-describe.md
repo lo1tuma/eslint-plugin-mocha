@@ -1,4 +1,4 @@
-# Disallow async functions passed to describe (`mocha/no-async-describe`)
+# Disallow async functions passed to a suite (`mocha/no-async-describe`)
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 
