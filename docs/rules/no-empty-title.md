@@ -1,4 +1,4 @@
-# Disallow empty test descriptions (`mocha/no-empty-description`)
+# Disallow empty test descriptions (`mocha/no-empty-title`)
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 
@@ -40,7 +40,7 @@ Example of a custom rule configuration:
 
 ```js
 rules: {
-    "mocha/no-empty-description": [ "warn", {
+    "mocha/no-empty-title": [ "warn", {
         testNames: ["it", "specify", "test", "mytestname"],
         message: 'custom error message'
     } ]

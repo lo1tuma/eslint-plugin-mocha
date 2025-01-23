@@ -6,7 +6,7 @@ const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } })
 const defaultErrorMessage = 'Unexpected empty test description.';
 const firstLine = { column: 1, line: 1 };
 
-ruleTester.run('no-empty-description', plugin.rules['no-empty-description'], {
+ruleTester.run('no-empty-title', plugin.rules['no-empty-title'], {
     valid: [
         'describe("some text")',
         'describe.only("some text")',

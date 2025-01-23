@@ -126,7 +126,7 @@ See [Configuring Eslint](http://eslint.org/docs/user-guide/configuring) on [esli
 | [handle-done-callback](docs/rules/handle-done-callback.md)                           | Enforces handling of callbacks for async tests                          | ✅  |    |    |    |
 | [max-top-level-suites](docs/rules/max-top-level-suites.md)                           | Enforce the number of top-level suites in a single file                 | ✅  |    |    |    |
 | [no-async-suite](docs/rules/no-async-suite.md)                                       | Disallow async functions passed to a suite                              | ✅  |    |    | 🔧 |
-| [no-empty-description](docs/rules/no-empty-description.md)                           | Disallow empty test descriptions                                        | ✅  |    |    |    |
+| [no-empty-title](docs/rules/no-empty-title.md)                                       | Disallow empty test descriptions                                        | ✅  |    |    |    |
 | [no-exclusive-tests](docs/rules/no-exclusive-tests.md)                               | Disallow exclusive tests                                                |    | ✅  |    |    |
 | [no-exports](docs/rules/no-exports.md)                                               | Disallow exports from test files                                        | ✅  |    |    |    |
 | [no-global-tests](docs/rules/no-global-tests.md)                                     | Disallow global tests                                                   | ✅  |    |    |    |
@@ -143,7 +143,7 @@ See [Configuring Eslint](http://eslint.org/docs/user-guide/configuring) on [esli
 | [no-synchronous-tests](docs/rules/no-synchronous-tests.md)                           | Disallow synchronous tests                                              |    |    | ✅  |    |
 | [no-top-level-hooks](docs/rules/no-top-level-hooks.md)                               | Disallow top-level hooks                                                |    | ✅  |    |    |
 | [prefer-arrow-callback](docs/rules/prefer-arrow-callback.md)                         | Require using arrow functions for callbacks                             |    |    | ✅  | 🔧 |
-| [valid-suite-description](docs/rules/valid-suite-description.md)                     | Require suite descriptions to match a pre-configured regular expression |    |    | ✅  |    |
-| [valid-test-description](docs/rules/valid-test-description.md)                       | Require test descriptions to match a pre-configured regular expression  |    |    | ✅  |    |
+| [valid-suite-title](docs/rules/valid-suite-title.md)                                 | Require suite descriptions to match a pre-configured regular expression |    |    | ✅  |    |
+| [valid-test-title](docs/rules/valid-test-title.md)                                   | Require test descriptions to match a pre-configured regular expression  |    |    | ✅  |    |
 
 <!-- end auto-generated rules list -->
