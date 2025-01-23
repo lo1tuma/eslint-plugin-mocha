@@ -1,8 +1,8 @@
 import { RuleTester } from 'eslint';
-import { noAsyncDescribeRule } from '../../lib/rules/no-async-describe.js';
+import { noAsyncSuiteRule } from '../../lib/rules/no-async-suite.js';
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
-ruleTester.run('no-async-describe', noAsyncDescribeRule, {
+ruleTester.run('no-async-suite', noAsyncSuiteRule, {
     valid: [
         'describe()',
         'describe("hello")',

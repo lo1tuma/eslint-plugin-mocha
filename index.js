@@ -2,7 +2,7 @@ import globals from 'globals';
 import { consistentSpacingBetweenBlocksRule } from './lib/rules/consistent-spacing-between-blocks.js';
 import { handleDoneCallbackRule } from './lib/rules/handle-done-callback.js';
 import { maxTopLevelSuitesRule } from './lib/rules/max-top-level-suites.js';
-import { noAsyncDescribeRule } from './lib/rules/no-async-describe.js';
+import { noAsyncSuiteRule } from './lib/rules/no-async-suite.js';
 import { noEmptyDescriptionRule } from './lib/rules/no-empty-description.js';
 import { noExclusiveTestsRule } from './lib/rules/no-exclusive-tests.js';
 import { noExportsRule } from './lib/rules/no-exports.js';
@@ -26,7 +26,7 @@ import { validTestDescriptionRule } from './lib/rules/valid-test-description.js'
 const allRules = {
     'mocha/handle-done-callback': 'error',
     'mocha/max-top-level-suites': 'error',
-    'mocha/no-async-describe': 'error',
+    'mocha/no-async-suite': 'error',
     'mocha/no-exclusive-tests': 'error',
     'mocha/no-exports': 'error',
     'mocha/no-global-tests': 'error',
@@ -52,7 +52,7 @@ const allRules = {
 const recommendedRules = {
     'mocha/handle-done-callback': 'error',
     'mocha/max-top-level-suites': ['error', { limit: 1 }],
-    'mocha/no-async-describe': 'error',
+    'mocha/no-async-suite': 'error',
     'mocha/no-exclusive-tests': 'warn',
     'mocha/no-exports': 'error',
     'mocha/no-global-tests': 'error',
@@ -79,7 +79,7 @@ const mochaPlugin = {
     rules: {
         'handle-done-callback': handleDoneCallbackRule,
         'max-top-level-suites': maxTopLevelSuitesRule,
-        'no-async-describe': noAsyncDescribeRule,
+        'no-async-suite': noAsyncSuiteRule,
         'no-exclusive-tests': noExclusiveTestsRule,
         'no-exports': noExportsRule,
         'no-global-tests': noGlobalTestsRule,

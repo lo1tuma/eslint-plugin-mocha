@@ -124,7 +124,7 @@ See [Configuring Eslint](http://eslint.org/docs/user-guide/configuring) on [esli
 | [consistent-spacing-between-blocks](docs/rules/consistent-spacing-between-blocks.md) | Require consistent spacing between blocks                               | ✅  |    |    | 🔧 |
 | [handle-done-callback](docs/rules/handle-done-callback.md)                           | Enforces handling of callbacks for async tests                          | ✅  |    |    |    |
 | [max-top-level-suites](docs/rules/max-top-level-suites.md)                           | Enforce the number of top-level suites in a single file                 | ✅  |    |    |    |
-| [no-async-describe](docs/rules/no-async-describe.md)                                 | Disallow async functions passed to a suite                              | ✅  |    |    | 🔧 |
+| [no-async-suite](docs/rules/no-async-suite.md)                                       | Disallow async functions passed to a suite                              | ✅  |    |    | 🔧 |
 | [no-empty-description](docs/rules/no-empty-description.md)                           | Disallow empty test descriptions                                        | ✅  |    |    |    |
 | [no-exclusive-tests](docs/rules/no-exclusive-tests.md)                               | Disallow exclusive tests                                                |    | ✅  |    |    |
 | [no-exports](docs/rules/no-exports.md)                                               | Disallow exports from test files                                        | ✅  |    |    |    |
