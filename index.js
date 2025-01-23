@@ -1,4 +1,5 @@
 import globals from 'globals';
+import { consistentInterfaceRule } from './lib/rules/consistent-interface.js';
 import { consistentSpacingBetweenBlocksRule } from './lib/rules/consistent-spacing-between-blocks.js';
 import { handleDoneCallbackRule } from './lib/rules/handle-done-callback.js';
 import { maxTopLevelSuitesRule } from './lib/rules/max-top-level-suites.js';
@@ -46,7 +47,8 @@ const allRules = {
     'mocha/valid-suite-description': 'error',
     'mocha/valid-test-description': 'error',
     'mocha/no-empty-description': 'error',
-    'mocha/consistent-spacing-between-blocks': 'error'
+    'mocha/consistent-spacing-between-blocks': 'error',
+    'mocha/consistent-interface': ['error', { interface: 'BDD' }]
 };
 
 const recommendedRules = {
@@ -99,7 +101,8 @@ const mochaPlugin = {
         'valid-suite-description': validSuiteDescriptionRule,
         'valid-test-description': validTestDescriptionRule,
         'no-empty-description': noEmptyDescriptionRule,
-        'consistent-spacing-between-blocks': consistentSpacingBetweenBlocksRule
+        'consistent-spacing-between-blocks': consistentSpacingBetweenBlocksRule,
+        'consistent-interface': consistentInterfaceRule
     },
     configs: {
         all: {
