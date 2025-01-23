@@ -121,6 +121,7 @@ See [Configuring Eslint](http://eslint.org/docs/user-guide/configuring) on [esli
 
 | Name                                                                                 | Description                                                             | 💼 | ⚠️ | 🚫 | 🔧 |
 | :----------------------------------------------------------------------------------- | :---------------------------------------------------------------------- | :- | :- | :- | :- |
+| [consistent-interface](docs/rules/consistent-interface.md)                           | Enforces consistent use of mocha interfaces                             |    |    |    |    |
 | [consistent-spacing-between-blocks](docs/rules/consistent-spacing-between-blocks.md) | Require consistent spacing between blocks                               | ✅  |    |    | 🔧 |
 | [handle-done-callback](docs/rules/handle-done-callback.md)                           | Enforces handling of callbacks for async tests                          | ✅  |    |    |    |
 | [max-top-level-suites](docs/rules/max-top-level-suites.md)                           | Enforce the number of top-level suites in a single file                 | ✅  |    |    |    |
