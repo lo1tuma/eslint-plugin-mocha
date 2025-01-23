@@ -41,14 +41,14 @@ ruleTester.run('max-top-level-suites', plugin.rules['max-top-level-suites'], {
         {
             code: 'foo("This is a test", function () { });',
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
+                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
             }
         },
         {
             code: 'foo("This is a test", function () { });',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
                 }
             }
         },
@@ -82,7 +82,7 @@ ruleTester.run('max-top-level-suites', plugin.rules['max-top-level-suites'], {
             },
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'describe.foo', type: 'suite', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'describe.foo', type: 'suite', interface: 'BDD' }]
                 }
             }
         },
@@ -100,7 +100,7 @@ ruleTester.run('max-top-level-suites', plugin.rules['max-top-level-suites'], {
             },
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'describe.foo()', type: 'suite', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'describe.foo()', type: 'suite', interface: 'BDD' }]
                 }
             }
         }
@@ -230,7 +230,7 @@ ruleTester.run('max-top-level-suites', plugin.rules['max-top-level-suites'], {
             code: 'foo("this is a test", function () { });' +
                 'foo("this is a different test", function () { });',
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
+                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
             },
             errors: [
                 { message: 'The number of top-level suites is more than 1.' }
@@ -241,7 +241,7 @@ ruleTester.run('max-top-level-suites', plugin.rules['max-top-level-suites'], {
                 'foo("this is a different test", function () { });',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
                 }
             },
             errors: [
@@ -254,8 +254,8 @@ ruleTester.run('max-top-level-suites', plugin.rules['max-top-level-suites'], {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'describe.foo()', type: 'suite', interfaces: ['BDD'] },
-                        { name: 'context.foo', type: 'suite', interfaces: ['BDD'] }
+                        { name: 'describe.foo()', type: 'suite', interface: 'BDD' },
+                        { name: 'context.foo', type: 'suite', interface: 'BDD' }
                     ]
                 }
             },
@@ -269,8 +269,8 @@ ruleTester.run('max-top-level-suites', plugin.rules['max-top-level-suites'], {
             settings: {
                 mocha: {
                     additionalCustomNames: [
-                        { name: 'forEach().describe', type: 'suite', interfaces: ['BDD'] },
-                        { name: 'context.foo', type: 'suite', interfaces: ['BDD'] }
+                        { name: 'forEach().describe', type: 'suite', interface: 'BDD' },
+                        { name: 'context.foo', type: 'suite', interface: 'BDD' }
                     ]
                 }
             },

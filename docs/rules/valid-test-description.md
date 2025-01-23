@@ -8,8 +8,7 @@ This rule enforces the test descriptions to follow the desired format.
 
 ## Rule Details
 
-By default, the regular expression is configured to be "^should" which requires test descriptions to start with "should".
-By default, the rule supports "it", "specify" and "test" test function names, but it can be configured to look for different test names via rule configuration.
+By default, the regular expression is configured to be `"^should"` which requires test descriptions to start with "should".
 
 ## Options
 
@@ -17,11 +16,7 @@ Example of a custom rule configuration:
 
 ```js
 rules: {
-    "mocha/valid-test-description": ["warn", "mypattern$", ["it", "specify", "test", "mytestname"], "custom error message"]
-},
-// OR
-rules: {
-    "mocha/valid-test-description": ["warn", { pattern: "mypattern$", testNames: ["it", "specify", "test", "mytestname"], message: 'custom error message' }]
+    "mocha/valid-test-description": ["warn", { pattern: "mypattern$", message: 'custom error message' }]
 },
 ```
 
@@ -29,7 +24,6 @@ where:
 
 - `warn` is a rule error level (see [Configuring Rules](http://eslint.org/docs/user-guide/configuring#configuring-rules))
 - `mypattern$` is a custom regular expression pattern to match test names against
-- `["it", "specify", "test", "mytestname"]` is an array of custom test names
 - `custom error message` a custom error message to describe your pattern
 
 The following patterns are considered warnings (with the default rule configuration):

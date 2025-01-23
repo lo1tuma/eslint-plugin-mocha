@@ -12,14 +12,14 @@ ruleTester.run('no-nested-tests', noNestedTestsRule, {
         {
             code: 'foo("", function () { it(); })',
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'foo', interfaces: ['BDD'] }]
+                'mocha/additionalCustomNames': [{ name: 'foo', interface: 'BDD' }]
             }
         },
         {
             code: 'foo("", function () { it(); })',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
                 }
             }
         }
@@ -121,7 +121,7 @@ ruleTester.run('no-nested-tests', noNestedTestsRule, {
         {
             code: 'it("", function () { foo() });',
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
+                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
             },
             errors: [{
                 message: 'Unexpected suite nested within a test.',
@@ -133,7 +133,7 @@ ruleTester.run('no-nested-tests', noNestedTestsRule, {
             code: 'it("", function () { foo() });',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
                 }
             },
             errors: [{
@@ -151,7 +151,15 @@ ruleTester.run('no-nested-tests', noNestedTestsRule, {
             }]
         },
         {
-            code: 'beforeEach(function () { beforeEach("foo", function () {}); });',
+            code: 'beforeEach(function () { describe("foo", function () {}); });',
+            errors: [{
+                message: 'Unexpected suite nested within a test hook.',
+                line: 1,
+                column: 26
+            }]
+        },
+        {
+            code: 'beforeEach(function () { beforeEach(function () {}); });',
             errors: [{
                 message: 'Unexpected test hook nested within a test hook.',
                 line: 1,

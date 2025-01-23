@@ -69,12 +69,12 @@ before(function (done) {
 
 This rule supports the following options:
 
-- `ignoreSkipped`: When set to `true` skipped test cases won’t be checked. Defaults to `false`.
+- `ignorePending`: When set to `true` skipped test cases won’t be checked. Defaults to `false`.
 
 ```json
 {
     "rules": {
-        "mocha/handle-done-callback": ["error", { "ignoreSkipped": true }]
+        "mocha/handle-done-callback": ["error", { "ignorePending": true }]
     }
 }
 ```

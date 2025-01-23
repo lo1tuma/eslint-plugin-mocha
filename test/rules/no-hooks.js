@@ -55,34 +55,38 @@ ruleTester.run('no-hooks', plugin.rules['no-hooks'], {
         {
             code: 'describe(function() { suiteTeardown(function() {}); });',
             options: [{ allow: ['suiteTeardown'] }]
+        },
+        {
+            code: 'describe(function() { suiteTeardown(function() {}); });',
+            options: [{ allow: ['suiteTeardown()'] }]
         }
     ],
 
     invalid: [
         {
             code: 'describe(function() { before(function() {}); });',
-            errors: [{ message: 'Unexpected use of Mocha `before` hook', column: 23, line: 1 }]
+            errors: [{ message: 'Unexpected use of Mocha `before()` hook', column: 23, line: 1 }]
         },
         {
             code: 'describe(function() { after(function() {}); });',
-            errors: [{ message: 'Unexpected use of Mocha `after` hook', column: 23, line: 1 }]
+            errors: [{ message: 'Unexpected use of Mocha `after()` hook', column: 23, line: 1 }]
         },
         {
             code: 'describe(function() { beforeEach(function() {}); });',
-            errors: [{ message: 'Unexpected use of Mocha `beforeEach` hook', column: 23, line: 1 }]
+            errors: [{ message: 'Unexpected use of Mocha `beforeEach()` hook', column: 23, line: 1 }]
         },
         {
             code: 'describe(function() { afterEach(function() {}); });',
-            errors: [{ message: 'Unexpected use of Mocha `afterEach` hook', column: 23, line: 1 }]
+            errors: [{ message: 'Unexpected use of Mocha `afterEach()` hook', column: 23, line: 1 }]
         },
         {
             code: 'describe(function() { describe(function() { before(function() {}); }); });',
-            errors: [{ message: 'Unexpected use of Mocha `before` hook', column: 45, line: 1 }]
+            errors: [{ message: 'Unexpected use of Mocha `before()` hook', column: 45, line: 1 }]
         },
         {
             code: 'describe(function() { after(function() {}); });',
             options: [{ allow: ['before'] }],
-            errors: [{ message: 'Unexpected use of Mocha `after` hook', column: 23, line: 1 }]
+            errors: [{ message: 'Unexpected use of Mocha `after()` hook', column: 23, line: 1 }]
         }
     ]
 });

@@ -76,7 +76,11 @@ ruleTester.run('no-empty-description', plugin.rules['no-empty-description'], {
             code: 'it(`${foo} template strings`, function () {});'
         },
         {
-            options: [{ testNames: ['someFunction'] }],
+            settings: {
+                mocha: {
+                    additionalCustomNames: [{ name: 'someFunction', type: 'testCase', interface: 'BDD' }]
+                }
+            },
             code: 'someFunction("this is a test", function () { });'
         },
         {
@@ -108,7 +112,12 @@ ruleTester.run('no-empty-description', plugin.rules['no-empty-description'], {
         },
 
         {
-            options: [{ testNames: ['someFunction'], message: 'Custom Error' }],
+            options: [{ message: 'Custom Error' }],
+            settings: {
+                mocha: {
+                    additionalCustomNames: [{ name: 'someFunction', type: 'testCase', interface: 'BDD' }]
+                }
+            },
             code: 'someFunction(function() { })',
             errors: [{ message: 'Custom Error', ...firstLine }]
         },

@@ -111,7 +111,7 @@ ruleTester.run('no-identical-title', plugin.rules['no-identical-title'], {
             ]
                 .join('\n'),
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
+                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
             }
         },
         {
@@ -122,7 +122,7 @@ ruleTester.run('no-identical-title', plugin.rules['no-identical-title'], {
                 .join('\n'),
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
                 }
             }
         }
@@ -204,7 +204,7 @@ ruleTester.run('no-identical-title', plugin.rules['no-identical-title'], {
             ]
                 .join('\n'),
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
+                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
             },
             errors: [{ message: 'Test suite title is used multiple times.', column: 1, line: 2 }]
         },
@@ -216,7 +216,7 @@ ruleTester.run('no-identical-title', plugin.rules['no-identical-title'], {
                 .join('\n'),
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
                 }
             },
             errors: [{ message: 'Test suite title is used multiple times.', column: 1, line: 2 }]

@@ -11,6 +11,10 @@ const es6LanguageOptions = {
 ruleTester.run('no-return-from-async', plugin.rules['no-return-from-async'], {
     valid: [
         {
+            code: 'it("title", function() {});',
+            languageOptions: es6LanguageOptions
+        },
+        {
             code: 'it("title", async function() {});',
             languageOptions: es6LanguageOptions
         },

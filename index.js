@@ -17,7 +17,6 @@ import { noReturnAndCallbackRule } from './lib/rules/no-return-and-callback.js';
 import { noReturnFromAsyncRule } from './lib/rules/no-return-from-async.js';
 import { noSetupInDescribeRule } from './lib/rules/no-setup-in-describe.js';
 import { noSiblingHooksRule } from './lib/rules/no-sibling-hooks.js';
-import { noSkippedTestsRule } from './lib/rules/no-skipped-tests.js';
 import { noSynchronousTestsRule } from './lib/rules/no-synchronous-tests.js';
 import { noTopLevelHooksRule } from './lib/rules/no-top-level-hooks.js';
 import { preferArrowCallbackRule } from './lib/rules/prefer-arrow-callback.js';
@@ -41,7 +40,6 @@ const allRules = {
     'mocha/no-return-from-async': 'error',
     'mocha/no-setup-in-describe': 'error',
     'mocha/no-sibling-hooks': 'error',
-    'mocha/no-skipped-tests': 'error',
     'mocha/no-synchronous-tests': 'error',
     'mocha/no-top-level-hooks': 'error',
     'mocha/prefer-arrow-callback': 'error',
@@ -68,7 +66,6 @@ const recommendedRules = {
     'mocha/no-return-from-async': 'off',
     'mocha/no-setup-in-describe': 'error',
     'mocha/no-sibling-hooks': 'error',
-    'mocha/no-skipped-tests': 'warn',
     'mocha/no-synchronous-tests': 'off',
     'mocha/no-top-level-hooks': 'warn',
     'mocha/prefer-arrow-callback': 'off',
@@ -96,7 +93,6 @@ const mochaPlugin = {
         'no-return-from-async': noReturnFromAsyncRule,
         'no-setup-in-describe': noSetupInDescribeRule,
         'no-sibling-hooks': noSiblingHooksRule,
-        'no-skipped-tests': noSkippedTestsRule,
         'no-synchronous-tests': noSynchronousTestsRule,
         'no-top-level-hooks': noTopLevelHooksRule,
         'prefer-arrow-callback': preferArrowCallbackRule,

@@ -121,6 +121,16 @@ ruleTester.run('no-hooks-for-single-case', plugin.rules['no-hooks-for-single-cas
         {
             code: [
                 'describe(function() {',
+                '    before(function() {});',
+                '    it(function() {});',
+                '});'
+            ]
+                .join('\n'),
+            options: [{ allow: ['before()'] }]
+        },
+        {
+            code: [
+                'describe(function() {',
                 '    after(function() {});',
                 '    it(function() {});',
                 '});'
@@ -169,7 +179,7 @@ ruleTester.run('no-hooks-for-single-case', plugin.rules['no-hooks-for-single-cas
                 .join('\n'),
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
                 }
             }
         },
@@ -183,7 +193,7 @@ ruleTester.run('no-hooks-for-single-case', plugin.rules['no-hooks-for-single-cas
             ]
                 .join('\n'),
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
+                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
             }
         }
     ],
@@ -196,7 +206,7 @@ ruleTester.run('no-hooks-for-single-case', plugin.rules['no-hooks-for-single-cas
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 }]
+            errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 5, line: 2 }]
         },
         {
             code: [
@@ -206,7 +216,7 @@ ruleTester.run('no-hooks-for-single-case', plugin.rules['no-hooks-for-single-cas
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 }]
+            errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 5, line: 2 }]
         },
         {
             code: [
@@ -216,7 +226,7 @@ ruleTester.run('no-hooks-for-single-case', plugin.rules['no-hooks-for-single-cas
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 3 }]
+            errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 5, line: 3 }]
         },
         {
             code: [
@@ -226,7 +236,7 @@ ruleTester.run('no-hooks-for-single-case', plugin.rules['no-hooks-for-single-cas
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Unexpected use of Mocha `after` hook for a single test case', column: 5, line: 2 }]
+            errors: [{ message: 'Unexpected use of Mocha `after()` hook for a single test case', column: 5, line: 2 }]
         },
         {
             code: [
@@ -237,7 +247,7 @@ ruleTester.run('no-hooks-for-single-case', plugin.rules['no-hooks-for-single-cas
             ]
                 .join('\n'),
             errors: [
-                { message: 'Unexpected use of Mocha `beforeEach` hook for a single test case', column: 5, line: 2 }
+                { message: 'Unexpected use of Mocha `beforeEach()` hook for a single test case', column: 5, line: 2 }
             ]
         },
         {
@@ -249,7 +259,7 @@ ruleTester.run('no-hooks-for-single-case', plugin.rules['no-hooks-for-single-cas
             ]
                 .join('\n'),
             errors: [
-                { message: 'Unexpected use of Mocha `afterEach` hook for a single test case', column: 5, line: 2 }
+                { message: 'Unexpected use of Mocha `afterEach()` hook for a single test case', column: 5, line: 2 }
             ]
         },
         {
@@ -258,7 +268,7 @@ ruleTester.run('no-hooks-for-single-case', plugin.rules['no-hooks-for-single-cas
                 'it(function() {});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Unexpected use of Mocha `before` hook for a single test case', column: 1, line: 1 }]
+            errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 1, line: 1 }]
         },
         {
             code: [
@@ -268,7 +278,7 @@ ruleTester.run('no-hooks-for-single-case', plugin.rules['no-hooks-for-single-cas
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 }]
+            errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 5, line: 2 }]
         },
         {
             code: [
@@ -278,7 +288,7 @@ ruleTester.run('no-hooks-for-single-case', plugin.rules['no-hooks-for-single-cas
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 }]
+            errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 5, line: 2 }]
         },
         {
             code: [
@@ -288,7 +298,7 @@ ruleTester.run('no-hooks-for-single-case', plugin.rules['no-hooks-for-single-cas
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 }]
+            errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 5, line: 2 }]
         },
         {
             code: [
@@ -302,7 +312,7 @@ ruleTester.run('no-hooks-for-single-case', plugin.rules['no-hooks-for-single-cas
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Unexpected use of Mocha `before` hook for a single test case', column: 9, line: 5 }]
+            errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 9, line: 5 }]
         },
         {
             code: [
@@ -313,7 +323,7 @@ ruleTester.run('no-hooks-for-single-case', plugin.rules['no-hooks-for-single-cas
             ]
                 .join('\n'),
             options: [{ allow: ['before'] }],
-            errors: [{ message: 'Unexpected use of Mocha `after` hook for a single test case', column: 5, line: 2 }]
+            errors: [{ message: 'Unexpected use of Mocha `after()` hook for a single test case', column: 5, line: 2 }]
         },
         {
             code: [
@@ -324,10 +334,10 @@ ruleTester.run('no-hooks-for-single-case', plugin.rules['no-hooks-for-single-cas
                 .join('\n'),
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
+                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
                 }
             },
-            errors: [{ message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 }]
+            errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 5, line: 2 }]
         },
         {
             code: [
@@ -337,9 +347,9 @@ ruleTester.run('no-hooks-for-single-case', plugin.rules['no-hooks-for-single-cas
             ]
                 .join('\n'),
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interfaces: ['BDD'] }]
+                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
             },
-            errors: [{ message: 'Unexpected use of Mocha `before` hook for a single test case', column: 5, line: 2 }]
+            errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 5, line: 2 }]
         }
     ]
 });
