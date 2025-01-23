@@ -3,7 +3,7 @@ import plugin from '../../index.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
-ruleTester.run('valid-test-description', plugin.rules['valid-test-description'], {
+ruleTester.run('valid-test-title', plugin.rules['valid-test-title'], {
     valid: [
         'it("should respond to GET", function() { });',
         'it("should do something");',

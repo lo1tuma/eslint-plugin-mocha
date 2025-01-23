@@ -1,4 +1,4 @@
-# Require suite descriptions to match a pre-configured regular expression (`mocha/valid-suite-description`)
+# Require suite descriptions to match a pre-configured regular expression (`mocha/valid-suite-title`)
 
 🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 
@@ -14,7 +14,7 @@ Example of a custom rule configuration:
 
 ```js
 rules: {
-   "mocha/valid-suite-description": ["warn", { pattern: "^[A-Z]", message: 'custom error message' }]
+   "mocha/valid-suite-title": ["warn", { pattern: "^[A-Z]", message: 'custom error message' }]
 },
 ```
 
@@ -51,10 +51,10 @@ There is also possible to configure a custom list of suite names and a custom er
 
 ```js
 rules: {
-   "mocha/valid-suite-description": ["warn", "^[A-Z]", ["describe", "context", "suite", "mysuitename"], "custom error message"]
+   "mocha/valid-suite-title": ["warn", "^[A-Z]", ["describe", "context", "suite", "mysuitename"], "custom error message"]
 },
 // OR
 rules: {
-   "mocha/valid-suite-description": ["warn", { pattern: "^[A-Z]", suiteNames: ["describe", "context", "suite", "mysuitename"], message: "custom error message" }]
+   "mocha/valid-suite-title": ["warn", { pattern: "^[A-Z]", suiteNames: ["describe", "context", "suite", "mysuitename"], message: "custom error message" }]
 },
 ```

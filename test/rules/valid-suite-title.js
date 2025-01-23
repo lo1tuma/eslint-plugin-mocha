@@ -3,7 +3,7 @@ import plugin from '../../index.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
-ruleTester.run('valid-suite-description', plugin.rules['valid-suite-description'], {
+ruleTester.run('valid-suite-title', plugin.rules['valid-suite-title'], {
     valid: [
         {
             options: [{ pattern: '^[A-Z]' }],

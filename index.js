@@ -4,7 +4,7 @@ import { consistentSpacingBetweenBlocksRule } from './lib/rules/consistent-spaci
 import { handleDoneCallbackRule } from './lib/rules/handle-done-callback.js';
 import { maxTopLevelSuitesRule } from './lib/rules/max-top-level-suites.js';
 import { noAsyncSuiteRule } from './lib/rules/no-async-suite.js';
-import { noEmptyDescriptionRule } from './lib/rules/no-empty-description.js';
+import { noEmptyTitleRule } from './lib/rules/no-empty-title.js';
 import { noExclusiveTestsRule } from './lib/rules/no-exclusive-tests.js';
 import { noExportsRule } from './lib/rules/no-exports.js';
 import { noGlobalTestsRule } from './lib/rules/no-global-tests.js';
@@ -21,8 +21,8 @@ import { noSiblingHooksRule } from './lib/rules/no-sibling-hooks.js';
 import { noSynchronousTestsRule } from './lib/rules/no-synchronous-tests.js';
 import { noTopLevelHooksRule } from './lib/rules/no-top-level-hooks.js';
 import { preferArrowCallbackRule } from './lib/rules/prefer-arrow-callback.js';
-import { validSuiteDescriptionRule } from './lib/rules/valid-suite-description.js';
-import { validTestDescriptionRule } from './lib/rules/valid-test-description.js';
+import { validSuiteTitleRule } from './lib/rules/valid-suite-title.js';
+import { validTestTitleRule } from './lib/rules/valid-test-title.js';
 
 const allRules = {
     'mocha/handle-done-callback': 'error',
@@ -44,11 +44,11 @@ const allRules = {
     'mocha/no-synchronous-tests': 'error',
     'mocha/no-top-level-hooks': 'error',
     'mocha/prefer-arrow-callback': 'error',
-    'mocha/valid-suite-description': 'error',
-    'mocha/valid-test-description': 'error',
-    'mocha/no-empty-description': 'error',
     'mocha/consistent-spacing-between-blocks': 'error',
-    'mocha/consistent-interface': ['error', { interface: 'BDD' }]
+    'mocha/consistent-interface': ['error', { interface: 'BDD' }],
+    'mocha/valid-suite-title': 'error',
+    'mocha/valid-test-title': 'error',
+    'mocha/no-empty-title': 'error'
 };
 
 const recommendedRules = {
@@ -71,9 +71,9 @@ const recommendedRules = {
     'mocha/no-synchronous-tests': 'off',
     'mocha/no-top-level-hooks': 'warn',
     'mocha/prefer-arrow-callback': 'off',
-    'mocha/valid-suite-description': 'off',
-    'mocha/valid-test-description': 'off',
-    'mocha/no-empty-description': 'error',
+    'mocha/valid-suite-title': 'off',
+    'mocha/valid-test-title': 'off',
+    'mocha/no-empty-title': 'error',
     'mocha/consistent-spacing-between-blocks': 'error'
 };
 
@@ -98,11 +98,11 @@ const mochaPlugin = {
         'no-synchronous-tests': noSynchronousTestsRule,
         'no-top-level-hooks': noTopLevelHooksRule,
         'prefer-arrow-callback': preferArrowCallbackRule,
-        'valid-suite-description': validSuiteDescriptionRule,
-        'valid-test-description': validTestDescriptionRule,
-        'no-empty-description': noEmptyDescriptionRule,
         'consistent-spacing-between-blocks': consistentSpacingBetweenBlocksRule,
-        'consistent-interface': consistentInterfaceRule
+        'consistent-interface': consistentInterfaceRule,
+        'valid-suite-title': validSuiteTitleRule,
+        'valid-test-title': validTestTitleRule,
+        'no-empty-title': noEmptyTitleRule
     },
     configs: {
         all: {
