@@ -1,16 +1,18 @@
-import { Linter } from 'eslint';
+import { Linter, type Rule } from 'eslint';
 import assert from 'node:assert';
-import { findImportReferencesByName } from '../../../lib/ast/find-import-references.js';
+import { findImportReferencesByName } from './find-import-references.js';
+import type { NameDetails } from '../mocha/name-details.js';
+import type { ResolvedReference } from './resolved-reference.js';
 
-function findReferenceNames(code, names, importSource, sourceType = 'module') {
+function findReferenceNames(code: string, names: readonly Partial<NameDetails>[], importSource: string, sourceType: "module" | "script" = 'module'): readonly Omit<ResolvedReference, 'node'>[] {
     const linter = new Linter();
-    let foundResolvedReferences = null;
+    let foundResolvedReferences: readonly Omit<ResolvedReference, 'node'>[] = [];
 
-    const testLintRule = {
+    const testLintRule: Rule.RuleModule = {
         create(ruleContext) {
             return {
                 Program() {
-                    const references = findImportReferencesByName(ruleContext, names, importSource);
+                    const references = findImportReferencesByName(ruleContext, names as (readonly NameDetails[]), importSource);
                     foundResolvedReferences = references.map((reference) => {
                         return {
                             path: reference.path,

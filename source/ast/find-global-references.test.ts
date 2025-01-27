@@ -1,16 +1,18 @@
-import { Linter } from 'eslint';
+import { Linter, type Rule } from 'eslint';
 import assert from 'node:assert';
-import { findGlobalReferencesByName } from '../../../lib/ast/find-global-references.js';
+import { findGlobalReferencesByName } from './find-global-references.js';
+import type { NameDetails } from '../mocha/name-details.js';
+import type { ResolvedReference } from './resolved-reference.js';
 
-function findReferenceNames(code, names, { globals = {} } = {}) {
+function findReferenceNames(code: string, names: readonly Partial<NameDetails>[], { globals = {} }: Record<string, unknown> = {}): readonly Omit<ResolvedReference, 'node'>[] {
     const linter = new Linter();
-    let foundResolvedReferences = null;
+    let foundResolvedReferences: readonly Omit<ResolvedReference, 'node'>[] = [];
 
-    const testLintRule = {
+    const testLintRule: Rule.RuleModule = {
         create(ruleContext) {
             return {
                 Program() {
-                    const references = findGlobalReferencesByName(ruleContext, names);
+                    const references = findGlobalReferencesByName(ruleContext, names as (readonly NameDetails[]));
                     foundResolvedReferences = references.map((reference) => {
                         return {
                             path: reference.path,
@@ -26,7 +28,7 @@ function findReferenceNames(code, names, { globals = {} } = {}) {
         plugins: { 'test-plugin': { rules: { 'test-rule': testLintRule } } },
         languageOptions: { ecmaVersion: 2018, sourceType: 'script', globals },
         rules: { 'test-plugin/test-rule': 'error' }
-    });
+    } as Linter.Config);
     if (results.length > 0) {
         throw new Error('Expect zero results');
     }
