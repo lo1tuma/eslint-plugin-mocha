@@ -1,6 +1,6 @@
 /* eslint-disable @cspell/spellchecker -- generated names shouldn’t be checked */
 import assert from 'node:assert';
-import { buildAllNameDetailsWithVariants } from '../../lib/mocha/name-details.js';
+import { buildAllNameDetailsWithVariants } from './name-details.js';
 
 describe('mocha names', function () {
     describe('buildAllNameDetailsWithVariants()', function () {

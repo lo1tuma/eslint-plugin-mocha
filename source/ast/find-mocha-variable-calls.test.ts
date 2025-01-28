@@ -1,16 +1,17 @@
-import { Linter } from 'eslint';
+import { Linter, type Rule } from 'eslint';
 import assert from 'node:assert';
-import { findMochaVariableCalls } from '../../../lib/ast/find-mocha-variable-calls.js';
+import { findMochaVariableCalls, type ResolvedReferenceWithNameDetails } from './find-mocha-variable-calls.js';
+import type { NameDetails } from '../mocha/name-details.js';
 
-function findCalls(code, names, { globals = {} } = {}) {
+function findCalls(code: string, names: readonly Partial<NameDetails>[], { globals = {} }: Record<string, unknown> = {}): readonly ResolvedReferenceWithNameDetails[] {
     const linter = new Linter();
-    let calls = null;
+    let calls: readonly ResolvedReferenceWithNameDetails[] = [];
 
-    const testLintRule = {
+    const testLintRule: Rule.RuleModule = {
         create(ruleContext) {
             return {
                 'Program:exit'() {
-                    calls = findMochaVariableCalls(ruleContext, names);
+                    calls = findMochaVariableCalls(ruleContext, names as (readonly NameDetails[]), 'BDD');
                 }
             };
         }
@@ -20,7 +21,7 @@ function findCalls(code, names, { globals = {} } = {}) {
         plugins: { 'test-plugin': { rules: { 'test-rule': testLintRule } } },
         languageOptions: { ecmaVersion: 2018, sourceType: 'script', globals },
         rules: { 'test-plugin/test-rule': 'error' }
-    });
+    } as Linter.Config);
     if (results.length > 0) {
         throw new Error('Expect zero results');
     }
@@ -63,7 +64,7 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['foo()']);
+        assert.deepStrictEqual(calls[0]?.path, ['foo()']);
     });
 
     it('finds a matching call when there is a resolved global', function () {
@@ -74,7 +75,7 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['foo()']);
+        assert.deepStrictEqual(calls[0]?.path, ['foo()']);
     });
 
     it('finds a matching call when there searching for a path', function () {
@@ -85,7 +86,7 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['foo', 'bar()']);
+        assert.deepStrictEqual(calls[0]?.path, ['foo', 'bar()']);
     });
 
     it('doesn’t find something when looking for a path but the searched path was not used', function () {
@@ -105,8 +106,8 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 2);
-        assert.deepStrictEqual(calls[0].path, ['foo()']);
-        assert.deepStrictEqual(calls[1].path, ['foo()']);
+        assert.deepStrictEqual(calls[0]?.path, ['foo()']);
+        assert.deepStrictEqual(calls[1]?.path, ['foo()']);
     });
 
     it('finds multiple matching calls of different names', function () {
@@ -119,8 +120,8 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 2);
-        assert.deepStrictEqual(calls[0].path, ['foo()']);
-        assert.deepStrictEqual(calls[1].path, ['bar()']);
+        assert.deepStrictEqual(calls[0]?.path, ['foo()']);
+        assert.deepStrictEqual(calls[1]?.path, ['bar()']);
     });
 
     it('finds multiple matching calls with property access', function () {
@@ -133,8 +134,8 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 2);
-        assert.deepStrictEqual(calls[0].path, ['foo', 'x()']);
-        assert.deepStrictEqual(calls[1].path, ['bar', 'x()']);
+        assert.deepStrictEqual(calls[0]?.path, ['foo', 'x()']);
+        assert.deepStrictEqual(calls[1]?.path, ['bar', 'x()']);
     });
 
     it('extracts the correct path of a member expression', function () {
@@ -144,7 +145,7 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['foo', 'bar()']);
+        assert.deepStrictEqual(calls[0]?.path, ['foo', 'bar()']);
     });
 
     it('extracts the correct path of a computed member expression', function () {
@@ -154,7 +155,7 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['foo', 'bar()']);
+        assert.deepStrictEqual(calls[0]?.path, ['foo', 'bar()']);
     });
 
     it('traces function calls renames via const variable declaration const x = foo; x()', function () {
@@ -164,8 +165,8 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['x()']);
-        assert.deepStrictEqual(calls[0].resolvedPath, ['foo()']);
+        assert.deepStrictEqual(calls[0]?.path, ['x()']);
+        assert.deepStrictEqual(calls[0]?.resolvedPath, ['foo()']);
     });
 
     it('traces renames via const variable declaration const y = bar, x = foo; x()', function () {
@@ -175,8 +176,8 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['x()']);
-        assert.deepStrictEqual(calls[0].resolvedPath, ['foo()']);
+        assert.deepStrictEqual(calls[0]?.path, ['x()']);
+        assert.deepStrictEqual(calls[0]?.resolvedPath, ['foo()']);
     });
 
     it('doesn’t trace renames via assignments x = foo; x()', function () {
@@ -222,8 +223,8 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['x()']);
-        assert.deepStrictEqual(calls[0].resolvedPath, ['foo', 'bar()']);
+        assert.deepStrictEqual(calls[0]?.path, ['x()']);
+        assert.deepStrictEqual(calls[0]?.resolvedPath, ['foo', 'bar()']);
     });
 
     it('traces property calls of renames const declaration const x = foo; x.bar()', function () {
@@ -233,8 +234,8 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['x', 'bar()']);
-        assert.deepStrictEqual(calls[0].resolvedPath, ['foo', 'bar()']);
+        assert.deepStrictEqual(calls[0]?.path, ['x', 'bar()']);
+        assert.deepStrictEqual(calls[0]?.resolvedPath, ['foo', 'bar()']);
     });
 
     it('traces renames via const destructuring const { bar } = foo; bar()', function () {
@@ -244,8 +245,8 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['bar()']);
-        assert.deepStrictEqual(calls[0].resolvedPath, ['foo', 'bar()']);
+        assert.deepStrictEqual(calls[0]?.path, ['bar()']);
+        assert.deepStrictEqual(calls[0]?.resolvedPath, ['foo', 'bar()']);
     });
 
     it('traces multiple renames via a single const destructuring const { bar,baz } = foo; bar();baz();', function () {
@@ -258,10 +259,10 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 2);
-        assert.deepStrictEqual(calls[0].path, ['bar()']);
-        assert.deepStrictEqual(calls[0].resolvedPath, ['foo', 'bar()']);
-        assert.deepStrictEqual(calls[1].path, ['baz()']);
-        assert.deepStrictEqual(calls[1].resolvedPath, ['foo', 'baz()']);
+        assert.deepStrictEqual(calls[0]?.path, ['bar()']);
+        assert.deepStrictEqual(calls[0]?.resolvedPath, ['foo', 'bar()']);
+        assert.deepStrictEqual(calls[1]?.path, ['baz()']);
+        assert.deepStrictEqual(calls[1]?.resolvedPath, ['foo', 'baz()']);
     });
 
     it('traces renames via const destructuring alias const { foo: bar } = x; bar()', function () {
@@ -271,8 +272,8 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['bar()']);
-        assert.deepStrictEqual(calls[0].resolvedPath, ['x', 'foo()']);
+        assert.deepStrictEqual(calls[0]?.path, ['bar()']);
+        assert.deepStrictEqual(calls[0]?.resolvedPath, ['x', 'foo()']);
     });
 
     it('traces renames via nested const destructuring const { foo: { bar: baz} } = x; baz()', function () {
@@ -282,8 +283,8 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['baz()']);
-        assert.deepStrictEqual(calls[0].resolvedPath, ['x', 'foo', 'bar()']);
+        assert.deepStrictEqual(calls[0]?.path, ['baz()']);
+        assert.deepStrictEqual(calls[0]?.resolvedPath, ['x', 'foo', 'bar()']);
     });
 
     it('doesn’t traces renames via var destructuring var { foo: bar } = x; bar()', function () {
@@ -311,8 +312,8 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['x()']);
-        assert.deepStrictEqual(calls[0].resolvedPath, ['foo()']);
+        assert.deepStrictEqual(calls[0]?.path, ['x()']);
+        assert.deepStrictEqual(calls[0]?.resolvedPath, ['foo()']);
     });
 
     it('renames in a local scope doesn’t affect global scope', function () {
@@ -340,8 +341,8 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['x()']);
-        assert.deepStrictEqual(calls[0].resolvedPath, ['foo', 'bar', 'baz()']);
+        assert.deepStrictEqual(calls[0]?.path, ['x()']);
+        assert.deepStrictEqual(calls[0]?.resolvedPath, ['foo', 'bar', 'baz()']);
     });
 
     it('remains the correct resolved path when assigning a nested property and using deep destructuring', function () {
@@ -351,8 +352,8 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['c()']);
-        assert.deepStrictEqual(calls[0].resolvedPath, ['foo', 'bar', 'baz', 'a', 'b()']);
+        assert.deepStrictEqual(calls[0]?.path, ['c()']);
+        assert.deepStrictEqual(calls[0]?.resolvedPath, ['foo', 'bar', 'baz', 'a', 'b()']);
     });
 
     it('traces multiple const renames in the same scope', function () {
@@ -362,8 +363,8 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['baz()']);
-        assert.deepStrictEqual(calls[0].resolvedPath, ['foo', 'bar()']);
+        assert.deepStrictEqual(calls[0]?.path, ['baz()']);
+        assert.deepStrictEqual(calls[0]?.resolvedPath, ['foo', 'bar()']);
     });
 
     it('traces multiple const renames with multi-level member access per alias', function () {
@@ -373,8 +374,8 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['quuux()']);
-        assert.deepStrictEqual(calls[0].resolvedPath, ['foo', 'bar', 'baz', 'quux', 'quuux()']);
+        assert.deepStrictEqual(calls[0]?.path, ['quuux()']);
+        assert.deepStrictEqual(calls[0]?.resolvedPath, ['foo', 'bar', 'baz', 'quux', 'quuux()']);
     });
 
     it('doesn’t trace dynamic assignments', function () {
@@ -393,8 +394,8 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['baz()']);
-        assert.deepStrictEqual(calls[0].resolvedPath, ['foo', 'bar', 'baz()']);
+        assert.deepStrictEqual(calls[0]?.path, ['baz()']);
+        assert.deepStrictEqual(calls[0]?.resolvedPath, ['foo', 'bar', 'baz()']);
     });
 
     it('traces multiple const renames in different scopes', function () {
@@ -404,8 +405,8 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['baz()']);
-        assert.deepStrictEqual(calls[0].resolvedPath, ['foo', 'bar', 'baz()']);
+        assert.deepStrictEqual(calls[0]?.path, ['baz()']);
+        assert.deepStrictEqual(calls[0]?.resolvedPath, ['foo', 'bar', 'baz()']);
     });
 
     it('traces dynamic member expression calls as long as the resolve to a constant string', function () {
@@ -415,8 +416,8 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['foo', 'bar()']);
-        assert.deepStrictEqual(calls[0].resolvedPath, ['foo', 'bar()']);
+        assert.deepStrictEqual(calls[0]?.path, ['foo', 'bar()']);
+        assert.deepStrictEqual(calls[0]?.resolvedPath, ['foo', 'bar()']);
     });
 
     it('doesn’t trace dynamic member expression calls when they can’t be resolved statically', function () {
@@ -435,8 +436,8 @@ describe('findMochaVariableCalls()', function () {
         );
 
         assert.strictEqual(calls.length, 1);
-        assert.deepStrictEqual(calls[0].path, ['bar', 'baz()']);
-        assert.deepStrictEqual(calls[0].resolvedPath, ['foo', 'bar', 'baz()']);
+        assert.deepStrictEqual(calls[0]?.path, ['bar', 'baz()']);
+        assert.deepStrictEqual(calls[0]?.resolvedPath, ['foo', 'bar', 'baz()']);
     });
 
     it('doesn’t trace unresolvable dynamic member expression calls of aliases', function () {
