@@ -23,8 +23,7 @@
         "test:bench": "tsc --build benchmarks/tsconfig.json && mocha -t 2400000 --spec 'target/build/benchmarks/**/*.bench.js'",
         "coveralls": "cat ./target/coverage/lcov.info | coveralls",
         "changelog": "pr-log",
-        "update:eslint-docs": "tsc --build source/tsconfig.sources.json && eslint-doc-generator --ignore-config all --url-configs \"https://github.com/lo1tuma/eslint-plugin-mocha#configs\"",
-        "release": "release-it"
+        "update:eslint-docs": "tsc --build source/tsconfig.sources.json && eslint-doc-generator --ignore-config all --url-configs \"https://github.com/lo1tuma/eslint-plugin-mocha#configs\""
     },
     "dependencies": {
         "@eslint-community/eslint-utils": "^4.4.1",
@@ -40,6 +39,7 @@
         "@enormora/eslint-config-mocha": "0.0.11",
         "@enormora/eslint-config-node": "0.0.16",
         "@enormora/eslint-config-typescript": "^0.0.18",
+        "@packtory/cli": "^0.0.5",
         "@types/mocha": "^10.0.10",
         "c8": "^10.1.3",
         "change-case": "^5.4.4",
@@ -51,7 +51,6 @@
         "markdownlint-cli": "0.43.0",
         "mocha": "11.1.0",
         "pr-log": "6.1.1",
-        "release-it": "18.1.1",
         "semver": "7.6.3",
         "typescript": "^5.7.3"
     },
