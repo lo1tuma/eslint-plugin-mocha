@@ -17,13 +17,13 @@ npm install --save-dev eslint-plugin-mocha
 
 ### Configuration via `eslint.config.js`
 
-To use this plugin with [the new eslint configuration format (flat config)](https://eslint.org/docs/latest/use/configure/configuration-files-new):
+To use this plugin with [eslint flat configuration format](https://eslint.org/docs/latest/use/configure/configuration-files-new):
 
 ```js
 import mochaPlugin from "eslint-plugin-mocha";
 
 export default [
-    mochaPlugin.configs.flat.recommended, // or `mochaPlugin.configs.flat.all` to enable all
+    mochaPlugin.configs.recommended, // or `mochaPlugin.configs.all` to enable all
     // ... Your configurations here
 ];
 ```
@@ -88,26 +88,6 @@ This plugin supports the following settings, which are used by multiple rules:
     ```
 
 - `interface`: This allows to select either `TDD`, `BDD` (default) or `exports`. When using `exports` mocha variables are resolved from named `import` statements instead of global variables.
-
-## Configs
-
-### `recommended`
-
-This plugin exports a recommended config that enforces good practices.
-
-Enable it with the extends option:
-
-```json
-{
-    "extends": ["plugin:mocha/recommended"]
-}
-```
-
-### `all`
-
-There's also a configuration that enables all of our rules.
-
-See [Configuring Eslint](http://eslint.org/docs/user-guide/configuring) on [eslint.org](http://eslint.org) for more info.
 
 ## Rules
 

@@ -1,0 +1,14 @@
+{
+    "diff": true,
+    "forbid-pending": true,
+    "extension": ["js"],
+    "spec": [],
+    "exclude": [],
+    "jobs": 1,
+    "parallel": false,
+    "enable-source-maps": true,
+    "reporter": "dot",
+    "slow": 75,
+    "timeout": 2000,
+    "ui": "bdd"
+}

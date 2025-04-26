@@ -1,0 +1,10 @@
+{
+    "extends": "../tsconfig.base.json",
+    "compilerOptions": {
+        "tsBuildInfoFile": "../target/buildcache/benchmarks.tsbuildinfo",
+        "rootDir": "..",
+        "types": ["node", "mocha"]
+    },
+    "include": ["./**/*.ts"],
+    "references": [{ "path": "../source/tsconfig.sources.json" }]
+}

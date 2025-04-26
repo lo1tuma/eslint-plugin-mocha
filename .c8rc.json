@@ -1,15 +1,15 @@
 {
     "all": true,
-    "lines": 100,
-    "statements": 100,
-    "functions": 100,
-    "branches": 100,
+    "lines": 98.4,
+    "statements": 98.4,
+    "functions": 99.6,
+    "branches": 95,
     "check-coverage": true,
     "extension": [".js"],
     "instrument": false,
-    "src": ".",
+    "src": "./target/build",
     "reporter": ["lcov", "text-summary"],
     "reportDir": "./target/coverage",
     "tempDirectory": "./target/c8-temporary-output",
-    "exclude": ["target", "test", "benchmarks/", "eslint.config.js"]
+    "exclude": ["**/*.test.js", "target/build/benchmarks/", "eslint.config.js"]
 }

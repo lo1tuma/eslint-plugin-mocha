@@ -2,6 +2,7 @@ import dprintPlugin from '@ben_12/eslint-plugin-dprint';
 import { baseConfig } from '@enormora/eslint-config-base';
 import { mochaConfig } from '@enormora/eslint-config-mocha';
 import { nodeConfig, nodeConfigFileConfig, nodeEntryPointFileConfig } from '@enormora/eslint-config-node';
+import { typescriptConfig } from '@enormora/eslint-config-typescript';
 import eslintPluginEslintPlugin from 'eslint-plugin-eslint-plugin';
 
 export default [
@@ -34,51 +35,64 @@ export default [
         }
     },
     {
+        ...typescriptConfig,
+        files: ['**/*.ts']
+    },
+    {
+        files: ['**/*.ts'],
+        rules: {
+            'functional/type-declaration-immutability': 'off',
+            'functional/prefer-immutable-types': 'off'
+        }
+    },
+    {
         ...nodeConfigFileConfig,
         files: ['eslint.config.js']
     },
     {
         ...mochaConfig,
-        files: ['test/index.js', '**/*.test.js', '**/*Spec.js', 'benchmarks/**/*.bench.js']
+        files: ['**/*.test.ts', 'benchmarks/**/*.bench.ts']
     },
     {
-        files: ['test/index.js', '**/*.test.js', '**/*Spec.js', 'benchmarks/**/*.bench.js'],
+        files: ['**/*.test.ts', 'benchmarks/**/*.bench.ts'],
         rules: {
             'max-statements': ['error', { max: 50 }],
             'max-nested-callbacks': ['error', { max: 8 }],
-            'no-magic-numbers': 'off'
+            'no-magic-numbers': 'off',
+            '@typescript-eslint/no-magic-numbers': 'off',
+            'no-template-curly-in-string': 'off'
         }
     },
     {
-        files: ['test/index.js'],
+        files: ['source/plugin.test.ts'],
         rules: {
             'import/no-dynamic-require': 'off'
         }
     },
     {
-        files: ['benchmarks/startup.bench.js'],
+        files: ['benchmarks/startup.bench.ts'],
         rules: {
             'import/no-unassigned-import': 'off'
         }
     },
     {
-        files: ['test/rules/*.js'],
+        files: ['test/rules/*.ts'],
         rules: {
             'no-template-curly-in-string': 'off'
         }
     },
     {
         ...nodeEntryPointFileConfig,
-        files: ['index.js']
+        files: ['source/plugin.ts']
     },
     {
-        files: ['index.js'],
+        files: ['source/plugin.ts'],
         rules: {
             'import/no-default-export': 'off'
         }
     },
     {
-        files: ['lib/rules/**/*.js', 'test/rules/**/*.js'],
+        files: ['lib/rules/**/*.ts'],
         plugins: { 'eslint-plugin': eslintPluginEslintPlugin },
         rules: {
             'eslint-plugin/fixer-return': 'error',

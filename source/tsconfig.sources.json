@@ -1,0 +1,10 @@
+{
+    "extends": "../tsconfig.base.json",
+    "compilerOptions": {
+        "tsBuildInfoFile": "../target/buildcache/sources.tsbuildinfo",
+        "rootDir": "..",
+        "types": ["node"]
+    },
+    "include": ["./**/*.ts"],
+    "exclude": ["./**/*.test.ts"]
+}
