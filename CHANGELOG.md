@@ -1,3 +1,40 @@
+## 11.0.0 (April 26, 2025)
+
+### Breaking Changes
+
+* Rename *-description rules to *-title ([#369](https://github.com/lo1tuma/eslint-plugin-mocha/pull/369))
+* Rename no-async-describe to no-async-suite ([#368](https://github.com/lo1tuma/eslint-plugin-mocha/pull/368))
+* Drop support for commonjs in no-exports rule ([#366](https://github.com/lo1tuma/eslint-plugin-mocha/pull/366))
+* Implement new resolve algorithm ([#365](https://github.com/lo1tuma/eslint-plugin-mocha/pull/365))
+* Switch to ESM ([#362](https://github.com/lo1tuma/eslint-plugin-mocha/pull/362))
+* Stop supporting ESLint versions < 9 ([#359](https://github.com/lo1tuma/eslint-plugin-mocha/pull/359))
+* Remove support for node v14, v16 and v18 ([#345](https://github.com/lo1tuma/eslint-plugin-mocha/pull/345))
+
+### Features
+
+* Implement new rule consistent-interface ([#367](https://github.com/lo1tuma/eslint-plugin-mocha/pull/367))
+
+### Enhancements
+
+* Add name to flat configs ([#356](https://github.com/lo1tuma/eslint-plugin-mocha/pull/356))
+
+### Dependency Upgrades
+
+* Update dependencies ([#371](https://github.com/lo1tuma/eslint-plugin-mocha/pull/371))
+* Update all dependencies ([#360](https://github.com/lo1tuma/eslint-plugin-mocha/pull/360))
+
+### Code Refactoring
+
+* Migrate codebase to typescript ([#372](https://github.com/lo1tuma/eslint-plugin-mocha/pull/372))
+* Replace nyc with c8 for collecting coverage information ([#361](https://github.com/lo1tuma/eslint-plugin-mocha/pull/361))
+* Use @eslint-community/eslint-utils instead of unmaintained eslint-utils ([#358](https://github.com/lo1tuma/eslint-plugin-mocha/pull/358))
+* Use node builtin assert instead of chai ([#357](https://github.com/lo1tuma/eslint-plugin-mocha/pull/357))
+
+### Build-Related
+
+* Use packtory as a release tool ([#374](https://github.com/lo1tuma/eslint-plugin-mocha/pull/374))
+* Update CI matrix to use latest node versions ([#370](https://github.com/lo1tuma/eslint-plugin-mocha/pull/370))
+
 ## 10.4.0 (March 7, 2024)
 
 ### Features
