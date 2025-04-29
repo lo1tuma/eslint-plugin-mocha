@@ -41,7 +41,28 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
 
         `it('does something outside a describe block', () => {});
 
-        afterEach(() => {});`
+        afterEach(() => {});`,
+        {
+            code: `describe('foo', () => {
+                it('bar', () => {}).timeout(42);
+            });`
+        },
+        {
+            code: `describe('foo', () => {
+                it('bar', () => {}).timeout(42);
+
+                it('baz', () => {}).timeout(42);
+            });`
+        },
+        {
+            code: `describe('foo', () => {
+                it('bar', () => {})
+                    .timeout(42);
+
+                it('baz', () => {})
+                    .timeout(42);
+            });`
+        }
     ],
 
     invalid: [
@@ -120,10 +141,27 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
                 }
             ]
         },
+        {
+            code: "describe('Same line blocks', () => {" +
+                "it('block one', () => {})\n.timeout(42);" +
+                "it('block two', () => {});" +
+                '});',
+            output: "describe('Same line blocks', () => {" +
+                "it('block one', () => {})\n.timeout(42);" +
+                '\n\n' +
+                "it('block two', () => {});" +
+                '});',
+            errors: [
+                {
+                    message: 'Expected line break before this statement.',
+                    type: 'CallExpression'
+                }
+            ]
+        },
 
         {
-            code: 'describe();describe();',
-            output: 'describe();\n\ndescribe();',
+            code: 'describe("", () => {});describe("", () => {});',
+            output: 'describe("", () => {});\n\ndescribe("", () => {});',
             errors: [
                 {
                     message: 'Expected line break before this statement.',

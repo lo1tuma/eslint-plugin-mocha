@@ -1,17 +1,50 @@
 import type { Rule } from 'eslint';
+import type { Except } from 'type-fest';
 import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
+import {
+    type AnyFunction,
+    isBlockStatement,
+    isFunction,
+    isMemberExpression,
+    isProgram,
+    type Program
+} from '../ast/node-types.js';
 import { getLastOrThrow } from '../list.js';
 
 const minimumAmountOfLinesBetweenNeeded = 2;
 
-function isFirstStatementInScope(node: Readonly<Rule.Node>): boolean {
-    // @ts-expect-error -- ok in this case
-    return node.parent.parent.body[0] === node.parent; // eslint-disable-line @typescript-eslint/no-unsafe-member-access -- ok in this case
+function containsNode(nodeA: Except<Rule.Node, 'parent'>, nodeB: Except<Rule.Node, 'parent'>): boolean {
+    const { range: rangeA } = nodeA;
+    const { range: rangeB } = nodeB;
+    if (rangeA === undefined || rangeB === undefined) {
+        return false;
+    }
+
+    return rangeB[1] <= rangeA[1] && rangeB[0] >= rangeA[0];
+}
+
+function isFirstStatementInScope(scopeNode: Layer['scopeNode'], node: Rule.Node): boolean {
+    if (isBlockStatement(scopeNode) || isProgram(scopeNode)) {
+        const [firstNode] = scopeNode.body;
+        if (firstNode !== undefined) {
+            return containsNode(firstNode, node);
+        }
+    }
+
+    return containsNode(scopeNode, node);
 }
 
 type Layer = {
     entities: VisitorContext[];
+    scopeNode: AnyFunction['body'] | Program;
 };
+
+function getParentWhileMemberExpression(node: Rule.Node): Rule.Node {
+    if (isMemberExpression(node.parent)) {
+        return getParentWhileMemberExpression(node.parent);
+    }
+    return node;
+}
 
 export const consistentSpacingBetweenBlocksRule: Readonly<Rule.RuleModule> = {
     meta: {
@@ -26,7 +59,7 @@ export const consistentSpacingBetweenBlocksRule: Readonly<Rule.RuleModule> = {
     },
 
     create(context) {
-        const layers: [Layer, ...Layer[]] = [{ entities: [] }];
+        const layers: Layer[] = [];
         const { sourceCode } = context;
 
         function addEntityToCurrentLayer(visitorContext: Readonly<VisitorContext>): void {
@@ -39,15 +72,15 @@ export const consistentSpacingBetweenBlocksRule: Readonly<Rule.RuleModule> = {
             const currentLayer = getLastOrThrow(layers);
 
             for (const entity of currentLayer.entities) {
-                const { node } = entity;
+                const node = getParentWhileMemberExpression(entity.node);
                 const beforeToken = sourceCode.getTokenBefore(node);
 
-                if (!isFirstStatementInScope(node) && beforeToken !== null) {
+                if (!isFirstStatementInScope(currentLayer.scopeNode, node) && beforeToken !== null) {
                     const linesBetween = (node.loc?.start.line ?? 0) - (beforeToken.loc.end.line);
 
                     if (linesBetween < minimumAmountOfLinesBetweenNeeded) {
                         context.report({
-                            node,
+                            node: entity.node,
                             message: 'Expected line break before this statement.',
                             fix(fixer) {
                                 return fixer.insertTextAfter(
@@ -64,12 +97,22 @@ export const consistentSpacingBetweenBlocksRule: Readonly<Rule.RuleModule> = {
         return createMochaVisitors(context, {
             suite(visitorContext) {
                 addEntityToCurrentLayer(visitorContext);
-                layers.push({ entities: [] });
             },
 
-            'suite:exit'() {
+            suiteCallback(visitorContext) {
+                const { node } = visitorContext;
+                if (isFunction(node)) {
+                    layers.push({ entities: [], scopeNode: node.body });
+                }
+            },
+
+            'suiteCallback:exit'() {
                 checkCurrentLayer();
                 layers.pop();
+            },
+
+            Program(node) {
+                layers.push({ entities: [], scopeNode: node });
             },
 
             'Program:exit'() {
