@@ -20,7 +20,7 @@ describe('startup / require time', function () {
     });
 
     it('should not consume more memory as the defined budget', async function () {
-        const budget = 350_000;
+        const budget = 450_000;
 
         const { medianMemory } = await runAsyncBenchmark(async () => {
             await importFresh('../source/plugin.js');

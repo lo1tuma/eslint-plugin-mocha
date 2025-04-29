@@ -37,7 +37,12 @@ export async function buildConfig() {
                     description: packageJson.description,
                     keywords: packageJson.keywords
                 },
-                entryPoints: [{ js: 'plugin.js' }],
+                entryPoints: [
+                    {
+                        js: 'plugin.js',
+                        declarationFile: 'plugin.d.ts'
+                    }
+                ],
                 additionalFiles: [
                     {
                         sourceFilePath: path.join(projectFolder, 'README.md'),
