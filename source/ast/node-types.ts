@@ -86,3 +86,9 @@ export type Literal = NodeType<'Literal'>;
 export function isLiteral(node: Except<Rule.Node, 'parent'>): node is Literal {
     return node.type === 'Literal';
 }
+
+export type Program = NodeType<'Program'>;
+
+export function isProgram(node: Except<Rule.Node, 'parent'>): node is Program {
+    return node.type === 'Program';
+}
