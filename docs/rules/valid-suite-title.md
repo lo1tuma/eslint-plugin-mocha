@@ -49,8 +49,8 @@ suite('Test suite', function () {});
 
 There are two options available:
 
-* `pattern`: a regexp pattern
-* `message`: a custom error message
+- `pattern`: a regexp pattern
+- `message`: a custom error message
 
 ```js
 rules: {
