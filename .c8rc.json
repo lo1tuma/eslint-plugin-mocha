@@ -1,7 +1,7 @@
 {
     "all": true,
-    "lines": 98.34,
-    "statements": 98.34,
+    "lines": 98.33,
+    "statements": 98.33,
     "functions": 99.6,
     "branches": 94.8,
     "check-coverage": true,

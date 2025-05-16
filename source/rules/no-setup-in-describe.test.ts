@@ -110,6 +110,16 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
 
     invalid: [
         {
+            code: 'suite("", function () { this.timeout(42); a(); });',
+            errors: [
+                {
+                    message: 'Unexpected function call in describe block.',
+                    line: 1,
+                    column: 43
+                }
+            ]
+        },
+        {
             code: 'suite("", function () { a(); });',
             errors: [
                 {
