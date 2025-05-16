@@ -125,7 +125,16 @@ ruleTester.run('no-identical-title', noIdenticalTitleRule, {
                     additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
                 }
             }
-        }
+        },
+        [
+            'describe("describe 1", function() {',
+            '   it("it", function() {});',
+            '});',
+            'describe("describe 2", function() {',
+            '   it("it", function() {});',
+            '});'
+        ]
+            .join('\n')
     ],
 
     invalid: [
