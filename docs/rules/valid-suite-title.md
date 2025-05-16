@@ -47,14 +47,13 @@ suite('Test suite', function () {});
 
 ## Options
 
-There is also possible to configure a custom list of suite names and a custom error message via the second and third rule configuration option:
+There are two options available:
+
+- `pattern`: a regexp pattern
+- `message`: a custom error message
 
 ```js
 rules: {
-   "mocha/valid-suite-title": ["warn", "^[A-Z]", ["describe", "context", "suite", "mysuitename"], "custom error message"]
-},
-// OR
-rules: {
-   "mocha/valid-suite-title": ["warn", { pattern: "^[A-Z]", suiteNames: ["describe", "context", "suite", "mysuitename"], message: "custom error message" }]
+   "mocha/valid-suite-title": ["warn", { pattern: "^[A-Z]", message: "custom error message" }]
 },
 ```
