@@ -62,6 +62,16 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
                 it('baz', () => {})
                     .timeout(42);
             });`
+        },
+        {
+            code: `describe('foo', () => {
+                [
+                    { title: 'bar' },
+                    { title: 'baz' },
+                ].forEach((testCase) => {
+                    it(testCase.title, () => {});
+                });
+            });`
         }
     ],
 
