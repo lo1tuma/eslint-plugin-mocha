@@ -5,12 +5,10 @@ import { isSuiteConfigCall } from '../mocha/config-call.js';
 
 const FUNCTION = 1;
 const DESCRIBE = 2;
-const PURE = 3;
 
 function isNestedInDescribeBlock(nesting: readonly number[]): boolean {
     return (
         nesting.length > 0 &&
-        !nesting.includes(PURE) &&
         nesting.lastIndexOf(FUNCTION) < nesting.lastIndexOf(DESCRIBE)
     );
 }
@@ -51,9 +49,7 @@ export const noSetupInDescribeRule: Readonly<Rule.RuleModule> = {
         const suiteNodes = new WeakSet();
 
         function handleCallExpressionInDescribe(node: Readonly<CallExpression>): void {
-            if (isSuiteConfigCall(node)) {
-                nesting.push(PURE);
-            } else if (isNestedInDescribeBlock(nesting)) {
+            if (isNestedInDescribeBlock(nesting) && !isSuiteConfigCall(node)) {
                 reportCallExpression(context, node);
             }
         }
@@ -78,7 +74,8 @@ export const noSetupInDescribeRule: Readonly<Rule.RuleModule> = {
             nonMochaMemberExpression(node) {
                 if (
                     !suiteNodes.has(node.parent) &&
-                    isNestedInDescribeBlock(nesting)
+                    isNestedInDescribeBlock(nesting) &&
+                    !isSuiteConfigCall(node.parent)
                 ) {
                     reportMemberExpression(context, node);
                 }
