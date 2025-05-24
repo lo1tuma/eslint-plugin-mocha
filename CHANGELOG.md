@@ -1,3 +1,24 @@
+## 11.1.0 (May 24, 2025)
+
+### Bug Fixes
+
+* Fix detecting mocha config calls in no-setup-in-describe ([#387](https://github.com/lo1tuma/eslint-plugin-mocha/pull/387))
+* Fix consistent-spacing-between-blocks when using timeout() modifier ([#379](https://github.com/lo1tuma/eslint-plugin-mocha/pull/379))
+
+### Enhancements
+
+* Include typescript declaration files in npm package ([#378](https://github.com/lo1tuma/eslint-plugin-mocha/pull/378))
+
+### Documentation
+
+* Fix valid-suite-title options documentation ([#385](https://github.com/lo1tuma/eslint-plugin-mocha/pull/385))
+
+### Code Refactoring
+
+* Add test to verify no-identical-title supports same titles in different suites ([#388](https://github.com/lo1tuma/eslint-plugin-mocha/pull/388))
+* Add test-case to verify generated tests work with consistent-spacing-between-blocks ([#386](https://github.com/lo1tuma/eslint-plugin-mocha/pull/386))
+* Add regression tests for no-setup-in-describe ([#380](https://github.com/lo1tuma/eslint-plugin-mocha/pull/380))
+
 ## 11.0.0 (April 26, 2025)
 
 ### Breaking Changes
