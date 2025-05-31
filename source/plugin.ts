@@ -78,6 +78,13 @@ const recommendedRules: Linter.RulesRecord = {
     'mocha/consistent-spacing-between-blocks': 'error'
 };
 
+export type MochaPlugin = ESLint.Plugin & {
+    configs: {
+        all: Linter.Config;
+        recommended: Linter.Config;
+    };
+};
+
 const mochaPlugin = {
     rules: {
         'handle-done-callback': handleDoneCallbackRule,
@@ -121,7 +128,9 @@ const mochaPlugin = {
     }
 } satisfies ESLint.Plugin;
 
-mochaPlugin.configs.all.plugins.mocha = mochaPlugin;
-mochaPlugin.configs.recommended.plugins.mocha = mochaPlugin;
+const plugin: MochaPlugin = mochaPlugin;
 
-export default mochaPlugin;
+plugin.configs.all.plugins.mocha = plugin;
+plugin.configs.recommended.plugins.mocha = plugin;
+
+export default plugin;
