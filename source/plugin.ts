@@ -78,7 +78,14 @@ const recommendedRules: Linter.RulesRecord = {
     'mocha/consistent-spacing-between-blocks': 'error'
 } as const;
 
-const mochaPlugin: ESLint.Plugin = {
+export type MochaPlugin = ESLint.Plugin & {
+    configs: {
+        all: Linter.Config;
+        recommended: Linter.Config;
+    };
+};
+
+const mochaPlugin: MochaPlugin = {
     rules: {
         'handle-done-callback': handleDoneCallbackRule,
         'max-top-level-suites': maxTopLevelSuitesRule,
@@ -104,7 +111,9 @@ const mochaPlugin: ESLint.Plugin = {
         'valid-suite-title': validSuiteTitleRule,
         'valid-test-title': validTestTitleRule,
         'no-empty-title': noEmptyTitleRule
-    }
+    },
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-type-assertion -- This field will be set later for cyclic references
+    configs: undefined as any
 };
 
 mochaPlugin.configs = {
