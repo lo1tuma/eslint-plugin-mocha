@@ -46,7 +46,8 @@ export const noHooksForSingleCaseRule: Readonly<Rule.RuleModule> = {
                             type: 'string'
                         }
                     }
-                }
+                },
+                additionalProperties: false
             }
         ]
     },
