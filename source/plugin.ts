@@ -76,9 +76,9 @@ const recommendedRules: Linter.RulesRecord = {
     'mocha/valid-test-title': 'off',
     'mocha/no-empty-title': 'error',
     'mocha/consistent-spacing-between-blocks': 'error'
-} as const;
+};
 
-const mochaPlugin: ESLint.Plugin = {
+const mochaPlugin = {
     rules: {
         'handle-done-callback': handleDoneCallbackRule,
         'max-top-level-suites': maxTopLevelSuitesRule,
@@ -104,22 +104,24 @@ const mochaPlugin: ESLint.Plugin = {
         'valid-suite-title': validSuiteTitleRule,
         'valid-test-title': validTestTitleRule,
         'no-empty-title': noEmptyTitleRule
-    }
-};
-
-mochaPlugin.configs = {
-    all: {
-        name: 'mocha/all',
-        plugins: { mocha: mochaPlugin },
-        languageOptions: { globals: globals.mocha },
-        rules: allRules
     },
-    recommended: {
-        name: 'mocha/recommended',
-        plugins: { mocha: mochaPlugin },
-        languageOptions: { globals: globals.mocha },
-        rules: recommendedRules
+    configs: {
+        all: {
+            name: 'mocha/all',
+            plugins: { mocha: {} },
+            languageOptions: { globals: globals.mocha },
+            rules: allRules
+        },
+        recommended: {
+            name: 'mocha/recommended',
+            plugins: { mocha: {} },
+            languageOptions: { globals: globals.mocha },
+            rules: recommendedRules
+        }
     }
 };
 
-export default mochaPlugin;
+mochaPlugin.configs.all.plugins.mocha = mochaPlugin;
+mochaPlugin.configs.recommended.plugins.mocha = mochaPlugin;
+
+export default mochaPlugin satisfies ESLint.Plugin;
