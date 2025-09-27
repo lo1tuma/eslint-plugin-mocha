@@ -119,9 +119,9 @@ const mochaPlugin = {
             rules: recommendedRules
         }
     }
-};
+} satisfies ESLint.Plugin;
 
 mochaPlugin.configs.all.plugins.mocha = mochaPlugin;
 mochaPlugin.configs.recommended.plugins.mocha = mochaPlugin;
 
-export default mochaPlugin satisfies ESLint.Plugin;
+export default mochaPlugin;
