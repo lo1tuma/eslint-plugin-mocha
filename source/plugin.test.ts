@@ -37,14 +37,15 @@ describe('eslint-plugin-mocha', function () {
         const ruleFiles = await determineAllRuleFiles();
 
         for (const file of ruleFiles) {
-            const ruleName = path.basename(file, '.js');
+            const ruleName = path.basename(file, '.js') as keyof typeof plugin.rules;
+            assert.ok(ruleName in plugin.rules);
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- ok
             const importedRuleModule = await import(path.join(rulesDir, file));
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access -- ok
             const importedRule = importedRuleModule[`${camelCase(ruleName)}Rule`];
 
             assert.notStrictEqual(importedRule, undefined);
-            assert.strictEqual(plugin.rules?.[ruleName], importedRule);
+            assert.strictEqual(plugin.rules[ruleName], importedRule);
         }
     });
 
