@@ -61,7 +61,8 @@ export const noSynchronousTestsRule: Readonly<Rule.RuleModule> = {
                         minItems: 1,
                         uniqueItems: true
                     }
-                }
+                },
+                additionalProperties: false
             }
         ]
     },
