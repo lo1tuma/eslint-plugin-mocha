@@ -1,3 +1,13 @@
+## 11.2.0 (October 2, 2025)
+
+### Enhancements
+
+* Improve exported plugin type ([#400](https://github.com/lo1tuma/eslint-plugin-mocha/pull/400))
+
+### Build-Related
+
+* ci: drop node 23, add node 24 ([#397](https://github.com/lo1tuma/eslint-plugin-mocha/pull/397))
+
 ## 11.1.0 (May 24, 2025)
 
 ### Bug Fixes

@@ -10,7 +10,10 @@ const npmToken = process.env.NPM_TOKEN;
 
 /** @returns {Promise<import('@packtory/cli').PacktoryConfig>} */
 export async function buildConfig() {
-    const packageJsonContent = await fs.readFile(path.join(projectFolder, './package.json'), { encoding: 'utf8' });
+    const packageJsonContent = await fs.readFile(
+        path.join(projectFolder, './package.json'),
+        { encoding: 'utf8' }
+    );
     const packageJson = JSON.parse(packageJsonContent);
 
     if (npmToken === undefined) {
@@ -24,7 +27,7 @@ export async function buildConfig() {
                 name: 'eslint-plugin-mocha',
                 versioning: {
                     automatic: false,
-                    version: '11.1.0'
+                    version: '11.2.0'
                 },
                 sourcesFolder,
                 mainPackageJson: packageJson,
