@@ -82,6 +82,11 @@ ruleTester.run('no-synchronous-tests', noSynchronousTestsRule, {
         {
             code: 'it("", function (done) { done(); });',
             options: [{}]
+        },
+        {
+            code:
+                'describe("Some tests", function () {it("should do something", async function () {await Promise.resolve(true);});});',
+            options: [{}]
         }
     ],
 

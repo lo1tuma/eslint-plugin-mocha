@@ -72,9 +72,13 @@ export const noSynchronousTestsRule: Readonly<Rule.RuleModule> = {
             ? asyncMethods
             // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- we have json schema validation in place so we know this is a string
             : options.allowed as unknown as string[];
+        const asyncTypes = new Set(['testCase', 'hook']);
 
         return createMochaVisitors(context, {
             anyTestEntityCallback(visitorContext) {
+                if (!asyncTypes.has(visitorContext.type)) {
+                    return;
+                }
                 // For each allowed async test method, check if it is used in the test
                 const testAsyncMethods = allowedAsyncMethods.map((
                     method
