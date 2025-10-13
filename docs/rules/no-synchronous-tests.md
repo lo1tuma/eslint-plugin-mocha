@@ -12,7 +12,7 @@ By default, this rule looks for the presence of one of:
 
 - An asynchronous callback.
 - An async function provided to a mocha test statement.
-- A return statement within the function body of any mocha test statement.
+- A `return` statement within the function body of any mocha test statement.
 
 If none of these three alternatives is used in a test method, the rule will raise a warning.
 
