@@ -39,6 +39,14 @@ type Layer = {
     scopeNode: AnyFunction['body'] | Program;
 };
 
+function isDirectStatementInScope(scopeNode: Layer['scopeNode'], node: Rule.Node): boolean {
+    let current = node.parent;
+    while (!isBlockStatement(current) && !isProgram(current)) {
+        current = current.parent;
+    }
+    return current === scopeNode;
+}
+
 function getParentWhileMemberExpression(node: Rule.Node): Rule.Node {
     if (isMemberExpression(node.parent)) {
         return getParentWhileMemberExpression(node.parent);
@@ -64,7 +72,9 @@ export const consistentSpacingBetweenBlocksRule: Readonly<Rule.RuleModule> = {
 
         function addEntityToCurrentLayer(visitorContext: Readonly<VisitorContext>): void {
             const currentLayer = getLastOrThrow(layers);
-            currentLayer.entities.push(visitorContext);
+            if (isDirectStatementInScope(currentLayer.scopeNode, visitorContext.node)) {
+                currentLayer.entities.push(visitorContext);
+            }
         }
 
         // eslint-disable-next-line complexity -- no idea how to refactor
