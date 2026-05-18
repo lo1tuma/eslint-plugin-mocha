@@ -37,7 +37,7 @@ describe('eslint-plugin-mocha', function () {
         const ruleFiles = await determineAllRuleFiles();
 
         for (const file of ruleFiles) {
-            const ruleName = path.basename(file, '.js') as keyof typeof plugin.rules;
+            const ruleName = path.basename(file, '.js');
             assert.ok(ruleName in plugin.rules);
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- ok
             const importedRuleModule = await import(path.join(rulesDir, file));

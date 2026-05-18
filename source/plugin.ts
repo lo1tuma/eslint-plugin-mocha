@@ -78,50 +78,68 @@ const recommendedRules: Linter.RulesRecord = {
     'mocha/consistent-spacing-between-blocks': 'error'
 };
 
-const mochaPlugin = {
-    rules: {
-        'handle-done-callback': handleDoneCallbackRule,
-        'max-top-level-suites': maxTopLevelSuitesRule,
-        'no-async-suite': noAsyncSuiteRule,
-        'no-exclusive-tests': noExclusiveTestsRule,
-        'no-exports': noExportsRule,
-        'no-global-tests': noGlobalTestsRule,
-        'no-hooks': noHooksRule,
-        'no-hooks-for-single-case': noHooksForSingleCaseRule,
-        'no-identical-title': noIdenticalTitleRule,
-        'no-mocha-arrows': noMochaArrowsRule,
-        'no-nested-tests': noNestedTestsRule,
-        'no-pending-tests': noPendingTestsRule,
-        'no-return-and-callback': noReturnAndCallbackRule,
-        'no-return-from-async': noReturnFromAsyncRule,
-        'no-setup-in-describe': noSetupInDescribeRule,
-        'no-sibling-hooks': noSiblingHooksRule,
-        'no-synchronous-tests': noSynchronousTestsRule,
-        'no-top-level-hooks': noTopLevelHooksRule,
-        'prefer-arrow-callback': preferArrowCallbackRule,
-        'consistent-spacing-between-blocks': consistentSpacingBetweenBlocksRule,
-        'consistent-interface': consistentInterfaceRule,
-        'valid-suite-title': validSuiteTitleRule,
-        'valid-test-title': validTestTitleRule,
-        'no-empty-title': noEmptyTitleRule
+const rules = {
+    'handle-done-callback': handleDoneCallbackRule,
+    'max-top-level-suites': maxTopLevelSuitesRule,
+    'no-async-suite': noAsyncSuiteRule,
+    'no-exclusive-tests': noExclusiveTestsRule,
+    'no-exports': noExportsRule,
+    'no-global-tests': noGlobalTestsRule,
+    'no-hooks': noHooksRule,
+    'no-hooks-for-single-case': noHooksForSingleCaseRule,
+    'no-identical-title': noIdenticalTitleRule,
+    'no-mocha-arrows': noMochaArrowsRule,
+    'no-nested-tests': noNestedTestsRule,
+    'no-pending-tests': noPendingTestsRule,
+    'no-return-and-callback': noReturnAndCallbackRule,
+    'no-return-from-async': noReturnFromAsyncRule,
+    'no-setup-in-describe': noSetupInDescribeRule,
+    'no-sibling-hooks': noSiblingHooksRule,
+    'no-synchronous-tests': noSynchronousTestsRule,
+    'no-top-level-hooks': noTopLevelHooksRule,
+    'prefer-arrow-callback': preferArrowCallbackRule,
+    'consistent-spacing-between-blocks': consistentSpacingBetweenBlocksRule,
+    'consistent-interface': consistentInterfaceRule,
+    'valid-suite-title': validSuiteTitleRule,
+    'valid-test-title': validTestTitleRule,
+    'no-empty-title': noEmptyTitleRule
+};
+
+type MochaConfig = Linter.Config & {
+    plugins: {
+        mocha: ESLint.Plugin;
+    };
+};
+
+const configs: {
+    all: MochaConfig;
+    recommended: MochaConfig;
+} = {
+    all: {
+        name: 'mocha/all',
+        plugins: { mocha: {} },
+        languageOptions: { globals: globals.mocha },
+        rules: allRules
     },
-    configs: {
-        all: {
-            name: 'mocha/all',
-            plugins: { mocha: {} },
-            languageOptions: { globals: globals.mocha },
-            rules: allRules
-        },
-        recommended: {
-            name: 'mocha/recommended',
-            plugins: { mocha: {} },
-            languageOptions: { globals: globals.mocha },
-            rules: recommendedRules
-        }
+    recommended: {
+        name: 'mocha/recommended',
+        plugins: { mocha: {} },
+        languageOptions: { globals: globals.mocha },
+        rules: recommendedRules
     }
-} satisfies ESLint.Plugin;
+};
 
-mochaPlugin.configs.all.plugins.mocha = mochaPlugin;
-mochaPlugin.configs.recommended.plugins.mocha = mochaPlugin;
+export type MochaPlugin = ESLint.Plugin & {
+    rules: typeof rules;
+    configs: typeof configs;
+};
 
-export default mochaPlugin;
+const plugin: MochaPlugin = {
+    rules,
+    configs
+};
+
+plugin.configs.all.plugins.mocha = plugin;
+plugin.configs.recommended.plugins.mocha = plugin;
+
+export default plugin;
