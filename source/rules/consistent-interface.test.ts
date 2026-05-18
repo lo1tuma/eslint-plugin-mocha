@@ -39,6 +39,11 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
             });`,
             options: [{ interface: 'BDD' }],
             settings: { mocha: { interface: 'exports' } }
+        },
+        {
+            code: "import {run} from 'mocha'; run();",
+            options: [{ interface: 'BDD' }],
+            settings: { mocha: { interface: 'BDD' } }
         }
     ],
 
@@ -79,6 +84,50 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
             errors: [
                 { line: 1, column: 37, message: 'Unexpected use of BDD interface instead of TDD' },
                 { line: 2, column: 17, message: 'Unexpected use of BDD interface instead of TDD' }
+            ]
+        },
+        {
+            code: `import {describe, it} from 'mocha'; describe('foo', () => {
+                it('bar', () => {});
+            });`,
+            options: [{ interface: 'BDD' }],
+            settings: { mocha: { interface: 'BDD' } },
+            errors: [
+                { line: 1, column: 37, message: 'Unexpected use of exports interface instead of global BDD' },
+                { line: 2, column: 17, message: 'Unexpected use of exports interface instead of global BDD' }
+            ]
+        },
+        {
+            code: `import {suite, test} from 'mocha'; suite('foo', () => {
+                test('bar', () => {});
+            });`,
+            options: [{ interface: 'TDD' }],
+            settings: { mocha: { interface: 'TDD' } },
+            errors: [
+                { line: 1, column: 36, message: 'Unexpected use of exports interface instead of global TDD' },
+                { line: 2, column: 17, message: 'Unexpected use of exports interface instead of global TDD' }
+            ]
+        },
+        {
+            code: `import {describe as foo, it as bar} from 'mocha'; foo('foo', () => {
+                bar('bar', () => {});
+            });`,
+            options: [{ interface: 'BDD' }],
+            settings: { mocha: { interface: 'TDD' } },
+            errors: [
+                { line: 1, column: 51, message: 'Unexpected use of exports interface instead of global TDD' },
+                { line: 2, column: 17, message: 'Unexpected use of exports interface instead of global TDD' }
+            ]
+        },
+        {
+            code: `import {describe, it} from 'mocha'; describe('foo', () => {
+                it('bar', () => {});
+            });`,
+            options: [{ interface: 'TDD' }],
+            settings: { mocha: { interface: 'BDD' } },
+            errors: [
+                { line: 1, column: 37, message: 'Unexpected use of exports interface instead of global BDD' },
+                { line: 2, column: 17, message: 'Unexpected use of exports interface instead of global BDD' }
             ]
         }
     ]

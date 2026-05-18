@@ -78,7 +78,8 @@ const recommendedRules: Linter.RulesRecord = {
     'mocha/valid-suite-title': 'off',
     'mocha/valid-test-title': 'off',
     'mocha/no-empty-title': 'error',
-    'mocha/consistent-spacing-between-blocks': 'error'
+    'mocha/consistent-spacing-between-blocks': 'error',
+    'mocha/consistent-interface': ['error', { interface: 'BDD' }]
 };
 
 const rules = {
