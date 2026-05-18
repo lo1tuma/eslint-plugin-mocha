@@ -16,7 +16,6 @@
 import type { AST, Rule, Scope, SourceCode } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { type CallExpression, isCallExpression, type MetaProperty, type Pattern } from '../ast/node-types.js';
-import { isRecord } from '../record.js';
 
 // ------------------------------------------------------------------------------
 // Helpers
@@ -157,13 +156,11 @@ export const preferArrowCallbackRule: Readonly<Rule.RuleModule> = {
     },
 
     create(context) {
-        const options = isRecord(context.options[0]) ? context.options[0] : {};
-
-        // allowUnboundThis defaults to true
-        const allowUnboundThis = options.allowUnboundThis !== false;
-        const allowNamedFunctions = typeof options.allowNamedFunctions === 'boolean'
-            ? options.allowNamedFunctions
-            : false;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- schema validation and defaultOptions guarantee the option shape
+        const [{ allowNamedFunctions, allowUnboundThis }] = context.options as [{
+            allowNamedFunctions: boolean;
+            allowUnboundThis: boolean;
+        }];
         const { sourceCode } = context;
 
         type CallbackInfo = {

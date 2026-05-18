@@ -3,7 +3,6 @@ import type { Rule } from 'eslint';
 import type { Except } from 'type-fest';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { type CallExpression, isCallExpression } from '../ast/node-types.js';
-import { isRecord } from '../record.js';
 
 const ERROR_MESSAGE = 'Unexpected empty test description.';
 
@@ -67,8 +66,8 @@ export const noEmptyTitleRule: Readonly<Rule.RuleModule> = {
         ]
     },
     create(context) {
-        const options = isRecord(context.options[0]) ? context.options[0] : {};
-        const message = typeof options.message === 'string' ? options.message : ERROR_MESSAGE;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- schema validation and defaultOptions guarantee the option shape
+        const [{ message }] = context.options as [{ message: string; }];
 
         function isNonEmptyDescription(mochaCallExpression: CallExpression): boolean {
             const description = mochaCallExpression.arguments[0];

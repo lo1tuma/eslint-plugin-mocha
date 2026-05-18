@@ -1,6 +1,5 @@
 import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { isRecord } from '../record.js';
 
 export const consistentInterfaceRule: Readonly<Rule.RuleModule> = {
     meta: {
@@ -27,9 +26,8 @@ export const consistentInterfaceRule: Readonly<Rule.RuleModule> = {
         ]
     },
     create(context) {
-        const options = isRecord(context.options[0]) ? context.options[0] : {};
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- we know that this is a string because of the schema validation
-        const interfaceToUse = options.interface as string;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- schema validation and defaultOptions guarantee the option shape
+        const [{ interface: interfaceToUse }] = context.options as [{ interface: string; }];
 
         return createMochaVisitors(context, {
             anyTestEntity(visitorContext) {

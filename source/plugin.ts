@@ -26,7 +26,7 @@ import { preferArrowCallbackRule } from './rules/prefer-arrow-callback.js';
 import { validSuiteTitleRule } from './rules/valid-suite-title.js';
 import { validTestTitleRule } from './rules/valid-test-title.js';
 
-const pluginMeta = readClosestPackageMetadata(import.meta.url);
+const pluginMeta = await readClosestPackageMetadata(import.meta.url);
 
 const allRules: Linter.RulesRecord = {
     'mocha/handle-done-callback': 'error',

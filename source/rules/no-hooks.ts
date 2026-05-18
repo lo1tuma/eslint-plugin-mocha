@@ -1,6 +1,5 @@
 import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { isRecord } from '../record.js';
 
 function ensureEndsWithParens(value: unknown): string {
     if (typeof value !== 'string') {
@@ -41,8 +40,8 @@ export const noHooksRule: Readonly<Rule.RuleModule> = {
     },
 
     create(context) {
-        const config = isRecord(context.options[0]) ? context.options[0] : {};
-        const allow = Array.isArray(config.allow) ? config.allow : [];
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- schema validation and defaultOptions guarantee the option shape
+        const [{ allow }] = context.options as [{ allow: string[]; }];
         const allowList = new Set(allow.map(ensureEndsWithParens));
 
         return createMochaVisitors(context, {

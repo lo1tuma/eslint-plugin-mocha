@@ -1,6 +1,6 @@
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { isRecord } from './record.js';
 
 export type PackageMetadata = {
@@ -8,9 +8,12 @@ export type PackageMetadata = {
     version: string;
 };
 
-function parsePackageMetadata(packageJsonPath: string, packageJsonContent: string): Readonly<PackageMetadata> {
-    const packageJson = JSON.parse(packageJsonContent) as unknown;
+type PackageMetadataReaderDependencies = {
+    accessFile: (packageJsonPath: string) => Promise<void>;
+    importJsonModule: (packageJsonUrl: string) => Promise<unknown>;
+};
 
+function parsePackageMetadata(packageJsonPath: string, packageJson: unknown): Readonly<PackageMetadata> {
     if (
         isRecord(packageJson) &&
         typeof packageJson.name === 'string' &&
@@ -39,12 +42,18 @@ function isEnoentError(error: unknown): boolean {
     return isRecord(error) && error.code === 'ENOENT';
 }
 
-function readPackageMetadata(packageJsonPath: string): Readonly<PackageMetadata> | undefined {
-    try {
-        // eslint-disable-next-line node/no-sync -- plugin metadata must be available during module initialization
-        const packageJsonContent = fs.readFileSync(packageJsonPath, { encoding: 'utf8' });
+async function importJsonModule(packageJsonUrl: string): Promise<unknown> {
+    return import(packageJsonUrl, {
+        with: { type: 'json' }
+    }) as Promise<unknown>;
+}
 
-        return parsePackageMetadata(packageJsonPath, packageJsonContent);
+async function readPackageMetadata(
+    packageJsonPath: string,
+    dependencies: Readonly<PackageMetadataReaderDependencies>
+): Promise<Readonly<PackageMetadata> | undefined> {
+    try {
+        await dependencies.accessFile(packageJsonPath);
     } catch (error) {
         if (isEnoentError(error)) {
             return undefined;
@@ -52,19 +61,38 @@ function readPackageMetadata(packageJsonPath: string): Readonly<PackageMetadata>
 
         throw error;
     }
-}
 
-export function readClosestPackageMetadata(currentModuleUrl: string): Readonly<PackageMetadata> {
-    let currentFolder = path.dirname(fileURLToPath(currentModuleUrl));
+    const packageJsonModule = await dependencies.importJsonModule(pathToFileURL(packageJsonPath).href);
 
-    for (;;) {
-        const packageJsonPath = path.join(currentFolder, 'package.json');
-        const packageMetadata = readPackageMetadata(packageJsonPath);
-
-        if (packageMetadata !== undefined) {
-            return packageMetadata;
-        }
-
-        currentFolder = determineParentFolder(currentFolder);
+    if (!isRecord(packageJsonModule) || !('default' in packageJsonModule)) {
+        throw new Error(`Missing default export in ${packageJsonPath}`);
     }
+
+    return parsePackageMetadata(packageJsonPath, packageJsonModule.default);
 }
+
+export function createPackageMetadataReader(
+    dependencies: Readonly<PackageMetadataReaderDependencies>
+): (currentModuleUrl: string) => Promise<Readonly<PackageMetadata>> {
+    return async function readClosestPackageMetadata(currentModuleUrl: string): Promise<Readonly<PackageMetadata>> {
+        let currentFolder = path.dirname(fileURLToPath(currentModuleUrl));
+
+        for (;;) {
+            const packageJsonPath = path.join(currentFolder, 'package.json');
+            const packageMetadata = await readPackageMetadata(packageJsonPath, dependencies);
+
+            if (packageMetadata !== undefined) {
+                return packageMetadata;
+            }
+
+            currentFolder = determineParentFolder(currentFolder);
+        }
+    };
+}
+
+export const readClosestPackageMetadata = createPackageMetadataReader({
+    async accessFile(packageJsonPath) {
+        await fs.access(packageJsonPath);
+    },
+    importJsonModule
+});

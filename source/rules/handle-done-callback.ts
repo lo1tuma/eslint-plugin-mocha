@@ -1,7 +1,6 @@
 import type { Rule, Scope } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import type { FunctionExpression } from '../ast/node-types.js';
-import { isRecord } from '../record.js';
 
 function findParamInScope(paramName: string, scope: Readonly<Scope.Scope>): Readonly<Scope.Variable | undefined> {
     return scope.variables.find((variable) => {
@@ -33,8 +32,8 @@ export const handleDoneCallbackRule: Readonly<Rule.RuleModule> = {
         ]
     },
     create(context) {
-        const options = isRecord(context.options[0]) ? context.options[0] : {};
-        const ignorePending = options.ignorePending === true;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- schema validation and defaultOptions guarantee the option shape
+        const [{ ignorePending }] = context.options as [{ ignorePending: boolean; }];
 
         function isReferenceHandled(reference: Readonly<Scope.Reference>): boolean {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- bad eslint core typing

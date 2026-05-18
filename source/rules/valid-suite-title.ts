@@ -2,7 +2,6 @@ import { getStringIfConstant } from '@eslint-community/eslint-utils';
 import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { type CallExpression, isCallExpression } from '../ast/node-types.js';
-import { isRecord } from '../record.js';
 
 type Options = {
     pattern: RegExp;
@@ -10,12 +9,9 @@ type Options = {
 };
 
 function objectOptions(options: unknown): Readonly<Options> {
-    const {
-        pattern: stringPattern,
-        message
-    } = isRecord(options) ? options : {};
-
-    const pattern = new RegExp(typeof stringPattern === 'string' ? stringPattern : '', 'u');
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- schema validation and defaultOptions guarantee the option shape
+    const { pattern: stringPattern, message } = options as { pattern: string; message?: string; };
+    const pattern = new RegExp(stringPattern, 'u');
 
     return { pattern, message: typeof message === 'string' ? message : undefined };
 }

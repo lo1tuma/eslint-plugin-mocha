@@ -1,7 +1,6 @@
 import type { Rule } from 'eslint';
 import type { Except } from 'type-fest';
 import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
-import { isRecord } from '../record.js';
 
 type Layer = {
     suiteNode: Except<Rule.Node, 'parent'>;
@@ -56,8 +55,9 @@ export const noHooksForSingleCaseRule: Readonly<Rule.RuleModule> = {
         ]
     },
     create(context) {
-        const options = isRecord(context.options[0]) ? context.options[0] : {};
-        const allowedHooks = new Set((Array.isArray(options.allow) ? options.allow : []).map(ensureEndsWithParens));
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- schema validation and defaultOptions guarantee the option shape
+        const [{ allow }] = context.options as [{ allow: string[]; }];
+        const allowedHooks = new Set(allow.map(ensureEndsWithParens));
         let layers: Layer[] = [];
 
         function increaseTestCount(): void {

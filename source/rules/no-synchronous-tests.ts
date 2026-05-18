@@ -2,7 +2,6 @@ import type { Rule } from 'eslint';
 import type { Except } from 'type-fest';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { type BlockStatement, isBlockStatement, isFunction, type ReturnStatement } from '../ast/node-types.js';
-import { isRecord } from '../record.js';
 
 const asyncMethods = ['async', 'callback', 'promise'];
 
@@ -71,12 +70,8 @@ export const noSynchronousTestsRule: Readonly<Rule.RuleModule> = {
         ]
     },
     create(context) {
-        const [firstOption] = context.options as unknown[];
-        const options = isRecord(firstOption) ? firstOption : {};
-        const allowedAsyncMethods = options.allowed === undefined
-            ? asyncMethods
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- we have json schema validation in place so we know this is a string
-            : options.allowed as unknown as string[];
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- schema validation and defaultOptions guarantee the option shape
+        const [{ allowed: allowedAsyncMethods }] = context.options as [{ allowed: string[]; }];
         const asyncTypes = new Set(['testCase', 'hook']);
 
         return createMochaVisitors(context, {

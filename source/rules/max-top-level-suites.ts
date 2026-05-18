@@ -1,6 +1,5 @@
 import type { Rule, Scope } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { isRecord } from '../record.js';
 
 const defaultSuiteLimit = 1;
 
@@ -33,8 +32,8 @@ export const maxTopLevelSuitesRule: Readonly<Rule.RuleModule> = {
     },
     create(context) {
         const topLevelSuites: Rule.Node[] = [];
-        const options = isRecord(context.options[0]) ? context.options[0] : {};
-        const suiteLimit = typeof options.limit === 'number' ? options.limit : defaultSuiteLimit;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- schema validation and defaultOptions guarantee the option shape
+        const [{ limit: suiteLimit }] = context.options as [{ limit: number; }];
 
         return createMochaVisitors(context, {
             suite(visitorContext) {

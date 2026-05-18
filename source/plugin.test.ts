@@ -34,8 +34,8 @@ async function determineAllDocumentationFiles(): Promise<string[]> {
 }
 
 describe('eslint-plugin-mocha', function () {
-    it('should expose plugin metadata', function () {
-        assert.deepStrictEqual(plugin.meta, readClosestPackageMetadata(import.meta.url));
+    it('should expose plugin metadata', async function () {
+        assert.deepStrictEqual(plugin.meta, await readClosestPackageMetadata(import.meta.url));
     });
 
     it('should expose all rules', async function () {
