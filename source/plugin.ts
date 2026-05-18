@@ -1,5 +1,6 @@
 import type { ESLint, Linter } from 'eslint';
 import globals from 'globals';
+import { readClosestPackageMetadata } from './package-metadata.js';
 import { consistentInterfaceRule } from './rules/consistent-interface.js';
 import { consistentSpacingBetweenBlocksRule } from './rules/consistent-spacing-between-blocks.js';
 import { handleDoneCallbackRule } from './rules/handle-done-callback.js';
@@ -25,11 +26,7 @@ import { preferArrowCallbackRule } from './rules/prefer-arrow-callback.js';
 import { validSuiteTitleRule } from './rules/valid-suite-title.js';
 import { validTestTitleRule } from './rules/valid-test-title.js';
 
-const pluginMeta = {
-    name: 'eslint-plugin-mocha',
-    // Keep this in sync with Packtory's publish-time package version.
-    version: '11.3.0'
-} as const;
+const pluginMeta = readClosestPackageMetadata(import.meta.url);
 
 const allRules: Linter.RulesRecord = {
     'mocha/handle-done-callback': 'error',

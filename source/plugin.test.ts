@@ -2,6 +2,7 @@ import { camelCase } from 'change-case';
 import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
+import { readClosestPackageMetadata } from './package-metadata.js';
 import plugin from './plugin.js';
 
 const { pathname: currentFolderName } = new URL('.', import.meta.url);
@@ -34,10 +35,7 @@ async function determineAllDocumentationFiles(): Promise<string[]> {
 
 describe('eslint-plugin-mocha', function () {
     it('should expose plugin metadata', function () {
-        assert.deepStrictEqual(plugin.meta, {
-            name: 'eslint-plugin-mocha',
-            version: '11.3.0'
-        });
+        assert.deepStrictEqual(plugin.meta, readClosestPackageMetadata(import.meta.url));
     });
 
     it('should expose all rules', async function () {
