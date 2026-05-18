@@ -85,7 +85,7 @@ export type MochaPlugin = ESLint.Plugin & {
     };
 };
 
-const mochaPlugin: MochaPlugin = {
+const mochaPlugin = {
     rules: {
         'handle-done-callback': handleDoneCallbackRule,
         'max-top-level-suites': maxTopLevelSuitesRule,
@@ -111,12 +111,10 @@ const mochaPlugin: MochaPlugin = {
         'valid-suite-title': validSuiteTitleRule,
         'valid-test-title': validTestTitleRule,
         'no-empty-title': noEmptyTitleRule
-    },
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-type-assertion -- This field will be set later for cyclic references
-    configs: undefined as any
-};
+    }
+} satisfies ESLint.Plugin;
 
-mochaPlugin.configs = {
+const configs: MochaPlugin['configs'] = {
     all: {
         name: 'mocha/all',
         plugins: { mocha: mochaPlugin },
@@ -131,4 +129,6 @@ mochaPlugin.configs = {
     }
 };
 
-export default mochaPlugin;
+const plugin: MochaPlugin = Object.assign(mochaPlugin, { configs });
+
+export default plugin;
