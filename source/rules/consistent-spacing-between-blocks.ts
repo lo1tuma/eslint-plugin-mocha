@@ -39,12 +39,23 @@ type Layer = {
     scopeNode: AnyFunction['body'] | Program;
 };
 
+function isNestedStatementBoundary(node: Rule.Node): boolean {
+    return node.type.endsWith('Statement') || node.type.endsWith('Declaration') || isFunction(node);
+}
+
 function isDirectStatementInScope(scopeNode: Layer['scopeNode'], node: Rule.Node): boolean {
-    let current = node.parent;
-    while (!isBlockStatement(current) && !isProgram(current)) {
+    let current = node;
+    while (current.parent !== scopeNode) {
         current = current.parent;
+        if (
+            isNestedStatementBoundary(current) &&
+            !(current.type === 'ExpressionStatement' && current.parent === scopeNode)
+        ) {
+            return false;
+        }
     }
-    return current === scopeNode;
+
+    return current.type === 'ExpressionStatement';
 }
 
 function getParentWhileMemberExpression(node: Rule.Node): Rule.Node {
