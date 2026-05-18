@@ -3,6 +3,164 @@ import { consistentSpacingBetweenBlocksRule } from './consistent-spacing-between
 
 const ruleTester = new RuleTester({ languageOptions: { ecmaVersion: 2020, sourceType: 'script' } });
 
+type StatementWrapper = (statement: string) => string;
+
+const nestedStatementWrappers: StatementWrapper[] = [
+    (statement) => {
+        return `{
+    ${statement}
+}`;
+    },
+    (statement) => {
+        return `testCases.forEach((testCase) => {
+    ${statement}
+});`;
+    },
+    (statement) => {
+        return `if (condition) {
+    ${statement}
+}`;
+    },
+    (statement) => {
+        return `if (condition)
+    ${statement}`;
+    },
+    (statement) => {
+        return `if (condition) {
+    helper();
+} else {
+    ${statement}
+}`;
+    },
+    (statement) => {
+        return `for (let index = 0; index < testCases.length; index += 1) {
+    ${statement}
+}`;
+    },
+    (statement) => {
+        return `for (let index = 0; index < testCases.length; index += 1)
+    ${statement}`;
+    },
+    (statement) => {
+        return `for (const key in testCases) {
+    ${statement}
+}`;
+    },
+    (statement) => {
+        return `for (const key in testCases)
+    ${statement}`;
+    },
+    (statement) => {
+        return `for (const testCase of testCases) {
+    ${statement}
+}`;
+    },
+    (statement) => {
+        return `for (const testCase of testCases)
+    ${statement}`;
+    },
+    (statement) => {
+        return `while (condition) {
+    ${statement}
+}`;
+    },
+    (statement) => {
+        return `while (condition)
+    ${statement}`;
+    },
+    (statement) => {
+        return `do {
+    ${statement}
+} while (condition);`;
+    },
+    (statement) => {
+        return `do
+    ${statement}
+while (condition);`;
+    },
+    (statement) => {
+        return `switch (kind) {
+    case 'first':
+        ${statement}
+        break;
+    default:
+        break;
+}`;
+    },
+    (statement) => {
+        return `try {
+    ${statement}
+} catch (error) {
+    handle(error);
+} finally {
+    cleanup();
+}`;
+    },
+    (statement) => {
+        return `function registerCase() {
+    ${statement}
+}`;
+    },
+    (statement) => {
+        return `const registerCase = () => {
+    ${statement}
+};`;
+    }
+];
+
+function indentLines(code: string): string[] {
+    return code.split('\n').map((line) => {
+        return `    ${line}`;
+    });
+}
+
+function createValidNestedStatementCase(wrapper: StatementWrapper): { code: string; } {
+    return {
+        code: [
+            "describe('foo', () => {",
+            "    it('bar', () => {});",
+            '',
+            ...indentLines(wrapper("it('baz', () => {});")),
+            '});'
+        ]
+            .join('\n')
+    };
+}
+
+function createInvalidNestedStatementCase(wrapper: StatementWrapper): {
+    code: string;
+    output: string;
+    errors: [{ message: string; type: string; }];
+} {
+    return {
+        code: [
+            "describe('foo', () => {",
+            "    it('bar', () => {});",
+            '',
+            ...indentLines(wrapper('helper();')),
+            '    afterEach(() => {});',
+            '});'
+        ]
+            .join('\n'),
+        output: [
+            "describe('foo', () => {",
+            "    it('bar', () => {});",
+            '',
+            ...indentLines(wrapper('helper();')),
+            '',
+            '    afterEach(() => {});',
+            '});'
+        ]
+            .join('\n'),
+        errors: [
+            {
+                message: 'Expected line break before this statement.',
+                type: 'CallExpression'
+            }
+        ]
+    };
+}
+
 ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetweenBlocksRule, {
     valid: [
         `describe();
@@ -72,7 +230,8 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
                     it(testCase.title, () => {});
                 });
             });`
-        }
+        },
+        ...nestedStatementWrappers.map(createValidNestedStatementCase)
     ],
 
     invalid: [
@@ -189,6 +348,7 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
                     type: 'CallExpression'
                 }
             ]
-        }
+        },
+        ...nestedStatementWrappers.map(createInvalidNestedStatementCase)
     ]
 });
