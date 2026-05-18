@@ -12,6 +12,9 @@ export const noGlobalTestsRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow global tests',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-global-tests.md'
         },
+        messages: {
+            unexpectedGlobalTest: 'Unexpected global mocha test.'
+        },
         schema: []
     },
     create(context) {
@@ -20,7 +23,7 @@ export const noGlobalTestsRule: Readonly<Rule.RuleModule> = {
                 const scope = context.sourceCode.getScope(visitorContext.node);
 
                 if (isGlobalScope(scope)) {
-                    context.report({ node: visitorContext.node, message: 'Unexpected global mocha test.' });
+                    context.report({ node: visitorContext.node, messageId: 'unexpectedGlobalTest' });
                 }
             }
         });

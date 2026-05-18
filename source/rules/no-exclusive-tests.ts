@@ -9,6 +9,9 @@ export const noExclusiveTestsRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow exclusive tests',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-exclusive-tests.md'
         },
+        messages: {
+            unexpectedExclusiveTest: 'Unexpected exclusive mocha test.'
+        },
         schema: []
     },
     create(context) {
@@ -17,7 +20,7 @@ export const noExclusiveTestsRule: Readonly<Rule.RuleModule> = {
                 context.report({
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ok in this case
                     node: ((visitorContext.node as CallExpression).callee as MemberExpression).property,
-                    message: 'Unexpected exclusive mocha test.'
+                    messageId: 'unexpectedExclusiveTest'
                 });
             }
         }

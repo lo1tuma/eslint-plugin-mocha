@@ -48,6 +48,10 @@ export const noSynchronousTestsRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow synchronous tests',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-synchronous-tests.md'
         },
+        defaultOptions: [{ allowed: asyncMethods }],
+        messages: {
+            unexpectedSynchronousTest: 'Unexpected synchronous test.'
+        },
         schema: [
             {
                 type: 'object',
@@ -100,7 +104,7 @@ export const noSynchronousTestsRule: Readonly<Rule.RuleModule> = {
                 const isAsyncTest = testAsyncMethods.includes(true);
 
                 if (!isAsyncTest) {
-                    context.report({ node: visitorContext.node, message: 'Unexpected synchronous test.' });
+                    context.report({ node: visitorContext.node, messageId: 'unexpectedSynchronousTest' });
                 }
             }
         });

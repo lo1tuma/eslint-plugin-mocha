@@ -15,6 +15,10 @@ export const maxTopLevelSuitesRule: Readonly<Rule.RuleModule> = {
             description: 'Enforce the number of top-level suites in a single file',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/max-top-level-suites.md'
         },
+        defaultOptions: [{ limit: defaultSuiteLimit }],
+        messages: {
+            tooManyTopLevelSuites: 'The number of top-level suites is more than {{limit}}.'
+        },
         schema: [
             {
                 type: 'object',
@@ -46,7 +50,8 @@ export const maxTopLevelSuitesRule: Readonly<Rule.RuleModule> = {
                     context.report({
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- ok in this case
                         node: topLevelSuites[suiteLimit]!,
-                        message: `The number of top-level suites is more than ${suiteLimit}.`
+                        messageId: 'tooManyTopLevelSuites',
+                        data: { limit: String(suiteLimit) }
                     });
                 }
             }

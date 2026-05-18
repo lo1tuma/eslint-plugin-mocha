@@ -75,6 +75,9 @@ export const noMochaArrowsRule: Readonly<Rule.RuleModule> = {
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-mocha-arrows.md'
         },
         fixable: 'code',
+        messages: {
+            unexpectedArrowFunction: 'Do not pass arrow functions to {{name}}'
+        },
         schema: []
     },
     create(context) {
@@ -86,7 +89,8 @@ export const noMochaArrowsRule: Readonly<Rule.RuleModule> = {
                 if (isArrowFunctionExpression(node)) {
                     context.report({
                         node: visitorContext.node.parent,
-                        message: `Do not pass arrow functions to ${visitorContext.name}`,
+                        messageId: 'unexpectedArrowFunction',
+                        data: { name: visitorContext.name },
                         fix(fixer) {
                             return fixArrowFunction(fixer, sourceCode, node);
                         }

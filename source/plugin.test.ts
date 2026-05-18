@@ -33,6 +33,13 @@ async function determineAllDocumentationFiles(): Promise<string[]> {
 }
 
 describe('eslint-plugin-mocha', function () {
+    it('should expose plugin metadata', function () {
+        assert.deepStrictEqual(plugin.meta, {
+            name: 'eslint-plugin-mocha',
+            version: '11.3.0'
+        });
+    });
+
     it('should expose all rules', async function () {
         const ruleFiles = await determineAllRuleFiles();
 
@@ -63,6 +70,13 @@ describe('eslint-plugin-mocha', function () {
 
                 assert.strictEqual(matchingDocumentationFiles.length, 1);
             });
+        });
+    });
+
+    describe('configs', function () {
+        it('should expose itself in flat configs', function () {
+            assert.strictEqual(plugin.configs.all.plugins.mocha, plugin);
+            assert.strictEqual(plugin.configs.recommended.plugins.mocha, plugin);
         });
     });
 });

@@ -33,6 +33,10 @@ export const validTestTitleRule: Readonly<Rule.RuleModule> = {
             description: 'Require test descriptions to match a pre-configured regular expression',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/valid-test-title.md'
         },
+        defaultOptions: [{ pattern: '^should' }],
+        messages: {
+            invalidTestTitle: 'Invalid "{{name}}" description found.'
+        },
         schema: [
             {
                 type: 'object',
@@ -78,7 +82,11 @@ export const validTestTitleRule: Readonly<Rule.RuleModule> = {
                 const { node, name } = visitorContext;
 
                 if (isCallExpression(node) && !hasValidOrNoTestDescription(node)) {
-                    context.report({ node, message: message ?? `Invalid "${name}" description found.` });
+                    context.report(
+                        message === undefined
+                            ? { node, messageId: 'invalidTestTitle', data: { name } }
+                            : { node, message }
+                    );
                 }
             }
         });

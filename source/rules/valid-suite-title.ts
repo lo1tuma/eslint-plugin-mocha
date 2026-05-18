@@ -34,6 +34,10 @@ export const validSuiteTitleRule: Readonly<Rule.RuleModule> = {
             description: 'Require suite descriptions to match a pre-configured regular expression',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/valid-suite-title.md'
         },
+        defaultOptions: [{ pattern: '' }],
+        messages: {
+            invalidSuiteTitle: 'Invalid "{{name}}" description found.'
+        },
         schema: [
             {
                 type: 'object',
@@ -78,7 +82,11 @@ export const validSuiteTitleRule: Readonly<Rule.RuleModule> = {
                 const { node, name } = visitorContext;
 
                 if (isCallExpression(node) && !hasValidOrNoSuiteDescription(node)) {
-                    context.report({ node, message: message ?? `Invalid "${name}" description found.` });
+                    context.report(
+                        message === undefined
+                            ? { node, messageId: 'invalidSuiteTitle', data: { name } }
+                            : { node, message }
+                    );
                 }
             }
         });

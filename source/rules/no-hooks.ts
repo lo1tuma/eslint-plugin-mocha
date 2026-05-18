@@ -20,6 +20,10 @@ export const noHooksRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow hooks',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-hooks.md'
         },
+        defaultOptions: [{ allow: [] }],
+        messages: {
+            unexpectedHook: 'Unexpected use of Mocha `{{name}}` hook'
+        },
         schema: [
             {
                 type: 'object',
@@ -48,7 +52,8 @@ export const noHooksRule: Readonly<Rule.RuleModule> = {
                 if (!isHookAllowed) {
                     context.report({
                         node: visitorContext.node,
-                        message: `Unexpected use of Mocha \`${visitorContext.name}\` hook`
+                        messageId: 'unexpectedHook',
+                        data: { name: visitorContext.name }
                     });
                 }
             }

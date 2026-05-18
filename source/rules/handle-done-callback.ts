@@ -16,13 +16,16 @@ export const handleDoneCallbackRule: Readonly<Rule.RuleModule> = {
             description: 'Enforces handling of callbacks for async tests',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/handle-done-callback.md'
         },
+        defaultOptions: [{ ignorePending: false }],
+        messages: {
+            expectedCallback: 'Expected "{{name}}" callback to be handled.'
+        },
         schema: [
             {
                 type: 'object',
                 properties: {
                     ignorePending: {
-                        type: 'boolean',
-                        default: false
+                        type: 'boolean'
                     }
                 },
                 additionalProperties: false
@@ -60,7 +63,7 @@ export const handleDoneCallbackRule: Readonly<Rule.RuleModule> = {
             if (callbackVariable !== undefined && !hasHandledReferences(callbackVariable.references)) {
                 context.report({
                     node: callback,
-                    message: 'Expected "{{name}}" callback to be handled.',
+                    messageId: 'expectedCallback',
                     data: { name: callbackName }
                 });
             }

@@ -9,14 +9,17 @@ export const consistentInterfaceRule: Readonly<Rule.RuleModule> = {
             description: 'Enforces consistent use of mocha interfaces',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/consistent-interface.md'
         },
+        defaultOptions: [{ interface: 'BDD' }],
+        messages: {
+            unexpectedInterface: 'Unexpected use of {{actualInterface}} interface instead of {{expectedInterface}}'
+        },
         schema: [
             {
                 type: 'object',
                 properties: {
                     interface: {
                         type: 'string',
-                        enum: ['BDD', 'TDD'],
-                        default: 'BDD'
+                        enum: ['BDD', 'TDD']
                     }
                 },
                 additionalProperties: false
@@ -33,7 +36,11 @@ export const consistentInterfaceRule: Readonly<Rule.RuleModule> = {
                 if (visitorContext.interface !== interfaceToUse) {
                     context.report({
                         node: visitorContext.node,
-                        message: `Unexpected use of ${visitorContext.interface} interface instead of ${interfaceToUse}`
+                        messageId: 'unexpectedInterface',
+                        data: {
+                            actualInterface: visitorContext.interface,
+                            expectedInterface: interfaceToUse
+                        }
                     });
                 }
             }

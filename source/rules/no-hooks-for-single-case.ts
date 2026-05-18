@@ -36,6 +36,10 @@ export const noHooksForSingleCaseRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow hooks for a single test or test suite',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-hooks-for-single-case.md'
         },
+        defaultOptions: [{ allow: [] }],
+        messages: {
+            unexpectedHookForSingleTest: 'Unexpected use of Mocha `{{name}}` hook for a single test case'
+        },
         schema: [
             {
                 type: 'object',
@@ -78,7 +82,8 @@ export const noHooksForSingleCaseRule: Readonly<Rule.RuleModule> = {
                         .forEach((hookNode) => {
                             context.report({
                                 node: hookNode.node,
-                                message: `Unexpected use of Mocha \`${hookNode.name}\` hook for a single test case`
+                                messageId: 'unexpectedHookForSingleTest',
+                                data: { name: hookNode.name }
                             });
                         });
                 }

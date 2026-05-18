@@ -9,6 +9,9 @@ export const noPendingTestsRule: Rule.RuleModule = {
             description: 'Disallow pending tests',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-pending-tests.md'
         },
+        messages: {
+            unexpectedPendingTest: 'Unexpected pending mocha test.'
+        },
         schema: []
     },
     create(context) {
@@ -22,7 +25,7 @@ export const noPendingTestsRule: Rule.RuleModule = {
 
             context.report({
                 node: nodeToReport,
-                message: 'Unexpected pending mocha test.'
+                messageId: 'unexpectedPendingTest'
             });
         }
 
@@ -35,7 +38,7 @@ export const noPendingTestsRule: Rule.RuleModule = {
                 if (isCallbackMissing(visitorContext.node)) {
                     context.report({
                         node: visitorContext.node,
-                        message: 'Unexpected pending mocha test.'
+                        messageId: 'unexpectedPendingTest'
                     });
                 } else if (visitorContext.modifier === 'pending') {
                     reportSkipped(visitorContext.node);

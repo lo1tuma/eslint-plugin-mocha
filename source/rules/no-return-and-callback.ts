@@ -8,7 +8,7 @@ function reportIfShortArrowFunction(context: Readonly<Rule.RuleContext>, node: R
     if (node.body.type !== 'BlockStatement') {
         context.report({
             node: node.body,
-            message: 'Confusing implicit return in a test with callback'
+            messageId: 'implicitReturnWithCallback'
         });
         return true;
     }
@@ -27,6 +27,10 @@ export const noReturnAndCallbackRule: Readonly<Rule.RuleModule> = {
         docs: {
             description: 'Disallow returning in a test or hook function that uses a callback',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-return-and-callback.md'
+        },
+        messages: {
+            implicitReturnWithCallback: 'Confusing implicit return in a test with callback',
+            unexpectedReturnWithCallback: 'Unexpected use of `return` in a test with callback'
         },
         schema: []
     },
@@ -47,7 +51,7 @@ export const noReturnAndCallbackRule: Readonly<Rule.RuleModule> = {
             if (returnStatement !== undefined && !isAllowedReturnStatement(returnStatement, doneName)) {
                 context.report({
                     node: returnStatement,
-                    message: 'Unexpected use of `return` in a test with callback'
+                    messageId: 'unexpectedReturnWithCallback'
                 });
             }
         }

@@ -25,6 +25,12 @@ import { preferArrowCallbackRule } from './rules/prefer-arrow-callback.js';
 import { validSuiteTitleRule } from './rules/valid-suite-title.js';
 import { validTestTitleRule } from './rules/valid-test-title.js';
 
+const pluginMeta = {
+    name: 'eslint-plugin-mocha',
+    // Keep this in sync with Packtory's publish-time package version.
+    version: '11.3.0'
+} as const;
+
 const allRules: Linter.RulesRecord = {
     'mocha/handle-done-callback': 'error',
     'mocha/max-top-level-suites': 'error',
@@ -130,11 +136,13 @@ const configs: {
 };
 
 export type MochaPlugin = ESLint.Plugin & {
+    meta: typeof pluginMeta;
     rules: typeof rules;
     configs: typeof configs;
 };
 
 const plugin: MochaPlugin = {
+    meta: pluginMeta,
     rules,
     configs
 };

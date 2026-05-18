@@ -50,6 +50,10 @@ export const noEmptyTitleRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow empty test descriptions',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-empty-title.md'
         },
+        defaultOptions: [{ message: ERROR_MESSAGE }],
+        messages: {
+            emptyTitle: ERROR_MESSAGE
+        },
         schema: [
             {
                 type: 'object',
@@ -88,7 +92,11 @@ export const noEmptyTitleRule: Readonly<Rule.RuleModule> = {
         return createMochaVisitors(context, {
             suiteOrTestCase(visitorContext) {
                 if (isCallExpression(visitorContext.node) && !isNonEmptyDescription(visitorContext.node)) {
-                    context.report({ node: visitorContext.node, message });
+                    context.report(
+                        message === ERROR_MESSAGE
+                            ? { node: visitorContext.node, messageId: 'emptyTitle' }
+                            : { node: visitorContext.node, message }
+                    );
                 }
             }
         });

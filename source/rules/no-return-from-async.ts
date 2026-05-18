@@ -7,7 +7,7 @@ function reportIfShortArrowFunction(context: Readonly<Rule.RuleContext>, node: R
     if (node.body.type !== 'BlockStatement') {
         context.report({
             node: node.body,
-            message: 'Confusing implicit return in a test with an async function'
+            messageId: 'implicitReturnWithAsync'
         });
         return true;
     }
@@ -20,6 +20,10 @@ export const noReturnFromAsyncRule: Readonly<Rule.RuleModule> = {
         docs: {
             description: 'Disallow returning from an async test or hook',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-return-from-async.md'
+        },
+        messages: {
+            implicitReturnWithAsync: 'Confusing implicit return in a test with an async function',
+            unexpectedReturnWithAsync: 'Unexpected use of `return` in a test with an async function'
         },
         schema: []
     },
@@ -40,7 +44,7 @@ export const noReturnFromAsyncRule: Readonly<Rule.RuleModule> = {
             if (returnStatement !== undefined && !isAllowedReturnStatement(returnStatement)) {
                 context.report({
                     node: returnStatement,
-                    message: 'Unexpected use of `return` in a test with an async function'
+                    messageId: 'unexpectedReturnWithAsync'
                 });
             }
         }

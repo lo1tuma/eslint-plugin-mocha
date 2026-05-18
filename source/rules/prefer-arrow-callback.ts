@@ -129,6 +129,11 @@ export const preferArrowCallbackRule: Readonly<Rule.RuleModule> = {
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/prefer-arrow-callback.md'
         },
 
+        defaultOptions: [{
+            allowNamedFunctions: false,
+            allowUnboundThis: true
+        }],
+
         schema: [
             {
                 type: 'object',
