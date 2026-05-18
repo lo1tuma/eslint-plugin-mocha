@@ -3,8 +3,22 @@ import type { Rule } from 'eslint';
 import type { Except } from 'type-fest';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { type CallExpression, isCallExpression } from '../ast/node-types.js';
+import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 
 const ERROR_MESSAGE = 'Unexpected empty test description.';
+const optionSchema = {
+    type: 'object',
+    properties: {
+        message: {
+            type: 'string'
+        }
+    },
+    additionalProperties: false
+} as const satisfies RuleSchema;
+
+type Option = InferSchemaOption<typeof optionSchema>;
+type ResolvedOption = Option & { message: string; };
+const defaultOption: ResolvedOption = { message: ERROR_MESSAGE };
 
 function isLiteral(node: Readonly<Rule.Node>): boolean {
     return node.type === 'Literal';
@@ -49,25 +63,14 @@ export const noEmptyTitleRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow empty test descriptions',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-empty-title.md'
         },
-        defaultOptions: [{ message: ERROR_MESSAGE }],
+        defaultOptions: [defaultOption],
         messages: {
             emptyTitle: ERROR_MESSAGE
         },
-        schema: [
-            {
-                type: 'object',
-                properties: {
-                    message: {
-                        type: 'string'
-                    }
-                },
-                additionalProperties: false
-            }
-        ]
+        schema: [optionSchema]
     },
     create(context) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- schema validation and defaultOptions guarantee the option shape
-        const [{ message }] = context.options as [{ message: string; }];
+        const { message } = getRuleOption<ResolvedOption>(context);
 
         function isNonEmptyDescription(mochaCallExpression: CallExpression): boolean {
             const description = mochaCallExpression.arguments[0];

@@ -2,26 +2,36 @@ import { getStringIfConstant } from '@eslint-community/eslint-utils';
 import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { type CallExpression, isCallExpression } from '../ast/node-types.js';
+import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 
-type Options = {
+type NormalizedOptions = {
     pattern: RegExp;
     message: string | undefined;
 };
 
-function objectOptions(options: unknown): Readonly<Options> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- schema validation and defaultOptions guarantee the option shape
-    const { pattern: stringPattern, message } = options as { pattern: string; message?: string; };
+const optionSchema = {
+    type: 'object',
+    properties: {
+        pattern: {
+            type: 'string'
+        },
+        message: {
+            type: 'string'
+        }
+    },
+    additionalProperties: false
+} as const satisfies RuleSchema;
+
+type Option = InferSchemaOption<typeof optionSchema>;
+type ResolvedOption = Option & { pattern: string; };
+const defaultOption: ResolvedOption = { pattern: '' };
+
+function objectOptions(options: Readonly<ResolvedOption>): Readonly<NormalizedOptions> {
+    const { pattern: stringPattern, message } = options;
     const pattern = new RegExp(stringPattern, 'u');
 
     return { pattern, message: typeof message === 'string' ? message : undefined };
 }
-
-const patternSchema = {
-    type: 'string'
-};
-const messageSchema = {
-    type: 'string'
-};
 
 export const validSuiteTitleRule: Readonly<Rule.RuleModule> = {
     meta: {
@@ -30,23 +40,14 @@ export const validSuiteTitleRule: Readonly<Rule.RuleModule> = {
             description: 'Require suite descriptions to match a pre-configured regular expression',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/valid-suite-title.md'
         },
-        defaultOptions: [{ pattern: '' }],
+        defaultOptions: [defaultOption],
         messages: {
             invalidSuiteTitle: 'Invalid "{{name}}" description found.'
         },
-        schema: [
-            {
-                type: 'object',
-                properties: {
-                    pattern: patternSchema,
-                    message: messageSchema
-                },
-                additionalProperties: false
-            }
-        ]
+        schema: [optionSchema]
     },
     create(context) {
-        const options = context.options[0] as unknown;
+        const options = getRuleOption<ResolvedOption>(context);
         const { pattern, message } = objectOptions(options);
 
         function hasValidSuiteDescription(mochaCallExpression: Readonly<CallExpression>): boolean {

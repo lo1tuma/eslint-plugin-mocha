@@ -1,5 +1,23 @@
 import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
+import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
+
+const optionSchema = {
+    type: 'object',
+    properties: {
+        allow: {
+            type: 'array',
+            items: {
+                type: 'string'
+            }
+        }
+    },
+    additionalProperties: false
+} as const satisfies RuleSchema;
+
+type Option = InferSchemaOption<typeof optionSchema>;
+type ResolvedOption = Option & { allow: string[]; };
+const defaultOption: ResolvedOption = { allow: [] };
 
 function ensureEndsWithParens(value: unknown): string {
     if (typeof value !== 'string') {
@@ -19,29 +37,15 @@ export const noHooksRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow hooks',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-hooks.md'
         },
-        defaultOptions: [{ allow: [] }],
+        defaultOptions: [defaultOption],
         messages: {
             unexpectedHook: 'Unexpected use of Mocha `{{name}}` hook'
         },
-        schema: [
-            {
-                type: 'object',
-                properties: {
-                    allow: {
-                        type: 'array',
-                        items: {
-                            type: 'string'
-                        }
-                    }
-                },
-                additionalProperties: false
-            }
-        ]
+        schema: [optionSchema]
     },
 
     create(context) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- schema validation and defaultOptions guarantee the option shape
-        const [{ allow }] = context.options as [{ allow: string[]; }];
+        const { allow } = getRuleOption<ResolvedOption>(context);
         const allowList = new Set(allow.map(ensureEndsWithParens));
 
         return createMochaVisitors(context, {

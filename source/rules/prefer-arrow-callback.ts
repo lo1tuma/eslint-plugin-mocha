@@ -16,6 +16,30 @@
 import type { AST, Rule, Scope, SourceCode } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { type CallExpression, isCallExpression, type MetaProperty, type Pattern } from '../ast/node-types.js';
+import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
+
+const optionSchema = {
+    type: 'object',
+    properties: {
+        allowNamedFunctions: {
+            type: 'boolean'
+        },
+        allowUnboundThis: {
+            type: 'boolean'
+        }
+    },
+    additionalProperties: false
+} as const satisfies RuleSchema;
+
+type Option = InferSchemaOption<typeof optionSchema>;
+type ResolvedOption = Option & {
+    allowNamedFunctions: boolean;
+    allowUnboundThis: boolean;
+};
+const defaultOption: ResolvedOption = {
+    allowNamedFunctions: false,
+    allowUnboundThis: true
+};
 
 // ------------------------------------------------------------------------------
 // Helpers
@@ -128,25 +152,9 @@ export const preferArrowCallbackRule: Readonly<Rule.RuleModule> = {
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/prefer-arrow-callback.md'
         },
 
-        defaultOptions: [{
-            allowNamedFunctions: false,
-            allowUnboundThis: true
-        }],
+        defaultOptions: [defaultOption],
 
-        schema: [
-            {
-                type: 'object',
-                properties: {
-                    allowNamedFunctions: {
-                        type: 'boolean'
-                    },
-                    allowUnboundThis: {
-                        type: 'boolean'
-                    }
-                },
-                additionalProperties: false
-            }
-        ],
+        schema: [optionSchema],
 
         fixable: 'code',
 
@@ -156,11 +164,10 @@ export const preferArrowCallbackRule: Readonly<Rule.RuleModule> = {
     },
 
     create(context) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- schema validation and defaultOptions guarantee the option shape
-        const [{ allowNamedFunctions, allowUnboundThis }] = context.options as [{
-            allowNamedFunctions: boolean;
-            allowUnboundThis: boolean;
-        }];
+        const {
+            allowNamedFunctions,
+            allowUnboundThis
+        } = getRuleOption<ResolvedOption>(context);
         const { sourceCode } = context;
 
         type CallbackInfo = {

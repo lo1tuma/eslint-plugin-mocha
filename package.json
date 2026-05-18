@@ -48,6 +48,7 @@
         "eslint": "9.18.0",
         "eslint-doc-generator": "2.0.2",
         "eslint-plugin-eslint-plugin": "6.4.0",
+        "json-schema-to-ts": "^3.1.1",
         "markdownlint-cli": "0.43.0",
         "mocha": "11.1.0",
         "pr-log": "6.1.1",

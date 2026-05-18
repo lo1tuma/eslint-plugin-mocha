@@ -1,5 +1,22 @@
 import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
+import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
+
+const interfaces = ['BDD', 'TDD'] as const;
+const optionSchema = {
+    type: 'object',
+    properties: {
+        interface: {
+            type: 'string',
+            enum: interfaces
+        }
+    },
+    additionalProperties: false
+} as const satisfies RuleSchema;
+
+type Option = InferSchemaOption<typeof optionSchema>;
+type ResolvedOption = Option & { interface: (typeof interfaces)[number]; };
+const defaultOption: ResolvedOption = { interface: 'BDD' };
 
 export const consistentInterfaceRule: Readonly<Rule.RuleModule> = {
     meta: {
@@ -8,26 +25,14 @@ export const consistentInterfaceRule: Readonly<Rule.RuleModule> = {
             description: 'Enforces consistent use of mocha interfaces',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/consistent-interface.md'
         },
-        defaultOptions: [{ interface: 'BDD' }],
+        defaultOptions: [defaultOption],
         messages: {
             unexpectedInterface: 'Unexpected use of {{actualInterface}} interface instead of {{expectedInterface}}'
         },
-        schema: [
-            {
-                type: 'object',
-                properties: {
-                    interface: {
-                        type: 'string',
-                        enum: ['BDD', 'TDD']
-                    }
-                },
-                additionalProperties: false
-            }
-        ]
+        schema: [optionSchema]
     },
     create(context) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- schema validation and defaultOptions guarantee the option shape
-        const [{ interface: interfaceToUse }] = context.options as [{ interface: string; }];
+        const { interface: interfaceToUse } = getRuleOption<ResolvedOption>(context);
 
         return createMochaVisitors(context, {
             anyTestEntity(visitorContext) {

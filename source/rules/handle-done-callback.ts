@@ -1,6 +1,21 @@
 import type { Rule, Scope } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import type { FunctionExpression } from '../ast/node-types.js';
+import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
+
+const optionSchema = {
+    type: 'object',
+    properties: {
+        ignorePending: {
+            type: 'boolean'
+        }
+    },
+    additionalProperties: false
+} as const satisfies RuleSchema;
+
+type Option = InferSchemaOption<typeof optionSchema>;
+type ResolvedOption = Option & { ignorePending: boolean; };
+const defaultOption: ResolvedOption = { ignorePending: false };
 
 function findParamInScope(paramName: string, scope: Readonly<Scope.Scope>): Readonly<Scope.Variable | undefined> {
     return scope.variables.find((variable) => {
@@ -15,25 +30,14 @@ export const handleDoneCallbackRule: Readonly<Rule.RuleModule> = {
             description: 'Enforces handling of callbacks for async tests',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/handle-done-callback.md'
         },
-        defaultOptions: [{ ignorePending: false }],
+        defaultOptions: [defaultOption],
         messages: {
             expectedCallback: 'Expected "{{name}}" callback to be handled.'
         },
-        schema: [
-            {
-                type: 'object',
-                properties: {
-                    ignorePending: {
-                        type: 'boolean'
-                    }
-                },
-                additionalProperties: false
-            }
-        ]
+        schema: [optionSchema]
     },
     create(context) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- schema validation and defaultOptions guarantee the option shape
-        const [{ ignorePending }] = context.options as [{ ignorePending: boolean; }];
+        const { ignorePending } = getRuleOption<ResolvedOption>(context);
 
         function isReferenceHandled(reference: Readonly<Scope.Reference>): boolean {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- bad eslint core typing

@@ -2,8 +2,29 @@ import type { Rule } from 'eslint';
 import type { Except } from 'type-fest';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { type BlockStatement, isBlockStatement, isFunction, type ReturnStatement } from '../ast/node-types.js';
+import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 
-const asyncMethods = ['async', 'callback', 'promise'];
+const asyncMethods = ['async', 'callback', 'promise'] as const;
+const optionSchema = {
+    type: 'object',
+    properties: {
+        allowed: {
+            type: 'array',
+            items: {
+                type: 'string',
+                enum: asyncMethods
+            },
+            minItems: 1,
+            uniqueItems: true
+        }
+    },
+    additionalProperties: false
+} as const satisfies RuleSchema;
+
+type Option = InferSchemaOption<typeof optionSchema>;
+type AsyncMethod = (typeof asyncMethods)[number];
+type ResolvedOption = Option & { allowed: AsyncMethod[]; };
+const defaultOption: ResolvedOption = { allowed: Array.from(asyncMethods) };
 
 function hasAsyncCallback(functionExpression: Readonly<Rule.Node>): boolean {
     return isFunction(functionExpression) && functionExpression.params.length === 1;
@@ -47,31 +68,14 @@ export const noSynchronousTestsRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow synchronous tests',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-synchronous-tests.md'
         },
-        defaultOptions: [{ allowed: asyncMethods }],
+        defaultOptions: [defaultOption],
         messages: {
             unexpectedSynchronousTest: 'Unexpected synchronous test.'
         },
-        schema: [
-            {
-                type: 'object',
-                properties: {
-                    allowed: {
-                        type: 'array',
-                        items: {
-                            type: 'string',
-                            enum: asyncMethods
-                        },
-                        minItems: 1,
-                        uniqueItems: true
-                    }
-                },
-                additionalProperties: false
-            }
-        ]
+        schema: [optionSchema]
     },
     create(context) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- schema validation and defaultOptions guarantee the option shape
-        const [{ allowed: allowedAsyncMethods }] = context.options as [{ allowed: string[]; }];
+        const { allowed: allowedAsyncMethods } = getRuleOption<ResolvedOption>(context);
         const asyncTypes = new Set(['testCase', 'hook']);
 
         return createMochaVisitors(context, {
@@ -83,6 +87,7 @@ export const noSynchronousTestsRule: Readonly<Rule.RuleModule> = {
                 const testAsyncMethods = allowedAsyncMethods.map((
                     method
                 ) => {
+                    // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check -- the default branch handles the promise case
                     switch (method) {
                         case 'async':
                             return isAsyncFunction(visitorContext.node);

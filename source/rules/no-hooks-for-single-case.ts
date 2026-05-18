@@ -1,12 +1,30 @@
 import type { Rule } from 'eslint';
 import type { Except } from 'type-fest';
 import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
+import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 
 type Layer = {
     suiteNode: Except<Rule.Node, 'parent'>;
     hookNodes: VisitorContext[];
     testCount: number;
 };
+
+const optionSchema = {
+    type: 'object',
+    properties: {
+        allow: {
+            type: 'array',
+            items: {
+                type: 'string'
+            }
+        }
+    },
+    additionalProperties: false
+} as const satisfies RuleSchema;
+
+type Option = InferSchemaOption<typeof optionSchema>;
+type ResolvedOption = Option & { allow: string[]; };
+const defaultOption: ResolvedOption = { allow: [] };
 
 function newSuiteLayer(suiteNode: Except<Rule.Node, 'parent'>): Readonly<Layer> {
     return {
@@ -35,28 +53,14 @@ export const noHooksForSingleCaseRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow hooks for a single test or test suite',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-hooks-for-single-case.md'
         },
-        defaultOptions: [{ allow: [] }],
+        defaultOptions: [defaultOption],
         messages: {
             unexpectedHookForSingleTest: 'Unexpected use of Mocha `{{name}}` hook for a single test case'
         },
-        schema: [
-            {
-                type: 'object',
-                properties: {
-                    allow: {
-                        type: 'array',
-                        items: {
-                            type: 'string'
-                        }
-                    }
-                },
-                additionalProperties: false
-            }
-        ]
+        schema: [optionSchema]
     },
     create(context) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- schema validation and defaultOptions guarantee the option shape
-        const [{ allow }] = context.options as [{ allow: string[]; }];
+        const { allow } = getRuleOption<ResolvedOption>(context);
         const allowedHooks = new Set(allow.map(ensureEndsWithParens));
         let layers: Layer[] = [];
 
