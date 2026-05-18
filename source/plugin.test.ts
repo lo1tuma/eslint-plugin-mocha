@@ -7,7 +7,7 @@ import plugin from './plugin.js';
 const { pathname: currentFolderName } = new URL('.', import.meta.url);
 
 const rulesDir = path.join(currentFolderName, './rules/');
-const documentationDir = path.join(currentFolderName, '../../../docs/rules/');
+const documentationDir = path.join(currentFolderName, '../../../documentation/rules/');
 
 async function determineAllRuleFiles(): Promise<string[]> {
     const ruleFiles = await fs.promises.readdir(rulesDir);

@@ -7,7 +7,7 @@ export const noExclusiveTestsRule: Readonly<Rule.RuleModule> = {
         type: 'problem',
         docs: {
             description: 'Disallow exclusive tests',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-exclusive-tests.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-exclusive-tests.md'
         },
         schema: []
     },

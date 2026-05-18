@@ -13,7 +13,7 @@ export const maxTopLevelSuitesRule: Readonly<Rule.RuleModule> = {
         type: 'suggestion',
         docs: {
             description: 'Enforce the number of top-level suites in a single file',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/max-top-level-suites.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/max-top-level-suites.md'
         },
         schema: [
             {

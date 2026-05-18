@@ -42,7 +42,7 @@ export const noAsyncSuiteRule: Readonly<Rule.RuleModule> = {
         type: 'problem',
         docs: {
             description: 'Disallow async functions passed to a suite',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-async-suite.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-async-suite.md'
         },
         fixable: 'code',
         schema: []

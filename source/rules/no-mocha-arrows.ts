@@ -72,7 +72,7 @@ export const noMochaArrowsRule: Readonly<Rule.RuleModule> = {
         type: 'suggestion',
         docs: {
             description: 'Disallow arrow functions as arguments to mocha functions',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-mocha-arrows.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-mocha-arrows.md'
         },
         fixable: 'code',
         schema: []

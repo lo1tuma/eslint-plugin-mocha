@@ -31,7 +31,7 @@ export const noIdenticalTitleRule: Readonly<Rule.RuleModule> = {
         type: 'suggestion',
         docs: {
             description: 'Disallow identical titles',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-identical-title.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-identical-title.md'
         },
         schema: []
     },

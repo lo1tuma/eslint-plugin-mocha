@@ -48,7 +48,7 @@ export const noEmptyTitleRule: Readonly<Rule.RuleModule> = {
         type: 'suggestion',
         docs: {
             description: 'Disallow empty test descriptions',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-empty-title.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-empty-title.md'
         },
         schema: [
             {

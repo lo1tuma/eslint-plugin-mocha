@@ -46,7 +46,7 @@ export const noSynchronousTestsRule: Readonly<Rule.RuleModule> = {
         type: 'suggestion',
         docs: {
             description: 'Disallow synchronous tests',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-synchronous-tests.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-synchronous-tests.md'
         },
         schema: [
             {

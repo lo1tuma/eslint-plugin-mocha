@@ -72,7 +72,7 @@ export const consistentSpacingBetweenBlocksRule: Readonly<Rule.RuleModule> = {
         schema: [],
         docs: {
             description: 'Require consistent spacing between blocks',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/' +
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/' +
                 'consistent-spacing-between-blocks.md'
         }
     },

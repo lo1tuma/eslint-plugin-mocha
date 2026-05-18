@@ -6,7 +6,7 @@ export const noNestedTestsRule: Readonly<Rule.RuleModule> = {
         type: 'problem',
         docs: {
             description: 'Disallow tests to be nested within other tests',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-nested-tests.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-nested-tests.md'
         },
         schema: []
     },

@@ -4,11 +4,11 @@
 
 <!-- end auto-generated rule header -->
 
-Test files should have only one purpose, which is testing a specific unit. Using exports could mean the test file is also used to provide and expose utility or library functionalities, instead those should be moved to separate files.
+Test files should stay focused on tests. If a test file also exports values, it often means helper or library code should move to a separate file.
 
 ## Rule Details
 
-This rule looks for ESM export statements and flags them as a problem when the same file also contains a use of a mocha function.
+This rule flags ESM export statements when the same file also uses a Mocha function.
 
 The following patterns are considered warnings:
 
@@ -34,4 +34,4 @@ afterEach(function () {/* ... */});
 
 ## When Not To Use It
 
-When you use the [`exports`](https://mochajs.org/#exports) interface it is not recommended to use this rule.
+Do not use this rule with Mocha's [`exports` interface](https://mochajs.org/#exports).

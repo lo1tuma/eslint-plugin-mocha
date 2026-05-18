@@ -4,11 +4,11 @@
 
 <!-- end auto-generated rule header -->
 
-This rule enforces the test descriptions to follow the desired format.
+This rule enforces a naming pattern for test titles.
 
 ## Rule Details
 
-By default, the regular expression is configured to be `"^should"` which requires test descriptions to start with "should".
+By default, the pattern is `"^should"`, so test titles must start with `should`.
 
 ## Options
 
@@ -20,11 +20,8 @@ rules: {
 },
 ```
 
-where:
-
-- `warn` is a rule error level (see [Configuring Rules](http://eslint.org/docs/user-guide/configuring#configuring-rules))
-- `mypattern$` is a custom regular expression pattern to match test names against
-- `custom error message` a custom error message to describe your pattern
+- `pattern` is the regular expression used to validate test titles
+- `message` is the custom error message shown when a title does not match
 
 The following patterns are considered warnings (with the default rule configuration):
 

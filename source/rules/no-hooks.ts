@@ -18,7 +18,7 @@ export const noHooksRule: Readonly<Rule.RuleModule> = {
         type: 'suggestion',
         docs: {
             description: 'Disallow hooks',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-hooks.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-hooks.md'
         },
         schema: [
             {

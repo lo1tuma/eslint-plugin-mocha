@@ -114,7 +114,7 @@ export default [
             'eslint-plugin/require-meta-docs-description': ['error', { pattern: '^(Enforce|Require|Disallow)' }],
             'eslint-plugin/require-meta-docs-url': [
                 'error',
-                { pattern: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/{{name}}.md' }
+                { pattern: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/{{name}}.md' }
             ]
         }
     }

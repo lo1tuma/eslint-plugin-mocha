@@ -4,8 +4,7 @@
 
 <!-- end auto-generated rule header -->
 
-Mocha allows you to write asynchronous tests by adding a `done` callback to the parameters of your test function.
-It is easy to forget calling this callback after the asynchronous operation is done.
+Mocha lets you write asynchronous tests by accepting a `done` callback. Forgetting to call it usually means the test times out.
 
 Example:
 
@@ -19,11 +18,11 @@ it('should work', function (done) {
 });
 ```
 
-In this example the `done` callback was never called and test will time out.
+In this example, the `done` callback is never called, so the test times out.
 
 ## Rule Details
 
-This rule checks each `FunctionExpression` or `ArrowFunctionExpression` inside of `it`, `it.only`, `test`, `test.only`, `specify`, `specify.only`, `before`, `after`, `beforeEach` and `afterEach`.
+This rule checks functions passed to `it`, `test`, `specify`, and the standard Mocha hooks.
 
 The following patterns are considered warnings:
 
@@ -67,9 +66,9 @@ before(function (done) {
 
 ## Options
 
-This rule supports the following options:
+This rule supports one option:
 
-- `ignorePending`: When set to `true` skipped test cases won’t be checked. Defaults to `false`.
+- `ignorePending`: When `true`, skipped test cases are ignored. Default: `false`.
 
 ```json
 {
@@ -81,8 +80,8 @@ This rule supports the following options:
 
 ## When Not To Use It
 
-If you don’t write asynchronous tests you can safely disable this rule.
+If you do not write asynchronous tests, you can disable this rule.
 
 ## Further Reading
 
-- [Asynchronous test code](http://mochajs.org/#asynchronous-code)
+- [Asynchronous code](https://mochajs.org/#asynchronous-code)

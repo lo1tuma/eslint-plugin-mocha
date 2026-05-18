@@ -6,7 +6,7 @@
 
 <!-- end auto-generated rule header -->
 
-Mocha [discourages](http://mochajs.org/#arrow-functions) passing it arrow functions as arguments. This rule prevents their use on the Mocha globals.
+Mocha [discourages](https://mochajs.org/#arrow-functions) passing arrow functions to suites, tests, and hooks. This rule prevents that on the Mocha globals.
 
 ## Rule Details
 
@@ -42,9 +42,9 @@ it('should be false', function () {
 });
 ```
 
-This does not check usage of the [`require` interface](http://mochajs.org/#require) for Mocha, only the globals.
+This rule only checks the global interface. It does not cover Mocha's [`require` interface](https://mochajs.org/#require).
 
 ## When Not To Use It
 
-- If you want to pass arrow functions to mocha, turn this rule off.
-- If you have other globals which share names with mocha globals, you should turn this rule off, because it would raise warnings.
+- If you want to pass arrow functions to Mocha.
+- If other globals in your project share names with Mocha globals.
