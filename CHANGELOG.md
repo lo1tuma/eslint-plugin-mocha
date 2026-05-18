@@ -1,3 +1,24 @@
+## 11.3.0 (May 18, 2026)
+
+### Bug Fixes
+
+* fix: don't add loops to current layer in consistent-spacing-between-b… ([#408](https://github.com/lo1tuma/eslint-plugin-mocha/pull/408))
+* Fix type of the plugin object's `configs` field ([#393](https://github.com/lo1tuma/eslint-plugin-mocha/pull/393))
+* Fix handling of suites in no-synchronous-tests ([#401](https://github.com/lo1tuma/eslint-plugin-mocha/pull/401))
+
+### Enhancements
+
+* Fix: disallow extra properties in rule options ([#395](https://github.com/lo1tuma/eslint-plugin-mocha/pull/395))
+* Improve exported plugin type ([#400](https://github.com/lo1tuma/eslint-plugin-mocha/pull/400))
+
+### Documentation
+
+* Syntax highlighting for return in no-synchronous-tests-return ([#402](https://github.com/lo1tuma/eslint-plugin-mocha/pull/402))
+
+### Build-Related
+
+* ci: drop node 23, add node 24 ([#397](https://github.com/lo1tuma/eslint-plugin-mocha/pull/397))
+
 ## 11.2.0 (October 2, 2025)
 
 ### Enhancements

@@ -27,7 +27,7 @@ export async function buildConfig() {
                 name: 'eslint-plugin-mocha',
                 versioning: {
                     automatic: false,
-                    version: '11.2.0'
+                    version: '11.3.0'
                 },
                 sourcesFolder,
                 mainPackageJson: packageJson,
