@@ -206,6 +206,11 @@ ruleTester.run('prefer-arrow-callback', preferArrowCallbackRule, {
             output: 'qux(async (foo = 1, bar = 2, baz = 3) => { return this; })',
             languageOptions: { ecmaVersion: 8 },
             errors
+        },
+        {
+            code: 'it("name", function() { foo(function() {}); });',
+            output: 'it("name", function() { foo(() => {}); });',
+            errors
         }
     ]
 });
