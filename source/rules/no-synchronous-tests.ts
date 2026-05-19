@@ -62,6 +62,12 @@ function doesReturnPromise(functionExpression: Readonly<Rule.Node>): boolean {
     return returnStatement !== null && returnStatement !== undefined;
 }
 
+const asyncChecksByMethod = {
+    async: isAsyncFunction,
+    callback: hasAsyncCallback,
+    promise: doesReturnPromise
+} as const satisfies Readonly<Record<AsyncMethod, AsyncCheck>>;
+
 export const noSynchronousTestsRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
@@ -78,14 +84,7 @@ export const noSynchronousTestsRule: Readonly<Rule.RuleModule> = {
     create(context) {
         const { allowed: allowedAsyncMethods } = getRuleOption<ResolvedOption>(context);
         const asyncChecks = allowedAsyncMethods.map<AsyncCheck>((method) => {
-            switch (method) {
-                case 'async':
-                    return isAsyncFunction;
-                case 'callback':
-                    return hasAsyncCallback;
-                default:
-                    return doesReturnPromise;
-            }
+            return asyncChecksByMethod[method];
         });
 
         return createMochaVisitors(context, {
