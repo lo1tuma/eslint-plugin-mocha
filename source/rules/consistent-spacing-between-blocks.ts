@@ -1,4 +1,4 @@
-import type { Rule } from 'eslint';
+import type { AST, Rule } from 'eslint';
 import type { Except } from 'type-fest';
 import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
 import {
@@ -35,8 +35,14 @@ function isFirstStatementInScope(scopeNode: Layer['scopeNode'], node: Rule.Node)
 }
 
 type Layer = {
-    entities: VisitorContext[];
+    entities: EntityLocation[];
     scopeNode: AnyFunction['body'] | Program;
+};
+
+type EntityLocation = {
+    reportNode: VisitorContext['node'];
+    statementNode: Rule.Node;
+    beforeToken: Readonly<AST.Token> | null;
 };
 
 function isNestedStatementBoundary(node: Rule.Node): boolean {
@@ -87,7 +93,15 @@ export const consistentSpacingBetweenBlocksRule: Readonly<Rule.RuleModule> = {
         function addEntityToCurrentLayer(visitorContext: Readonly<VisitorContext>): void {
             const currentLayer = getLastOrThrow(layers);
             if (isDirectStatementInScope(currentLayer.scopeNode, visitorContext.node)) {
-                currentLayer.entities.push(visitorContext);
+                const statementNode = getParentWhileMemberExpression(visitorContext.node);
+                currentLayer.entities.push({
+                    reportNode: visitorContext.node,
+                    statementNode,
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- includeComments is false
+                    beforeToken: sourceCode.getTokenBefore(statementNode, { includeComments: false }) as (
+                        Readonly<AST.Token> | null
+                    )
+                });
             }
         }
 
@@ -96,15 +110,14 @@ export const consistentSpacingBetweenBlocksRule: Readonly<Rule.RuleModule> = {
             const currentLayer = getLastOrThrow(layers);
 
             for (const entity of currentLayer.entities) {
-                const node = getParentWhileMemberExpression(entity.node);
-                const beforeToken = sourceCode.getTokenBefore(node);
+                const { reportNode, statementNode, beforeToken } = entity;
 
-                if (!isFirstStatementInScope(currentLayer.scopeNode, node) && beforeToken !== null) {
-                    const linesBetween = (node.loc?.start.line ?? 0) - (beforeToken.loc.end.line);
+                if (!isFirstStatementInScope(currentLayer.scopeNode, statementNode) && beforeToken !== null) {
+                    const linesBetween = (statementNode.loc?.start.line ?? 0) - (beforeToken.loc?.end.line ?? 0);
 
                     if (linesBetween < minimumAmountOfLinesBetweenNeeded) {
                         context.report({
-                            node: entity.node,
+                            node: reportNode,
                             messageId: 'expectedLineBreak',
                             fix(fixer) {
                                 return fixer.insertTextAfter(
