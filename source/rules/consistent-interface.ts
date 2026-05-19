@@ -23,7 +23,7 @@ export const consistentInterfaceRule: Readonly<Rule.RuleModule> = {
         type: 'problem',
         docs: {
             description: 'Enforces consistent use of mocha interfaces',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/consistent-interface.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/consistent-interface.md'
         },
         defaultOptions: [defaultOption],
         messages: {

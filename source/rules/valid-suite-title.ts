@@ -38,7 +38,7 @@ export const validSuiteTitleRule: Readonly<Rule.RuleModule> = {
         type: 'suggestion',
         docs: {
             description: 'Require suite descriptions to match a pre-configured regular expression',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/valid-suite-title.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/valid-suite-title.md'
         },
         defaultOptions: [defaultOption],
         messages: {

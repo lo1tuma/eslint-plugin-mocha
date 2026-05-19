@@ -7,7 +7,7 @@ export const noPendingTestsRule: Rule.RuleModule = {
         type: 'suggestion',
         docs: {
             description: 'Disallow pending tests',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-pending-tests.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-pending-tests.md'
         },
         messages: {
             unexpectedPendingTest: 'Unexpected pending mocha test.'

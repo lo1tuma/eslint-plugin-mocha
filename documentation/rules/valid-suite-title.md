@@ -4,11 +4,11 @@
 
 <!-- end auto-generated rule header -->
 
-This rule enforces the suite descriptions to follow the desired format.
+This rule enforces a naming pattern for suite titles.
 
 ## Rule Details
 
-By default, the regular expression is not configured and would be required if rule is enabled.
+This rule has no default pattern. If you enable it, configure `pattern`.
 
 Example of a custom rule configuration:
 
@@ -18,12 +18,10 @@ rules: {
 },
 ```
 
-where:
+- `pattern` is the regular expression used to validate suite titles
+- `message` is the custom error message shown when a title does not match
 
-- `warn` is a rule error level (see [Configuring Rules](http://eslint.org/docs/user-guide/configuring#configuring-rules))
-- `^[A-Z]` is a custom regular expression pattern to match suite names against; `^[A-Z]` enforces a suite name to start with an upper-case letter
-
-The following patterns are considered warnings (with the example rule configuration posted above):
+The following patterns are considered warnings with the example configuration above:
 
 ```js
 // bdd
@@ -47,10 +45,10 @@ suite('Test suite', function () {});
 
 ## Options
 
-There are two options available:
+This rule supports two options:
 
-- `pattern`: a regexp pattern
-- `message`: a custom error message
+- `pattern`: A regular expression.
+- `message`: A custom error message.
 
 ```js
 rules: {

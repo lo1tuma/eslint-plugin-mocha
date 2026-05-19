@@ -6,7 +6,7 @@ export const noTopLevelHooksRule: Readonly<Rule.RuleModule> = {
         type: 'problem',
         docs: {
             description: 'Disallow top-level hooks',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-top-level-hooks.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-top-level-hooks.md'
         },
         messages: {
             unexpectedTopLevelHook: 'Unexpected use of Mocha `{{name}}` hook outside of a test suite'

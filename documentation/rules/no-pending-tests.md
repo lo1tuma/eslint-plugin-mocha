@@ -4,9 +4,7 @@
 
 <!-- end auto-generated rule header -->
 
-Mocha allows specification of pending tests, which represent tests that aren't yet implemented or explicitly skipped, but are intended to be implemented eventually. These are designated like a normal mocha test, but with only the first argument provided (no callback for the actual implementation). For example: `it('unimplemented test');` or `it.skip('foo', function () {});`
-
-This rule allows you to raise ESLint warnings or errors on pending tests. This can be useful, for example, for reminding developers that pending tests exist in the repository, so they're more likely to get implemented.
+Mocha supports pending tests. These are tests with no implementation, such as `it('unimplemented test');`, or tests that are explicitly skipped. This rule lets you warn or error on those cases.
 
 ## Rule Details
 
@@ -52,8 +50,8 @@ test.only('bar', function () {});
 
 ## When Not To Use It
 
-- If the existence of pending/unimplemented tests isn't considered important enough to warrant raising lint warnings/errors.
+- If pending or skipped tests are acceptable in your project.
 
 ## Further Reading
 
-- [Pending Tests](http://mochajs.org/#pending-tests)
+- [Pending tests](https://mochajs.org/#pending-tests)

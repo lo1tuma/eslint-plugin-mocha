@@ -26,7 +26,7 @@ export const noReturnAndCallbackRule: Readonly<Rule.RuleModule> = {
         type: 'problem',
         docs: {
             description: 'Disallow returning in a test or hook function that uses a callback',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-return-and-callback.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-return-and-callback.md'
         },
         messages: {
             implicitReturnWithCallback: 'Confusing implicit return in a test with callback',

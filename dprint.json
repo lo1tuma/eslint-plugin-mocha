@@ -73,7 +73,7 @@
         "target/",
         "CHANGELOG.md",
         "README.md",
-        "docs/rules/*.md",
+        "documentation/rules/*.md",
         "**/node_modules",
         "**/*-lock.json"
     ],
