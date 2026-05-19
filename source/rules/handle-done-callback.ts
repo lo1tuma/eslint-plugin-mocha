@@ -18,9 +18,9 @@ type ResolvedOption = Option & { ignorePending: boolean; };
 const defaultOption: ResolvedOption = { ignorePending: false };
 
 function findParamInScope(paramName: string, scope: Readonly<Scope.Scope>): Readonly<Scope.Variable | undefined> {
-    return scope.variables.find((variable) => {
-        return variable.name === paramName && variable.defs[0]?.type === 'Parameter';
-    });
+    const variable = scope.set.get(paramName);
+
+    return variable?.defs[0]?.type === 'Parameter' ? variable : undefined;
 }
 
 export const handleDoneCallbackRule: Readonly<Rule.RuleModule> = {
@@ -40,12 +40,9 @@ export const handleDoneCallbackRule: Readonly<Rule.RuleModule> = {
         const { ignorePending } = getRuleOption<ResolvedOption>(context);
 
         function isReferenceHandled(reference: Readonly<Scope.Reference>): boolean {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- bad eslint core typing
-            const node = context.sourceCode.getNodeByRangeIndex(
-                reference.identifier.range?.[0] ?? 0
-            ) as (Rule.Node | null);
-
-            return node?.parent.type === 'CallExpression';
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- eslint core typing omits parent
+            const node = reference.identifier as Rule.Node;
+            return node.parent.type === 'CallExpression';
         }
 
         function hasHandledReferences(references: readonly Scope.Reference[]): boolean {
