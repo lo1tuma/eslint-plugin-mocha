@@ -2,6 +2,7 @@ import { camelCase } from 'change-case';
 import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
+import { readClosestPackageMetadata } from './package-metadata.js';
 import plugin from './plugin.js';
 
 const { pathname: currentFolderName } = new URL('.', import.meta.url);
@@ -33,6 +34,10 @@ async function determineAllDocumentationFiles(): Promise<string[]> {
 }
 
 describe('eslint-plugin-mocha', function () {
+    it('should expose plugin metadata', async function () {
+        assert.deepStrictEqual(plugin.meta, await readClosestPackageMetadata(import.meta.url));
+    });
+
     it('should expose all rules', async function () {
         const ruleFiles = await determineAllRuleFiles();
 
@@ -63,6 +68,13 @@ describe('eslint-plugin-mocha', function () {
 
                 assert.strictEqual(matchingDocumentationFiles.length, 1);
             });
+        });
+    });
+
+    describe('configs', function () {
+        it('should expose itself in flat configs', function () {
+            assert.strictEqual(plugin.configs.all.plugins.mocha, plugin);
+            assert.strictEqual(plugin.configs.recommended.plugins.mocha, plugin);
         });
     });
 });

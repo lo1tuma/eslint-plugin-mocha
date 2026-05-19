@@ -92,30 +92,25 @@ export default [
         }
     },
     {
-        files: ['lib/rules/**/*.ts'],
-        plugins: { 'eslint-plugin': eslintPluginEslintPlugin },
+        ...eslintPluginEslintPlugin.configs['flat/rules-recommended'],
+        files: ['source/rules/**/*.ts'],
         rules: {
-            'eslint-plugin/fixer-return': 'error',
-            'eslint-plugin/no-deprecated-context-methods': 'error',
-            'eslint-plugin/no-deprecated-report-api': 'error',
+            ...eslintPluginEslintPlugin.configs['flat/rules-recommended'].rules,
             'eslint-plugin/no-identical-tests': 'error',
-            'eslint-plugin/no-missing-message-ids': 'error',
-            'eslint-plugin/no-missing-placeholders': 'error',
             'eslint-plugin/no-only-tests': 'error',
-            'eslint-plugin/no-unused-message-ids': 'error',
-            'eslint-plugin/no-unused-placeholders': 'error',
-            'eslint-plugin/no-useless-token-range': 'error',
-            'eslint-plugin/prefer-object-rule': 'error',
-            'eslint-plugin/prefer-output-null': 'error',
-            'eslint-plugin/require-meta-fixable': 'error',
-            'eslint-plugin/require-meta-has-suggestions': 'error',
-            'eslint-plugin/require-meta-schema': 'error',
-            'eslint-plugin/require-meta-type': 'error',
             'eslint-plugin/require-meta-docs-description': ['error', { pattern: '^(Enforce|Require|Disallow)' }],
             'eslint-plugin/require-meta-docs-url': [
                 'error',
                 { pattern: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/{{name}}.md' }
             ]
+        }
+    },
+    {
+        ...eslintPluginEslintPlugin.configs['flat/tests-recommended'],
+        files: ['source/rules/*.test.ts'],
+        rules: {
+            ...eslintPluginEslintPlugin.configs['flat/tests-recommended'].rules,
+            'eslint-plugin/prefer-output-null': 'off'
         }
     }
 ];

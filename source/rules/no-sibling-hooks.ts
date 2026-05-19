@@ -21,6 +21,9 @@ export const noSiblingHooksRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow duplicate uses of a hook at the same level inside a suite',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-sibling-hooks.md'
         },
+        messages: {
+            unexpectedDuplicateHook: 'Unexpected use of duplicate Mocha `{{name}}` hook'
+        },
         schema: []
     },
     create(context) {
@@ -46,7 +49,8 @@ export const noSiblingHooksRule: Readonly<Rule.RuleModule> = {
                 if (currentLayer?.alreadyUsedHooks.has(name) === true) {
                     context.report({
                         node,
-                        message: `Unexpected use of duplicate Mocha \`${name}\` hook`
+                        messageId: 'unexpectedDuplicateHook',
+                        data: { name }
                     });
                 } else {
                     currentLayer?.alreadyUsedHooks.add(name);

@@ -3,9 +3,22 @@ import type { Rule } from 'eslint';
 import type { Except } from 'type-fest';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { type CallExpression, isCallExpression } from '../ast/node-types.js';
-import { isRecord } from '../record.js';
+import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 
 const ERROR_MESSAGE = 'Unexpected empty test description.';
+const optionSchema = {
+    type: 'object',
+    properties: {
+        message: {
+            type: 'string'
+        }
+    },
+    additionalProperties: false
+} as const satisfies RuleSchema;
+
+type Option = InferSchemaOption<typeof optionSchema>;
+type ResolvedOption = Option & { message: string; };
+const defaultOption: ResolvedOption = { message: ERROR_MESSAGE };
 
 function isLiteral(node: Readonly<Rule.Node>): boolean {
     return node.type === 'Literal';
@@ -50,21 +63,14 @@ export const noEmptyTitleRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow empty test descriptions',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-empty-title.md'
         },
-        schema: [
-            {
-                type: 'object',
-                properties: {
-                    message: {
-                        type: 'string'
-                    }
-                },
-                additionalProperties: false
-            }
-        ]
+        defaultOptions: [defaultOption],
+        messages: {
+            emptyTitle: ERROR_MESSAGE
+        },
+        schema: [optionSchema]
     },
     create(context) {
-        const options = isRecord(context.options[0]) ? context.options[0] : {};
-        const message = typeof options.message === 'string' ? options.message : ERROR_MESSAGE;
+        const { message } = getRuleOption<ResolvedOption>(context);
 
         function isNonEmptyDescription(mochaCallExpression: CallExpression): boolean {
             const description = mochaCallExpression.arguments[0];
@@ -88,7 +94,11 @@ export const noEmptyTitleRule: Readonly<Rule.RuleModule> = {
         return createMochaVisitors(context, {
             suiteOrTestCase(visitorContext) {
                 if (isCallExpression(visitorContext.node) && !isNonEmptyDescription(visitorContext.node)) {
-                    context.report({ node: visitorContext.node, message });
+                    context.report(
+                        message === ERROR_MESSAGE
+                            ? { node: visitorContext.node, messageId: 'emptyTitle' }
+                            : { node: visitorContext.node, message }
+                    );
                 }
             }
         });

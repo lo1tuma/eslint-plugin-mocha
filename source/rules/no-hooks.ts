@@ -1,6 +1,23 @@
 import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { isRecord } from '../record.js';
+import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
+
+const optionSchema = {
+    type: 'object',
+    properties: {
+        allow: {
+            type: 'array',
+            items: {
+                type: 'string'
+            }
+        }
+    },
+    additionalProperties: false
+} as const satisfies RuleSchema;
+
+type Option = InferSchemaOption<typeof optionSchema>;
+type ResolvedOption = Option & { allow: string[]; };
+const defaultOption: ResolvedOption = { allow: [] };
 
 function ensureEndsWithParens(value: unknown): string {
     if (typeof value !== 'string') {
@@ -20,25 +37,15 @@ export const noHooksRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow hooks',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-hooks.md'
         },
-        schema: [
-            {
-                type: 'object',
-                properties: {
-                    allow: {
-                        type: 'array',
-                        items: {
-                            type: 'string'
-                        }
-                    }
-                },
-                additionalProperties: false
-            }
-        ]
+        defaultOptions: [defaultOption],
+        messages: {
+            unexpectedHook: 'Unexpected use of Mocha `{{name}}` hook'
+        },
+        schema: [optionSchema]
     },
 
     create(context) {
-        const config = isRecord(context.options[0]) ? context.options[0] : {};
-        const allow = Array.isArray(config.allow) ? config.allow : [];
+        const { allow } = getRuleOption<ResolvedOption>(context);
         const allowList = new Set(allow.map(ensureEndsWithParens));
 
         return createMochaVisitors(context, {
@@ -48,7 +55,8 @@ export const noHooksRule: Readonly<Rule.RuleModule> = {
                 if (!isHookAllowed) {
                     context.report({
                         node: visitorContext.node,
-                        message: `Unexpected use of Mocha \`${visitorContext.name}\` hook`
+                        messageId: 'unexpectedHook',
+                        data: { name: visitorContext.name }
                     });
                 }
             }

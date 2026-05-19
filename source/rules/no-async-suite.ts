@@ -45,6 +45,9 @@ export const noAsyncSuiteRule: Readonly<Rule.RuleModule> = {
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-async-suite.md'
         },
         fixable: 'code',
+        messages: {
+            unexpectedAsyncSuite: 'Unexpected async function in {{name}}'
+        },
         schema: []
     },
     create(context) {
@@ -57,7 +60,8 @@ export const noAsyncSuiteRule: Readonly<Rule.RuleModule> = {
                 if (isAsyncFunction(node)) {
                     context.report({
                         node,
-                        message: `Unexpected async function in ${visitorContext.name}`,
+                        messageId: 'unexpectedAsyncSuite',
+                        data: { name: visitorContext.name },
                         fix(fixer) {
                             return fixAsyncFunction(sourceCode, fixer, node);
                         }

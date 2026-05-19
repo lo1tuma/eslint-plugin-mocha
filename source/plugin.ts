@@ -1,5 +1,6 @@
 import type { ESLint, Linter } from 'eslint';
 import globals from 'globals';
+import { readClosestPackageMetadata } from './package-metadata.js';
 import { consistentInterfaceRule } from './rules/consistent-interface.js';
 import { consistentSpacingBetweenBlocksRule } from './rules/consistent-spacing-between-blocks.js';
 import { handleDoneCallbackRule } from './rules/handle-done-callback.js';
@@ -24,6 +25,8 @@ import { noTopLevelHooksRule } from './rules/no-top-level-hooks.js';
 import { preferArrowCallbackRule } from './rules/prefer-arrow-callback.js';
 import { validSuiteTitleRule } from './rules/valid-suite-title.js';
 import { validTestTitleRule } from './rules/valid-test-title.js';
+
+const pluginMeta = await readClosestPackageMetadata(import.meta.url);
 
 const allRules: Linter.RulesRecord = {
     'mocha/handle-done-callback': 'error',
@@ -130,11 +133,13 @@ const configs: {
 };
 
 export type MochaPlugin = ESLint.Plugin & {
+    meta: typeof pluginMeta;
     rules: typeof rules;
     configs: typeof configs;
 };
 
 const plugin: MochaPlugin = {
+    meta: pluginMeta,
     rules,
     configs
 };

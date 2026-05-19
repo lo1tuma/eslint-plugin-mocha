@@ -1,13 +1,30 @@
 import type { Rule } from 'eslint';
 import type { Except } from 'type-fest';
 import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
-import { isRecord } from '../record.js';
+import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 
 type Layer = {
     suiteNode: Except<Rule.Node, 'parent'>;
     hookNodes: VisitorContext[];
     testCount: number;
 };
+
+const optionSchema = {
+    type: 'object',
+    properties: {
+        allow: {
+            type: 'array',
+            items: {
+                type: 'string'
+            }
+        }
+    },
+    additionalProperties: false
+} as const satisfies RuleSchema;
+
+type Option = InferSchemaOption<typeof optionSchema>;
+type ResolvedOption = Option & { allow: string[]; };
+const defaultOption: ResolvedOption = { allow: [] };
 
 function newSuiteLayer(suiteNode: Except<Rule.Node, 'parent'>): Readonly<Layer> {
     return {
@@ -36,24 +53,15 @@ export const noHooksForSingleCaseRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow hooks for a single test or test suite',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-hooks-for-single-case.md'
         },
-        schema: [
-            {
-                type: 'object',
-                properties: {
-                    allow: {
-                        type: 'array',
-                        items: {
-                            type: 'string'
-                        }
-                    }
-                },
-                additionalProperties: false
-            }
-        ]
+        defaultOptions: [defaultOption],
+        messages: {
+            unexpectedHookForSingleTest: 'Unexpected use of Mocha `{{name}}` hook for a single test case'
+        },
+        schema: [optionSchema]
     },
     create(context) {
-        const options = isRecord(context.options[0]) ? context.options[0] : {};
-        const allowedHooks = new Set((Array.isArray(options.allow) ? options.allow : []).map(ensureEndsWithParens));
+        const { allow } = getRuleOption<ResolvedOption>(context);
+        const allowedHooks = new Set(allow.map(ensureEndsWithParens));
         let layers: Layer[] = [];
 
         function increaseTestCount(): void {
@@ -78,7 +86,8 @@ export const noHooksForSingleCaseRule: Readonly<Rule.RuleModule> = {
                         .forEach((hookNode) => {
                             context.report({
                                 node: hookNode.node,
-                                message: `Unexpected use of Mocha \`${hookNode.name}\` hook for a single test case`
+                                messageId: 'unexpectedHookForSingleTest',
+                                data: { name: hookNode.name }
                             });
                         });
                 }
