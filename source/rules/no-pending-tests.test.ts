@@ -6,11 +6,11 @@ const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } })
 const expectedErrorMessage = 'Unexpected pending mocha test.';
 
 function asRuleContext(ruleContext: Record<string, unknown>): Rule.RuleContext {
-    return ruleContext as Rule.RuleContext;
+    return ruleContext as unknown as Rule.RuleContext;
 }
 
 function asRuleNode(node: Record<string, unknown>): Rule.Node {
-    return node as Rule.Node;
+    return node as unknown as Rule.Node;
 }
 
 ruleTester.run('no-pending-tests', noPendingTestsRule, {

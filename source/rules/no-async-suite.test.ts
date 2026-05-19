@@ -6,19 +6,19 @@ import { containsDirectAwait, fixAsyncFunction, noAsyncSuiteRule } from './no-as
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
 function asSourceCode(sourceCode: Record<string, unknown>): SourceCode {
-    return sourceCode as SourceCode;
+    return sourceCode as unknown as SourceCode;
 }
 
 function asRuleFixer(fixer: Record<string, unknown>): Rule.RuleFixer {
-    return fixer as Rule.RuleFixer;
+    return fixer as unknown as Rule.RuleFixer;
 }
 
 function asRuleFix(fix: Record<string, unknown>): Rule.Fix {
-    return fix as Rule.Fix;
+    return fix as unknown as Rule.Fix;
 }
 
 function asAnyFunction(node: Record<string, unknown>): AnyFunction {
-    return node as AnyFunction;
+    return node as unknown as AnyFunction;
 }
 
 ruleTester.run('no-async-suite', noAsyncSuiteRule, {

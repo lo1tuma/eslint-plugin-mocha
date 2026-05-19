@@ -6,7 +6,7 @@ const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } })
 type ProgramNode = Parameters<Exclude<Rule.RuleListener['Program'], undefined>>[0];
 
 function asNode(node: Record<string, unknown>): Rule.Node {
-    return node as Rule.Node;
+    return node as unknown as Rule.Node;
 }
 
 function readProgramBody(node: ProgramNode): Readonly<ProgramNode['body']> {
