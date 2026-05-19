@@ -280,11 +280,52 @@ export function createMochaVisitors(
         'anyTestEntityCallback:exit': anyTestEntityCallbackExit
     };
     const cachedVisitorContextsByNode = findCallsCached(context);
+    const hasCallExpressionListener = (
+        typeof nonMochaCallExpression === 'function' ||
+        typeof testCase === 'function' ||
+        typeof testCaseCallback === 'function' ||
+        typeof suite === 'function' ||
+        typeof suiteCallback === 'function' ||
+        typeof hook === 'function' ||
+        typeof hookCallback === 'function' ||
+        typeof suiteOrTestCase === 'function' ||
+        typeof anyTestEntity === 'function' ||
+        typeof anyTestEntityCallback === 'function'
+    );
+    const hasCallExpressionExitListener = (
+        typeof nonMochaCallExpressionExit === 'function' ||
+        typeof testCaseExit === 'function' ||
+        typeof testCaseCallbackExit === 'function' ||
+        typeof suiteExit === 'function' ||
+        typeof suiteCallbackExit === 'function' ||
+        typeof hookExit === 'function' ||
+        typeof hookCallbackExit === 'function' ||
+        typeof suiteOrTestCaseExit === 'function' ||
+        typeof anyTestEntityExit === 'function' ||
+        typeof anyTestEntityCallbackExit === 'function'
+    );
+    const hasMemberExpressionListener = (
+        typeof mochaMemberExpression === 'function' ||
+        typeof nonMochaMemberExpression === 'function'
+    );
+    const hasMemberExpressionExitListener = (
+        typeof mochaMemberExpressionExit === 'function' ||
+        typeof nonMochaMemberExpressionExit === 'function'
+    );
+    const hasFunctionExpressionListener = (
+        typeof mochaFunctionExpression === 'function' ||
+        typeof nonMochaFunctionExpression === 'function'
+    );
+    const hasFunctionExpressionExitListener = (
+        typeof mochaFunctionExpressionExit === 'function' ||
+        typeof nonMochaFunctionExpressionExit === 'function'
+    );
+    const listeners: Rule.RuleListener = {
+        ...nonMochaVisitors
+    };
 
-    return {
-        ...nonMochaVisitors,
-
-        CallExpression(node) {
+    if (hasCallExpressionListener) {
+        listeners.CallExpression = function (node): void {
             const cachedVisitorContext = cachedVisitorContextsByNode.get(node);
             if (cachedVisitorContext === undefined) {
                 callVisitorIfExists(mochaVisitors, 'nonMochaCallExpression', node);
@@ -293,9 +334,11 @@ export function createMochaVisitors(
             }
             // @ts-expect-error -- ok in this case
             callVisitorIfExists(nonMochaVisitors, 'CallExpression', node);
-        },
+        };
+    }
 
-        'CallExpression:exit'(node) {
+    if (hasCallExpressionExitListener) {
+        listeners['CallExpression:exit'] = function (node): void {
             const cachedVisitorContext = cachedVisitorContextsByNode.get(node);
             if (cachedVisitorContext === undefined) {
                 callVisitorIfExists(mochaVisitors, 'nonMochaCallExpression:exit', node);
@@ -304,22 +347,32 @@ export function createMochaVisitors(
             }
             // @ts-expect-error -- ok in this case
             callVisitorIfExists(nonMochaVisitors, 'CallExpression:exit', node);
-        },
+        };
+    }
 
-        MemberExpression(node) {
+    if (hasMemberExpressionListener) {
+        listeners.MemberExpression = function (node): void {
             processExpression(visitors, cachedVisitorContextsByNode, node, 'MemberExpression');
-        },
+        };
+    }
 
-        'MemberExpression:exit'(node) {
+    if (hasMemberExpressionExitListener) {
+        listeners['MemberExpression:exit'] = function (node): void {
             processExpression(visitors, cachedVisitorContextsByNode, node, 'MemberExpression:exit');
-        },
+        };
+    }
 
-        FunctionExpression(node) {
+    if (hasFunctionExpressionListener) {
+        listeners.FunctionExpression = function (node): void {
             processExpression(visitors, cachedVisitorContextsByNode, node, 'FunctionExpression');
-        },
+        };
+    }
 
-        'FunctionExpression:exit'(node) {
+    if (hasFunctionExpressionExitListener) {
+        listeners['FunctionExpression:exit'] = function (node): void {
             processExpression(visitors, cachedVisitorContextsByNode, node, 'FunctionExpression:exit');
-        }
-    };
+        };
+    }
+
+    return listeners;
 }
