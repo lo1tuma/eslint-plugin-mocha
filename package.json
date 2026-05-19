@@ -23,7 +23,7 @@
         "test:bench": "tsc --build benchmarks/tsconfig.json && mocha -t 2400000 --spec 'target/build/benchmarks/**/*.bench.js'",
         "coveralls": "cat ./target/coverage/lcov.info | coveralls",
         "changelog": "pr-log",
-        "update:eslint-docs": "tsc --build source/tsconfig.sources.json && eslint-doc-generator --ignore-config all --url-configs \"https://github.com/lo1tuma/eslint-plugin-mocha#configs\""
+        "update:eslint-docs": "tsc --build source/tsconfig.sources.json && eslint-doc-generator --ignore-config all --path-rule-doc \"documentation/rules/{name}.md\" --url-configs \"https://github.com/lo1tuma/eslint-plugin-mocha#configs\""
     },
     "dependencies": {
         "@eslint-community/eslint-utils": "^4.4.1",

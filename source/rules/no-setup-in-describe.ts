@@ -35,7 +35,7 @@ export const noSetupInDescribeRule: Readonly<Rule.RuleModule> = {
         type: 'suggestion',
         docs: {
             description: 'Disallow setup in describe blocks',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-setup-in-describe.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-setup-in-describe.md'
         },
         messages: {
             unexpectedFunctionCall: 'Unexpected function call in describe block.',

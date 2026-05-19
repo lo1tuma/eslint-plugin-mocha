@@ -28,7 +28,7 @@ export const handleDoneCallbackRule: Readonly<Rule.RuleModule> = {
         type: 'problem',
         docs: {
             description: 'Enforces handling of callbacks for async tests',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/handle-done-callback.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/handle-done-callback.md'
         },
         defaultOptions: [defaultOption],
         messages: {

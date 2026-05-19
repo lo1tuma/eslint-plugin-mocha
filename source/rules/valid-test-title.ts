@@ -38,7 +38,7 @@ export const validTestTitleRule: Readonly<Rule.RuleModule> = {
         type: 'suggestion',
         docs: {
             description: 'Require test descriptions to match a pre-configured regular expression',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/valid-test-title.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/valid-test-title.md'
         },
         defaultOptions: [defaultOption],
         messages: {

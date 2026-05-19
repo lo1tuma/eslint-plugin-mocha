@@ -5,7 +5,7 @@ export const noExportsRule: Readonly<Rule.RuleModule> = {
     meta: {
         docs: {
             description: 'Disallow exports from test files',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-exports.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-exports.md'
         },
         messages: {
             unexpectedExport: 'Unexpected export from a test file'

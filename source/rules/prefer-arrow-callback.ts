@@ -149,7 +149,7 @@ export const preferArrowCallbackRule: Readonly<Rule.RuleModule> = {
         docs: {
             description: 'Require using arrow functions for callbacks',
             recommended: false,
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/prefer-arrow-callback.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/prefer-arrow-callback.md'
         },
 
         defaultOptions: [defaultOption],

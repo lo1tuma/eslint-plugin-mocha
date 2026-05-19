@@ -19,7 +19,7 @@ export const noSiblingHooksRule: Readonly<Rule.RuleModule> = {
         type: 'suggestion',
         docs: {
             description: 'Disallow duplicate uses of a hook at the same level inside a suite',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-sibling-hooks.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-sibling-hooks.md'
         },
         messages: {
             unexpectedDuplicateHook: 'Unexpected use of duplicate Mocha `{{name}}` hook'

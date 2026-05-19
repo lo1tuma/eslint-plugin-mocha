@@ -19,7 +19,7 @@ export const noReturnFromAsyncRule: Readonly<Rule.RuleModule> = {
         type: 'suggestion',
         docs: {
             description: 'Disallow returning from an async test or hook',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-return-from-async.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-return-from-async.md'
         },
         messages: {
             implicitReturnWithAsync: 'Confusing implicit return in a test with an async function',
