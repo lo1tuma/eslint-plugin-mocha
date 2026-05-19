@@ -5,26 +5,6 @@ import { getAdditionalNames, getInterface } from '../settings.js';
 import { findMochaVariableCalls, type ResolvedReferenceWithNameDetails } from './find-mocha-variable-calls.js';
 import { isCallExpression } from './node-types.js';
 
-type Range = [number, number];
-
-function isSameRange(rangeA: Readonly<Range>, rangeB: Readonly<Range>): boolean {
-    return rangeA[0] === rangeB[0] && rangeA[1] === rangeB[1];
-}
-
-function isSameNode(nodeA: Readonly<Rule.Node>, nodeB: Readonly<Rule.Node>): boolean {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- ok
-    return nodeA.type === nodeB.type && isSameRange(nodeA.range!, nodeB.range!);
-}
-
-function getReferenceByNode(
-    references: readonly ResolvedReferenceWithNameDetails[],
-    node: Readonly<Rule.Node>
-): Readonly<ResolvedReferenceWithNameDetails | undefined> {
-    return references.find((reference) => {
-        return isSameNode(reference.node, node);
-    });
-}
-
 type MochaVisitor = (context: Readonly<VisitorContext>) => void;
 
 type TestEntityVisitors = {
@@ -93,19 +73,55 @@ function isAnyFunctionExpression(node: Readonly<Rule.Node>): boolean {
     return node.type === 'FunctionExpression' || node.type === 'ArrowFunctionExpression';
 }
 
+function getFunctionExpressionLastArgument(node: Readonly<Rule.Node>): Readonly<Rule.Node | undefined> {
+    if (!isCallExpression(node)) {
+        return undefined;
+    }
+
+    const lastArgument = node.arguments.at(-1);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ok
+    return lastArgument !== undefined && isAnyFunctionExpression(lastArgument as Rule.Node)
+        ? lastArgument as Rule.Node
+        : undefined;
+}
+
+type CachedVisitorContext = {
+    readonly context: Readonly<VisitorContext>;
+    readonly callbackContext: Readonly<VisitorContext> | undefined;
+};
+
 function callVisitorsForTestEntityCallback(
     visitors: Readonly<TestEntityVisitors>,
     name: keyof TestEntityVisitors,
-    context: Readonly<VisitorContext>
+    context: Readonly<VisitorContext> | undefined
 ): void {
-    if (isCallExpression(context.node)) {
-        const lastArgument = context.node.arguments.at(-1);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ok
-        if (lastArgument !== undefined && isAnyFunctionExpression(lastArgument as Rule.Node)) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ok
-            callVisitorIfExists(visitors, name, { ...context, node: lastArgument as Rule.Node });
-        }
+    if (context !== undefined) {
+        callVisitorIfExists(visitors, name, context);
     }
+}
+
+function createCachedVisitorContext(
+    reference: Readonly<ResolvedReferenceWithNameDetails>
+): Readonly<CachedVisitorContext> {
+    const context = createContext(reference);
+    const callbackNode = getFunctionExpressionLastArgument(context.node);
+
+    return {
+        context,
+        callbackContext: callbackNode === undefined ? undefined : { ...context, node: callbackNode }
+    };
+}
+
+function createVisitorContextCache(
+    references: readonly ResolvedReferenceWithNameDetails[]
+): Readonly<WeakMap<Rule.Node, Readonly<CachedVisitorContext>>> {
+    const cache = new WeakMap<Rule.Node, Readonly<CachedVisitorContext>>();
+
+    for (const reference of references) {
+        cache.set(reference.node, createCachedVisitorContext(reference));
+    }
+
+    return cache;
 }
 
 export type VisitorContext = {
@@ -129,10 +145,10 @@ function createContext(reference: Readonly<ResolvedReferenceWithNameDetails>): R
 // eslint-disable-next-line max-statements -- no good idea to split this up
 function callVisitors(
     visitors: Readonly<MochaSpecificVisitors>,
-    reference: Readonly<ResolvedReferenceWithNameDetails>,
+    cachedVisitorContext: Readonly<CachedVisitorContext>,
     stageSuffix: '' | ':exit' = ''
 ): void {
-    const context = createContext(reference);
+    const { context, callbackContext } = cachedVisitorContext;
 
     if (context.type === 'config') {
         return;
@@ -140,40 +156,42 @@ function callVisitors(
     if (context.type === 'testCase') {
         callVisitorIfExists(visitors, `testCase${stageSuffix}`, context);
         callVisitorIfExists(visitors, `suiteOrTestCase${stageSuffix}`, context);
-        callVisitorsForTestEntityCallback(visitors, `testCaseCallback${stageSuffix}`, context);
+        callVisitorsForTestEntityCallback(visitors, `testCaseCallback${stageSuffix}`, callbackContext);
     }
     if (context.type === 'suite') {
         callVisitorIfExists(visitors, `suite${stageSuffix}`, context);
         callVisitorIfExists(visitors, `suiteOrTestCase${stageSuffix}`, context);
-        callVisitorsForTestEntityCallback(visitors, `suiteCallback${stageSuffix}`, context);
+        callVisitorsForTestEntityCallback(visitors, `suiteCallback${stageSuffix}`, callbackContext);
     }
     if (context.type === 'hook') {
         callVisitorIfExists(visitors, `hook${stageSuffix}`, context);
-        callVisitorsForTestEntityCallback(visitors, `hookCallback${stageSuffix}`, context);
+        callVisitorsForTestEntityCallback(visitors, `hookCallback${stageSuffix}`, callbackContext);
     }
 
     callVisitorIfExists(visitors, `anyTestEntity${stageSuffix}`, context);
-    callVisitorsForTestEntityCallback(visitors, `anyTestEntityCallback${stageSuffix}`, context);
+    callVisitorsForTestEntityCallback(visitors, `anyTestEntityCallback${stageSuffix}`, callbackContext);
 }
 
 function processExpression(
     visitors: Readonly<MochaVisitors>,
-    calls: readonly ResolvedReferenceWithNameDetails[],
+    cachedVisitorContextsByNode: Readonly<WeakMap<Rule.Node, Readonly<CachedVisitorContext>>>,
     node: Readonly<Rule.Node>,
     visitorName: keyof Rule.NodeListener
 ): void {
-    const reference = getReferenceByNode(calls, node.parent);
-    const prefix: 'mocha' | 'nonMocha' = reference === undefined ? 'nonMocha' : 'mocha';
+    const cachedVisitorContext = cachedVisitorContextsByNode.get(node.parent);
+    const prefix: 'mocha' | 'nonMocha' = cachedVisitorContext === undefined ? 'nonMocha' : 'mocha';
     // @ts-expect-error -- ok in this case
     callVisitorIfExists(visitors, `${prefix}${visitorName}`, node);
     // @ts-expect-error -- ok in this case
     callVisitorIfExists(visitors, visitorName, node);
 }
 
-const cachedCalls = new Map<string, WeakMap<SourceCode, readonly ResolvedReferenceWithNameDetails[]>>();
+const cachedCalls = new Map<string, WeakMap<SourceCode, Readonly<WeakMap<Rule.Node, Readonly<CachedVisitorContext>>>>>();
 
 // eslint-disable-next-line max-statements -- caching with two cache keys, requires weird dance of statements
-function findCallsCached(context: Readonly<Rule.RuleContext>): readonly ResolvedReferenceWithNameDetails[] {
+function findCallsCached(
+    context: Readonly<Rule.RuleContext>
+): Readonly<WeakMap<Rule.Node, Readonly<CachedVisitorContext>>> {
     const settingsCacheKey = JSON.stringify(context.settings);
     let callsPerSettings = cachedCalls.get(settingsCacheKey);
     if (callsPerSettings === undefined) {
@@ -182,17 +200,18 @@ function findCallsCached(context: Readonly<Rule.RuleContext>): readonly Resolved
     }
 
     const callCacheKey = context.sourceCode;
-    let calls = callsPerSettings.get(callCacheKey);
-    if (calls === undefined) {
+    let cachedVisitorContextsByNode = callsPerSettings.get(callCacheKey);
+    if (cachedVisitorContextsByNode === undefined) {
         const additionalCustomNames = getAdditionalNames(context.settings);
         const interfaceToUse = getInterface(context.settings);
         const names = getAllNames(additionalCustomNames);
+        const calls = findMochaVariableCalls(context, names, interfaceToUse);
 
-        calls = findMochaVariableCalls(context, names, interfaceToUse);
-        callsPerSettings.set(callCacheKey, calls);
+        cachedVisitorContextsByNode = createVisitorContextCache(calls);
+        callsPerSettings.set(callCacheKey, cachedVisitorContextsByNode);
     }
 
-    return calls;
+    return cachedVisitorContextsByNode;
 }
 
 export function createMochaVisitors(
@@ -260,47 +279,47 @@ export function createMochaVisitors(
         anyTestEntityCallback,
         'anyTestEntityCallback:exit': anyTestEntityCallbackExit
     };
-    const calls = findCallsCached(context);
+    const cachedVisitorContextsByNode = findCallsCached(context);
 
     return {
         ...nonMochaVisitors,
 
         CallExpression(node) {
-            const reference = getReferenceByNode(calls, node);
-            if (reference === undefined) {
+            const cachedVisitorContext = cachedVisitorContextsByNode.get(node);
+            if (cachedVisitorContext === undefined) {
                 callVisitorIfExists(mochaVisitors, 'nonMochaCallExpression', node);
             } else {
-                callVisitors(mochaVisitors, reference);
+                callVisitors(mochaVisitors, cachedVisitorContext);
             }
             // @ts-expect-error -- ok in this case
             callVisitorIfExists(nonMochaVisitors, 'CallExpression', node);
         },
 
         'CallExpression:exit'(node) {
-            const reference = getReferenceByNode(calls, node);
-            if (reference === undefined) {
+            const cachedVisitorContext = cachedVisitorContextsByNode.get(node);
+            if (cachedVisitorContext === undefined) {
                 callVisitorIfExists(mochaVisitors, 'nonMochaCallExpression:exit', node);
             } else {
-                callVisitors(mochaVisitors, reference, ':exit');
+                callVisitors(mochaVisitors, cachedVisitorContext, ':exit');
             }
             // @ts-expect-error -- ok in this case
             callVisitorIfExists(nonMochaVisitors, 'CallExpression:exit', node);
         },
 
         MemberExpression(node) {
-            processExpression(visitors, calls, node, 'MemberExpression');
+            processExpression(visitors, cachedVisitorContextsByNode, node, 'MemberExpression');
         },
 
         'MemberExpression:exit'(node) {
-            processExpression(visitors, calls, node, 'MemberExpression:exit');
+            processExpression(visitors, cachedVisitorContextsByNode, node, 'MemberExpression:exit');
         },
 
         FunctionExpression(node) {
-            processExpression(visitors, calls, node, 'FunctionExpression');
+            processExpression(visitors, cachedVisitorContextsByNode, node, 'FunctionExpression');
         },
 
         'FunctionExpression:exit'(node) {
-            processExpression(visitors, calls, node, 'FunctionExpression:exit');
+            processExpression(visitors, cachedVisitorContextsByNode, node, 'FunctionExpression:exit');
         }
     };
 }
