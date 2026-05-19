@@ -1,8 +1,21 @@
 import type { Rule, Scope } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { isRecord } from '../record.js';
+import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 
 const defaultSuiteLimit = 1;
+const optionSchema = {
+    type: 'object',
+    properties: {
+        limit: {
+            type: 'integer'
+        }
+    },
+    additionalProperties: false
+} as const satisfies RuleSchema;
+
+type Option = InferSchemaOption<typeof optionSchema>;
+type ResolvedOption = Option & { limit: number; };
+const defaultOption: ResolvedOption = { limit: defaultSuiteLimit };
 
 function isTopLevelScope(scope: Readonly<Scope.Scope>): boolean {
     return scope.type === 'module' || scope.upper === null;
@@ -15,22 +28,15 @@ export const maxTopLevelSuitesRule: Readonly<Rule.RuleModule> = {
             description: 'Enforce the number of top-level suites in a single file',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/max-top-level-suites.md'
         },
-        schema: [
-            {
-                type: 'object',
-                properties: {
-                    limit: {
-                        type: 'integer'
-                    }
-                },
-                additionalProperties: false
-            }
-        ]
+        defaultOptions: [defaultOption],
+        messages: {
+            tooManyTopLevelSuites: 'The number of top-level suites is more than {{limit}}.'
+        },
+        schema: [optionSchema]
     },
     create(context) {
         const topLevelSuites: Rule.Node[] = [];
-        const options = isRecord(context.options[0]) ? context.options[0] : {};
-        const suiteLimit = typeof options.limit === 'number' ? options.limit : defaultSuiteLimit;
+        const { limit: suiteLimit } = getRuleOption<ResolvedOption>(context);
 
         return createMochaVisitors(context, {
             suite(visitorContext) {
@@ -46,7 +52,8 @@ export const maxTopLevelSuitesRule: Readonly<Rule.RuleModule> = {
                     context.report({
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- ok in this case
                         node: topLevelSuites[suiteLimit]!,
-                        message: `The number of top-level suites is more than ${suiteLimit}.`
+                        messageId: 'tooManyTopLevelSuites',
+                        data: { limit: String(suiteLimit) }
                     });
                 }
             }

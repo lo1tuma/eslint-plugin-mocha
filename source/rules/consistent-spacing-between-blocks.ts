@@ -70,6 +70,9 @@ export const consistentSpacingBetweenBlocksRule: Readonly<Rule.RuleModule> = {
         type: 'suggestion',
         fixable: 'whitespace',
         schema: [],
+        messages: {
+            expectedLineBreak: 'Expected line break before this statement.'
+        },
         docs: {
             description: 'Require consistent spacing between blocks',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/' +
@@ -102,7 +105,7 @@ export const consistentSpacingBetweenBlocksRule: Readonly<Rule.RuleModule> = {
                     if (linesBetween < minimumAmountOfLinesBetweenNeeded) {
                         context.report({
                             node: entity.node,
-                            message: 'Expected line break before this statement.',
+                            messageId: 'expectedLineBreak',
                             fix(fixer) {
                                 return fixer.insertTextAfter(
                                     beforeToken,

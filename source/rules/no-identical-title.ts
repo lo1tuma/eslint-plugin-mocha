@@ -33,6 +33,10 @@ export const noIdenticalTitleRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow identical titles',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-identical-title.md'
         },
+        messages: {
+            duplicateTestTitle: 'Test title is used multiple times in the same test suite.',
+            duplicateSuiteTitle: 'Test suite title is used multiple times.'
+        },
         schema: []
     },
     create(context) {
@@ -45,7 +49,7 @@ export const noIdenticalTitleRule: Readonly<Rule.RuleModule> = {
             if (titles.includes(title)) {
                 context.report({
                     node: visitorContext.node,
-                    message: 'Test title is used multiple times in the same test suite.'
+                    messageId: 'duplicateTestTitle'
                 });
             }
             titles.push(title);
@@ -58,7 +62,7 @@ export const noIdenticalTitleRule: Readonly<Rule.RuleModule> = {
             if (titles.includes(title)) {
                 context.report({
                     node: visitorContext.node,
-                    message: 'Test suite title is used multiple times.'
+                    messageId: 'duplicateSuiteTitle'
                 });
             }
             titles.push(title);

@@ -14,10 +14,8 @@ function isNestedInDescribeBlock(nesting: readonly number[]): boolean {
 }
 
 function reportCallExpression(context: Readonly<Rule.RuleContext>, callExpression: Readonly<CallExpression>): void {
-    const message = 'Unexpected function call in describe block.';
-
     context.report({
-        message,
+        messageId: 'unexpectedFunctionCall',
         node: callExpression.callee
     });
 }
@@ -26,11 +24,8 @@ function reportMemberExpression(
     context: Readonly<Rule.RuleContext>,
     memberExpression: Readonly<MemberExpression>
 ): void {
-    const message = 'Unexpected member expression in describe block. ' +
-        'Member expressions may call functions via getters.';
-
     context.report({
-        message,
+        messageId: 'unexpectedMemberExpression',
         node: memberExpression
     });
 }
@@ -41,6 +36,11 @@ export const noSetupInDescribeRule: Readonly<Rule.RuleModule> = {
         docs: {
             description: 'Disallow setup in describe blocks',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/no-setup-in-describe.md'
+        },
+        messages: {
+            unexpectedFunctionCall: 'Unexpected function call in describe block.',
+            unexpectedMemberExpression:
+                'Unexpected member expression in describe block. Member expressions may call functions via getters.'
         },
         schema: []
     },

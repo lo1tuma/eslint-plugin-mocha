@@ -16,7 +16,30 @@
 import type { AST, Rule, Scope, SourceCode } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { type CallExpression, isCallExpression, type MetaProperty, type Pattern } from '../ast/node-types.js';
-import { isRecord } from '../record.js';
+import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
+
+const optionSchema = {
+    type: 'object',
+    properties: {
+        allowNamedFunctions: {
+            type: 'boolean'
+        },
+        allowUnboundThis: {
+            type: 'boolean'
+        }
+    },
+    additionalProperties: false
+} as const satisfies RuleSchema;
+
+type Option = InferSchemaOption<typeof optionSchema>;
+type ResolvedOption = Option & {
+    allowNamedFunctions: boolean;
+    allowUnboundThis: boolean;
+};
+const defaultOption: ResolvedOption = {
+    allowNamedFunctions: false,
+    allowUnboundThis: true
+};
 
 // ------------------------------------------------------------------------------
 // Helpers
@@ -129,20 +152,9 @@ export const preferArrowCallbackRule: Readonly<Rule.RuleModule> = {
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/docs/rules/prefer-arrow-callback.md'
         },
 
-        schema: [
-            {
-                type: 'object',
-                properties: {
-                    allowNamedFunctions: {
-                        type: 'boolean'
-                    },
-                    allowUnboundThis: {
-                        type: 'boolean'
-                    }
-                },
-                additionalProperties: false
-            }
-        ],
+        defaultOptions: [defaultOption],
+
+        schema: [optionSchema],
 
         fixable: 'code',
 
@@ -152,13 +164,10 @@ export const preferArrowCallbackRule: Readonly<Rule.RuleModule> = {
     },
 
     create(context) {
-        const options = isRecord(context.options[0]) ? context.options[0] : {};
-
-        // allowUnboundThis defaults to true
-        const allowUnboundThis = options.allowUnboundThis !== false;
-        const allowNamedFunctions = typeof options.allowNamedFunctions === 'boolean'
-            ? options.allowNamedFunctions
-            : false;
+        const {
+            allowNamedFunctions,
+            allowUnboundThis
+        } = getRuleOption<ResolvedOption>(context);
         const { sourceCode } = context;
 
         type CallbackInfo = {
