@@ -25,6 +25,7 @@ type Option = InferSchemaOption<typeof optionSchema>;
 type AsyncMethod = (typeof asyncMethods)[number];
 type ResolvedOption = Option & { allowed: AsyncMethod[]; };
 const defaultOption: ResolvedOption = { allowed: Array.from(asyncMethods) };
+type AsyncCheck = (functionExpression: Readonly<Rule.Node>) => boolean;
 
 function hasAsyncCallback(functionExpression: Readonly<Rule.Node>): boolean {
     return isFunction(functionExpression) && functionExpression.params.length === 1;
@@ -61,6 +62,12 @@ function doesReturnPromise(functionExpression: Readonly<Rule.Node>): boolean {
     return returnStatement !== null && returnStatement !== undefined;
 }
 
+const asyncChecksByMethod = {
+    async: isAsyncFunction,
+    callback: hasAsyncCallback,
+    promise: doesReturnPromise
+} as const satisfies Readonly<Record<AsyncMethod, AsyncCheck>>;
+
 export const noSynchronousTestsRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
@@ -76,36 +83,23 @@ export const noSynchronousTestsRule: Readonly<Rule.RuleModule> = {
     },
     create(context) {
         const { allowed: allowedAsyncMethods } = getRuleOption<ResolvedOption>(context);
-        const asyncTypes = new Set(['testCase', 'hook']);
+        const asyncChecks = allowedAsyncMethods.map<AsyncCheck>((method) => {
+            return asyncChecksByMethod[method];
+        });
 
         return createMochaVisitors(context, {
             anyTestEntityCallback(visitorContext) {
-                if (!asyncTypes.has(visitorContext.type)) {
+                if (visitorContext.type !== 'testCase' && visitorContext.type !== 'hook') {
                     return;
                 }
-                // For each allowed async test method, check if it is used in the test
-                const testAsyncMethods = allowedAsyncMethods.map((
-                    method
-                ) => {
-                    // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check -- the default branch handles the promise case
-                    switch (method) {
-                        case 'async':
-                            return isAsyncFunction(visitorContext.node);
 
-                        case 'callback':
-                            return hasAsyncCallback(visitorContext.node);
-
-                        default:
-                            return doesReturnPromise(visitorContext.node);
+                for (const checkAsync of asyncChecks) {
+                    if (checkAsync(visitorContext.node)) {
+                        return;
                     }
-                });
-
-                // Check that at least one allowed async test method is used in the test
-                const isAsyncTest = testAsyncMethods.includes(true);
-
-                if (!isAsyncTest) {
-                    context.report({ node: visitorContext.node, messageId: 'unexpectedSynchronousTest' });
                 }
+
+                context.report({ node: visitorContext.node, messageId: 'unexpectedSynchronousTest' });
             }
         });
     }
