@@ -76,5 +76,13 @@ describe('eslint-plugin-mocha', function () {
             assert.strictEqual(plugin.configs.all.plugins.mocha, plugin);
             assert.strictEqual(plugin.configs.recommended.plugins.mocha, plugin);
         });
+
+        it('should enable consistent-interface in the recommended config', function () {
+            assert.notStrictEqual(plugin.configs.recommended.rules, undefined);
+            assert.deepStrictEqual(plugin.configs.recommended.rules?.['mocha/consistent-interface'], [
+                'error',
+                { interface: 'BDD' }
+            ]);
+        });
     });
 });

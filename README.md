@@ -95,7 +95,7 @@ forEach([1, 2, 3]).describe("example", function (n) {});
 forEach([1, 2, 3]).describeModule.modifier("example", function (n) {});
 ```
 
-- `interface`: Selects `BDD`, `TDD`, or `exports`. The default is `BDD`. With `exports`, rule resolution uses named `import` statements instead of globals.
+- `interface`: Selects `BDD`, `TDD`, or `exports`. The default is `BDD`. With `exports`, rule resolution uses named `import` statements instead of globals. `mocha/consistent-interface` also reports named imports of Mocha interface methods when this setting is `BDD` or `TDD`, which helps catch accidental `exports`-style usage and interface misconfiguration earlier.
 
 ## Rules
 
@@ -111,7 +111,7 @@ For maintainers: the rules table below is generated, and the headers in `documen
 
 | Name                                                                                          | Description                                                             | 💼 | ⚠️ | 🚫 | 🔧 |
 | :-------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------- | :- | :- | :- | :- |
-| [consistent-interface](documentation/rules/consistent-interface.md)                           | Enforces consistent use of mocha interfaces                             |    |    |    |    |
+| [consistent-interface](documentation/rules/consistent-interface.md)                           | Enforces consistent use of mocha interfaces                             | ✅  |    |    |    |
 | [consistent-spacing-between-blocks](documentation/rules/consistent-spacing-between-blocks.md) | Require consistent spacing between blocks                               | ✅  |    |    | 🔧 |
 | [handle-done-callback](documentation/rules/handle-done-callback.md)                           | Enforces handling of callbacks for async tests                          | ✅  |    |    |    |
 | [max-top-level-suites](documentation/rules/max-top-level-suites.md)                           | Enforce the number of top-level suites in a single file                 | ✅  |    |    |    |
