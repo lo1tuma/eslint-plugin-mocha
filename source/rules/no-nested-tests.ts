@@ -1,5 +1,5 @@
 import type { Rule } from 'eslint';
-import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.js';
 
 export const noNestedTestsRule: Readonly<Rule.RuleModule> = {
     meta: {
@@ -18,38 +18,47 @@ export const noNestedTestsRule: Readonly<Rule.RuleModule> = {
         schema: []
     },
     create(context) {
-        const entityStack: VisitorContext['type'][] = [];
-
         function report(node: Readonly<Rule.Node>, messageId: string): void {
             context.report({ messageId, node });
         }
 
-        // eslint-disable-next-line complexity -- no idea how to reduce the complexity
-        function checkForAndReportErrors(node: Readonly<Rule.Node>): void {
-            const previousTypes = new Set(entityStack.slice(0, -1));
-            const currentType = entityStack.at(-1);
-
-            if (currentType === 'suite' && previousTypes.has('hook')) {
-                report(node, 'suiteNestedInHook');
-            } else if (currentType === 'suite' && previousTypes.has('testCase')) {
-                report(node, 'suiteNestedInTest');
-            } else if (currentType === 'testCase' && previousTypes.has('testCase')) {
-                report(node, 'testNestedInTest');
-            } else if (currentType === 'testCase' && previousTypes.has('hook')) {
-                report(node, 'testNestedInHook');
-            } else if (currentType === 'hook' && previousTypes.has('hook')) {
-                report(node, 'hookNestedInHook');
-            }
-        }
+        let hooksNesting = 0;
+        let testCaseNesting = 0;
 
         return createMochaVisitors(context, {
             anyTestEntity(visitorContext) {
-                entityStack.push(visitorContext.type);
-                checkForAndReportErrors(visitorContext.node);
+                if (visitorContext.type === 'suite') {
+                    if (hooksNesting > 0) {
+                        report(visitorContext.node, 'suiteNestedInHook');
+                    } else if (testCaseNesting > 0) {
+                        report(visitorContext.node, 'suiteNestedInTest');
+                    }
+                    return;
+                }
+
+                if (visitorContext.type === 'testCase') {
+                    if (testCaseNesting > 0) {
+                        report(visitorContext.node, 'testNestedInTest');
+                    } else if (hooksNesting > 0) {
+                        report(visitorContext.node, 'testNestedInHook');
+                    }
+
+                    testCaseNesting += 1;
+                    return;
+                }
+
+                if (hooksNesting > 0) {
+                    report(visitorContext.node, 'hookNestedInHook');
+                }
+                hooksNesting += 1;
             },
 
-            'anyTestEntity:exit'() {
-                entityStack.pop();
+            'anyTestEntity:exit'(visitorContext) {
+                if (visitorContext.type === 'testCase') {
+                    testCaseNesting -= 1;
+                } else if (visitorContext.type === 'hook') {
+                    hooksNesting -= 1;
+                }
             }
         });
     }
