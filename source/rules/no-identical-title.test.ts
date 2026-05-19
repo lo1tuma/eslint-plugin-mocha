@@ -106,6 +106,13 @@ ruleTester.run('no-identical-title', noIdenticalTitleRule, {
             .join('\n'),
         {
             code: [
+                'it(null, function() {});',
+                'it(null, function() {});'
+            ]
+                .join('\n')
+        },
+        {
+            code: [
                 'foo("describe1", function() {});',
                 'foo("describe2", function() {});'
             ]

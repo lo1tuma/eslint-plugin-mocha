@@ -1,4 +1,3 @@
-/* eslint-disable no-warning-comments -- needed for c8 ignore comments */
 import { getStringIfConstant } from '@eslint-community/eslint-utils';
 import type { Rule, SourceCode } from 'eslint';
 import type { Except } from 'type-fest';
@@ -67,14 +66,10 @@ export function extractMemberExpressionPath(sourceCode: Readonly<SourceCode>, no
             const formattedName = formatName(currentNode.name, currentNode);
             path.unshift(formattedName);
             return path;
-            /* c8 ignore next */
         } else {
-            /* c8 ignore next */
             return path;
-            /* c8 ignore next */
         }
     }
-    /* c8 ignore next */
     return path;
 }
 

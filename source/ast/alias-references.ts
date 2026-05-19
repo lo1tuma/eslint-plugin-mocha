@@ -83,7 +83,7 @@ function getDeclaredIdentifiers(
 }
 
 // eslint-disable-next-line complexity -- no good idea how to refactor
-function extendPath(
+export function extendPath(
     parentReference: Readonly<ResolvedReference>,
     originalPath: DynamicPath,
     identifierPath: DynamicPath

@@ -1,5 +1,6 @@
-import { RuleTester } from 'eslint';
-import { handleDoneCallbackRule } from './handle-done-callback.js';
+import { RuleTester, type Scope } from 'eslint';
+import assert from 'node:assert';
+import { findParamInScope, handleDoneCallbackRule } from './handle-done-callback.js';
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
 ruleTester.run('handle-done-callback', handleDoneCallbackRule, {
@@ -115,4 +116,16 @@ ruleTester.run('handle-done-callback', handleDoneCallbackRule, {
             errors: [{ message: 'Expected "done" callback to be handled.', column: 18, line: 1 }]
         }
     ]
+});
+
+describe('handle-done-callback helpers', function () {
+    it('findParamInScope() ignores non-parameter variables', function () {
+        const result = findParamInScope('done', {
+            set: new Map([
+                ['done', { defs: [{ type: 'Variable' }] }]
+            ])
+        } as unknown as Scope.Scope);
+
+        assert.strictEqual(result, undefined);
+    });
 });
