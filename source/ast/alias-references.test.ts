@@ -1,10 +1,11 @@
 import { Linter, type Rule } from 'eslint';
 import assert from 'node:assert';
 import { extendPath, resolveAliasedReferences } from './alias-references.js';
+import type { CallExpression } from './node-types.js';
 import { initialReferenceToResolvedReference, type ResolvedReference } from './resolved-reference.js';
 
-function asNode(node: Record<string, unknown>): Rule.Node {
-    return node as Rule.Node;
+function asCallExpression(node: Record<string, unknown>): CallExpression {
+    return node as unknown as CallExpression;
 }
 
 function findResolvedAliasesOfGlobalVariables(code: string): readonly ResolvedReference[] {
@@ -41,8 +42,13 @@ function findResolvedAliasesOfGlobalVariables(code: string): readonly ResolvedRe
 describe('resolveAliasedReferences()', function () {
     it('preserves symbol path segments when extending function-call aliases', function () {
         const dynamicSegment = Symbol('dynamic');
+        const parentReference: ResolvedReference = {
+            node: asCallExpression({ type: 'CallExpression' }),
+            path: [],
+            resolvedPath: ['foo']
+        };
         const result = extendPath(
-            { node: asNode({}), path: [], resolvedPath: ['foo'] },
+            parentReference,
             [dynamicSegment],
             ['bar()']
         );

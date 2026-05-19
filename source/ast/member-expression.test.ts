@@ -35,7 +35,7 @@ function readExpression(code: string): { sourceCode: Readonly<SourceCode>; expre
     assert.deepStrictEqual(messages, []);
     assert.notStrictEqual(result, null);
 
-    return result as { sourceCode: Readonly<SourceCode>; expression: Readonly<Rule.Node>; };
+    return result as unknown as { sourceCode: Readonly<SourceCode>; expression: Readonly<Rule.Node>; };
 }
 
 describe('member expression helpers', function () {
