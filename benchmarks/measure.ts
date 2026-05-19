@@ -28,11 +28,14 @@ type MedianResult = {
 
 function median(list: readonly number[]): number {
     const listParts = 2;
-    const medianIndex = Math.floor(list.length / listParts);
-    const lowerValue = list[medianIndex - 1] ?? 0;
-    const upperValue = list[medianIndex] ?? 0;
+    const sortedList = [...list].sort((left, right) => {
+        return left - right;
+    });
+    const medianIndex = Math.floor(sortedList.length / listParts);
+    const lowerValue = sortedList[medianIndex - 1] ?? 0;
+    const upperValue = sortedList[medianIndex] ?? 0;
 
-    if (list.length % listParts === 0) {
+    if (sortedList.length % listParts === 0) {
         return (lowerValue + upperValue) / listParts;
     }
 
