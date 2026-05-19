@@ -81,7 +81,7 @@ const iterations = 50;
 
 describe('runtime', function () {
     it('should not take longer as the defined budget to lint many files with the recommended config', function () {
-        const cpuAgnosticBudget = 3_250_000;
+        const cpuAgnosticBudget = 2_050_000;
         const budget = cpuAgnosticBudget / cpuSpeed;
 
         const { medianDuration } = runSyncBenchmark(() => {
@@ -96,7 +96,7 @@ describe('runtime', function () {
     });
 
     it('should not consume more memory as the defined budget to lint many files with the recommended config', function () {
-        const budget = 40_000_000;
+        const budget = 2_000_000;
 
         const { medianMemory } = runSyncBenchmark(() => {
             lintManyFilesWithAllRecommendedRules({ numberOfFiles: 350 });
