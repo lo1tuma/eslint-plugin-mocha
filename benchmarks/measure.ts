@@ -28,7 +28,7 @@ type MedianResult = {
 
 function median(list: readonly number[]): number {
     const listParts = 2;
-    const sortedList = [...list].sort((left, right) => {
+    const sortedList = Array.from(list).sort((left, right) => {
         return left - right;
     });
     const medianIndex = Math.floor(sortedList.length / listParts);
