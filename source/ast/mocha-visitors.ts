@@ -201,7 +201,7 @@ function createCallExpressionDispatchGroup(
     };
 }
 
-function dispatchCallback(
+export function dispatchCallback(
     visitor: MochaVisitor | undefined,
     context: Readonly<VisitorContext>
 ): void {
@@ -289,7 +289,7 @@ function createCallExpressionDispatcher(
     };
 }
 
-function callExpressionVisitor(
+export function callExpressionVisitor(
     cachedMochaCallsByNode: Readonly<WeakMap<Rule.Node, Readonly<CachedMochaCall>>>,
     node: CallExpressionNode,
     listenerSet: Readonly<CallExpressionListenerSet>

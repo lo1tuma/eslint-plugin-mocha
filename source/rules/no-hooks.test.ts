@@ -1,4 +1,5 @@
-import { RuleTester } from 'eslint';
+import { type Rule, RuleTester } from 'eslint';
+import assert from 'node:assert';
 import { noHooksRule } from './no-hooks.js';
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
@@ -89,4 +90,21 @@ ruleTester.run('no-hooks', noHooksRule, {
             errors: [{ message: 'Unexpected use of Mocha `after()` hook', column: 23, line: 1 }]
         }
     ]
+});
+
+describe('no-hooks create()', function () {
+    it('normalizes non-string allow entries when invoked directly', function () {
+        noHooksRule.create({
+            id: 'no-hooks',
+            options: [{ allow: [42] }],
+            settings: {},
+            sourceCode: {
+                scopeManager: {
+                    globalScope: null
+                }
+            }
+        } as unknown as Rule.RuleContext);
+
+        assert.ok(true);
+    });
 });

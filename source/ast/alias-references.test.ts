@@ -1,7 +1,11 @@
 import { Linter, type Rule } from 'eslint';
 import assert from 'node:assert';
-import { resolveAliasedReferences } from './alias-references.js';
+import { extendPath, resolveAliasedReferences } from './alias-references.js';
 import { initialReferenceToResolvedReference, type ResolvedReference } from './resolved-reference.js';
+
+function asNode(node: Record<string, unknown>): Rule.Node {
+    return node as Rule.Node;
+}
 
 function findResolvedAliasesOfGlobalVariables(code: string): readonly ResolvedReference[] {
     const linter = new Linter();
@@ -35,6 +39,18 @@ function findResolvedAliasesOfGlobalVariables(code: string): readonly ResolvedRe
 }
 
 describe('resolveAliasedReferences()', function () {
+    it('preserves symbol path segments when extending function-call aliases', function () {
+        const dynamicSegment = Symbol('dynamic');
+        const result = extendPath(
+            { node: asNode({}), path: [], resolvedPath: ['foo'] },
+            [dynamicSegment],
+            ['bar()']
+        );
+
+        assert.strictEqual(result[0], 'foo');
+        assert.strictEqual(result[1], dynamicSegment);
+    });
+
     it('returns an empty array if no initial references exist', function () {
         const aliases = findResolvedAliasesOfGlobalVariables('');
 
@@ -371,6 +387,14 @@ describe('resolveAliasedReferences()', function () {
         const aliases = findResolvedAliasesOfGlobalVariables(
             'const { bar } = foo; bar[Math.random()];'
         );
+
+        assert.strictEqual(aliases.length, 1);
+        assert.deepStrictEqual(aliases[0]?.path, ['foo']);
+        assert.deepStrictEqual(aliases[0]?.resolvedPath, ['foo']);
+    });
+
+    it('ignores rest elements in object patterns', function () {
+        const aliases = findResolvedAliasesOfGlobalVariables('const { ...rest } = foo; rest;');
 
         assert.strictEqual(aliases.length, 1);
         assert.deepStrictEqual(aliases[0]?.path, ['foo']);

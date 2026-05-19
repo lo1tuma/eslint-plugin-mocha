@@ -1,5 +1,10 @@
-import { RuleTester } from 'eslint';
-import { consistentSpacingBetweenBlocksRule } from './consistent-spacing-between-blocks.js';
+import { type Rule, RuleTester } from 'eslint';
+import assert from 'node:assert';
+import {
+    consistentSpacingBetweenBlocksRule,
+    containsNode,
+    isFirstStatementInScope
+} from './consistent-spacing-between-blocks.js';
 
 const ruleTester = new RuleTester({ languageOptions: { ecmaVersion: 2020, sourceType: 'script' } });
 
@@ -351,4 +356,28 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
         },
         ...nestedStatementWrappers.map(createInvalidNestedStatementCase)
     ]
+});
+
+describe('consistent-spacing-between-blocks helpers', function () {
+    it('containsNode() returns false when ranges are missing', function () {
+        const result = containsNode({ range: undefined } as Rule.Node, { range: [0, 1] } as Rule.Node);
+
+        assert.strictEqual(result, false);
+    });
+
+    it('isFirstStatementInScope() falls back to the scope node when the block is empty', function () {
+        const scopeNode = {
+            type: 'BlockStatement',
+            body: [],
+            range: [0, 10]
+        } as unknown as Rule.Node;
+        const node = {
+            type: 'ExpressionStatement',
+            range: [1, 2]
+        } as unknown as Rule.Node;
+
+        const result = isFirstStatementInScope(scopeNode as never, node);
+
+        assert.strictEqual(result, true);
+    });
 });

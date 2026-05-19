@@ -1,5 +1,6 @@
-import { RuleTester } from 'eslint';
-import { noSynchronousTestsRule } from './no-synchronous-tests.js';
+import { type Rule, RuleTester } from 'eslint';
+import assert from 'node:assert';
+import { doesReturnPromise, noSynchronousTestsRule } from './no-synchronous-tests.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
@@ -130,4 +131,12 @@ ruleTester.run('no-synchronous-tests', noSynchronousTestsRule, {
             errors: [{ message: 'Unexpected synchronous test.', column: 8, line: 1 }]
         }
     ]
+});
+
+describe('no-synchronous-tests helpers', function () {
+    it('doesReturnPromise() returns false for non-function nodes', function () {
+        const result = doesReturnPromise({ type: 'Identifier' } as Rule.Node);
+
+        assert.strictEqual(result, false);
+    });
 });

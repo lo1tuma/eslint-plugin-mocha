@@ -45,7 +45,7 @@ function findPromiseReturnStatement(nodes: Readonly<BlockStatement['body']>): Re
     });
 }
 
-function doesReturnPromise(functionExpression: Readonly<Rule.Node>): boolean {
+export function doesReturnPromise(functionExpression: Readonly<Rule.Node>): boolean {
     if (!isFunction(functionExpression)) {
         return false;
     }

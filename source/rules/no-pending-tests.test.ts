@@ -1,8 +1,17 @@
-import { RuleTester } from 'eslint';
-import { noPendingTestsRule } from './no-pending-tests.js';
+import { type Rule, RuleTester } from 'eslint';
+import assert from 'node:assert';
+import { checkPendingSuite, checkPendingTestCase, noPendingTestsRule } from './no-pending-tests.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const expectedErrorMessage = 'Unexpected pending mocha test.';
+
+function asRuleContext(ruleContext: Record<string, unknown>): Rule.RuleContext {
+    return ruleContext as Rule.RuleContext;
+}
+
+function asRuleNode(node: Record<string, unknown>): Rule.Node {
+    return node as Rule.Node;
+}
 
 ruleTester.run('no-pending-tests', noPendingTestsRule, {
     valid: [
@@ -161,4 +170,42 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
             errors: [{ message: expectedErrorMessage, column: 33, line: 1 }]
         }
     ]
+});
+
+describe('no-pending-tests helpers', function () {
+    it('checkPendingTestCase() ignores non-call-expression nodes', function () {
+        const reports: string[] = [];
+
+        checkPendingTestCase(
+            asRuleContext({
+                report() {
+                    reports.push('reported');
+                }
+            }),
+            {
+                modifier: null,
+                node: asRuleNode({ type: 'Identifier' })
+            }
+        );
+
+        assert.deepStrictEqual(reports, []);
+    });
+
+    it('checkPendingSuite() ignores non-call-expression nodes', function () {
+        const reports: string[] = [];
+
+        checkPendingSuite(
+            asRuleContext({
+                report() {
+                    reports.push('reported');
+                }
+            }),
+            {
+                modifier: 'pending',
+                node: asRuleNode({ type: 'Identifier' })
+            }
+        );
+
+        assert.deepStrictEqual(reports, []);
+    });
 });

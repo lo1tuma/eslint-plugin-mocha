@@ -14,6 +14,43 @@ function reportIfShortArrowFunction(context: Readonly<Rule.RuleContext>, node: R
     return false;
 }
 
+function isAllowedReturnStatement(node: Readonly<ReturnStatement>): boolean {
+    const { argument } = node;
+
+    return (isReturnOfUndefined(node) || argument?.type === 'Literal');
+}
+
+export function reportIfFunctionWithBlock(
+    context: Readonly<Rule.RuleContext>,
+    node: Readonly<AnyFunction>
+): void {
+    if (node.body.type !== 'BlockStatement') {
+        return;
+    }
+
+    const returnStatement = findReturnStatement(node.body.body);
+
+    if (returnStatement !== undefined && !isAllowedReturnStatement(returnStatement)) {
+        context.report({
+            node: returnStatement,
+            messageId: 'unexpectedReturnWithAsync'
+        });
+    }
+}
+
+export function checkNodeForReturnFromAsync(context: Readonly<Rule.RuleContext>, node: Readonly<Rule.Node>): void {
+    if (!isFunction(node)) {
+        return;
+    }
+    if (node.async !== true) {
+        return;
+    }
+
+    if (!reportIfShortArrowFunction(context, node)) {
+        reportIfFunctionWithBlock(context, node);
+    }
+}
+
 export const noReturnFromAsyncRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
@@ -28,43 +65,9 @@ export const noReturnFromAsyncRule: Readonly<Rule.RuleModule> = {
         schema: []
     },
     create(context) {
-        function isAllowedReturnStatement(node: Readonly<ReturnStatement>): boolean {
-            const { argument } = node;
-
-            return (isReturnOfUndefined(node) || argument?.type === 'Literal');
-        }
-
-        function reportIfFunctionWithBlock(node: Readonly<AnyFunction>): void {
-            if (node.body.type !== 'BlockStatement') {
-                return;
-            }
-
-            const returnStatement = findReturnStatement(node.body.body);
-
-            if (returnStatement !== undefined && !isAllowedReturnStatement(returnStatement)) {
-                context.report({
-                    node: returnStatement,
-                    messageId: 'unexpectedReturnWithAsync'
-                });
-            }
-        }
-
-        function check(node: Readonly<Rule.Node>): void {
-            if (!isFunction(node)) {
-                return;
-            }
-            if (node.async !== true) {
-                return;
-            }
-
-            if (!reportIfShortArrowFunction(context, node)) {
-                reportIfFunctionWithBlock(node);
-            }
-        }
-
         return createMochaVisitors(context, {
             anyTestEntityCallback(visitorContext) {
-                check(visitorContext.node);
+                checkNodeForReturnFromAsync(context, visitorContext.node);
             }
         });
     }

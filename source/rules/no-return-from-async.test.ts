@@ -1,5 +1,10 @@
-import { RuleTester } from 'eslint';
-import { noReturnFromAsyncRule } from './no-return-from-async.js';
+import { type Rule, RuleTester } from 'eslint';
+import assert from 'node:assert';
+import {
+    checkNodeForReturnFromAsync,
+    noReturnFromAsyncRule,
+    reportIfFunctionWithBlock
+} from './no-return-from-async.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const message = 'Unexpected use of `return` in a test with an async function';
@@ -134,4 +139,32 @@ ruleTester.run('no-return-from-async', noReturnFromAsyncRule, {
             languageOptions: es6LanguageOptions
         }
     ]
+});
+
+describe('no-return-from-async helpers', function () {
+    it('reportIfFunctionWithBlock() ignores non-block bodies', function () {
+        const reports: string[] = [];
+
+        reportIfFunctionWithBlock({
+            report() {
+                reports.push('reported');
+            }
+        } as unknown as Rule.RuleContext, {
+            body: { type: 'Identifier' }
+        } as never);
+
+        assert.deepStrictEqual(reports, []);
+    });
+
+    it('checkNodeForReturnFromAsync() ignores non-function nodes', function () {
+        const reports: string[] = [];
+
+        checkNodeForReturnFromAsync({
+            report() {
+                reports.push('reported');
+            }
+        } as unknown as Rule.RuleContext, { type: 'Identifier' } as Rule.Node);
+
+        assert.deepStrictEqual(reports, []);
+    });
 });
