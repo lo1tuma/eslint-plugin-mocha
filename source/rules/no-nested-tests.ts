@@ -25,32 +25,45 @@ export const noNestedTestsRule: Readonly<Rule.RuleModule> = {
         let hooksNesting = 0;
         let testCaseNesting = 0;
 
+        function reportNestedSuite(node: Readonly<Rule.Node>): void {
+            if (hooksNesting > 0) {
+                report(node, 'suiteNestedInHook');
+            } else if (testCaseNesting > 0) {
+                report(node, 'suiteNestedInTest');
+            }
+        }
+
+        function reportNestedTestCase(node: Readonly<Rule.Node>): void {
+            if (testCaseNesting > 0) {
+                report(node, 'testNestedInTest');
+            } else if (hooksNesting > 0) {
+                report(node, 'testNestedInHook');
+            }
+        }
+
+        function enterHook(node: Readonly<Rule.Node>): void {
+            if (hooksNesting > 0) {
+                report(node, 'hookNestedInHook');
+            }
+            hooksNesting += 1;
+        }
+
         return createMochaVisitors(context, {
             anyTestEntity(visitorContext) {
                 if (visitorContext.type === 'suite') {
-                    if (hooksNesting > 0) {
-                        report(visitorContext.node, 'suiteNestedInHook');
-                    } else if (testCaseNesting > 0) {
-                        report(visitorContext.node, 'suiteNestedInTest');
-                    }
+                    reportNestedSuite(visitorContext.node);
                     return;
                 }
 
                 if (visitorContext.type === 'testCase') {
-                    if (testCaseNesting > 0) {
-                        report(visitorContext.node, 'testNestedInTest');
-                    } else if (hooksNesting > 0) {
-                        report(visitorContext.node, 'testNestedInHook');
-                    }
-
+                    reportNestedTestCase(visitorContext.node);
                     testCaseNesting += 1;
                     return;
                 }
 
-                if (hooksNesting > 0) {
-                    report(visitorContext.node, 'hookNestedInHook');
+                if (visitorContext.type === 'hook') {
+                    enterHook(visitorContext.node);
                 }
-                hooksNesting += 1;
             },
 
             'anyTestEntity:exit'(visitorContext) {

@@ -45,6 +45,12 @@ type EntityLocation = {
     beforeToken: Readonly<AST.Token> | null;
 };
 
+type SpacingCheck = {
+    readonly beforeToken: Readonly<AST.Token>;
+    readonly linesBetween: number;
+    readonly reportNode: VisitorContext['node'];
+};
+
 function isNestedStatementBoundary(node: Rule.Node): boolean {
     return node.type.endsWith('Statement') || node.type.endsWith('Declaration') || isFunction(node);
 }
@@ -69,6 +75,28 @@ function getParentWhileMemberExpression(node: Rule.Node): Rule.Node {
         return getParentWhileMemberExpression(node.parent);
     }
     return node;
+}
+
+function getSpacingCheck(
+    currentLayer: Readonly<Layer>,
+    entity: Readonly<EntityLocation>
+): Readonly<SpacingCheck> | undefined {
+    const { statementNode, beforeToken } = entity;
+    const statementNodeLocation = statementNode.loc;
+    if (
+        isFirstStatementInScope(currentLayer.scopeNode, statementNode) ||
+        beforeToken === null ||
+        statementNodeLocation === null ||
+        statementNodeLocation === undefined
+    ) {
+        return undefined;
+    }
+
+    return {
+        beforeToken,
+        linesBetween: statementNodeLocation.start.line - beforeToken.loc.end.line,
+        reportNode: entity.reportNode
+    };
 }
 
 export const consistentSpacingBetweenBlocksRule: Readonly<Rule.RuleModule> = {
@@ -97,7 +125,6 @@ export const consistentSpacingBetweenBlocksRule: Readonly<Rule.RuleModule> = {
                 currentLayer.entities.push({
                     reportNode: visitorContext.node,
                     statementNode,
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- includeComments is false
                     beforeToken: sourceCode.getTokenBefore(statementNode, { includeComments: false }) as (
                         Readonly<AST.Token> | null
                     )
@@ -105,28 +132,25 @@ export const consistentSpacingBetweenBlocksRule: Readonly<Rule.RuleModule> = {
             }
         }
 
-        // eslint-disable-next-line complexity -- no idea how to refactor
         function checkCurrentLayer(): void {
             const currentLayer = getLastOrThrow(layers);
 
             for (const entity of currentLayer.entities) {
-                const { reportNode, statementNode, beforeToken } = entity;
-
-                if (!isFirstStatementInScope(currentLayer.scopeNode, statementNode) && beforeToken !== null) {
-                    const linesBetween = (statementNode.loc?.start.line ?? 0) - (beforeToken.loc?.end.line ?? 0);
-
-                    if (linesBetween < minimumAmountOfLinesBetweenNeeded) {
-                        context.report({
-                            node: reportNode,
-                            messageId: 'expectedLineBreak',
-                            fix(fixer) {
-                                return fixer.insertTextAfter(
-                                    beforeToken,
-                                    linesBetween === 0 ? '\n\n' : '\n'
-                                );
-                            }
-                        });
-                    }
+                const spacingCheck = getSpacingCheck(currentLayer, entity);
+                if (
+                    spacingCheck !== undefined &&
+                    spacingCheck.linesBetween < minimumAmountOfLinesBetweenNeeded
+                ) {
+                    context.report({
+                        node: spacingCheck.reportNode,
+                        messageId: 'expectedLineBreak',
+                        fix(fixer) {
+                            return fixer.insertTextAfter(
+                                spacingCheck.beforeToken,
+                                spacingCheck.linesBetween === 0 ? '\n\n' : '\n'
+                            );
+                        }
+                    });
                 }
             }
         }
