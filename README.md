@@ -117,7 +117,7 @@ For maintainers: the rules table below is generated, and the headers in `documen
 | [max-top-level-suites](documentation/rules/max-top-level-suites.md)                           | Enforce the number of top-level suites in a single file                 | ✅  |    |    |    |
 | [no-async-suite](documentation/rules/no-async-suite.md)                                       | Disallow async functions passed to a suite                              | ✅  |    |    | 🔧 |
 | [no-empty-title](documentation/rules/no-empty-title.md)                                       | Disallow empty test descriptions                                        | ✅  |    |    |    |
-| [no-exclusive-tests](documentation/rules/no-exclusive-tests.md)                               | Disallow exclusive tests                                                |    | ✅  |    |    |
+| [no-exclusive-tests](documentation/rules/no-exclusive-tests.md)                               | Disallow exclusive tests                                                |    | ✅  |    | 🔧 |
 | [no-exports](documentation/rules/no-exports.md)                                               | Disallow exports from test files                                        | ✅  |    |    |    |
 | [no-global-tests](documentation/rules/no-global-tests.md)                                     | Disallow global tests                                                   | ✅  |    |    |    |
 | [no-hooks](documentation/rules/no-hooks.md)                                                   | Disallow hooks                                                          |    |    | ✅  |    |
