@@ -2,7 +2,7 @@ import type { Rule, SourceCode } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { type AnyFunction, isBlockStatement } from '../ast/node-types.js';
 
-function containsDirectAwait(node: AnyFunction['body']): boolean {
+export function containsDirectAwait(node: AnyFunction['body']): boolean {
     if (node.type === 'AwaitExpression') {
         return true;
     }
@@ -20,7 +20,7 @@ function isAsyncFunction(node: Rule.Node): node is AnyFunction {
         node.async === true;
 }
 
-function fixAsyncFunction(
+export function fixAsyncFunction(
     sourceCode: Readonly<SourceCode>,
     fixer: Rule.RuleFixer,
     fn: Readonly<AnyFunction>

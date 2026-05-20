@@ -13,7 +13,7 @@ import { getLastOrThrow } from '../list.js';
 
 const minimumAmountOfLinesBetweenNeeded = 2;
 
-function containsNode(nodeA: Except<Rule.Node, 'parent'>, nodeB: Except<Rule.Node, 'parent'>): boolean {
+export function containsNode(nodeA: Except<Rule.Node, 'parent'>, nodeB: Except<Rule.Node, 'parent'>): boolean {
     const { range: rangeA } = nodeA;
     const { range: rangeB } = nodeB;
     if (rangeA === undefined || rangeB === undefined) {
@@ -23,7 +23,7 @@ function containsNode(nodeA: Except<Rule.Node, 'parent'>, nodeB: Except<Rule.Nod
     return rangeB[1] <= rangeA[1] && rangeB[0] >= rangeA[0];
 }
 
-function isFirstStatementInScope(scopeNode: Layer['scopeNode'], node: Rule.Node): boolean {
+export function isFirstStatementInScope(scopeNode: Layer['scopeNode'], node: Rule.Node): boolean {
     if (isBlockStatement(scopeNode) || isProgram(scopeNode)) {
         const [firstNode] = scopeNode.body;
         if (firstNode !== undefined) {

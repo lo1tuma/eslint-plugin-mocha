@@ -42,6 +42,18 @@ function findReferenceNames(
 }
 
 describe('findGlobalReferencesByName()', function () {
+    it('returns an empty array if the scope manager has no global scope', function () {
+        const foundResolvedReferences = findGlobalReferencesByName({
+            sourceCode: {
+                scopeManager: {
+                    globalScope: null
+                }
+            }
+        } as Rule.RuleContext, [{ path: ['foo'] }] as unknown as readonly NameDetails[]);
+
+        assert.deepStrictEqual(foundResolvedReferences, []);
+    });
+
     it('returns an empty array if no match was found', function () {
         const foundResolvedReferences = findReferenceNames('bar;', [{ path: ['foo'] }]);
 

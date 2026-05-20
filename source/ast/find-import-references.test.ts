@@ -47,6 +47,22 @@ function findReferenceNames(
 }
 
 describe('findImportReferencesByName()', function () {
+    it('returns an empty array if the scope manager has no global scope', function () {
+        const foundResolvedReferences = findImportReferencesByName(
+            {
+                sourceCode: {
+                    scopeManager: {
+                        globalScope: undefined
+                    }
+                }
+            } as unknown as Rule.RuleContext,
+            [{ path: ['foo'] }] as unknown as readonly NameDetails[],
+            'bar'
+        );
+
+        assert.deepStrictEqual(foundResolvedReferences, []);
+    });
+
     it('returns an empty array if no import statement exist', function () {
         const foundResolvedReferences = findReferenceNames('', [{ path: ['foo'] }], 'bar');
 
@@ -182,5 +198,17 @@ describe('findImportReferencesByName()', function () {
             path: ['baz'],
             resolvedPath: ['foo']
         }]);
+    });
+
+    it('preserves dynamic paths when the imported binding is used with dynamic member access', function () {
+        const foundResolvedReferences = findReferenceNames('import { foo } from "bar"; foo[bar];', [
+            { path: ['foo'] }
+        ], 'bar');
+
+        assert.strictEqual(foundResolvedReferences.length, 1);
+        assert.strictEqual(foundResolvedReferences[0]?.path[0], 'foo');
+        assert.strictEqual(typeof foundResolvedReferences[0]?.path[1], 'symbol');
+        assert.strictEqual(foundResolvedReferences[0]?.resolvedPath[0], 'foo');
+        assert.strictEqual(typeof foundResolvedReferences[0]?.resolvedPath[1], 'symbol');
     });
 });
