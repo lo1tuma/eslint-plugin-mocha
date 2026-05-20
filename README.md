@@ -44,7 +44,7 @@ export default [
 
 These settings are shared by multiple rules.
 
-- `additionalCustomNames`: Adds custom suite or test function names. This is useful for Mocha wrappers such as [`ember-mocha`](https://github.com/switchfly/ember-mocha) or [`mocha-each`](https://github.com/ryym/mocha-each).
+- `additionalCustomNames`: Adds custom suite, test, or hook function names. This is useful for Mocha wrappers such as [`ember-mocha`](https://github.com/switchfly/ember-mocha) or project-specific helpers that wrap setup and teardown.
 
 ```json
 {
@@ -63,6 +63,11 @@ These settings are shared by multiple rules.
                 "name": "testModule",
                 "type": "testCase",
                 "interface": "TDD"
+            },
+            {
+                "name": "prepareTestContexts",
+                "type": "hook",
+                "interface": "BDD"
             }
         ]
     }
@@ -95,6 +100,7 @@ forEach([1, 2, 3]).describe("example", function (n) {});
 forEach([1, 2, 3]).describeModule.modifier("example", function (n) {});
 ```
 
+- `type`: Selects `suite`, `testCase`, or `hook`.
 - `interface`: Selects `BDD`, `TDD`, or `exports`. The default is `BDD`. With `exports`, rule resolution uses named `import` statements instead of globals. `mocha/consistent-interface` also reports named imports of Mocha interface methods when this setting is `BDD` or `TDD`, which helps catch accidental `exports`-style usage and interface misconfiguration earlier.
 
 ## Rules

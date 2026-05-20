@@ -19,11 +19,11 @@ describe('settings', function () {
         it('returns the configured additional names from nested settings', function () {
             const result = getAdditionalNames({
                 mocha: {
-                    additionalCustomNames: [{ interface: 'TDD', name: 'bar', type: 'testCase' }]
+                    additionalCustomNames: [{ interface: 'BDD', name: 'prepareTestContexts', type: 'hook' }]
                 }
             });
 
-            assert.deepStrictEqual(result, [{ interface: 'TDD', name: 'bar', type: 'testCase' }]);
+            assert.deepStrictEqual(result, [{ interface: 'BDD', name: 'prepareTestContexts', type: 'hook' }]);
         });
 
         it('throws when additionalCustomNames is not an array', function () {
@@ -88,6 +88,20 @@ describe('settings', function () {
                 function (error: unknown) {
                     return error instanceof TypeError &&
                         error.message === 'additionalCustomNames type missing or invalid';
+                }
+            );
+        });
+
+        it('throws when an additionalCustomNames item has an unknown type', function () {
+            assert.throws(
+                function () {
+                    getAdditionalNames({
+                        'mocha/additionalCustomNames': [{ interface: 'BDD', name: 'bar', type: 'config' }]
+                    });
+                },
+                function (error: unknown) {
+                    return error instanceof Error &&
+                        error.message === 'additionalCustomNames type config is invalid';
                 }
             );
         });
