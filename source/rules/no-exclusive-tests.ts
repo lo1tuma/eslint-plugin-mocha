@@ -2,7 +2,7 @@ import type { Rule, SourceCode } from 'eslint';
 import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
 import { isCallExpression, isMemberExpression, type MemberExpression } from '../ast/node-types.js';
 
-function fixExclusiveTest(
+export function fixExclusiveTest(
     fixer: Rule.RuleFixer,
     sourceCode: Readonly<SourceCode>,
     node: Readonly<Rule.Node>
@@ -16,12 +16,21 @@ function fixExclusiveTest(
         : fixer.replaceTextRange(node.callee.range, sourceCode.getText(node.callee.object));
 }
 
-function getExclusivePropertyNode(node: Readonly<Rule.Node>): Readonly<MemberExpression['property']> | null {
+export function getExclusivePropertyNode(node: Readonly<Rule.Node>): Readonly<MemberExpression['property']> | null {
     if (!isCallExpression(node) || !isMemberExpression(node.callee)) {
         return null;
     }
 
     return node.callee.property;
+}
+
+export function createExclusiveTestReportDescriptor(
+    node: Readonly<Rule.Node>,
+    exclusivePropertyNode: Readonly<MemberExpression['property']>
+): Rule.ReportDescriptor & { messageId: 'unexpectedExclusiveTest'; } {
+    return exclusivePropertyNode.loc === null || exclusivePropertyNode.loc === undefined
+        ? { node, messageId: 'unexpectedExclusiveTest' }
+        : { node, loc: exclusivePropertyNode.loc, messageId: 'unexpectedExclusiveTest' };
 }
 
 export const noExclusiveTestsRule: Readonly<Rule.RuleModule> = {
@@ -32,9 +41,10 @@ export const noExclusiveTestsRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow exclusive tests',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-exclusive-tests.md'
         },
-        fixable: 'code',
+        hasSuggestions: true,
         messages: {
-            unexpectedExclusiveTest: 'Unexpected exclusive mocha test.'
+            unexpectedExclusiveTest: 'Unexpected exclusive mocha test.',
+            removeExclusiveModifier: 'Remove the exclusive modifier from this Mocha call.'
         },
         schema: []
     },
@@ -45,19 +55,14 @@ export const noExclusiveTestsRule: Readonly<Rule.RuleModule> = {
             const exclusivePropertyNode = getExclusivePropertyNode(visitorContext.node);
 
             if (visitorContext.modifier === 'exclusive' && exclusivePropertyNode !== null) {
-                const reportDescriptor = exclusivePropertyNode.loc === null || exclusivePropertyNode.loc === undefined
-                    ? { node: visitorContext.node, messageId: 'unexpectedExclusiveTest' as const }
-                    : {
-                        node: visitorContext.node,
-                        loc: exclusivePropertyNode.loc,
-                        messageId: 'unexpectedExclusiveTest' as const
-                    };
-
                 context.report({
-                    ...reportDescriptor,
-                    fix(fixer) {
-                        return fixExclusiveTest(fixer, sourceCode, visitorContext.node);
-                    }
+                    ...createExclusiveTestReportDescriptor(visitorContext.node, exclusivePropertyNode),
+                    suggest: [{
+                        messageId: 'removeExclusiveModifier',
+                        fix(fixer) {
+                            return fixExclusiveTest(fixer, sourceCode, visitorContext.node);
+                        }
+                    }]
                 });
             }
         }
