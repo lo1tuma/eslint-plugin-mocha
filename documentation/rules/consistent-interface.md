@@ -2,6 +2,8 @@
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 
+🔧 This rule is automatically fixable by the [`--fix` CLI option](https://eslint.org/docs/latest/user-guide/command-line-interface#--fix).
+
 <!-- end auto-generated rule header -->
 
 Mocha has several interfaces such as `BDD`, `TDD`, `Exports`, `QUnit` etc. Usually Mocha injects the variables and functions of the selected interface into the global scope. When using the `Exports` interface, named imports from `mocha` are used instead. This rule enforces a consistent `BDD` or `TDD` interface for imported Mocha interface methods, and it also reports imported Mocha interface methods when `settings.mocha.interface` is configured for globals.
@@ -25,6 +27,8 @@ where:
 With `settings.mocha.interface: "exports"`, this rule enforces that imported Mocha interface methods all belong to the configured `BDD` or `TDD` interface.
 
 With `settings.mocha.interface: "BDD"` or `settings.mocha.interface: "TDD"`, this rule reports named imports of Mocha interface methods from `mocha`, because those imports indicate `exports`-style usage and can prevent other rules from recognizing Mocha calls.
+
+The autofix is intentionally limited to direct named imports such as `import { describe } from 'mocha'`. Aliased imports and mixed default imports are still reported, but they are left for manual cleanup.
 
 ## When Not To Use It
 
