@@ -4,40 +4,66 @@ import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { type AnyFunction, isFunction } from '../ast/node-types.js';
 
 type TraversableNode = Except<Rule.Node, 'parent'>;
+type ContainsDirectAwait = (node: AnyFunction['body'] | TraversableNode) => boolean;
 
 function isNode(value: unknown): value is TraversableNode {
     return typeof value === 'object' && value !== null && 'type' in value;
 }
 
-function getChildNodes(node: TraversableNode): readonly unknown[] {
-    const childNodes: unknown[] = [];
+function getNodeProperty(node: TraversableNode, key: string): unknown {
+    return Reflect.get(node, key);
+}
 
-    for (const [key, value] of Object.entries(node) as readonly [string, unknown][]) {
-        if (key !== 'parent') {
-            childNodes.push(value);
+function containsDirectAwaitInValue(
+    containsAwait: ContainsDirectAwait,
+    value: unknown
+): boolean {
+    return isNode(value) && containsAwait(value);
+}
+
+function containsDirectAwaitInValues(
+    containsAwait: ContainsDirectAwait,
+    values: readonly unknown[]
+): boolean {
+    for (const value of values) {
+        if (containsDirectAwaitInValue(containsAwait, value)) {
+            return true;
         }
     }
 
-    return childNodes;
+    return false;
 }
 
-export function containsDirectAwait(node: AnyFunction['body'] | TraversableNode): boolean {
+function containsDirectAwaitInChildNodes(
+    sourceCode: Readonly<SourceCode>,
+    node: TraversableNode,
+    containsAwait: ContainsDirectAwait
+): boolean {
+    for (const key of sourceCode.visitorKeys[node.type] ?? []) {
+        const value = getNodeProperty(node, key);
+
+        if (Array.isArray(value)) {
+            if (containsDirectAwaitInValues(containsAwait, value)) {
+                return true;
+            }
+        } else if (containsDirectAwaitInValue(containsAwait, value)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+export function containsDirectAwait(
+    sourceCode: Readonly<SourceCode>,
+    node: AnyFunction['body'] | TraversableNode
+): boolean {
     if (node.type === 'AwaitExpression') {
         return true;
     }
 
-    if (isFunction(node)) {
-        return false;
-    }
-
-    const childNodes = getChildNodes(node);
-
-    return childNodes.some((value) => {
-        const containsAwaitInValue = (childValue: unknown): boolean => {
-            return isNode(childValue) && containsDirectAwait(childValue);
-        };
-
-        return Array.isArray(value) ? value.some(containsAwaitInValue) : containsAwaitInValue(value);
+    return !isFunction(node) && containsDirectAwaitInChildNodes(sourceCode, node, (childNode) => {
+        return containsDirectAwait(sourceCode, childNode);
     });
 }
 
@@ -52,7 +78,7 @@ export function fixAsyncFunction(
     fixer: Rule.RuleFixer,
     fn: Readonly<AnyFunction>
 ): Readonly<Rule.Fix | null> {
-    if (!containsDirectAwait(fn.body)) {
+    if (!containsDirectAwait(sourceCode, fn.body)) {
         // Remove the "async" token and all the whitespace before "function":
         const amountOfTokens = 2;
         const [asyncToken, functionToken] = sourceCode.getFirstTokens(fn, amountOfTokens);

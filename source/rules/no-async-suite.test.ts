@@ -163,13 +163,17 @@ ruleTester.run('no-async-suite', noAsyncSuiteRule, {
 
 describe('no-async-suite helpers', function () {
     it('containsDirectAwait() returns false for non-await expressions', function () {
-        const result = containsDirectAwait({ type: 'Identifier' } as never);
+        const sourceCode = asSourceCode({
+            visitorKeys: {}
+        });
+        const result = containsDirectAwait(sourceCode, { type: 'Identifier' } as never);
 
         assert.strictEqual(result, false);
     });
 
     it('fixAsyncFunction() returns null when the async token cannot be resolved', function () {
         const sourceCode = asSourceCode({
+            visitorKeys: {},
             getFirstTokens() {
                 return [];
             }
