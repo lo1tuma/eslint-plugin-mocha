@@ -23,6 +23,10 @@ function asScopeVariable(variable: Record<string, unknown>): Scope.Variable {
     return variable as unknown as Scope.Variable;
 }
 
+function asImportDeclaration(node: Record<string, unknown>): Parameters<typeof removeFullImportDeclaration>[2] {
+    return node as unknown as Parameters<typeof removeFullImportDeclaration>[2];
+}
+
 ruleTester.run('consistent-interface', consistentInterfaceRule, {
     valid: [
         {
@@ -234,11 +238,12 @@ describe('consistent-interface helpers', function () {
                     return null;
                 }
             } as unknown as SourceCode,
-            {
+            asImportDeclaration({
                 type: 'ImportDeclaration',
+                attributes: [],
                 source: { type: 'Literal', value: 'mocha' },
                 specifiers: []
-            }
+            })
         );
 
         assert.strictEqual(result, null);
@@ -259,12 +264,13 @@ describe('consistent-interface helpers', function () {
                     return null;
                 }
             } as unknown as SourceCode,
-            {
+            asImportDeclaration({
                 type: 'ImportDeclaration',
+                attributes: [],
                 range: [0, 30],
                 source: { type: 'Literal', value: 'mocha' },
                 specifiers: []
-            }
+            })
         );
 
         assert.deepStrictEqual(removedRange, [0, 30]);
@@ -357,11 +363,12 @@ describe('consistent-interface helpers', function () {
     it('createUnexpectedImportDescriptor() returns null when no location is available', function () {
         const result = createUnexpectedImportDescriptor(
             {
-                importDeclaration: {
+                importDeclaration: asImportDeclaration({
                     type: 'ImportDeclaration',
+                    attributes: [],
                     source: { type: 'Literal', value: 'mocha' },
                     specifiers: []
-                },
+                }),
                 specifier: {
                     type: 'ImportSpecifier',
                     imported: { type: 'Identifier', name: 'describe' },
@@ -399,8 +406,9 @@ describe('consistent-interface helpers', function () {
                 }
             } as unknown as SourceCode,
             specifier,
-            {
+            asImportDeclaration({
                 type: 'ImportDeclaration',
+                attributes: [],
                 range: [0, 30],
                 source: { type: 'Literal', value: 'mocha' },
                 specifiers: [
@@ -411,7 +419,7 @@ describe('consistent-interface helpers', function () {
                         local: { type: 'Identifier', name: 'run' }
                     }
                 ]
-            }
+            })
         );
 
         assert.strictEqual(result, null);
@@ -428,11 +436,12 @@ describe('consistent-interface helpers', function () {
                 }
             }),
             {
-                importDeclaration: {
+                importDeclaration: asImportDeclaration({
                     type: 'ImportDeclaration',
+                    attributes: [],
                     source: { type: 'Literal', value: 'mocha' },
                     specifiers: []
-                },
+                }),
                 specifier: {
                     type: 'ImportSpecifier',
                     imported: { type: 'Identifier', name: 'describe' },
