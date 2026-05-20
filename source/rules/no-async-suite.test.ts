@@ -92,6 +92,28 @@ ruleTester.run('no-async-suite', noAsyncSuiteRule, {
             }]
         },
         {
+            code: 'describe("hello", async () => {const bar = await foo;})',
+            // Do not offer a fix when await appears inside a declaration
+            output: null,
+            languageOptions: { ecmaVersion: 8 },
+            errors: [{
+                message: 'Unexpected async function in describe()',
+                line: 1,
+                column: 19
+            }]
+        },
+        {
+            code: 'describe("hello", async () => {if (ready) {await foo;}})',
+            // Do not offer a fix when await appears inside control flow
+            output: null,
+            languageOptions: { ecmaVersion: 8 },
+            errors: [{
+                message: 'Unexpected async function in describe()',
+                line: 1,
+                column: 19
+            }]
+        },
+        {
             code: 'describe("hello", async () => {async function bar() {await foo;}})',
             // Do offer a fix despite a nested async function containing await
             output: 'describe("hello", () => {async function bar() {await foo;}})',
