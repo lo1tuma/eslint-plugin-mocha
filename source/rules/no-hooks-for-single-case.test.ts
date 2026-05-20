@@ -1,4 +1,5 @@
-import { RuleTester } from 'eslint';
+import { type Rule, RuleTester } from 'eslint';
+import assert from 'node:assert';
 import { noHooksForSingleCaseRule } from './no-hooks-for-single-case.js';
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
@@ -352,4 +353,21 @@ ruleTester.run('no-hooks-for-single-case', noHooksForSingleCaseRule, {
             errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 5, line: 2 }]
         }
     ]
+});
+
+describe('no-hooks-for-single-case create()', function () {
+    it('normalizes non-string allow entries when invoked directly', function () {
+        noHooksForSingleCaseRule.create({
+            id: 'no-hooks-for-single-case',
+            options: [{ allow: [42] }],
+            settings: {},
+            sourceCode: {
+                scopeManager: {
+                    globalScope: null
+                }
+            }
+        } as unknown as Rule.RuleContext);
+
+        assert.ok(true);
+    });
 });

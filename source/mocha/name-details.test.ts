@@ -1,6 +1,45 @@
-/* eslint-disable @cspell/spellchecker -- generated names shouldn’t be checked */
+import { Linter, type Rule, type SourceCode } from 'eslint';
 import assert from 'node:assert';
-import { buildAllNameDetailsWithVariants } from './name-details.js';
+import { extractMemberExpressionPath } from '../ast/member-expression.js';
+import { buildAllNameDetailsWithVariants, reformatLastPathSegmentWithCallExpressions } from './name-details.js';
+
+function prefixPending(name: string): string {
+    return `x${name}`;
+}
+
+const prefixedFoo = prefixPending('foo');
+
+function readExpression(code: string): { sourceCode: Readonly<SourceCode>; expression: Readonly<Rule.Node>; } {
+    const linter = new Linter();
+    let result: { sourceCode: Readonly<SourceCode>; expression: Readonly<Rule.Node>; } | null = null;
+
+    const testRule: Rule.RuleModule = {
+        create(ruleContext) {
+            return {
+                Program() {
+                    const [firstStatement] = ruleContext.sourceCode.ast.body;
+                    assert.notStrictEqual(firstStatement, undefined);
+                    assert.strictEqual(firstStatement?.type, 'ExpressionStatement');
+
+                    result = {
+                        sourceCode: ruleContext.sourceCode,
+                        expression: firstStatement.expression as unknown as Readonly<Rule.Node>
+                    };
+                }
+            };
+        }
+    };
+
+    const messages = linter.verify(code, {
+        plugins: { 'test-plugin': { rules: { 'test-rule': testRule } } },
+        languageOptions: { ecmaVersion: 2020, sourceType: 'script' },
+        rules: { 'test-plugin/test-rule': 'error' }
+    });
+    assert.deepStrictEqual(messages, []);
+    assert.notStrictEqual(result, null);
+
+    return result as unknown as { sourceCode: Readonly<SourceCode>; expression: Readonly<Rule.Node>; };
+}
 
 describe('mocha names', function () {
     describe('buildAllNameDetailsWithVariants()', function () {
@@ -51,10 +90,10 @@ describe('mocha names', function () {
                     interface: 'BDD',
                     modifier: 'pending',
                     normalizedPath: [
-                        'xfoo()'
+                        `${prefixedFoo}()`
                     ],
                     path: [
-                        'xfoo'
+                        prefixedFoo
                     ],
                     type: 'suite'
                 },
@@ -107,11 +146,11 @@ describe('mocha names', function () {
                     interface: 'BDD',
                     modifier: 'pending',
                     normalizedPath: [
-                        'xfoo()',
+                        `${prefixedFoo}()`,
                         'timeout()'
                     ],
                     path: [
-                        'xfoo',
+                        prefixedFoo,
                         'timeout'
                     ],
                     type: 'config'
@@ -167,11 +206,11 @@ describe('mocha names', function () {
                     interface: 'BDD',
                     modifier: 'pending',
                     normalizedPath: [
-                        'xfoo()',
+                        `${prefixedFoo}()`,
                         'slow()'
                     ],
                     path: [
-                        'xfoo',
+                        prefixedFoo,
                         'slow'
                     ],
                     type: 'config'
@@ -227,11 +266,11 @@ describe('mocha names', function () {
                     interface: 'BDD',
                     modifier: 'pending',
                     normalizedPath: [
-                        'xfoo()',
+                        `${prefixedFoo}()`,
                         'retries()'
                     ],
                     path: [
-                        'xfoo',
+                        prefixedFoo,
                         'retries'
                     ],
                     type: 'config'
@@ -253,6 +292,17 @@ describe('mocha names', function () {
                     type: 'config'
                 }
             ]);
+        });
+    });
+
+    describe('reformatLastPathSegmentWithCallExpressions()', function () {
+        it('returns dynamic paths unchanged', function () {
+            const { sourceCode, expression } = readExpression('foo[bar];');
+            const dynamicPath = extractMemberExpressionPath(sourceCode, expression);
+
+            const result = reformatLastPathSegmentWithCallExpressions(dynamicPath, 2);
+
+            assert.strictEqual(result, dynamicPath);
         });
     });
 });

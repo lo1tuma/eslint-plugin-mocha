@@ -17,7 +17,10 @@ type Option = InferSchemaOption<typeof optionSchema>;
 type ResolvedOption = Option & { ignorePending: boolean; };
 const defaultOption: ResolvedOption = { ignorePending: false };
 
-function findParamInScope(paramName: string, scope: Readonly<Scope.Scope>): Readonly<Scope.Variable | undefined> {
+export function findParamInScope(
+    paramName: string,
+    scope: Readonly<Scope.Scope>
+): Readonly<Scope.Variable | undefined> {
     const variable = scope.set.get(paramName);
 
     return variable?.defs[0]?.type === 'Parameter' ? variable : undefined;

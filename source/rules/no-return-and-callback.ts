@@ -21,6 +21,45 @@ function isFunctionCallWithName(node: Except<Rule.Node, 'parent'> | null | undef
         node.callee.name === name;
 }
 
+function isAllowedReturnStatement(node: Readonly<ReturnStatement>, doneName: string): boolean {
+    if (isReturnOfUndefined(node) || node.argument?.type === 'Literal') {
+        return true;
+    }
+
+    return isFunctionCallWithName(node.argument, doneName);
+}
+
+export function reportIfFunctionWithBlock(
+    context: Readonly<Rule.RuleContext>,
+    node: Readonly<AnyFunction>,
+    doneName: string
+): void {
+    if (node.body.type !== 'BlockStatement') {
+        return;
+    }
+    const returnStatement = findReturnStatement(node.body.body);
+    if (returnStatement !== undefined && !isAllowedReturnStatement(returnStatement, doneName)) {
+        context.report({
+            node: returnStatement,
+            messageId: 'unexpectedReturnWithCallback'
+        });
+    }
+}
+
+export function checkNodeForReturnAndCallback(context: Readonly<Rule.RuleContext>, node: Readonly<Rule.Node>): void {
+    if (!isFunction(node)) {
+        return;
+    }
+    const [firstParam] = node.params;
+    if (firstParam?.type !== 'Identifier') {
+        return;
+    }
+
+    if (!reportIfShortArrowFunction(context, node)) {
+        reportIfFunctionWithBlock(context, node, firstParam.name);
+    }
+}
+
 export const noReturnAndCallbackRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'problem',
@@ -35,44 +74,9 @@ export const noReturnAndCallbackRule: Readonly<Rule.RuleModule> = {
         schema: []
     },
     create(context) {
-        function isAllowedReturnStatement(node: Readonly<ReturnStatement>, doneName: string): boolean {
-            if (isReturnOfUndefined(node) || node.argument?.type === 'Literal') {
-                return true;
-            }
-
-            return isFunctionCallWithName(node.argument, doneName);
-        }
-
-        function reportIfFunctionWithBlock(node: Readonly<AnyFunction>, doneName: string): void {
-            if (node.body.type !== 'BlockStatement') {
-                return;
-            }
-            const returnStatement = findReturnStatement(node.body.body);
-            if (returnStatement !== undefined && !isAllowedReturnStatement(returnStatement, doneName)) {
-                context.report({
-                    node: returnStatement,
-                    messageId: 'unexpectedReturnWithCallback'
-                });
-            }
-        }
-
-        function check(node: Readonly<Rule.Node>): void {
-            if (!isFunction(node)) {
-                return;
-            }
-            const [firstParam] = node.params;
-            if (firstParam?.type !== 'Identifier') {
-                return;
-            }
-
-            if (!reportIfShortArrowFunction(context, node)) {
-                reportIfFunctionWithBlock(node, firstParam.name);
-            }
-        }
-
         return createMochaVisitors(context, {
             anyTestEntityCallback(visitorContext) {
-                check(visitorContext.node);
+                checkNodeForReturnAndCallback(context, visitorContext.node);
             }
         });
     }

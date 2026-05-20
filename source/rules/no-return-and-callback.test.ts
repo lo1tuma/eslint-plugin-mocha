@@ -1,5 +1,10 @@
-import { RuleTester } from 'eslint';
-import { noReturnAndCallbackRule } from './no-return-and-callback.js';
+import { type Rule, RuleTester } from 'eslint';
+import assert from 'node:assert';
+import {
+    checkNodeForReturnAndCallback,
+    noReturnAndCallbackRule,
+    reportIfFunctionWithBlock
+} from './no-return-and-callback.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const message = 'Unexpected use of `return` in a test with callback';
@@ -118,4 +123,48 @@ ruleTester.run('no-return-and-callback', noReturnAndCallbackRule, {
             errors: [{ message, column: 36, line: 1 }]
         }
     ]
+});
+
+describe('no-return-and-callback helpers', function () {
+    it('reportIfFunctionWithBlock() ignores non-block bodies', function () {
+        const reports: string[] = [];
+
+        reportIfFunctionWithBlock({
+            report() {
+                reports.push('reported');
+            }
+        } as unknown as Rule.RuleContext, {
+            body: { type: 'Identifier' }
+        } as never, 'done');
+
+        assert.deepStrictEqual(reports, []);
+    });
+
+    it('checkNodeForReturnAndCallback() ignores non-function nodes', function () {
+        const reports: string[] = [];
+
+        checkNodeForReturnAndCallback({
+            report() {
+                reports.push('reported');
+            }
+        } as unknown as Rule.RuleContext, { type: 'Identifier' } as Rule.Node);
+
+        assert.deepStrictEqual(reports, []);
+    });
+
+    it('checkNodeForReturnAndCallback() ignores functions without an identifier callback parameter', function () {
+        const reports: string[] = [];
+
+        checkNodeForReturnAndCallback({
+            report() {
+                reports.push('reported');
+            }
+        } as unknown as Rule.RuleContext, {
+            type: 'FunctionExpression',
+            body: { type: 'BlockStatement', body: [] },
+            params: [{ type: 'AssignmentPattern' }]
+        } as never);
+
+        assert.deepStrictEqual(reports, []);
+    });
 });

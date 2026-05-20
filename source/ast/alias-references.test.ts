@@ -1,7 +1,12 @@
 import { Linter, type Rule } from 'eslint';
 import assert from 'node:assert';
-import { resolveAliasedReferences } from './alias-references.js';
+import { extendPath, resolveAliasedReferences } from './alias-references.js';
+import type { CallExpression } from './node-types.js';
 import { initialReferenceToResolvedReference, type ResolvedReference } from './resolved-reference.js';
+
+function asCallExpression(node: Record<string, unknown>): CallExpression {
+    return node as unknown as CallExpression;
+}
 
 function findResolvedAliasesOfGlobalVariables(code: string): readonly ResolvedReference[] {
     const linter = new Linter();
@@ -35,6 +40,23 @@ function findResolvedAliasesOfGlobalVariables(code: string): readonly ResolvedRe
 }
 
 describe('resolveAliasedReferences()', function () {
+    it('preserves symbol path segments when extending function-call aliases', function () {
+        const dynamicSegment = Symbol('dynamic');
+        const parentReference: ResolvedReference = {
+            node: asCallExpression({ type: 'CallExpression' }),
+            path: [],
+            resolvedPath: ['foo']
+        };
+        const result = extendPath(
+            parentReference,
+            [dynamicSegment],
+            ['bar()']
+        );
+
+        assert.strictEqual(result[0], 'foo');
+        assert.strictEqual(result[1], dynamicSegment);
+    });
+
     it('returns an empty array if no initial references exist', function () {
         const aliases = findResolvedAliasesOfGlobalVariables('');
 
@@ -371,6 +393,14 @@ describe('resolveAliasedReferences()', function () {
         const aliases = findResolvedAliasesOfGlobalVariables(
             'const { bar } = foo; bar[Math.random()];'
         );
+
+        assert.strictEqual(aliases.length, 1);
+        assert.deepStrictEqual(aliases[0]?.path, ['foo']);
+        assert.deepStrictEqual(aliases[0]?.resolvedPath, ['foo']);
+    });
+
+    it('ignores rest elements in object patterns', function () {
+        const aliases = findResolvedAliasesOfGlobalVariables('const { ...rest } = foo; rest;');
 
         assert.strictEqual(aliases.length, 1);
         assert.deepStrictEqual(aliases[0]?.path, ['foo']);
