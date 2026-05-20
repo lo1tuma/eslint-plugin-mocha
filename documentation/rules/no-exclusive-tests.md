@@ -2,6 +2,8 @@
 
 ⚠️ This rule _warns_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 
+🔧 This rule is automatically fixable by the [`--fix` CLI option](https://eslint.org/docs/latest/user-guide/command-line-interface#--fix).
+
 <!-- end auto-generated rule header -->
 
 Mocha lets you run a single suite or test by appending `.only`. That is useful while debugging, but easy to leave behind by accident. This rule warns whenever exclusive tests are used.
