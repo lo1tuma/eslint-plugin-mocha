@@ -44,7 +44,7 @@ export default [
 
 These settings are shared by multiple rules.
 
-- `additionalCustomNames`: Adds custom suite, test, or hook function names. This is useful for Mocha wrappers such as [`ember-mocha`](https://github.com/switchfly/ember-mocha) or project-specific helpers that wrap setup and teardown.
+- `additionalCustomNames`: Adds custom suite, test, or hook function names. This is useful for Mocha wrappers such as [`ember-mocha`](https://github.com/switchfly/ember-mocha), [`mocha-each`](https://github.com/ryym/mocha-each), or project-specific helpers that wrap setup and teardown. Use `interface: "exports"` for wrappers that expose named imports from a helper module instead of importing directly from `mocha`.
 
 ```json
 {

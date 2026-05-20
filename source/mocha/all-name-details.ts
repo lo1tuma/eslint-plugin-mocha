@@ -12,12 +12,12 @@ export type CustomNameConfig = Pick<NameDetailsConfig, 'interface'> & {
     type: CustomMochaEntityType;
 };
 
-function nameConfigToNameDetails(nameConfig: Readonly<CustomNameConfig>): Readonly<NameDetailsConfig> {
+export function nameConfigToNameDetails(nameConfig: Readonly<CustomNameConfig>): Readonly<NameDetailsConfig> {
     const { name, ...rest } = nameConfig;
     return { path: convertNameToPathArray(name), modifier: null, config: null, ...rest };
 }
 
-const builtinNameDetailsList = buildAllNameDetailsWithVariants(builtinNames);
+export const builtinNameDetailsList = buildAllNameDetailsWithVariants(builtinNames);
 
 function hasMatchingInterface(
     nameDetails: Readonly<NameDetailsConfig>,
@@ -26,12 +26,28 @@ function hasMatchingInterface(
     return interfaceToUse === 'exports' || nameDetails.interface === interfaceToUse;
 }
 
+function hasMatchingCustomInterface(
+    nameDetails: Readonly<NameDetailsConfig>,
+    interfaceToUse: MochaInterface
+): boolean {
+    return nameDetails.interface === 'exports' || hasMatchingInterface(nameDetails, interfaceToUse);
+}
+
 function filterByInterface(
     nameDetailsList: readonly NameDetailsConfig[],
     interfaceToUse: MochaInterface
 ): readonly NameDetailsConfig[] {
     return nameDetailsList.filter((nameDetails) => {
         return hasMatchingInterface(nameDetails, interfaceToUse);
+    });
+}
+
+function filterCustomNamesByInterface(
+    nameDetailsList: readonly NameDetailsConfig[],
+    interfaceToUse: MochaInterface
+): readonly NameDetailsConfig[] {
+    return nameDetailsList.filter((nameDetails) => {
+        return hasMatchingCustomInterface(nameDetails, interfaceToUse);
     });
 }
 
@@ -58,10 +74,14 @@ function buildAdditionalNameDetailsForInterface(
     additionalNames: readonly CustomNameConfig[],
     interfaceToUse: MochaInterface
 ): readonly NameDetails[] {
-    return interfaceToUse === 'exports'
-        ? buildAdditionalNameDetails(additionalNames)
-        : buildNameDetailsForInterface(additionalNames.map(nameConfigToNameDetails), interfaceToUse);
+    const additionalNameDetails = additionalNames.map(nameConfigToNameDetails);
+
+    return buildAllNameDetailsWithVariants(filterCustomNamesByInterface(additionalNameDetails, interfaceToUse));
 }
+
+export const getAllCustomNameDetails = buildAdditionalNameDetails;
+
+export const getCustomNameDetailsForInterface = buildAdditionalNameDetailsForInterface;
 
 export function getAllNames(
     additionalNames: readonly CustomNameConfig[],
@@ -79,7 +99,7 @@ export function getAllNames(
     return [
         ...builtinNameDetails,
         ...(includeAllInterfaces
-            ? buildAdditionalNameDetails(additionalNames)
-            : buildAdditionalNameDetailsForInterface(additionalNames, interfaceToUse))
+            ? getAllCustomNameDetails(additionalNames)
+            : getCustomNameDetailsForInterface(additionalNames, interfaceToUse))
     ];
 }

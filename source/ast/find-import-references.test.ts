@@ -8,7 +8,7 @@ import type { ResolvedReference } from './resolved-reference.js';
 function findReferenceNames(
     code: string,
     names: readonly Partial<NameDetails>[],
-    importSource: string,
+    importSource: string | null,
     sourceType: 'module' | 'script' = 'module'
 ): readonly Except<ResolvedReference, 'node'>[] {
     const linter = new Linter();
@@ -193,6 +193,17 @@ describe('findImportReferencesByName()', function () {
         const foundResolvedReferences = findReferenceNames('import { foo as baz } from "bar"; baz;', [
             { path: ['foo'] }
         ], 'bar');
+
+        assert.deepStrictEqual(foundResolvedReferences, [{
+            path: ['baz'],
+            resolvedPath: ['foo']
+        }]);
+    });
+
+    it('returns matching references from any module when the import source is null', function () {
+        const foundResolvedReferences = findReferenceNames('import { foo as baz } from "bar"; baz;', [
+            { path: ['foo'] }
+        ], null);
 
         assert.deepStrictEqual(foundResolvedReferences, [{
             path: ['baz'],
