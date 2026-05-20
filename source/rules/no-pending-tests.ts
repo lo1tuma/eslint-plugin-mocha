@@ -38,7 +38,7 @@ function isLiteralSkipProperty(property: Readonly<MemberExpression['property']>)
     return isLiteral(property) && property.value === 'skip';
 }
 
-function isPendingMemberExpression(
+export function isPendingMemberExpression(
     callee: Readonly<CallExpression['callee']>
 ): callee is Extract<CallExpression['callee'], { type: 'MemberExpression'; }> {
     if (!isMemberExpression(callee)) {
@@ -51,7 +51,7 @@ function isPendingMemberExpression(
         (callee.computed && isLiteralSkipProperty(property));
 }
 
-function fixPendingMemberExpression(
+export function fixPendingMemberExpression(
     fixer: Rule.RuleFixer,
     sourceCode: Readonly<SourceCode>,
     callee: Readonly<CallExpression['callee']>
@@ -73,15 +73,26 @@ function fixPendingTest(
     return fixPendingIdentifier(fixer, node.callee) ?? fixPendingMemberExpression(fixer, sourceCode, node.callee);
 }
 
+function canSuggestPendingTest(node: Readonly<CallExpression>): boolean {
+    return (isIdentifier(node.callee) && node.callee.name.startsWith('x')) || isPendingMemberExpression(node.callee);
+}
+
 export function reportSkipped(context: Readonly<Rule.RuleContext>, node: CallExpression): void {
     const nodeToReport = node.callee.type === 'MemberExpression' ? node.callee.property : node.callee;
 
     context.report({
         node: nodeToReport,
         messageId: 'unexpectedPendingTest',
-        fix(fixer) {
-            return fixPendingTest(fixer, context.sourceCode, node);
-        }
+        ...(canSuggestPendingTest(node)
+            ? {
+                suggest: [{
+                    messageId: 'removePendingModifier' as const,
+                    fix(fixer: Rule.RuleFixer) {
+                        return fixPendingTest(fixer, context.sourceCode, node);
+                    }
+                }]
+            }
+            : {})
     });
 }
 
@@ -124,9 +135,10 @@ export const noPendingTestsRule: Rule.RuleModule = {
             description: 'Disallow pending tests',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-pending-tests.md'
         },
-        fixable: 'code',
+        hasSuggestions: true,
         messages: {
-            unexpectedPendingTest: 'Unexpected pending mocha test.'
+            unexpectedPendingTest: 'Unexpected pending mocha test.',
+            removePendingModifier: 'Remove the pending modifier from this Mocha call.'
         },
         schema: []
     },
