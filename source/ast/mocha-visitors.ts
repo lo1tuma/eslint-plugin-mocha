@@ -1,5 +1,5 @@
 import type { Rule, SourceCode } from 'eslint';
-import { getAllNames } from '../mocha/all-name-details.js';
+import { getAllCustomNameDetails, getCustomNameDetailsForInterface } from '../mocha/all-name-details.js';
 import type { MochaEntityType, MochaInterface, MochaModifier } from '../mocha/descriptors.js';
 import { getAdditionalNames, getInterface } from '../settings.js';
 import { findMochaVariableCalls, type ResolvedReferenceWithNameDetails } from './find-mocha-variable-calls.js';
@@ -347,8 +347,16 @@ function findCallsCached(
     if (cachedMochaCallsByNode === undefined) {
         const additionalCustomNames = getAdditionalNames(context.settings);
         const interfaceToUse = getInterface(context.settings);
-        const names = getAllNames(additionalCustomNames, interfaceToUse, options.includeAllInterfaces === true);
-        const calls = findMochaVariableCalls(context, names, interfaceToUse);
+        const includeAllInterfaces = options.includeAllInterfaces === true;
+        const customNames = includeAllInterfaces
+            ? getAllCustomNameDetails(additionalCustomNames)
+            : getCustomNameDetailsForInterface(additionalCustomNames, interfaceToUse);
+        const calls = findMochaVariableCalls(
+            context,
+            customNames,
+            interfaceToUse,
+            includeAllInterfaces
+        );
 
         cachedMochaCallsByNode = createMochaCallCache(calls);
         callsPerSettings.set(callCacheKey, cachedMochaCallsByNode);
