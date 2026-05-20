@@ -1,17 +1,44 @@
 import type { Rule, SourceCode } from 'eslint';
+import type { Except } from 'type-fest';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { type AnyFunction, isBlockStatement } from '../ast/node-types.js';
+import { type AnyFunction, isFunction } from '../ast/node-types.js';
 
-export function containsDirectAwait(node: AnyFunction['body']): boolean {
+type TraversableNode = Except<Rule.Node, 'parent'>;
+
+function isNode(value: unknown): value is TraversableNode {
+    return typeof value === 'object' && value !== null && 'type' in value;
+}
+
+function getChildNodes(node: TraversableNode): readonly unknown[] {
+    const childNodes: unknown[] = [];
+
+    for (const [key, value] of Object.entries(node) as readonly [string, unknown][]) {
+        if (key !== 'parent') {
+            childNodes.push(value);
+        }
+    }
+
+    return childNodes;
+}
+
+export function containsDirectAwait(node: AnyFunction['body'] | TraversableNode): boolean {
     if (node.type === 'AwaitExpression') {
         return true;
     }
-    if (isBlockStatement(node)) {
-        return node.body.some((statement) => {
-            return statement.type === 'ExpressionStatement' ? containsDirectAwait(statement.expression) : false;
-        });
+
+    if (isFunction(node)) {
+        return false;
     }
-    return false;
+
+    const childNodes = getChildNodes(node);
+
+    return childNodes.some((value) => {
+        const containsAwaitInValue = (childValue: unknown): boolean => {
+            return isNode(childValue) && containsDirectAwait(childValue);
+        };
+
+        return Array.isArray(value) ? value.some(containsAwaitInValue) : containsAwaitInValue(value);
+    });
 }
 
 function isAsyncFunction(node: Rule.Node): node is AnyFunction {
