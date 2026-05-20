@@ -47,78 +47,97 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
     invalid: [
         {
             code: 'it("is pending")',
+            output: null,
             errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'test("is pending")',
+            output: null,
             errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'specify("is pending")',
+            output: null,
             errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'describe.skip()',
+            output: 'describe()',
             errors: [{ message: expectedErrorMessage, column: 10, line: 1 }]
         },
         {
             code: 'describe["skip"]()',
+            output: 'describe()',
             errors: [{ message: expectedErrorMessage, column: 10, line: 1 }]
         },
         {
             code: 'xdescribe()',
+            output: 'describe()',
             errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'it.skip()',
+            output: 'it()',
             errors: [{ message: expectedErrorMessage, column: 4, line: 1 }]
         },
         {
             code: 'it["skip"]()',
+            output: 'it()',
             errors: [{ message: expectedErrorMessage, column: 4, line: 1 }]
         },
         {
             code: 'xit()',
+            output: 'it()',
             errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'suite.skip()',
+            output: 'suite()',
             errors: [{ message: expectedErrorMessage, column: 7, line: 1 }]
         },
         {
             code: 'suite["skip"]()',
+            output: 'suite()',
             errors: [{ message: expectedErrorMessage, column: 7, line: 1 }]
         },
         {
             code: 'test.skip()',
+            output: 'test()',
             errors: [{ message: expectedErrorMessage, column: 6, line: 1 }]
         },
         {
             code: 'test["skip"]()',
+            output: 'test()',
             errors: [{ message: expectedErrorMessage, column: 6, line: 1 }]
         },
         {
             code: 'context.skip()',
+            output: 'context()',
             errors: [{ message: expectedErrorMessage, column: 9, line: 1 }]
         },
         {
             code: 'context["skip"]()',
+            output: 'context()',
             errors: [{ message: expectedErrorMessage, column: 9, line: 1 }]
         },
         {
             code: 'xcontext()',
+            output: 'context()',
             errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'specify.skip()',
+            output: 'specify()',
             errors: [{ message: expectedErrorMessage, column: 9, line: 1 }]
         },
         {
             code: 'xspecify()',
+            output: 'specify()',
             errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
             code: 'custom.skip()',
+            output: 'custom()',
             settings: {
                 'mocha/additionalCustomNames': [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
             },
@@ -126,6 +145,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
         },
         {
             code: 'custom["skip"]()',
+            output: 'custom()',
             settings: {
                 'mocha/additionalCustomNames': [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
             },
@@ -133,6 +153,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
         },
         {
             code: 'xcustom()',
+            output: 'custom()',
             settings: {
                 'mocha/additionalCustomNames': [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
             },
@@ -140,6 +161,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
         },
         {
             code: 'custom.skip()',
+            output: 'custom()',
             settings: {
                 mocha: {
                     additionalCustomNames: [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
@@ -149,6 +171,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
         },
         {
             code: 'custom["skip"]()',
+            output: 'custom()',
             settings: {
                 mocha: {
                     additionalCustomNames: [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
@@ -158,6 +181,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
         },
         {
             code: 'xcustom()',
+            output: 'custom()',
             settings: {
                 mocha: {
                     additionalCustomNames: [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
@@ -167,6 +191,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
         },
         {
             code: 'var dynamicOnly = "skip"; suite[dynamicOnly]()',
+            output: null,
             errors: [{ message: expectedErrorMessage, column: 33, line: 1 }]
         }
     ]

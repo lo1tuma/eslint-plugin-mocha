@@ -2,6 +2,8 @@
 
 ⚠️ This rule _warns_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 
+🔧 This rule is automatically fixable by the [`--fix` CLI option](https://eslint.org/docs/latest/user-guide/command-line-interface#--fix).
+
 <!-- end auto-generated rule header -->
 
 Mocha supports pending tests. These are tests with no implementation, such as `it('unimplemented test');`, or tests that are explicitly skipped. This rule lets you warn or error on those cases.
