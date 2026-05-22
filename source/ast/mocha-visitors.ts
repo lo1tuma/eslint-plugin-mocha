@@ -323,11 +323,19 @@ const cachedCalls = new Map<
     WeakMap<SourceCode, Readonly<WeakMap<Rule.Node, Readonly<CachedMochaCall>>>>
 >();
 
+type CreateMochaVisitorOptions = {
+    readonly includeAllInterfaces?: boolean;
+};
+
 // eslint-disable-next-line max-statements -- caching with two cache keys, requires weird dance of statements
 function findCallsCached(
-    context: Readonly<Rule.RuleContext>
+    context: Readonly<Rule.RuleContext>,
+    options: Readonly<CreateMochaVisitorOptions>
 ): Readonly<WeakMap<Rule.Node, Readonly<CachedMochaCall>>> {
-    const settingsCacheKey = JSON.stringify(context.settings);
+    const settingsCacheKey = JSON.stringify({
+        settings: context.settings,
+        includeAllInterfaces: options.includeAllInterfaces === true
+    });
     let callsPerSettings = cachedCalls.get(settingsCacheKey);
     if (callsPerSettings === undefined) {
         callsPerSettings = new WeakMap();
@@ -339,7 +347,7 @@ function findCallsCached(
     if (cachedMochaCallsByNode === undefined) {
         const additionalCustomNames = getAdditionalNames(context.settings);
         const interfaceToUse = getInterface(context.settings);
-        const names = getAllNames(additionalCustomNames);
+        const names = getAllNames(additionalCustomNames, interfaceToUse, options.includeAllInterfaces === true);
         const calls = findMochaVariableCalls(context, names, interfaceToUse);
 
         cachedMochaCallsByNode = createMochaCallCache(calls);
@@ -522,10 +530,11 @@ function createSpecificVisitors(
 
 export function createMochaVisitors(
     context: Readonly<Rule.RuleContext>,
-    visitors: Readonly<MochaVisitors>
+    visitors: Readonly<MochaVisitors>,
+    options: Readonly<CreateMochaVisitorOptions> = {}
 ): Readonly<Rule.RuleListener> {
     const splitVisitors = splitMochaVisitors(visitors);
-    const cachedMochaCallsByNode = findCallsCached(context);
+    const cachedMochaCallsByNode = findCallsCached(context, options);
 
     return {
         ...splitVisitors.genericVisitors,

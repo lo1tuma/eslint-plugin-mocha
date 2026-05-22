@@ -1,4 +1,5 @@
 import { RuleTester } from 'eslint';
+import { withInterface } from '../mocha-interface-test-cases.js';
 import { validSuiteTitleRule } from './valid-suite-title.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
@@ -13,10 +14,10 @@ ruleTester.run('valid-suite-title', validSuiteTitleRule, {
             options: [{ pattern: '^[A-Z]' }],
             code: 'context("This is a test", function () { });'
         },
-        {
+        withInterface('TDD', {
             options: [{ pattern: '^[A-Z]' }],
             code: 'suite("This is a test", function () { });'
-        },
+        }),
         {
             options: [{ pattern: '^[A-Z]' }],
             settings: {
@@ -67,13 +68,13 @@ ruleTester.run('valid-suite-title', validSuiteTitleRule, {
                 { message: 'Invalid "context()" description found.' }
             ]
         },
-        {
+        withInterface('TDD', {
             options: [{ pattern: '^[A-Z]' }],
             code: 'suite("this is a test", function () { });',
             errors: [
                 { message: 'Invalid "suite()" description found.' }
             ]
-        },
+        }),
         {
             options: [{ pattern: '^[A-Z]' }],
             settings: {
