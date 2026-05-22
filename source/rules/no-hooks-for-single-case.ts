@@ -49,6 +49,7 @@ function ensureEndsWithParens(value: unknown): string {
 export const noHooksForSingleCaseRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
+        languages: ['js/js'],
         docs: {
             description: 'Disallow hooks for a single test or test suite',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-hooks-for-single-case.md'

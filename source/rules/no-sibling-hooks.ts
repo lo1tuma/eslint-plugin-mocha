@@ -17,6 +17,7 @@ function createNewLayer(node: Except<Rule.Node, 'parent'>): Readonly<Layer> {
 export const noSiblingHooksRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
+        languages: ['js/js'],
         docs: {
             description: 'Disallow duplicate uses of a hook at the same level inside a suite',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-sibling-hooks.md'

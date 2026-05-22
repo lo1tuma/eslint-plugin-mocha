@@ -11,6 +11,7 @@ export const noExportsRule: Readonly<Rule.RuleModule> = {
             unexpectedExport: 'Unexpected export from a test file'
         },
         type: 'suggestion',
+        languages: ['js/js'],
         schema: []
     },
     create(context) {

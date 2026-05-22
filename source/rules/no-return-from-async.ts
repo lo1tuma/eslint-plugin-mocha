@@ -54,6 +54,7 @@ export function checkNodeForReturnFromAsync(context: Readonly<Rule.RuleContext>,
 export const noReturnFromAsyncRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
+        languages: ['js/js'],
         docs: {
             description: 'Disallow returning from an async test or hook',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-return-from-async.md'

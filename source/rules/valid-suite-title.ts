@@ -36,6 +36,7 @@ function objectOptions(options: Readonly<ResolvedOption>): Readonly<NormalizedOp
 export const validSuiteTitleRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
+        languages: ['js/js'],
         docs: {
             description: 'Require suite descriptions to match a pre-configured regular expression',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/valid-suite-title.md'

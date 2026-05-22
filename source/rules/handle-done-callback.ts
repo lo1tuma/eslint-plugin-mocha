@@ -30,6 +30,7 @@ export function findParamInScope(
 export const handleDoneCallbackRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'problem',
+        languages: ['js/js'],
         docs: {
             description: 'Enforces handling of callbacks for async tests',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/handle-done-callback.md'
