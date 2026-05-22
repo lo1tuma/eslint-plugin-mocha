@@ -33,49 +33,15 @@ function createCoreContext(
     context: Rule.RuleContext,
     mochaCallbacks: WeakSet<Rule.Node>
 ): Rule.RuleContext {
-    return {
-        id: context.id,
-        options: context.options,
-        settings: context.settings,
-        parserPath: context.parserPath,
-        languageOptions: context.languageOptions,
-        parserOptions: context.parserOptions,
-        cwd: context.cwd,
-        filename: context.filename,
-        physicalFilename: context.physicalFilename,
-        sourceCode: context.sourceCode,
-        getAncestors(): ReturnType<Rule.RuleContext['getAncestors']> {
-            return context.getAncestors();
-        },
-        getDeclaredVariables(
-            node: Parameters<Rule.RuleContext['getDeclaredVariables']>[0]
-        ): ReturnType<Rule.RuleContext['getDeclaredVariables']> {
-            return context.getDeclaredVariables(node);
-        },
-        getFilename(): ReturnType<Rule.RuleContext['getFilename']> {
-            return context.getFilename();
-        },
-        getPhysicalFilename(): ReturnType<Rule.RuleContext['getPhysicalFilename']> {
-            return context.getPhysicalFilename();
-        },
-        getCwd(): ReturnType<Rule.RuleContext['getCwd']> {
-            return context.getCwd();
-        },
-        getScope(): ReturnType<Rule.RuleContext['getScope']> {
-            return context.getScope();
-        },
-        getSourceCode(): ReturnType<Rule.RuleContext['getSourceCode']> {
-            return context.getSourceCode();
-        },
-        markVariableAsUsed(name: string): ReturnType<Rule.RuleContext['markVariableAsUsed']> {
-            return context.markVariableAsUsed(name);
-        },
-        report(descriptor: Rule.ReportDescriptor): void {
-            if (!shouldSkipReport(mochaCallbacks, descriptor)) {
-                context.report(descriptor);
+    return Object.create(context, {
+        report: {
+            value(descriptor: Rule.ReportDescriptor): void {
+                if (!shouldSkipReport(mochaCallbacks, descriptor)) {
+                    context.report(descriptor);
+                }
             }
         }
-    };
+    });
 }
 
 export const preferArrowCallbackRule: Readonly<Rule.RuleModule> = {

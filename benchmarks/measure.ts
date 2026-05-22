@@ -1,12 +1,12 @@
 import os from 'node:os';
 import { performance as performanceHooks } from 'node:perf_hooks';
 
-const [{ speed: cpuSpeed = 0 } = {}] = os.cpus();
+const [{ speed: cpuSpeed } = { speed: 0 }] = os.cpus();
 
 export { cpuSpeed };
 
 export async function importFresh(modulePath: string): Promise<void> {
-    const cacheBuster = `${performanceHooks.now()}_${Math.random()}`;
+    const cacheBuster = `${performanceHooks.now()}_${process.hrtime.bigint().toString()}`;
     const cacheBustingModulePath = `${modulePath}?buster=${cacheBuster}`;
 
     await import(cacheBustingModulePath);
@@ -28,7 +28,7 @@ type MedianResult = {
 
 function median(list: readonly number[]): number {
     const listParts = 2;
-    const sortedList = Array.from(list).sort((left, right) => {
+    const sortedList = Array.from(list).toSorted((left, right) => {
         return left - right;
     });
     const medianIndex = Math.floor(sortedList.length / listParts);

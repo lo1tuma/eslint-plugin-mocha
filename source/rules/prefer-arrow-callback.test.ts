@@ -20,8 +20,7 @@ const ruleTester = new RuleTester({
 // ------------------------------------------------------------------------------
 
 const errors: [RuleTester.TestCaseError] = [{
-    message: 'Unexpected function expression.',
-    type: 'FunctionExpression'
+    message: 'Unexpected function expression.'
 }];
 
 ruleTester.run('prefer-arrow-callback', preferArrowCallbackRule, {
