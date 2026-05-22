@@ -80,8 +80,8 @@ describe('prefer-arrow-callback rule wrapper', function () {
         }
     });
 
-    it('forwards rule context helper methods to the wrapped core rule', async function () {
-        const observedCalls: string[] = [];
+    it('forwards the wrapped core rule report through the filtered context', async function () {
+        const observedContextValues: Record<string, string> = {};
         const reportedMessages: string[] = [];
 
         try {
@@ -105,23 +105,9 @@ describe('prefer-arrow-callback rule wrapper', function () {
                             const [node] = ruleContext.sourceCode.ast.body as [Rule.Node?];
                             const reportNode = node ?? ruleContext.sourceCode.ast;
 
-                            observedCalls.push('getAncestors');
-                            ruleContext.getAncestors();
-                            observedCalls.push('getDeclaredVariables');
-                            ruleContext.getDeclaredVariables(reportNode);
-                            observedCalls.push('getFilename');
-                            ruleContext.getFilename();
-                            observedCalls.push('getPhysicalFilename');
-                            ruleContext.getPhysicalFilename();
-                            observedCalls.push('getCwd');
-                            ruleContext.getCwd();
-                            observedCalls.push('getScope');
-                            ruleContext.getScope();
-                            observedCalls.push('getSourceCode');
-                            ruleContext.getSourceCode();
-                            observedCalls.push('markVariableAsUsed');
-                            ruleContext.markVariableAsUsed('foo');
-                            observedCalls.push('report');
+                            observedContextValues.filename = ruleContext.filename;
+                            observedContextValues.physicalFilename = ruleContext.physicalFilename;
+                            observedContextValues.sourceText = ruleContext.sourceCode.text;
                             ruleContext.report({
                                 node: reportNode,
                                 message: 'wrapped report'
@@ -147,41 +133,11 @@ describe('prefer-arrow-callback rule wrapper', function () {
                 id: 'prefer-arrow-callback',
                 options: [],
                 settings: {},
-                parserPath: '<text>',
                 languageOptions: { ecmaVersion: 2022, sourceType: 'script' },
-                parserOptions: {},
                 cwd: process.cwd(),
                 filename: '<text>',
                 physicalFilename: '<text>',
                 sourceCode,
-                getAncestors() {
-                    return [];
-                },
-                getDeclaredVariables() {
-                    return [];
-                },
-                getFilename() {
-                    return '<text>';
-                },
-                getPhysicalFilename() {
-                    return '<text>';
-                },
-                getCwd() {
-                    return process.cwd();
-                },
-                getScope() {
-                    const [scope] = sourceCode.scopeManager.scopes;
-
-                    assert.ok(scope !== undefined);
-
-                    return scope;
-                },
-                getSourceCode() {
-                    return sourceCode;
-                },
-                markVariableAsUsed() {
-                    return false;
-                },
                 report(descriptor) {
                     if ('message' in descriptor) {
                         reportedMessages.push(descriptor.message);
@@ -194,17 +150,11 @@ describe('prefer-arrow-callback rule wrapper', function () {
             builtinRules.get = originalGet;
         }
 
-        assert.deepStrictEqual(observedCalls, [
-            'getAncestors',
-            'getDeclaredVariables',
-            'getFilename',
-            'getPhysicalFilename',
-            'getCwd',
-            'getScope',
-            'getSourceCode',
-            'markVariableAsUsed',
-            'report'
-        ]);
+        assert.deepStrictEqual(observedContextValues, {
+            filename: '<text>',
+            physicalFilename: '<text>',
+            sourceText: 'foo();'
+        });
         assert.deepStrictEqual(reportedMessages, ['wrapped report']);
     });
 });
