@@ -1,6 +1,12 @@
-import { type Rule, RuleTester } from 'eslint';
+import { type Rule, RuleTester, type SourceCode } from 'eslint';
 import assert from 'node:assert';
-import { checkPendingSuite, checkPendingTestCase, noPendingTestsRule } from './no-pending-tests.js';
+import {
+    checkPendingSuite,
+    checkPendingTestCase,
+    fixPendingMemberExpression,
+    isPendingMemberExpression,
+    noPendingTestsRule
+} from './no-pending-tests.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const expectedErrorMessage = 'Unexpected pending mocha test.';
@@ -11,6 +17,18 @@ function asRuleContext(ruleContext: Record<string, unknown>): Rule.RuleContext {
 
 function asRuleNode(node: Record<string, unknown>): Rule.Node {
     return node as unknown as Rule.Node;
+}
+
+function asSourceCode(sourceCode: Record<string, unknown>): SourceCode {
+    return sourceCode as unknown as SourceCode;
+}
+
+function asRuleFixer(fixer: Record<string, unknown>): Rule.RuleFixer {
+    return fixer as unknown as Rule.RuleFixer;
+}
+
+function asRuleFix(fix: Record<string, unknown>): Rule.Fix {
+    return fix as unknown as Rule.Fix;
 }
 
 ruleTester.run('no-pending-tests', noPendingTestsRule, {
@@ -59,84 +77,174 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
         },
         {
             code: 'describe.skip()',
-            errors: [{ message: expectedErrorMessage, column: 10, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 10,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'describe()' }]
+            }]
         },
         {
             code: 'describe["skip"]()',
-            errors: [{ message: expectedErrorMessage, column: 10, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 10,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'describe()' }]
+            }]
         },
         {
             code: 'xdescribe()',
-            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 1,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'describe()' }]
+            }]
         },
         {
             code: 'it.skip()',
-            errors: [{ message: expectedErrorMessage, column: 4, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 4,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'it()' }]
+            }]
         },
         {
             code: 'it["skip"]()',
-            errors: [{ message: expectedErrorMessage, column: 4, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 4,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'it()' }]
+            }]
         },
         {
             code: 'xit()',
-            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 1,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'it()' }]
+            }]
         },
         {
             code: 'suite.skip()',
-            errors: [{ message: expectedErrorMessage, column: 7, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 7,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'suite()' }]
+            }]
         },
         {
             code: 'suite["skip"]()',
-            errors: [{ message: expectedErrorMessage, column: 7, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 7,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'suite()' }]
+            }]
         },
         {
             code: 'test.skip()',
-            errors: [{ message: expectedErrorMessage, column: 6, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 6,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'test()' }]
+            }]
         },
         {
             code: 'test["skip"]()',
-            errors: [{ message: expectedErrorMessage, column: 6, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 6,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'test()' }]
+            }]
         },
         {
             code: 'context.skip()',
-            errors: [{ message: expectedErrorMessage, column: 9, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 9,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'context()' }]
+            }]
         },
         {
             code: 'context["skip"]()',
-            errors: [{ message: expectedErrorMessage, column: 9, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 9,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'context()' }]
+            }]
         },
         {
             code: 'xcontext()',
-            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 1,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'context()' }]
+            }]
         },
         {
             code: 'specify.skip()',
-            errors: [{ message: expectedErrorMessage, column: 9, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 9,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'specify()' }]
+            }]
         },
         {
             code: 'xspecify()',
-            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 1,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'specify()' }]
+            }]
         },
         {
             code: 'custom.skip()',
             settings: {
                 'mocha/additionalCustomNames': [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
             },
-            errors: [{ message: expectedErrorMessage, column: 8, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 8,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'custom()' }]
+            }]
         },
         {
             code: 'custom["skip"]()',
             settings: {
                 'mocha/additionalCustomNames': [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
             },
-            errors: [{ message: expectedErrorMessage, column: 8, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 8,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'custom()' }]
+            }]
         },
         {
             code: 'xcustom()',
             settings: {
                 'mocha/additionalCustomNames': [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
             },
-            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 1,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'custom()' }]
+            }]
         },
         {
             code: 'custom.skip()',
@@ -145,7 +253,12 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                     additionalCustomNames: [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
                 }
             },
-            errors: [{ message: expectedErrorMessage, column: 8, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 8,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'custom()' }]
+            }]
         },
         {
             code: 'custom["skip"]()',
@@ -154,7 +267,12 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                     additionalCustomNames: [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
                 }
             },
-            errors: [{ message: expectedErrorMessage, column: 8, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 8,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'custom()' }]
+            }]
         },
         {
             code: 'xcustom()',
@@ -163,7 +281,12 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                     additionalCustomNames: [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
                 }
             },
-            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
+            errors: [{
+                message: expectedErrorMessage,
+                column: 1,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'custom()' }]
+            }]
         },
         {
             code: 'var dynamicOnly = "skip"; suite[dynamicOnly]()',
@@ -207,5 +330,35 @@ describe('no-pending-tests helpers', function () {
         );
 
         assert.deepStrictEqual(reports, []);
+    });
+
+    it('isPendingMemberExpression() returns false for non-member-expression callees', function () {
+        const result = isPendingMemberExpression({ type: 'Identifier', name: 'xdescribe' } as never);
+
+        assert.strictEqual(result, false);
+    });
+
+    it('fixPendingMemberExpression() returns null when the member-expression range is missing', function () {
+        const result = fixPendingMemberExpression(
+            asRuleFixer({
+                replaceTextRange() {
+                    return asRuleFix({});
+                }
+            }),
+            asSourceCode({
+                getText() {
+                    return 'describe';
+                }
+            }),
+            {
+                type: 'MemberExpression',
+                computed: false,
+                object: { type: 'Identifier', name: 'describe' },
+                property: { type: 'Identifier', name: 'skip' },
+                range: undefined
+            } as never
+        );
+
+        assert.strictEqual(result, null);
     });
 });
