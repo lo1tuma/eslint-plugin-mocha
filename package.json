@@ -7,24 +7,7 @@
         "node": ">=22.0.0"
     },
     "exports": "./target/build/source/plugin.js",
-    "scripts": {
-        "format:check": "dprint check --list-different",
-        "format:fix": "dprint fmt",
-        "eslint": "eslint . --max-warnings 0",
-        "lint": "npm run lint:docs && npm run lint:eslint-docs && npm run lint:js",
-        "lint:docs": "markdownlint \"**/*.md\"",
-        "lint:eslint-docs": "tsc --build source/tsconfig.sources.json && npm run update:eslint-docs -- --check",
-        "lint:js": "npm run eslint",
-        "fix:all": "npm run eslint -- --fix && npm run format:fix",
-        "compile": "tsc --build",
-        "test": "npm run test:unit:with-coverage && npm run test:bench",
-        "test:unit": "tsc --build source/tsconfig.unit-tests.json && mocha --spec 'target/build/source/**/*.test.js'",
-        "test:unit:with-coverage": "c8 npm run test:unit",
-        "test:bench": "tsc --build benchmarks/tsconfig.json && mocha -t 2400000 --spec 'target/build/benchmarks/**/*.bench.js'",
-        "coveralls": "cat ./target/coverage/lcov.info | coveralls",
-        "changelog": "pr-log",
-        "update:eslint-docs": "tsc --build source/tsconfig.sources.json && eslint-doc-generator --ignore-config all --path-rule-doc \"documentation/rules/{name}.md\" --url-configs \"https://github.com/lo1tuma/eslint-plugin-mocha#configs\""
-    },
+    "scripts": {},
     "dependencies": {
         "@eslint-community/eslint-utils": "^4.4.1",
         "globals": "^15.14.0",
@@ -53,6 +36,7 @@
         "markdownlint-cli": "0.43.0",
         "mocha": "11.1.0",
         "pr-log": "6.1.1",
+        "rust-just": "1.51.0",
         "semver": "7.6.3",
         "typescript": "^5.7.3"
     },
