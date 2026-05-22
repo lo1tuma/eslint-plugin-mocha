@@ -323,6 +323,8 @@ export const consistentInterfaceRule: Readonly<Rule.RuleModule> = {
                         );
                     }
                 }
+            }, {
+                includeAllInterfaces: true
             })
         };
     }

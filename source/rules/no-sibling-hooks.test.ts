@@ -1,4 +1,5 @@
 import { RuleTester } from 'eslint';
+import { withInterface } from '../mocha-interface-test-cases.js';
 import { noSiblingHooksRule } from './no-sibling-hooks.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
@@ -180,7 +181,8 @@ ruleTester.run('no-sibling-hooks', noSiblingHooksRule, {
                     ]
                 }
             }
-        }
+        },
+        withInterface('BDD', 'describe(function() { setup(function() {}); setup(function() {}); });')
     ],
 
     invalid: [
@@ -200,6 +202,10 @@ ruleTester.run('no-sibling-hooks', noSiblingHooksRule, {
             code: 'describe(function() { afterEach(function() {}); afterEach(function() {}); });',
             errors: [{ message: 'Unexpected use of duplicate Mocha `afterEach()` hook', column: 49, line: 1 }]
         },
+        withInterface('TDD', {
+            code: 'describe(function() { setup(function() {}); setup(function() {}); });',
+            errors: [{ message: 'Unexpected use of duplicate Mocha `setup()` hook', column: 45, line: 1 }]
+        }),
         {
             code: [
                 'describe(function() {',

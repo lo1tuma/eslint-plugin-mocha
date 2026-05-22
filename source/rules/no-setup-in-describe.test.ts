@@ -1,5 +1,6 @@
 import { type Rule, RuleTester } from 'eslint';
 import assert from 'node:assert';
+import { withInterface } from '../mocha-interface-test-cases.js';
 import { noSetupInDescribeRule } from './no-setup-in-describe.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
@@ -46,10 +47,10 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
         'describe("", () => { after(function() {}).timeout(10_000); });',
         'describe("", () => { beforeEach(function() {}).timeout(10_000); });',
         'describe("", () => { afterEach(function() {}).timeout(10_000); });',
-        'suite("", function () { teardown(function() { b(); }); test(); })',
-        'suite("", function () { suiteTeardown(function() { b(); }); test(); })',
-        'suite("", function () { setup(function() { b(); }); test(); })',
-        'suite("", function () { suiteSetup(function() { b(); }); test(); })',
+        withInterface('TDD', 'suite("", function () { teardown(function() { b(); }); test(); })'),
+        withInterface('TDD', 'suite("", function () { suiteTeardown(function() { b(); }); test(); })'),
+        withInterface('TDD', 'suite("", function () { setup(function() { b(); }); test(); })'),
+        withInterface('TDD', 'suite("", function () { suiteSetup(function() { b(); }); test(); })'),
         {
             code: 'describe("", function () { before(() => { b(); }); it(); })',
             languageOptions: { ecmaVersion: 6 }
@@ -126,7 +127,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
     ],
 
     invalid: [
-        {
+        withInterface('TDD', {
             code: 'suite("", function () { this.timeout(42); a(); });',
             errors: [
                 {
@@ -135,8 +136,8 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
                     column: 43
                 }
             ]
-        },
-        {
+        }),
+        withInterface('TDD', {
             code: 'suite("", function () { a(); });',
             errors: [
                 {
@@ -145,7 +146,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
                     column: 25
                 }
             ]
-        },
+        }),
         {
             code: 'describe("", function () { a(); });',
             errors: [

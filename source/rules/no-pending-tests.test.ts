@@ -1,5 +1,6 @@
 import { type Rule, RuleTester, type SourceCode } from 'eslint';
 import assert from 'node:assert';
+import { withInterface } from '../mocha-interface-test-cases.js';
 import {
     checkPendingSuite,
     checkPendingTestCase,
@@ -35,8 +36,8 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
     valid: [
         'it()',
         'it("should be false", function() { assert(something, false); })',
-        'test()',
-        'test("should be false", function() { assert(something, false); })',
+        withInterface('TDD', 'test()'),
+        withInterface('TDD', 'test("should be false", function() { assert(something, false); })'),
         'specify()',
         'specify("should be false", function() { assert(something, false); })',
         'something.it()',
@@ -44,14 +45,14 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
         'describe()',
         'describe.only()',
         'it.only()',
-        'suite()',
-        'suite.only()',
-        'test.only()',
+        withInterface('TDD', 'suite()'),
+        withInterface('TDD', 'suite.only()'),
+        withInterface('TDD', 'test.only()'),
         'context()',
         'context.only()',
         'var appliedOnly = describe.skip; appliedOnly.apply(describe)',
         'var calledOnly = it.skip; calledOnly.call(it)',
-        'var dynamicOnly = "ski"; dynamicOnly += String.fromCharCode(112); suite[dynamicOnly]()',
+        withInterface('TDD', 'var dynamicOnly = "ski"; dynamicOnly += String.fromCharCode(112); suite[dynamicOnly]()'),
         {
             code: 'xcustom()',
             settings: {
@@ -67,10 +68,10 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
             code: 'it("is pending")',
             errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
-        {
+        withInterface('TDD', {
             code: 'test("is pending")',
             errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
-        },
+        }),
         {
             code: 'specify("is pending")',
             errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
@@ -129,7 +130,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                 suggestions: [{ messageId: 'removePendingModifier', output: 'it()' }]
             }]
         },
-        {
+        withInterface('TDD', {
             code: 'suite.skip()',
             errors: [{
                 message: expectedErrorMessage,
@@ -137,8 +138,8 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                 line: 1,
                 suggestions: [{ messageId: 'removePendingModifier', output: 'suite()' }]
             }]
-        },
-        {
+        }),
+        withInterface('TDD', {
             code: 'suite["skip"]()',
             errors: [{
                 message: expectedErrorMessage,
@@ -146,8 +147,8 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                 line: 1,
                 suggestions: [{ messageId: 'removePendingModifier', output: 'suite()' }]
             }]
-        },
-        {
+        }),
+        withInterface('TDD', {
             code: 'test.skip()',
             errors: [{
                 message: expectedErrorMessage,
@@ -155,8 +156,8 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                 line: 1,
                 suggestions: [{ messageId: 'removePendingModifier', output: 'test()' }]
             }]
-        },
-        {
+        }),
+        withInterface('TDD', {
             code: 'test["skip"]()',
             errors: [{
                 message: expectedErrorMessage,
@@ -164,7 +165,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                 line: 1,
                 suggestions: [{ messageId: 'removePendingModifier', output: 'test()' }]
             }]
-        },
+        }),
         {
             code: 'context.skip()',
             errors: [{
@@ -288,10 +289,10 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                 suggestions: [{ messageId: 'removePendingModifier', output: 'custom()' }]
             }]
         },
-        {
+        withInterface('TDD', {
             code: 'var dynamicOnly = "skip"; suite[dynamicOnly]()',
             errors: [{ message: expectedErrorMessage, column: 33, line: 1 }]
-        }
+        })
     ]
 });
 

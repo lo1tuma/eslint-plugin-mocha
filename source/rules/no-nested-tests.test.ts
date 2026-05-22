@@ -1,4 +1,5 @@
 import { RuleTester } from 'eslint';
+import { withInterface } from '../mocha-interface-test-cases.js';
 import { noNestedTestsRule } from './no-nested-tests.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
@@ -44,14 +45,14 @@ ruleTester.run('no-nested-tests', noNestedTestsRule, {
                 column: 27
             }]
         },
-        {
-            code: 'test("", function () { it() });',
+        withInterface('TDD', {
+            code: 'test("", function () { test() });',
             errors: [{
                 message: 'Unexpected test nested within another test.',
                 line: 1,
                 column: 24
             }]
-        },
+        }),
         {
             code: 'specify("", function () { it() });',
             errors: [{
@@ -76,14 +77,14 @@ ruleTester.run('no-nested-tests', noNestedTestsRule, {
                 column: 22
             }]
         },
-        {
-            code: 'it("", function () { suite() });',
+        withInterface('TDD', {
+            code: 'test("", function () { suite() });',
             errors: [{
                 message: 'Unexpected suite nested within a test.',
                 line: 1,
-                column: 22
+                column: 24
             }]
-        },
+        }),
         {
             code: 'it("", function () { describe.skip() });',
             errors: [{

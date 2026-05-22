@@ -1,4 +1,5 @@
 import { RuleTester } from 'eslint';
+import { withInterface } from '../mocha-interface-test-cases.js';
 import { maxTopLevelSuitesRule } from './max-top-level-suites.js';
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
@@ -10,18 +11,18 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
         {
             code: 'context("This is a test", function () { });'
         },
-        {
+        withInterface('TDD', {
             code: 'suite("This is a test", function () { });'
-        },
+        }),
         {
             code: 'describe("This is a test", function () { describe("This is a different test", function () { }) });'
         },
         {
             code: 'context("This is a test", function () { context("This is a different test", function () { }) });'
         },
-        {
+        withInterface('TDD', {
             code: 'suite("This is a test", function () { suite("This is a different test", function () { }) });'
-        },
+        }),
         {
             options: [{ limit: 2 }],
             code: 'describe("This is a test", function () { });'
@@ -140,21 +141,15 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                 { message: 'The number of top-level suites is more than 1.' }
             ]
         },
-        {
+        withInterface('TDD', {
             code: 'suite("this is a test", function () { });' +
                 'suite("this is a different test", function () { });',
             errors: [
                 { message: 'The number of top-level suites is more than 1.' }
             ]
-        },
+        }),
         {
             code: 'describe("this is a test", function () { }); context("this is a test", function () { });',
-            errors: [
-                { message: 'The number of top-level suites is more than 1.' }
-            ]
-        },
-        {
-            code: 'suite("this is a test", function () { }); context("this is a test", function () { });',
             errors: [
                 { message: 'The number of top-level suites is more than 1.' }
             ]
@@ -193,7 +188,7 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                 { message: 'The number of top-level suites is more than 1.' }
             ]
         },
-        {
+        withInterface('TDD', {
             options: [{ limit: 2 }],
             code: 'suite.skip("this is a test", function () { });' +
                 'suite.only("this is a different test", function () { });' +
@@ -201,7 +196,7 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
             errors: [
                 { message: 'The number of top-level suites is more than 2.' }
             ]
-        },
+        }),
         {
             options: [{ limit: 2 }],
             code: 'context.skip("this is a test", function () { });' +

@@ -1,4 +1,5 @@
 import { RuleTester } from 'eslint';
+import { withInterface } from '../mocha-interface-test-cases.js';
 import { validTestTitleRule } from './valid-test-title.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
@@ -9,15 +10,15 @@ ruleTester.run('valid-test-title', validTestTitleRule, {
         'it("should do something");',
         'specify("should respond to GET", function() { });',
         'specify("should do something");',
-        'test("should respond to GET", function() { });',
-        'test("should do something");',
+        withInterface('TDD', 'test("should respond to GET", function() { });'),
+        withInterface('TDD', 'test("should do something");'),
         'it();',
         'specify();',
-        'test();',
-        {
+        withInterface('TDD', 'test();'),
+        withInterface('TDD', {
             options: [{ pattern: 'test' }],
             code: 'test("this is a test", function () { });'
-        },
+        }),
         {
             options: [{ pattern: '^should' }],
             code: 'someFunction("should do something", function () { });',
@@ -64,12 +65,12 @@ ruleTester.run('valid-test-title', validTestTitleRule, {
                 { message: 'Invalid "specify()" description found.' }
             ]
         },
-        {
+        withInterface('TDD', {
             code: 'test("does something", function() { });',
             errors: [
                 { message: 'Invalid "test()" description found.' }
             ]
-        },
+        }),
         {
             options: [{ pattern: 'required' }],
             code: 'it("this is a test", function () { });',
@@ -84,13 +85,13 @@ ruleTester.run('valid-test-title', validTestTitleRule, {
                 { message: 'Invalid "specify()" description found.' }
             ]
         },
-        {
+        withInterface('TDD', {
             options: [{ pattern: 'required' }],
             code: 'test("this is a test", function () { });',
             errors: [
                 { message: 'Invalid "test()" description found.' }
             ]
-        },
+        }),
         {
             options: [{ pattern: 'required' }],
             code: 'customFunction("this is a test", function () { });',
