@@ -29,6 +29,7 @@ export function extractTitleArgument(node: Readonly<Rule.Node>): string | null {
 export const noIdenticalTitleRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
+        languages: ['js/js'],
         docs: {
             description: 'Disallow identical titles',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-identical-title.md'

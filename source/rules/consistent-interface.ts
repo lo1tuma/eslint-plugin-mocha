@@ -288,6 +288,7 @@ export function reportUnexpectedImportBindingsInModule(
 export const consistentInterfaceRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'problem',
+        languages: ['js/js'],
         docs: {
             description: 'Enforces consistent use of mocha interfaces',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/consistent-interface.md'

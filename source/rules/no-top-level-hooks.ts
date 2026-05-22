@@ -4,6 +4,7 @@ import { createMochaVisitors } from '../ast/mocha-visitors.js';
 export const noTopLevelHooksRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'problem',
+        languages: ['js/js'],
         docs: {
             description: 'Disallow top-level hooks',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-top-level-hooks.md'
