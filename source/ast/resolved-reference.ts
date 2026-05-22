@@ -1,5 +1,6 @@
 import type { Rule, Scope, SourceCode } from 'eslint';
 import { type DynamicPath, extractMemberExpressionPath } from './member-expression.js';
+import { getParentNode } from './node-types.js';
 import type { CallExpression } from './node-types.js';
 
 export type Reference = {
@@ -14,15 +15,21 @@ export type ResolvedReference = {
 };
 
 export function findParentNodeAndPathForIdentifier(sourceCode: SourceCode, node: Rule.Node): Reference {
-    if (node.parent.type === 'MemberExpression') {
-        return findParentNodeAndPathForIdentifier(sourceCode, node.parent);
+    const parent = getParentNode(node);
+
+    if (parent.type === 'MemberExpression') {
+        return findParentNodeAndPathForIdentifier(sourceCode, parent);
     }
-    if (node.parent.type === 'CallExpression' && node.parent.parent.type === 'MemberExpression') {
-        return findParentNodeAndPathForIdentifier(sourceCode, node.parent.parent);
+    if (parent.type === 'CallExpression') {
+        const grandparent = getParentNode(parent);
+
+        if (grandparent.type === 'MemberExpression') {
+            return findParentNodeAndPathForIdentifier(sourceCode, grandparent);
+        }
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- we know the type of the parent
-    return { node: node.parent as CallExpression, path: extractMemberExpressionPath(sourceCode, node) };
+    return { node: parent as CallExpression, path: extractMemberExpressionPath(sourceCode, node) };
 }
 
 export function initialReferenceToResolvedReference(

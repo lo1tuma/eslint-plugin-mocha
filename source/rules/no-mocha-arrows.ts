@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion -- needed */
 import type { Rule, SourceCode } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { type ArrowFunctionExpression, isArrowFunctionExpression } from '../ast/node-types.js';
+import { getParentNode, isArrowFunctionExpression } from '../ast/node-types.js';
+import type { ArrowFunctionExpression } from '../ast/node-types.js';
 
 function extractSourceTextByRange(sourceCode: Readonly<SourceCode>, start: number, end: number): string {
     return sourceCode.text.slice(start, end).trim();
@@ -88,7 +89,7 @@ export const noMochaArrowsRule: Readonly<Rule.RuleModule> = {
                 const { node } = visitorContext;
                 if (isArrowFunctionExpression(node)) {
                     context.report({
-                        node: visitorContext.node.parent,
+                        node: getParentNode(visitorContext.node),
                         messageId: 'unexpectedArrowFunction',
                         data: { name: visitorContext.name },
                         fix(fixer) {

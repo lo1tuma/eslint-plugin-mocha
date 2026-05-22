@@ -92,3 +92,11 @@ export type Program = NodeType<'Program'>;
 export function isProgram(node: Except<Rule.Node, 'parent'>): node is Program {
     return node.type === 'Program';
 }
+
+export function getParentNode(node: Rule.Node): Rule.Node {
+    if (node.parent === null) {
+        throw new Error('Expected node to have a parent.');
+    }
+
+    return node.parent;
+}

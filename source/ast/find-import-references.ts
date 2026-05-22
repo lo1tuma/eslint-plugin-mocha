@@ -4,6 +4,7 @@ import { filterWithArgs, flatMapWithArgs, mapWithArgs } from '../list.js';
 import type { NameDetails } from '../mocha/name-details.js';
 import { getUniqueBaseNames } from '../mocha/path.js';
 import { type DynamicPath, isConstantPath } from './member-expression.js';
+import { getParentNode } from './node-types.js';
 import { findParentNodeAndPathForIdentifier, type ResolvedReference } from './resolved-reference.js';
 
 function isLiteralWithValue(node: Except<Rule.Node, 'parent'>, expectedValue: string): boolean {
@@ -33,10 +34,11 @@ function getAllNamedImportBindingVariables(
 function isNonAssignmentReference(reference: Readonly<Scope.Reference>): boolean {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- bad eslint core typings
     const node = reference.identifier as Rule.Node;
+    const parent = getParentNode(node);
 
     return (
-        node.parent.type !== 'AssignmentExpression' ||
-        node.parent.left !== node
+        parent.type !== 'AssignmentExpression' ||
+        parent.left !== node
     );
 }
 
@@ -75,10 +77,9 @@ function resolveReferencesForNamedImport(
 ): readonly ResolvedReference[] {
     const importDef = variable.defs[0];
     if (importDef !== undefined) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access -- ok
-        const originalName = importDef.node.imported.name;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- filtered to import bindings above
+        const originalName = (importDef.node as { imported: { name: string; }; }).imported.name;
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- ok
         if (identifierNames.includes(originalName)) {
             return mapWithArgs(variable.references, resolveImportPathWithOriginalName, sourceCode, originalName);
         }

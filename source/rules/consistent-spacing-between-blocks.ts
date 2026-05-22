@@ -3,6 +3,7 @@ import type { Except } from 'type-fest';
 import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
 import {
     type AnyFunction,
+    getParentNode,
     isBlockStatement,
     isFunction,
     isMemberExpression,
@@ -57,11 +58,11 @@ function isNestedStatementBoundary(node: Rule.Node): boolean {
 
 function isDirectStatementInScope(scopeNode: Layer['scopeNode'], node: Rule.Node): boolean {
     let current = node;
-    while (current.parent !== scopeNode) {
-        current = current.parent;
+    while (getParentNode(current) !== scopeNode) {
+        current = getParentNode(current);
         if (
             isNestedStatementBoundary(current) &&
-            !(current.type === 'ExpressionStatement' && current.parent === scopeNode)
+            !(current.type === 'ExpressionStatement' && getParentNode(current) === scopeNode)
         ) {
             return false;
         }
@@ -71,8 +72,10 @@ function isDirectStatementInScope(scopeNode: Layer['scopeNode'], node: Rule.Node
 }
 
 function getParentWhileMemberExpression(node: Rule.Node): Rule.Node {
-    if (isMemberExpression(node.parent)) {
-        return getParentWhileMemberExpression(node.parent);
+    const parent = getParentNode(node);
+
+    if (isMemberExpression(parent)) {
+        return getParentWhileMemberExpression(parent);
     }
     return node;
 }
