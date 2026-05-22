@@ -1,10 +1,30 @@
 import type { Rule } from 'eslint';
+import { extractMemberExpressionPath, isConstantPath } from '../ast/member-expression.js';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import type { CallExpression, MemberExpression } from '../ast/node-types.js';
 import { isSuiteConfigCall } from '../mocha/config-call.js';
+import { reformatLastPathSegmentWithCallExpressions } from '../mocha/name-details.js';
+import { convertNameToPathArray, isSamePath } from '../mocha/path.js';
+import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 
 const FUNCTION = 1;
 const DESCRIBE = 2;
+const optionSchema = {
+    type: 'object',
+    properties: {
+        allow: {
+            type: 'array',
+            items: {
+                type: 'string'
+            }
+        }
+    },
+    additionalProperties: false
+} as const satisfies RuleSchema;
+
+type Option = InferSchemaOption<typeof optionSchema>;
+type ResolvedOption = Option & { allow: string[]; };
+const defaultOption: ResolvedOption = { allow: [] };
 
 function isNestedInDescribeBlock(nesting: readonly number[]): boolean {
     return (
@@ -30,6 +50,25 @@ function reportMemberExpression(
     });
 }
 
+function ensureEndsWithParens(value: unknown): string {
+    if (typeof value !== 'string') {
+        return '';
+    }
+
+    if (value.endsWith('()')) {
+        return value;
+    }
+
+    return `${value}()`;
+}
+
+function normalizeAllowedCall(value: unknown): readonly string[] {
+    const path = convertNameToPathArray(ensureEndsWithParens(value));
+    const [lastPathSegment] = path.slice(-1);
+
+    return [...path.slice(0, -1), ensureEndsWithParens(lastPathSegment)];
+}
+
 export const noSetupInDescribeRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
@@ -38,19 +77,39 @@ export const noSetupInDescribeRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow setup in describe blocks',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-setup-in-describe.md'
         },
+        defaultOptions: [defaultOption],
         messages: {
             unexpectedFunctionCall: 'Unexpected function call in describe block.',
             unexpectedMemberExpression:
                 'Unexpected member expression in describe block. Member expressions may call functions via getters.'
         },
-        schema: []
+        schema: [optionSchema]
     },
     create(context) {
+        const { allow } = getRuleOption<ResolvedOption>(context);
+        const allowedCalls = allow.map(normalizeAllowedCall);
         const nesting: number[] = [];
         const suiteNodes = new WeakSet();
 
+        function isAllowedCall(node: Readonly<CallExpression>): boolean {
+            const calleeWithParent = { ...node.callee, parent: node };
+            const path = reformatLastPathSegmentWithCallExpressions(
+                extractMemberExpressionPath(context.sourceCode, calleeWithParent),
+                1
+            );
+
+            return isConstantPath(path) &&
+                allowedCalls.some((allowedCall) => {
+                    return isSamePath(path, allowedCall);
+                });
+        }
+
+        function isAllowedCallMemberExpression(node: Readonly<MemberExpression>): boolean {
+            return node.parent.type === 'CallExpression' && node.parent.callee === node && isAllowedCall(node.parent);
+        }
+
         function handleCallExpressionInDescribe(node: Readonly<CallExpression>): void {
-            if (isNestedInDescribeBlock(nesting) && !isSuiteConfigCall(node)) {
+            if (isNestedInDescribeBlock(nesting) && !isSuiteConfigCall(node) && !isAllowedCall(node)) {
                 reportCallExpression(context, node);
             }
         }
@@ -76,7 +135,8 @@ export const noSetupInDescribeRule: Readonly<Rule.RuleModule> = {
                 if (
                     !suiteNodes.has(node.parent) &&
                     isNestedInDescribeBlock(nesting) &&
-                    !isSuiteConfigCall(node.parent)
+                    !isSuiteConfigCall(node.parent) &&
+                    !isAllowedCallMemberExpression(node)
                 ) {
                     reportMemberExpression(context, node);
                 }

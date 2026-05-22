@@ -21,7 +21,11 @@ Any setup directly in a `describe` is run before all tests execute. This is unde
 1. When doing TDD in a large codebase, all setup is run for tests that don't have `only` set. This can add a substantial amount of time per iteration.
 2. If global state is altered by the setup of another describe block, your test may be affected.
 
-This rule reports all function calls and use of the dot operator (due to getters and setters) directly in describe blocks. An exception is made for Mocha's suite configuration methods, like `this.timeout();`, which do not represent setup logic.
+For this rule, "setup" means code that executes immediately while the suite callback itself is evaluated. That includes work done directly in the suite body before any tests run, even when the code looks harmless.
+
+In practice, this rule reports direct function calls and direct property access in suite bodies. Property access is included because getters can execute code. Exceptions are made for Mocha's structural calls (`describe`, `it`, hooks, and their supported variants) and Mocha suite configuration calls such as `this.timeout();`, `it(...).timeout();`, or `before(...).timeout();`.
+
+This rule does not make special exceptions for JavaScript builtins. For example, `Symbol()` is still a direct function call in the suite body and is reported by default.
 
 If you're using [dynamically generated tests](https://mochajs.org/#dynamically-generating-tests), you should disable this rule.
 
@@ -73,5 +77,42 @@ describe('something', function () {
 describe('something', function () {
     this.timeout(5000);
     it('should take awhile', function () {});
+});
+```
+
+## Options
+
+This rule accepts one optional object:
+
+- `allow`: an array of call names that should be allowed directly in suite bodies
+
+Entries may be written with or without `()`. Dotted names are supported.
+
+```json
+{
+    "rules": {
+        "mocha/no-setup-in-describe": ["error", {
+            "allow": ["Symbol", "Object.freeze"]
+        }]
+    }
+}
+```
+
+With this option, the following patterns would not be considered problems:
+
+```js
+describe('something', function () {
+    const token = Symbol('id');
+    Object.freeze(sharedFixture);
+    it('should work', function () {});
+});
+```
+
+The `allow` option only applies to calls. It does not allow bare property access:
+
+```js
+describe('something', function () {
+    Object.freeze;
+    it('should work', function () {});
 });
 ```
