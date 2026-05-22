@@ -9,7 +9,7 @@ ESLint rules for [Mocha](https://mochajs.org/).
 
 ## Install
 
-This plugin requires ESLint `9.0.0` or later.
+This plugin requires ESLint `10.2.0` or later.
 
 ```bash
 npm install --save-dev eslint-plugin-mocha
