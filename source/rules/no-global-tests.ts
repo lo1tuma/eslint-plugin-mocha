@@ -8,6 +8,7 @@ function isGlobalScope(scope: Readonly<Scope.Scope>): boolean {
 export const noGlobalTestsRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
+        languages: ['js/js'],
         docs: {
             description: 'Disallow global tests',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-global-tests.md'

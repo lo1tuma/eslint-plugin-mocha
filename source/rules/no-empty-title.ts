@@ -59,6 +59,7 @@ function isValidDescriptionArgumentNode(node: Except<Rule.Node, 'parent'> | unde
 export const noEmptyTitleRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
+        languages: ['js/js'],
         docs: {
             description: 'Disallow empty test descriptions',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-empty-title.md'

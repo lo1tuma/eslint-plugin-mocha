@@ -54,6 +54,12 @@ describe('eslint-plugin-mocha', function () {
         }
     });
 
+    it('should declare all rules as js-only', function () {
+        for (const rule of Object.values(plugin.rules)) {
+            assert.deepStrictEqual(rule.meta?.languages, ['js/js']);
+        }
+    });
+
     describe('documentation', function () {
         it('should have each rule documented', async function () {
             const ruleFiles = await determineAllRuleFiles();

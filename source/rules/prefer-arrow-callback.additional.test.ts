@@ -62,6 +62,7 @@ describe('prefer-arrow-callback rule wrapper', function () {
 
             assert.deepStrictEqual(preferArrowCallbackRule.meta, {
                 type: 'suggestion',
+                languages: ['js/js'],
                 docs: {
                     description: 'Require using arrow functions for callbacks',
                     recommended: false,
