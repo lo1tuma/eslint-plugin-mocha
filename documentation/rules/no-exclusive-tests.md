@@ -2,9 +2,13 @@
 
 ⚠️ This rule _warns_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 
+💡 This rule is manually fixable by [editor suggestions](https://eslint.org/docs/latest/use/core-concepts#rule-suggestions).
+
 <!-- end auto-generated rule header -->
 
 Mocha lets you run a single suite or test by appending `.only`. That is useful while debugging, but easy to leave behind by accident. This rule warns whenever exclusive tests are used.
+
+This rule intentionally does not support the `--fix` CLI option. Many editors apply ESLint fixes on save, and silently removing `.only` would make it harder to focus a test while debugging. For direct `describe.only()`-style calls, the rule does provide ESLint suggestions so you can remove the modifier explicitly.
 
 ## Rule Details
 

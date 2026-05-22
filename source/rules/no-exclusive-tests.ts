@@ -1,6 +1,37 @@
-import type { Rule } from 'eslint';
+import type { Rule, SourceCode } from 'eslint';
 import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
-import type { CallExpression, MemberExpression } from '../ast/node-types.js';
+import { isCallExpression, isMemberExpression, type MemberExpression } from '../ast/node-types.js';
+
+export function fixExclusiveTest(
+    fixer: Rule.RuleFixer,
+    sourceCode: Readonly<SourceCode>,
+    node: Readonly<Rule.Node>
+): Readonly<Rule.Fix | null> {
+    if (!isCallExpression(node) || !isMemberExpression(node.callee)) {
+        return null;
+    }
+
+    return node.callee.range === undefined
+        ? null
+        : fixer.replaceTextRange(node.callee.range, sourceCode.getText(node.callee.object));
+}
+
+export function getExclusivePropertyNode(node: Readonly<Rule.Node>): Readonly<MemberExpression['property']> | null {
+    if (!isCallExpression(node) || !isMemberExpression(node.callee)) {
+        return null;
+    }
+
+    return node.callee.property;
+}
+
+export function createExclusiveTestReportDescriptor(
+    node: Readonly<Rule.Node>,
+    exclusivePropertyNode: Readonly<MemberExpression['property']>
+): Rule.ReportDescriptor & { messageId: 'unexpectedExclusiveTest'; } {
+    return exclusivePropertyNode.loc === null || exclusivePropertyNode.loc === undefined
+        ? { node, messageId: 'unexpectedExclusiveTest' }
+        : { node, loc: exclusivePropertyNode.loc, messageId: 'unexpectedExclusiveTest' };
+}
 
 export const noExclusiveTestsRule: Readonly<Rule.RuleModule> = {
     meta: {
@@ -10,18 +41,28 @@ export const noExclusiveTestsRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow exclusive tests',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-exclusive-tests.md'
         },
+        hasSuggestions: true,
         messages: {
-            unexpectedExclusiveTest: 'Unexpected exclusive mocha test.'
+            unexpectedExclusiveTest: 'Unexpected exclusive mocha test.',
+            removeExclusiveModifier: 'Remove the exclusive modifier from this Mocha call.'
         },
         schema: []
     },
     create(context) {
+        const { sourceCode } = context;
+
         function checkPresenceOfExclusiveModifier(visitorContext: Readonly<VisitorContext>): void {
-            if (visitorContext.modifier === 'exclusive') {
+            const exclusivePropertyNode = getExclusivePropertyNode(visitorContext.node);
+
+            if (visitorContext.modifier === 'exclusive' && exclusivePropertyNode !== null) {
                 context.report({
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ok in this case
-                    node: ((visitorContext.node as CallExpression).callee as MemberExpression).property,
-                    messageId: 'unexpectedExclusiveTest'
+                    ...createExclusiveTestReportDescriptor(visitorContext.node, exclusivePropertyNode),
+                    suggest: [{
+                        messageId: 'removeExclusiveModifier',
+                        fix(fixer) {
+                            return fixExclusiveTest(fixer, sourceCode, visitorContext.node);
+                        }
+                    }]
                 });
             }
         }
