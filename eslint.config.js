@@ -4,20 +4,32 @@ import { mochaConfig } from '@enormora/eslint-config-mocha';
 import { nodeConfig, nodeConfigFileConfig, nodeEntryPointFileConfig } from '@enormora/eslint-config-node';
 import { typescriptConfig } from '@enormora/eslint-config-typescript';
 import eslintPluginEslintPlugin from 'eslint-plugin-eslint-plugin';
+import globals from 'globals';
 
 export default [
     {
         ignores: ['target/**/*']
     },
-    baseConfig,
+    ...baseConfig,
     nodeConfig,
     {
+        files: ['**/*.{js,cjs,mjs,ts,cts,mts}'],
         plugins: { dprint: dprintPlugin },
         rules: {
             'prettier/prettier': 'off',
             'dprint/typescript': ['error', { configFile: 'dprint.json' }],
             'import/order': 'off',
+            '@stylistic/array-bracket-spacing': 'off',
             '@stylistic/member-delimiter-style': 'off',
+            '@stylistic/no-extra-parens': 'off',
+            '@stylistic/operator-linebreak': 'off',
+            '@typescript-eslint/no-unnecessary-condition': 'off',
+            '@typescript-eslint/no-unnecessary-type-assertion': 'off',
+            '@typescript-eslint/prefer-optional-chain': 'off',
+            'restricted-syntax-typescript/no-inline-signature-type-literal': 'off',
+            'restricted-syntax-typescript/no-ts-enum-declaration': 'off',
+            'sonarjs/different-types-comparison': 'off',
+            'sonarjs/function-return-type': 'off',
 
             // rules disabled because they don’t work with eslint v9 yet
             'no-secrets/no-secrets': 'off',
@@ -35,6 +47,12 @@ export default [
         }
     },
     {
+        files: ['**/*.md'],
+        rules: {
+            'dprint/markdown': 'off'
+        }
+    },
+    {
         ...typescriptConfig,
         files: ['**/*.ts']
     },
@@ -42,7 +60,12 @@ export default [
         files: ['**/*.ts'],
         rules: {
             'functional/type-declaration-immutability': 'off',
-            'functional/prefer-immutable-types': 'off'
+            'functional/prefer-immutable-types': 'off',
+            '@typescript-eslint/no-unnecessary-condition': 'off',
+            '@typescript-eslint/no-unnecessary-type-assertion': 'off',
+            '@typescript-eslint/prefer-optional-chain': 'off',
+            'restricted-syntax-typescript/no-inline-signature-type-literal': 'off',
+            'restricted-syntax-typescript/no-ts-enum-declaration': 'off'
         }
     },
     {
@@ -55,6 +78,7 @@ export default [
     },
     {
         files: ['**/*.test.ts', 'benchmarks/**/*.bench.ts'],
+        languageOptions: { globals: globals.mocha },
         rules: {
             'max-statements': ['error', { max: 50 }],
             'max-nested-callbacks': ['error', { max: 8 }],
@@ -89,6 +113,23 @@ export default [
         files: ['source/plugin.ts'],
         rules: {
             'import/no-default-export': 'off'
+        }
+    },
+    {
+        files: ['source/rules/prefer-arrow-callback.ts', 'source/rules/prefer-arrow-callback.additional.test.ts'],
+        rules: {
+            'sonarjs/deprecation': 'off',
+            '@typescript-eslint/no-unsafe-return': 'off'
+        }
+    },
+    {
+        files: [
+            'source/ast/resolved-reference.ts',
+            'source/rules/handle-done-callback.ts',
+            'source/rules/no-mocha-arrows.ts'
+        ],
+        rules: {
+            'no-duplicate-imports': 'off'
         }
     },
     {

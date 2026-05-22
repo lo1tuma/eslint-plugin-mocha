@@ -3,7 +3,7 @@ import assert from 'node:assert';
 import mochaPlugin from '../source/plugin.js';
 import { cpuSpeed, runSyncBenchmark } from './measure.js';
 
-const { configs: { all } = {} } = mochaPlugin;
+const { configs: { all } } = mochaPlugin;
 
 type Options = {
     readonly numberOfFiles: number;

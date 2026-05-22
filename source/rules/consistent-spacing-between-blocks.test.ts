@@ -135,7 +135,7 @@ function createValidNestedStatementCase(wrapper: StatementWrapper): { code: stri
 function createInvalidNestedStatementCase(wrapper: StatementWrapper): {
     code: string;
     output: string;
-    errors: [{ message: string; type: string; }];
+    errors: [{ message: string; }];
 } {
     return {
         code: [
@@ -159,8 +159,7 @@ function createInvalidNestedStatementCase(wrapper: StatementWrapper): {
             .join('\n'),
         errors: [
             {
-                message: 'Expected line break before this statement.',
-                type: 'CallExpression'
+                message: 'Expected line break before this statement.'
             }
         ]
     };
@@ -253,8 +252,7 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
             });`,
             errors: [
                 {
-                    message: 'Expected line break before this statement.',
-                    type: 'CallExpression'
+                    message: 'Expected line break before this statement.'
                 }
             ]
         },
@@ -272,8 +270,7 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
             });`,
             errors: [
                 {
-                    message: 'Expected line break before this statement.',
-                    type: 'CallExpression'
+                    message: 'Expected line break before this statement.'
                 }
             ]
         },
@@ -291,8 +288,7 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
             });`,
             errors: [
                 {
-                    message: 'Expected line break before this statement.',
-                    type: 'CallExpression'
+                    message: 'Expected line break before this statement.'
                 }
             ]
         },
@@ -310,8 +306,7 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
                 '});',
             errors: [
                 {
-                    message: 'Expected line break before this statement.',
-                    type: 'CallExpression'
+                    message: 'Expected line break before this statement.'
                 }
             ]
         },
@@ -327,8 +322,7 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
                 '});',
             errors: [
                 {
-                    message: 'Expected line break before this statement.',
-                    type: 'CallExpression'
+                    message: 'Expected line break before this statement.'
                 }
             ]
         },
@@ -338,8 +332,7 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
             output: 'describe("", () => {});\n\ndescribe("", () => {});',
             errors: [
                 {
-                    message: 'Expected line break before this statement.',
-                    type: 'CallExpression'
+                    message: 'Expected line break before this statement.'
                 }
             ]
         },
@@ -349,8 +342,7 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
             output: 'describe();\n\ndescribe();',
             errors: [
                 {
-                    message: 'Expected line break before this statement.',
-                    type: 'CallExpression'
+                    message: 'Expected line break before this statement.'
                 }
             ]
         },

@@ -1,5 +1,6 @@
 import type { Rule, Scope } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
+import { getParentNode } from '../ast/node-types.js';
 import type { FunctionExpression } from '../ast/node-types.js';
 import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 
@@ -45,7 +46,7 @@ export const handleDoneCallbackRule: Readonly<Rule.RuleModule> = {
         function isReferenceHandled(reference: Readonly<Scope.Reference>): boolean {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- eslint core typing omits parent
             const node = reference.identifier as Rule.Node;
-            return node.parent.type === 'CallExpression';
+            return getParentNode(node).type === 'CallExpression';
         }
 
         function hasHandledReferences(references: readonly Scope.Reference[]): boolean {

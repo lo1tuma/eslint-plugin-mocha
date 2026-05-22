@@ -10,7 +10,7 @@
     "scripts": {
         "format:check": "dprint check --list-different",
         "format:fix": "dprint fmt",
-        "eslint": "eslint . --cache --cache-location './target/eslintcache' --cache-strategy content --max-warnings 0",
+        "eslint": "eslint . --max-warnings 0",
         "lint": "npm run lint:docs && npm run lint:eslint-docs && npm run lint:js",
         "lint:docs": "markdownlint \"**/*.md\"",
         "lint:eslint-docs": "tsc --build source/tsconfig.sources.json && npm run update:eslint-docs -- --check",
@@ -31,21 +31,22 @@
         "type-fest": "^4.40.0"
     },
     "devDependencies": {
-        "@ben_12/eslint-plugin-dprint": "1.0.1",
-        "@dprint/json": "0.19.4",
-        "@dprint/markdown": "0.17.8",
-        "@dprint/typescript": "0.93.3",
-        "@enormora/eslint-config-base": "^0.0.18",
-        "@enormora/eslint-config-mocha": "0.0.11",
-        "@enormora/eslint-config-node": "0.0.16",
-        "@enormora/eslint-config-typescript": "^0.0.18",
+        "@ben_12/eslint-plugin-dprint": "1.19.0",
+        "@dprint/json": "0.21.3",
+        "@dprint/markdown": "0.22.0",
+        "@dprint/typescript": "0.96.0",
+        "@enormora/eslint-config-base": "^0.0.32",
+        "@enormora/eslint-config-mocha": "0.0.27",
+        "@enormora/eslint-config-node": "0.0.27",
+        "@enormora/eslint-config-typescript": "^0.0.37",
         "@packtory/cli": "^0.0.5",
         "@types/mocha": "^10.0.10",
         "c8": "^11.0.0",
         "change-case": "^5.4.4",
         "coveralls": "3.1.1",
         "dprint": "0.48.0",
-        "eslint": "9.18.0",
+        "dprint-plugin-yaml": "0.6.0",
+        "eslint": "10.4.0",
         "eslint-doc-generator": "2.0.2",
         "eslint-plugin-eslint-plugin": "6.4.0",
         "json-schema-to-ts": "^3.1.1",
@@ -59,7 +60,7 @@
         "yargs": "18.0.0"
     },
     "peerDependencies": {
-        "eslint": ">=9.0.0"
+        "eslint": ">=10.2.0"
     },
     "repository": {
         "type": "git",

@@ -1,7 +1,13 @@
 import { getStringIfConstant } from '@eslint-community/eslint-utils';
 import type { Rule, SourceCode } from 'eslint';
 import type { Except } from 'type-fest';
-import { isCallExpression, isIdentifier, isMemberExpression, type MemberExpression } from './node-types.js';
+import {
+    getParentNode,
+    isCallExpression,
+    isIdentifier,
+    isMemberExpression,
+    type MemberExpression
+} from './node-types.js';
 
 const dynamicMemberSymbol = Symbol('dynamic member access symbol');
 
@@ -15,7 +21,9 @@ function isConstantPathElement(element: string | symbol): element is string {
 }
 
 function isCallExpressionCallee(node: Readonly<Rule.Node>): boolean {
-    return node.parent.type === 'CallExpression' && node.parent.callee === node;
+    const parent = getParentNode(node);
+
+    return parent.type === 'CallExpression' && parent.callee === node;
 }
 
 function formatName(name: string | symbol, node: Readonly<Rule.Node>): DynamicPathSegment {

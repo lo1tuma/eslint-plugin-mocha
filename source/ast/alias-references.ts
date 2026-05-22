@@ -114,7 +114,7 @@ function aliasReferenceToResolvedReference(
 }
 
 function isNonInitReference(reference: Readonly<Scope.Reference>): boolean {
-    return !reference.init;
+    return reference.init !== true;
 }
 
 // eslint-disable-next-line max-statements -- no good idea how to split this function
