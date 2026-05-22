@@ -105,6 +105,7 @@ function getSpacingCheck(
 export const consistentSpacingBetweenBlocksRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
+        languages: ['js/js'],
         fixable: 'whitespace',
         schema: [],
         messages: {

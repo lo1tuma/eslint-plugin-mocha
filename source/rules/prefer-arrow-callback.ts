@@ -47,6 +47,7 @@ function createCoreContext(
 export const preferArrowCallbackRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: coreRule.meta?.type ?? 'suggestion',
+        languages: ['js/js'],
         docs: {
             description: coreRule.meta?.docs?.description ?? 'Require using arrow functions for callbacks',
             recommended: false,

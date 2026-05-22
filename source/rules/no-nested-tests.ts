@@ -4,6 +4,7 @@ import { createMochaVisitors } from '../ast/mocha-visitors.js';
 export const noNestedTestsRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'problem',
+        languages: ['js/js'],
         docs: {
             description: 'Disallow tests to be nested within other tests',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-nested-tests.md'

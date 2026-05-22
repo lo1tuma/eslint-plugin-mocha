@@ -63,6 +63,7 @@ export function checkNodeForReturnAndCallback(context: Readonly<Rule.RuleContext
 export const noReturnAndCallbackRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'problem',
+        languages: ['js/js'],
         docs: {
             description: 'Disallow returning in a test or hook function that uses a callback',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-return-and-callback.md'
