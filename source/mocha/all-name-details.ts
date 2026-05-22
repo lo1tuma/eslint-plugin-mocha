@@ -1,8 +1,11 @@
-import { builtinNames, type NameDetailsConfig } from './descriptors.js';
+import { builtinNames, type CustomMochaEntityType, type NameDetailsConfig } from './descriptors.js';
 import { buildAllNameDetailsWithVariants, type NameDetails } from './name-details.js';
 import { convertNameToPathArray } from './path.js';
 
-export type CustomNameConfig = Pick<NameDetailsConfig, 'interface' | 'type'> & { name: string; };
+export type CustomNameConfig = Pick<NameDetailsConfig, 'interface'> & {
+    name: string;
+    type: CustomMochaEntityType;
+};
 
 function nameConfigToNameDetails(nameConfig: Readonly<CustomNameConfig>): Readonly<NameDetailsConfig> {
     const { name, ...rest } = nameConfig;

@@ -15,6 +15,12 @@ export const configCallNames = ['timeout', 'slow', 'retries'] as const;
 export type MochaConfigCall = (typeof configCallNames)[number];
 
 export type MochaEntityType = 'config' | 'hook' | 'suite' | 'testCase';
+const customNameTypes = ['hook', 'suite', 'testCase'] as const;
+export type CustomMochaEntityType = (typeof customNameTypes)[number];
+
+export function isCustomMochaEntityType(value: unknown): value is CustomMochaEntityType {
+    return (customNameTypes as readonly unknown[]).includes(value);
+}
 
 export type MochaModifier = 'exclusive' | 'pending';
 

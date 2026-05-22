@@ -1,5 +1,5 @@
 import type { CustomNameConfig } from './mocha/all-name-details.js';
-import { isMochaInterface, type MochaInterface } from './mocha/descriptors.js';
+import { isCustomMochaEntityType, isMochaInterface, type MochaInterface } from './mocha/descriptors.js';
 import { isRecord } from './record.js';
 
 function settingFor(settings: Record<string, unknown>, propertyName: string, fallback: unknown): unknown {
@@ -36,6 +36,9 @@ function validateAdditionalNames(value: unknown): asserts value is readonly Cust
         }
         if (typeof item.type !== 'string') {
             throw new TypeError('additionalCustomNames type missing or invalid');
+        }
+        if (!isCustomMochaEntityType(item.type)) {
+            throw new Error(`additionalCustomNames type ${item.type} is invalid`);
         }
     }
 }
