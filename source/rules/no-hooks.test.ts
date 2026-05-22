@@ -60,6 +60,15 @@ ruleTester.run('no-hooks', noHooksRule, {
         {
             code: 'describe(function() { suiteTeardown(function() {}); });',
             options: [{ allow: ['suiteTeardown()'] }]
+        },
+        {
+            code: 'describe(function() { prepareTestContexts(function() {}); });',
+            options: [{ allow: ['prepareTestContexts()'] }],
+            settings: {
+                mocha: {
+                    additionalCustomNames: [{ name: 'prepareTestContexts', type: 'hook', interface: 'BDD' }]
+                }
+            }
         }
     ],
 
@@ -88,6 +97,15 @@ ruleTester.run('no-hooks', noHooksRule, {
             code: 'describe(function() { after(function() {}); });',
             options: [{ allow: ['before'] }],
             errors: [{ message: 'Unexpected use of Mocha `after()` hook', column: 23, line: 1 }]
+        },
+        {
+            code: 'describe(function() { prepareTestContexts(function() {}); });',
+            settings: {
+                mocha: {
+                    additionalCustomNames: [{ name: 'prepareTestContexts', type: 'hook', interface: 'BDD' }]
+                }
+            },
+            errors: [{ message: 'Unexpected use of Mocha `prepareTestContexts()` hook', column: 23, line: 1 }]
         }
     ]
 });

@@ -59,6 +59,14 @@ ruleTester.run('no-top-level-hooks', noTopLevelHooksRule, {
             }
         },
         {
+            code: 'describe(function() { prepareTestContexts(function() {}); });',
+            settings: {
+                mocha: {
+                    additionalCustomNames: [{ name: 'prepareTestContexts', type: 'hook', interface: 'BDD' }]
+                }
+            }
+        },
+        {
             code: 'describe(function() { before(function() {}); });',
             languageOptions: {
                 ecmaVersion: 2019,
@@ -136,6 +144,19 @@ ruleTester.run('no-top-level-hooks', noTopLevelHooksRule, {
             errors: [{
                 message: 'Unexpected use of Mocha `before()` hook outside of a test suite',
                 column: 32,
+                line: 1
+            }]
+        },
+        {
+            code: 'prepareTestContexts(function() {});',
+            settings: {
+                mocha: {
+                    additionalCustomNames: [{ name: 'prepareTestContexts', type: 'hook', interface: 'BDD' }]
+                }
+            },
+            errors: [{
+                message: 'Unexpected use of Mocha `prepareTestContexts()` hook outside of a test suite',
+                column: 1,
                 line: 1
             }]
         },
