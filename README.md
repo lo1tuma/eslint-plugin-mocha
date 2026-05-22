@@ -99,7 +99,7 @@ forEach([1, 2, 3]).describeModule.modifier("example", function (n) {});
 
 ## Rules
 
-For maintainers: the rules table below is generated, and the headers in `documentation/rules/*.md` are partly generated. Refresh them with `npm run update:eslint-docs`.
+For maintainers: the rules table below is generated, and the headers in `documentation/rules/*.md` are partly generated. Refresh them with `npx just update-eslint-docs`.
 
 <!-- begin auto-generated rules list -->
 
