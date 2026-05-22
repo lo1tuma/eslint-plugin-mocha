@@ -1,4 +1,5 @@
-import { RuleTester } from 'eslint';
+import { type Rule, RuleTester } from 'eslint';
+import assert from 'node:assert';
 import { noSetupInDescribeRule } from './no-setup-in-describe.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
@@ -105,7 +106,23 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
             code: 'describe("", function () { const bar = () => { a.b = "c"; }; it(); })',
             languageOptions: { ecmaVersion: 2015 }
         },
-        'describe("", function () { var bar = function () { a.b = "c"; }; it(); })'
+        'describe("", function () { var bar = function () { a.b = "c"; }; it(); })',
+        {
+            code: 'describe("", function () { const token = Symbol("bar"); it(); })',
+            options: [{ allow: ['Symbol'] }]
+        },
+        {
+            code: 'describe("", function () { const token = Symbol("bar"); it(); })',
+            options: [{ allow: ['Symbol()'] }]
+        },
+        {
+            code: 'describe("", function () { Object.freeze({}); it(); })',
+            options: [{ allow: ['Object.freeze'] }]
+        },
+        {
+            code: 'describe("", function () { Object.freeze({}); it(); })',
+            options: [{ allow: ['Object.freeze()'] }]
+        }
     ],
 
     invalid: [
@@ -282,6 +299,56 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
                     column: 28
                 }
             ]
+        },
+        {
+            code: 'describe("", function () { const token = Symbol("bar"); it(); })',
+            errors: [
+                {
+                    message: 'Unexpected function call in describe block.',
+                    line: 1,
+                    column: 42
+                }
+            ]
+        },
+        {
+            code: 'describe("", function () { const token = Symbol("bar"); helper(); it(); })',
+            options: [{ allow: ['Symbol'] }],
+            errors: [
+                {
+                    message: 'Unexpected function call in describe block.',
+                    line: 1,
+                    column: 57
+                }
+            ]
+        },
+        {
+            code: 'describe("", function () { Object.freeze; it(); })',
+            options: [{ allow: ['Object.freeze'] }],
+            errors: [
+                {
+                    message: memberExpressionError,
+                    line: 1,
+                    column: 28
+                }
+            ]
         }
     ]
+});
+
+describe('no-setup-in-describe create()', function () {
+    it('normalizes non-string allow entries when invoked directly', function () {
+        noSetupInDescribeRule.create({
+            id: 'no-setup-in-describe',
+            options: [{ allow: [42] }],
+            settings: {},
+            sourceCode: {
+                ast: { body: [] },
+                scopeManager: {
+                    globalScope: null
+                }
+            }
+        } as unknown as Rule.RuleContext);
+
+        assert.ok(true);
+    });
 });
