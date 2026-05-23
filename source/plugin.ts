@@ -10,7 +10,6 @@ import { noAsyncSuiteRule } from './rules/no-async-suite.js';
 import { noEmptyTitleRule } from './rules/no-empty-title.js';
 import { noExclusiveTestsRule } from './rules/no-exclusive-tests.js';
 import { noExportsRule } from './rules/no-exports.js';
-import { noGlobalTestsRule } from './rules/no-global-tests.js';
 import { noHooksForSingleCaseRule } from './rules/no-hooks-for-single-case.js';
 import { noHooksRule } from './rules/no-hooks.js';
 import { noIdenticalTitleRule } from './rules/no-identical-title.js';
@@ -23,6 +22,7 @@ import { noRootHooksRule } from './rules/no-root-hooks.js';
 import { noSetupInDescribeRule } from './rules/no-setup-in-describe.js';
 import { noSiblingHooksRule } from './rules/no-sibling-hooks.js';
 import { noSynchronousTestsRule } from './rules/no-synchronous-tests.js';
+import { noTopLevelTestsRule } from './rules/no-top-level-tests.js';
 import { preferArrowCallbackRule } from './rules/prefer-arrow-callback.js';
 import { validSuiteTitleRule } from './rules/valid-suite-title.js';
 import { validTestTitleRule } from './rules/valid-test-title.js';
@@ -36,7 +36,7 @@ const allRules: Linter.RulesRecord = {
     'mocha/no-async-suite': 'error',
     'mocha/no-exclusive-tests': 'error',
     'mocha/no-exports': 'error',
-    'mocha/no-global-tests': 'error',
+    'mocha/no-top-level-tests': 'error',
     'mocha/no-hooks': 'error',
     'mocha/no-hooks-for-single-case': 'error',
     'mocha/no-identical-title': 'error',
@@ -64,7 +64,7 @@ const recommendedRules: Linter.RulesRecord = {
     'mocha/no-async-suite': 'error',
     'mocha/no-exclusive-tests': 'warn',
     'mocha/no-exports': 'error',
-    'mocha/no-global-tests': 'error',
+    'mocha/no-top-level-tests': 'error',
     'mocha/no-hooks': 'off',
     'mocha/no-hooks-for-single-case': 'off',
     'mocha/no-identical-title': 'error',
@@ -92,7 +92,7 @@ const rules = {
     'no-async-suite': noAsyncSuiteRule,
     'no-exclusive-tests': noExclusiveTestsRule,
     'no-exports': noExportsRule,
-    'no-global-tests': noGlobalTestsRule,
+    'no-top-level-tests': noTopLevelTestsRule,
     'no-hooks': noHooksRule,
     'no-hooks-for-single-case': noHooksForSingleCaseRule,
     'no-identical-title': noIdenticalTitleRule,

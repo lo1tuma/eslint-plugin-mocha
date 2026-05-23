@@ -133,7 +133,6 @@ For maintainers: the rules table below is generated, and the headers in `documen
 | [no-empty-title](documentation/rules/no-empty-title.md)                                       | Disallow empty test descriptions                                        | ✅  |    |    |    |    |
 | [no-exclusive-tests](documentation/rules/no-exclusive-tests.md)                               | Disallow exclusive tests                                                |    | ✅  |    |    | 💡 |
 | [no-exports](documentation/rules/no-exports.md)                                               | Disallow exports from test files                                        | ✅  |    |    |    | 💡 |
-| [no-global-tests](documentation/rules/no-global-tests.md)                                     | Disallow global tests                                                   | ✅  |    |    |    |    |
 | [no-hooks](documentation/rules/no-hooks.md)                                                   | Disallow hooks                                                          |    |    | ✅  |    |    |
 | [no-hooks-for-single-case](documentation/rules/no-hooks-for-single-case.md)                   | Disallow hooks for a single test or test suite                          |    |    | ✅  |    |    |
 | [no-identical-title](documentation/rules/no-identical-title.md)                               | Disallow identical titles                                               | ✅  |    |    |    |    |
@@ -146,6 +145,7 @@ For maintainers: the rules table below is generated, and the headers in `documen
 | [no-setup-in-describe](documentation/rules/no-setup-in-describe.md)                           | Disallow setup in describe blocks                                       | ✅  |    |    |    |    |
 | [no-sibling-hooks](documentation/rules/no-sibling-hooks.md)                                   | Disallow duplicate uses of a hook at the same level inside a suite      | ✅  |    |    |    |    |
 | [no-synchronous-tests](documentation/rules/no-synchronous-tests.md)                           | Disallow synchronous tests                                              |    |    | ✅  |    |    |
+| [no-top-level-tests](documentation/rules/no-top-level-tests.md)                               | Disallow top-level tests                                                | ✅  |    |    |    |    |
 | [prefer-arrow-callback](documentation/rules/prefer-arrow-callback.md)                         | Require using arrow functions for callbacks                             |    |    | ✅  | 🔧 |    |
 | [valid-suite-title](documentation/rules/valid-suite-title.md)                                 | Require suite descriptions to match a pre-configured regular expression |    |    | ✅  |    |    |
 | [valid-test-title](documentation/rules/valid-test-title.md)                                   | Require test descriptions to match a pre-configured regular expression  |    |    | ✅  |    |    |

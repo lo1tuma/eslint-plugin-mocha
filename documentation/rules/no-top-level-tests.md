@@ -1,10 +1,10 @@
-# Disallow global tests (`mocha/no-global-tests`)
+# Disallow top-level tests (`mocha/no-top-level-tests`)
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 
 <!-- end auto-generated rule header -->
 
-Mocha gives you the possibility to structure your tests inside of suites using `describe`, `suite` or `context`.
+Mocha lets you structure tests inside suites using `describe`, `suite` or `context`.
 
 Example:
 
@@ -14,7 +14,7 @@ describe('something', function () {
 });
 ```
 
-This rule aims to prevent writing tests outside of test-suites:
+This rule prevents writing tests outside of suites:
 
 ```js
 it('should work', function () {});
@@ -22,7 +22,7 @@ it('should work', function () {});
 
 ## Rule Details
 
-This rule checks each mocha test function to not be located directly in the global scope.
+This rule reports Mocha test functions declared outside any suite.
 
 The following patterns are considered problems:
 

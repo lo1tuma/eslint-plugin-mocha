@@ -1,20 +1,20 @@
 import type { Rule, Scope } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 
-function isGlobalScope(scope: Readonly<Scope.Scope>): boolean {
+function isTopLevelScope(scope: Readonly<Scope.Scope>): boolean {
     return scope.type === 'global' || scope.type === 'module';
 }
 
-export const noGlobalTestsRule: Readonly<Rule.RuleModule> = {
+export const noTopLevelTestsRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
         languages: ['js/js'],
         docs: {
-            description: 'Disallow global tests',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-global-tests.md'
+            description: 'Disallow top-level tests',
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-top-level-tests.md'
         },
         messages: {
-            unexpectedGlobalTest: 'Unexpected global mocha test.'
+            unexpectedTopLevelTest: 'Unexpected top-level mocha test.'
         },
         schema: []
     },
@@ -23,8 +23,8 @@ export const noGlobalTestsRule: Readonly<Rule.RuleModule> = {
             testCase(visitorContext) {
                 const scope = context.sourceCode.getScope(visitorContext.node);
 
-                if (isGlobalScope(scope)) {
-                    context.report({ node: visitorContext.node, messageId: 'unexpectedGlobalTest' });
+                if (isTopLevelScope(scope)) {
+                    context.report({ node: visitorContext.node, messageId: 'unexpectedTopLevelTest' });
                 }
             }
         });
