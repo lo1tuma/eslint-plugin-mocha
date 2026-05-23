@@ -275,7 +275,8 @@ describe('consistent-structure helpers', function () {
                 hasSeenSuite: false,
                 hasSeenTestCase: false,
                 highestSeenKind: null,
-                scopeNode: suiteBody as never
+                scopeNode: suiteBody as never,
+                usedHookNames: new Set()
             }],
             {
                 interface: 'BDD',
