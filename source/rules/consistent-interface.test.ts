@@ -48,21 +48,21 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                 test('bar', () => {});
             });`,
             options: [{ interface: 'TDD' }],
-            settings: { mocha: { interface: 'exports' } }
+            settings: { mocha: { interface: 'require' } }
         },
         {
             code: `import {describe, it} from 'mocha'; describe('foo', () => {
                 it('bar', () => {});
             });`,
             options: [{ interface: 'BDD' }],
-            settings: { mocha: { interface: 'exports' } }
+            settings: { mocha: { interface: 'require' } }
         },
         {
             code: `import {describe as foo, it as bar} from 'mocha'; foo('foo', () => {
                 bar('bar', () => {});
             });`,
             options: [{ interface: 'BDD' }],
-            settings: { mocha: { interface: 'exports' } }
+            settings: { mocha: { interface: 'require' } }
         },
         {
             code: 'import {run} from "mocha"; run();',
@@ -93,7 +93,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                 test('bar', () => {});
             });`,
             options: [{ interface: 'BDD' }],
-            settings: { mocha: { interface: 'exports' } },
+            settings: { mocha: { interface: 'require' } },
             errors: [
                 { line: 1, column: 36, message: 'Unexpected use of TDD interface instead of BDD' },
                 { line: 2, column: 17, message: 'Unexpected use of TDD interface instead of BDD' }
@@ -104,7 +104,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                 it('bar', () => {});
             });`,
             options: [{ interface: 'TDD' }],
-            settings: { mocha: { interface: 'exports' } },
+            settings: { mocha: { interface: 'require' } },
             errors: [
                 { line: 1, column: 37, message: 'Unexpected use of BDD interface instead of TDD' },
                 { line: 2, column: 17, message: 'Unexpected use of BDD interface instead of TDD' }
@@ -120,8 +120,8 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
             options: [{ interface: 'BDD' }],
             settings: { mocha: { interface: 'BDD' } },
             errors: [
-                { message: 'Unexpected use of exports interface instead of global BDD' },
-                { message: 'Unexpected use of exports interface instead of global BDD' }
+                { message: 'Unexpected use of require interface instead of global BDD' },
+                { message: 'Unexpected use of require interface instead of global BDD' }
             ]
         },
         {
@@ -134,8 +134,8 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
             options: [{ interface: 'TDD' }],
             settings: { mocha: { interface: 'TDD' } },
             errors: [
-                { message: 'Unexpected use of exports interface instead of global TDD' },
-                { message: 'Unexpected use of exports interface instead of global TDD' }
+                { message: 'Unexpected use of require interface instead of global TDD' },
+                { message: 'Unexpected use of require interface instead of global TDD' }
             ]
         },
         {
@@ -146,8 +146,8 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
             options: [{ interface: 'BDD' }],
             settings: { mocha: { interface: 'TDD' } },
             errors: [
-                { message: 'Unexpected use of exports interface instead of global TDD' },
-                { message: 'Unexpected use of exports interface instead of global TDD' }
+                { message: 'Unexpected use of require interface instead of global TDD' },
+                { message: 'Unexpected use of require interface instead of global TDD' }
             ]
         },
         {
@@ -160,8 +160,8 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
             options: [{ interface: 'TDD' }],
             settings: { mocha: { interface: 'BDD' } },
             errors: [
-                { message: 'Unexpected use of exports interface instead of global BDD' },
-                { message: 'Unexpected use of exports interface instead of global BDD' }
+                { message: 'Unexpected use of require interface instead of global BDD' },
+                { message: 'Unexpected use of require interface instead of global BDD' }
             ]
         },
         {
@@ -174,7 +174,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
             options: [{ interface: 'BDD' }],
             settings: { mocha: { interface: 'BDD' } },
             errors: [
-                { message: 'Unexpected use of exports interface instead of global BDD' }
+                { message: 'Unexpected use of require interface instead of global BDD' }
             ]
         },
         {
@@ -183,7 +183,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
             options: [{ interface: 'BDD' }],
             settings: { mocha: { interface: 'BDD' } },
             errors: [
-                { message: 'Unexpected use of exports interface instead of global BDD' }
+                { message: 'Unexpected use of require interface instead of global BDD' }
             ]
         }
     ]

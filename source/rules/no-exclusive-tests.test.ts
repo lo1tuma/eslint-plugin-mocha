@@ -83,7 +83,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 ecmaVersion: 2018,
                 sourceType: 'module'
             },
-            settings: { mocha: { interface: 'exports' } }
+            settings: { mocha: { interface: 'require' } }
         }
     ],
 
@@ -121,7 +121,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 ecmaVersion: 2018,
                 sourceType: 'module'
             },
-            settings: { mocha: { interface: 'exports' } },
+            settings: { mocha: { interface: 'require' } },
             errors: [{
                 message: expectedErrorMessage,
                 column: 32,
@@ -135,7 +135,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 ecmaVersion: 2018,
                 sourceType: 'module'
             },
-            settings: { mocha: { interface: 'exports' } },
+            settings: { mocha: { interface: 'require' } },
             errors: [{
                 message: expectedErrorMessage,
                 column: 40,
@@ -152,7 +152,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 ecmaVersion: 2018,
                 sourceType: 'module'
             },
-            settings: { mocha: { interface: 'exports' } },
+            settings: { mocha: { interface: 'require' } },
             errors: [{
                 message: expectedErrorMessage,
                 column: 57,
@@ -375,7 +375,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 sourceType: 'module'
             },
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'custom', type: 'testCase', interface: 'exports' }]
+                'mocha/additionalCustomNames': [{ name: 'custom', type: 'testCase', interface: 'require' }]
             },
             errors: [{
                 message: expectedErrorMessage,
