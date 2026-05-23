@@ -181,13 +181,15 @@ describe('consistent-structure helpers', function () {
     });
 
     it('getStructureEntityKind() throws for unsupported mocha entities', function () {
+        const { expression: node } = readExpression('foo;');
+
         assert.throws(
             function () {
                 getStructureEntityKind({
                     interface: 'BDD',
                     modifier: null,
                     name: 'timeout',
-                    node: {} as Rule.Node,
+                    node,
                     type: 'config'
                 });
             },
@@ -196,11 +198,12 @@ describe('consistent-structure helpers', function () {
     });
 
     it('getDirectStructureContext() returns null when no structure layer exists', function () {
+        const { expression: node } = readExpression('foo;');
         const result = getDirectStructureContext([], {
             interface: 'BDD',
             modifier: null,
             name: 'describe',
-            node: {} as Rule.Node,
+            node,
             type: 'suite'
         });
 
