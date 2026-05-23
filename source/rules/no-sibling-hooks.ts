@@ -4,14 +4,26 @@ import { createMochaVisitors } from '../ast/mocha-visitors.js';
 
 type Layer = {
     suiteNode: Except<Rule.Node, 'parent'>;
+    isProgram: boolean;
+    functionDepth: number;
     alreadyUsedHooks: Set<string>;
 };
 
-function createNewLayer(node: Except<Rule.Node, 'parent'>): Readonly<Layer> {
+function createNewLayer(
+    node: Except<Rule.Node, 'parent'>,
+    isProgram: boolean,
+    functionDepth: number
+): Readonly<Layer> {
     return {
         suiteNode: node,
+        isProgram,
+        functionDepth,
         alreadyUsedHooks: new Set()
     };
+}
+
+function isInLayerBody(layer: Readonly<Layer> | undefined, functionDepth: number): boolean {
+    return layer !== undefined && (layer.isProgram || layer.functionDepth === functionDepth);
 }
 
 export const noSiblingHooksRule: Readonly<Rule.RuleModule> = {
@@ -29,23 +41,45 @@ export const noSiblingHooksRule: Readonly<Rule.RuleModule> = {
     },
     create(context) {
         const layers: Layer[] = [];
+        const suiteCallbackNodes = new Set<Rule.Node>();
+        let functionDepth = 0;
+
+        function enterFunction(node: Rule.Node): void {
+            if (!suiteCallbackNodes.has(node)) {
+                functionDepth += 1;
+            }
+        }
+
+        function exitFunction(node: Rule.Node): void {
+            if (!suiteCallbackNodes.has(node)) {
+                functionDepth -= 1;
+            }
+        }
 
         return createMochaVisitors(context, {
             Program(node) {
-                layers.push(createNewLayer(node));
+                layers.push(createNewLayer(node, true, functionDepth));
             },
 
             suite(visitorContext) {
-                layers.push(createNewLayer(visitorContext.node));
+                layers.push(createNewLayer(visitorContext.node, false, functionDepth));
             },
 
             'suite:exit'() {
                 layers.pop();
             },
 
+            suiteCallback(visitorContext) {
+                suiteCallbackNodes.add(visitorContext.node);
+            },
+
             hook(visitorContext) {
                 const { name, node } = visitorContext;
                 const currentLayer = layers.at(-1);
+
+                if (!isInLayerBody(currentLayer, functionDepth)) {
+                    return;
+                }
 
                 if (currentLayer?.alreadyUsedHooks.has(name) === true) {
                     context.report({
@@ -56,7 +90,14 @@ export const noSiblingHooksRule: Readonly<Rule.RuleModule> = {
                 } else {
                     currentLayer?.alreadyUsedHooks.add(name);
                 }
-            }
+            },
+
+            FunctionDeclaration: enterFunction,
+            'FunctionDeclaration:exit': exitFunction,
+            FunctionExpression: enterFunction,
+            'FunctionExpression:exit': exitFunction,
+            ArrowFunctionExpression: enterFunction,
+            'ArrowFunctionExpression:exit': exitFunction
         });
     }
 };

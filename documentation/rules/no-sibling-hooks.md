@@ -10,6 +10,7 @@ It is possible to declare a hook multiple times inside the same test suite, but 
 ## Rule Details
 
 This rule looks for every call to `before`, `after`, `beforeEach` and `afterEach` and reports them if they are called at least twice inside of a test suite at the same level.
+Hooks declared inside nested functions are not treated as siblings of hooks in the surrounding suite.
 
 The following patterns are considered warnings:
 
@@ -55,6 +56,12 @@ describe('foo', function () {
             // ...
         });
     });
+
+    function addSharedTests() {
+        before(function () { // Is allowed because it's inside a nested function
+            // ...
+        });
+    }
 });
 ```
 
