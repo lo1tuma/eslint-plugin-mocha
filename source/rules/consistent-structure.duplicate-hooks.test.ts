@@ -1,29 +1,33 @@
 import { RuleTester } from 'eslint';
 import { withInterface } from '../mocha-interface-test-cases.js';
-import { noSiblingHooksRule } from './no-sibling-hooks.js';
+import { consistentStructureRule } from './consistent-structure.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
+const options = [{ disallowDuplicateHooks: true }];
 
-ruleTester.run('no-sibling-hooks', noSiblingHooksRule, {
+ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, {
     valid: [
-        'describe(function() { before(function() {}); it(function() {}); });',
-        'describe(function() { after(function() {}); it(function() {}); });',
-        'describe(function() { beforeEach(function() {}); it(function() {}); });',
-        'describe(function() { afterEach(function() {}); it(function() {}); });',
-        'describe(function() { before(function() {}); after(function() {}); });',
-        'describe(function() { before(function() {}); beforeEach(function() {}); });',
-        'describe(function() { beforeEach(function() {}); afterEach(function() {}); });',
-        'before(function() {}); beforeEach(function() {});',
-        'foo.before(function() {}); foo.before(function() {});',
-        [
-            'describe(function() {',
-            '    before(function() {});',
-            '    describe(function() {',
-            '        before(function() {});',
-            '    });',
-            '});'
-        ]
-            .join('\n'),
+        { code: 'describe(function() { before(function() {}); it(function() {}); });', options },
+        { code: 'describe(function() { after(function() {}); it(function() {}); });', options },
+        { code: 'describe(function() { beforeEach(function() {}); it(function() {}); });', options },
+        { code: 'describe(function() { afterEach(function() {}); it(function() {}); });', options },
+        { code: 'describe(function() { before(function() {}); after(function() {}); });', options },
+        { code: 'describe(function() { before(function() {}); beforeEach(function() {}); });', options },
+        { code: 'describe(function() { beforeEach(function() {}); afterEach(function() {}); });', options },
+        { code: 'before(function() {}); beforeEach(function() {});', options },
+        { code: 'foo.before(function() {}); foo.before(function() {});', options },
+        {
+            code: [
+                'describe(function() {',
+                '    before(function() {});',
+                '    describe(function() {',
+                '        before(function() {});',
+                '    });',
+                '});'
+            ]
+                .join('\n'),
+            options
+        },
         {
             code: [
                 'describe(function() {',
@@ -33,98 +37,120 @@ ruleTester.run('no-sibling-hooks', noSiblingHooksRule, {
                 '    before(function() {});',
                 '});'
             ]
-                .join('\n')
+                .join('\n'),
+            options
         },
-        [
-            'describe(function() {',
-            '    before(function() {});',
-            '    function runSomeTests() {',
-            '        before(function() {});',
-            '        it(function() {});',
-            '    }',
-            '    function runSomeOtherTests() {',
-            '        before(function() {});',
-            '        it(function() {});',
-            '    }',
-            '    context(function() {',
-            '        before(function() {});',
-            '        context(function() {',
-            '            runSomeTests();',
-            '        });',
-            '        context(function() {',
-            '            runSomeOtherTests();',
-            '        });',
-            '    });',
-            '    context(function() {',
-            '        before(function() {});',
-            '        context(function() {',
-            '            runSomeTests();',
-            '        });',
-            '        context(function() {',
-            '            runSomeOtherTests();',
-            '        });',
-            '    });',
-            '});'
-        ]
-            .join('\n'),
-        [
-            'describe(function() {',
-            '    before(function() {});',
-            '    const runSomeTests = () => {',
-            '        before(function() {});',
-            '        it(function() {});',
-            '    };',
-            '    context(function() {',
-            '        runSomeTests();',
-            '    });',
-            '});'
-        ]
-            .join('\n'),
-        [
-            'describe(function() {',
-            '    describe.only(function() {',
-            '        before(function() {});',
-            '    });',
-            '    before(function() {});',
-            '});'
-        ]
-            .join('\n'),
-        [
-            'describe(function() {',
-            '    describe.skip(function() {',
-            '        before(function() {});',
-            '    });',
-            '    before(function() {});',
-            '});'
-        ]
-            .join('\n'),
-        [
-            'describe(function() {',
-            '    xdescribe(function() {',
-            '        before(function() {});',
-            '    });',
-            '    before(function() {});',
-            '});'
-        ]
-            .join('\n'),
-        [
-            'describe(function() {',
-            '    context(function() {',
-            '        before(function() {});',
-            '    });',
-            '    before(function() {});',
-            '});'
-        ]
-            .join('\n'),
-        [
-            'describe(function() {',
-            '    xcontext(function() {',
-            '        before(function() {});',
-            '    });',
-            '    before(function() {});',
-            '});'
-        ]
-            .join('\n'),
+        {
+            code: [
+                'describe(function() {',
+                '    before(function() {});',
+                '    function runSomeTests() {',
+                '        before(function() {});',
+                '        it(function() {});',
+                '    }',
+                '    function runSomeOtherTests() {',
+                '        before(function() {});',
+                '        it(function() {});',
+                '    }',
+                '    context(function() {',
+                '        before(function() {});',
+                '        context(function() {',
+                '            runSomeTests();',
+                '        });',
+                '        context(function() {',
+                '            runSomeOtherTests();',
+                '        });',
+                '    });',
+                '    context(function() {',
+                '        before(function() {});',
+                '        context(function() {',
+                '            runSomeTests();',
+                '        });',
+                '        context(function() {',
+                '            runSomeOtherTests();',
+                '        });',
+                '    });',
+                '});'
+            ]
+                .join('\n'),
+            options
+        },
+        {
+            code: [
+                'describe(function() {',
+                '    before(function() {});',
+                '    const runSomeTests = () => {',
+                '        before(function() {});',
+                '        it(function() {});',
+                '    };',
+                '    context(function() {',
+                '        runSomeTests();',
+                '    });',
+                '});'
+            ]
+                .join('\n'),
+            options
+        },
+        {
+            code: [
+                'describe(function() {',
+                '    describe.only(function() {',
+                '        before(function() {});',
+                '    });',
+                '    before(function() {});',
+                '});'
+            ]
+                .join('\n'),
+            options
+        },
+        {
+            code: [
+                'describe(function() {',
+                '    describe.skip(function() {',
+                '        before(function() {});',
+                '    });',
+                '    before(function() {});',
+                '});'
+            ]
+                .join('\n'),
+            options
+        },
+        {
+            code: [
+                'describe(function() {',
+                '    xdescribe(function() {',
+                '        before(function() {});',
+                '    });',
+                '    before(function() {});',
+                '});'
+            ]
+                .join('\n'),
+            options
+        },
+        {
+            code: [
+                'describe(function() {',
+                '    context(function() {',
+                '        before(function() {});',
+                '    });',
+                '    before(function() {});',
+                '});'
+            ]
+                .join('\n'),
+            options
+        },
+        {
+            code: [
+                'describe(function() {',
+                '    xcontext(function() {',
+                '        before(function() {});',
+                '    });',
+                '    before(function() {});',
+                '});'
+            ]
+                .join('\n'),
+            options
+        },
         {
             code: [
                 'foo(function() {',
@@ -135,6 +161,7 @@ ruleTester.run('no-sibling-hooks', noSiblingHooksRule, {
                 '});'
             ]
                 .join('\n'),
+            options,
             settings: {
                 'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
             }
@@ -149,6 +176,7 @@ ruleTester.run('no-sibling-hooks', noSiblingHooksRule, {
                 '});'
             ]
                 .join('\n'),
+            options,
             settings: {
                 mocha: {
                     additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
@@ -165,6 +193,7 @@ ruleTester.run('no-sibling-hooks', noSiblingHooksRule, {
                 '});'
             ]
                 .join('\n'),
+            options,
             settings: {
                 mocha: {
                     additionalCustomNames: [{ name: 'describe.foo', type: 'suite', interface: 'BDD' }]
@@ -181,6 +210,7 @@ ruleTester.run('no-sibling-hooks', noSiblingHooksRule, {
                 '});'
             ]
                 .join('\n'),
+            options,
             settings: {
                 mocha: {
                     additionalCustomNames: [{ name: 'describe.foo()', type: 'suite', interface: 'BDD' }]
@@ -215,6 +245,7 @@ ruleTester.run('no-sibling-hooks', noSiblingHooksRule, {
                 '});'
             ]
                 .join('\n'),
+            options,
             settings: {
                 mocha: {
                     additionalCustomNames: [
@@ -227,29 +258,37 @@ ruleTester.run('no-sibling-hooks', noSiblingHooksRule, {
                 }
             }
         },
-        withInterface('BDD', 'describe(function() { setup(function() {}); setup(function() {}); });')
+        withInterface('BDD', {
+            code: 'describe(function() { setup(function() {}); setup(function() {}); });',
+            options
+        })
     ],
 
     invalid: [
         {
             code: 'describe(function() { before(function() {}); before(function() {}); });',
+            options,
             errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 46, line: 1 }]
         },
         {
             code: 'describe(function() { after(function() {}); after(function() {}); });',
+            options,
             errors: [{ message: 'Unexpected use of duplicate Mocha `after()` hook', column: 45, line: 1 }]
         },
         {
             code: 'describe(function() { beforeEach(function() {}); beforeEach(function() {}); });',
+            options,
             errors: [{ message: 'Unexpected use of duplicate Mocha `beforeEach()` hook', column: 50, line: 1 }]
         },
         {
             code: 'describe(function() { afterEach(function() {}); afterEach(function() {}); });',
+            options,
             errors: [{ message: 'Unexpected use of duplicate Mocha `afterEach()` hook', column: 49, line: 1 }]
         },
         withInterface('TDD', {
-            code: 'describe(function() { setup(function() {}); setup(function() {}); });',
-            errors: [{ message: 'Unexpected use of duplicate Mocha `setup()` hook', column: 45, line: 1 }]
+            code: 'setup(function() {}); setup(function() {});',
+            options,
+            errors: [{ message: 'Unexpected use of duplicate Mocha `setup()` hook', column: 23, line: 1 }]
         }),
         {
             code: [
@@ -262,6 +301,7 @@ ruleTester.run('no-sibling-hooks', noSiblingHooksRule, {
                 '});'
             ]
                 .join('\n'),
+            options,
             errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 9, line: 5 }]
         },
         {
@@ -275,6 +315,7 @@ ruleTester.run('no-sibling-hooks', noSiblingHooksRule, {
                 '});'
             ]
                 .join('\n'),
+            options,
             errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 5, line: 6 }]
         },
         {
@@ -288,6 +329,7 @@ ruleTester.run('no-sibling-hooks', noSiblingHooksRule, {
                 '});'
             ]
                 .join('\n'),
+            options,
             settings: {
                 'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
             },
@@ -304,6 +346,7 @@ ruleTester.run('no-sibling-hooks', noSiblingHooksRule, {
                 'createSuite();'
             ]
                 .join('\n'),
+            options,
             errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 9, line: 4 }]
         },
         {
@@ -317,6 +360,7 @@ ruleTester.run('no-sibling-hooks', noSiblingHooksRule, {
                 '});'
             ]
                 .join('\n'),
+            options,
             settings: {
                 mocha: {
                     additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
@@ -335,6 +379,7 @@ ruleTester.run('no-sibling-hooks', noSiblingHooksRule, {
                 '});'
             ]
                 .join('\n'),
+            options,
             settings: {
                 mocha: {
                     additionalCustomNames: [{ name: 'describe.foo', type: 'suite', interface: 'BDD' }]
@@ -353,6 +398,7 @@ ruleTester.run('no-sibling-hooks', noSiblingHooksRule, {
                 '});'
             ]
                 .join('\n'),
+            options,
             settings: {
                 mocha: {
                     additionalCustomNames: [{ name: 'describe.foo()', type: 'suite', interface: 'BDD' }]
@@ -371,6 +417,7 @@ ruleTester.run('no-sibling-hooks', noSiblingHooksRule, {
                 '});'
             ]
                 .join('\n'),
+            options,
             settings: {
                 mocha: {
                     additionalCustomNames: [{ name: 'forEach().describe', type: 'suite', interface: 'BDD' }]
