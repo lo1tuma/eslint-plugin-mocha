@@ -1,6 +1,6 @@
 import type { Rule, Scope } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { getParentNode } from '../ast/node-types.js';
+import { getParentNode, isIdentifier } from '../ast/node-types.js';
 import type { FunctionExpression } from '../ast/node-types.js';
 import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 
@@ -25,6 +25,22 @@ export function findParamInScope(
     const variable = scope.set.get(paramName);
 
     return variable?.defs[0]?.type === 'Parameter' ? variable : undefined;
+}
+
+function isTypeScriptThisParameter(param: FunctionExpression['params'][number]): boolean {
+    return isIdentifier(param) && param.name === 'this';
+}
+
+function getDoneCallback(
+    functionExpression: Readonly<FunctionExpression>
+): FunctionExpression['params'][number] | undefined {
+    const [firstParam, secondParam] = functionExpression.params;
+
+    if (firstParam === undefined) {
+        return undefined;
+    }
+
+    return isTypeScriptThisParameter(firstParam) ? secondParam : firstParam;
 }
 
 export const handleDoneCallbackRule: Readonly<Rule.RuleModule> = {
@@ -56,7 +72,7 @@ export const handleDoneCallbackRule: Readonly<Rule.RuleModule> = {
 
         function checkAsyncMochaFunction(functionExpression: Readonly<FunctionExpression>): void {
             const scope = context.sourceCode.getScope(functionExpression);
-            const callback = functionExpression.params[0];
+            const callback = getDoneCallback(functionExpression);
 
             if (callback === undefined || callback.type !== 'Identifier') {
                 return;
