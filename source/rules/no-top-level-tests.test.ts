@@ -1,11 +1,11 @@
 import { RuleTester } from 'eslint';
 import { withInterface } from '../mocha-interface-test-cases.js';
-import { noGlobalTestsRule } from './no-global-tests.js';
+import { noTopLevelTestsRule } from './no-top-level-tests.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
-const expectedErrorMessage = 'Unexpected global mocha test.';
+const expectedErrorMessage = 'Unexpected top-level mocha test.';
 
-ruleTester.run('no-global-tests', noGlobalTestsRule, {
+ruleTester.run('no-top-level-tests', noTopLevelTestsRule, {
     valid: [
         'describe();',
         withInterface('TDD', 'suite();'),
