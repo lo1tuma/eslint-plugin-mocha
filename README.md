@@ -7,6 +7,8 @@
 
 ESLint rules for [Mocha](https://mochajs.org/).
 
+This plugin targets Mocha's current JavaScript interfaces documented for Mocha 11. It does not execute Mocha or require Mocha at runtime.
+
 ## Install
 
 This plugin requires ESLint `10.2.0` or later.
