@@ -1,7 +1,7 @@
 const mochaInterfaces = [
     'BDD',
     'TDD',
-    'exports'
+    'require'
 ] as const;
 
 export type MochaInterface = (typeof mochaInterfaces)[number];

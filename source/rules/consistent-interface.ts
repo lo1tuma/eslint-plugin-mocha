@@ -232,7 +232,7 @@ export function createUnexpectedImportDescriptor(
             loc,
             messageId: 'unexpectedInterface',
             data: {
-                actualInterface: 'exports',
+                actualInterface: 'require',
                 expectedInterface: `global ${configuredMochaInterface}`
             }
         };
@@ -306,7 +306,7 @@ export const consistentInterfaceRule: Readonly<Rule.RuleModule> = {
 
         return {
             Program() {
-                if (configuredMochaInterface === 'exports') {
+                if (configuredMochaInterface === 'require') {
                     return;
                 }
 

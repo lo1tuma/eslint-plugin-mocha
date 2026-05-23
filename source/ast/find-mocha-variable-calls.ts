@@ -113,17 +113,17 @@ function isResultWithConstantPath(result: Readonly<ResolvedReference>): boolean 
 }
 
 type SplitCustomNames = {
-    readonly exports: readonly NameDetails[];
+    readonly require: readonly NameDetails[];
     readonly globals: readonly NameDetails[];
 };
 
 function splitCustomNamesByInterface(customNames: readonly NameDetails[]): Readonly<SplitCustomNames> {
     return {
-        exports: customNames.filter((nameDetails) => {
-            return nameDetails.interface === 'exports';
+        require: customNames.filter((nameDetails) => {
+            return nameDetails.interface === 'require';
         }),
         globals: customNames.filter((nameDetails) => {
-            return nameDetails.interface !== 'exports';
+            return nameDetails.interface !== 'require';
         })
     };
 }
@@ -136,20 +136,20 @@ export function findMochaVariableCalls(
 ): readonly ResolvedReferenceWithNameDetails[] {
     const { sourceCode } = context;
     const builtinNames = getAllNames([], interfaceToUse, includeAllInterfaces);
-    const builtinReferences = interfaceToUse === 'exports'
+    const builtinReferences = interfaceToUse === 'require'
         ? findImportReferencesByName(context, builtinNames, 'mocha')
         : findGlobalReferencesByName(context, builtinNames);
     const customNamesByInterface = splitCustomNamesByInterface(customNames);
-    const customExportReferences = findImportReferencesByName(
+    const customRequireReferences = findImportReferencesByName(
         context,
-        customNamesByInterface.exports,
+        customNamesByInterface.require,
         null
     );
     const customGlobalReferences = findGlobalReferencesByName(context, customNamesByInterface.globals);
 
     const resolvedReferences = resolveAliasedReferences(sourceCode, [
         ...builtinReferences,
-        ...customExportReferences,
+        ...customRequireReferences,
         ...customGlobalReferences
     ]);
 
