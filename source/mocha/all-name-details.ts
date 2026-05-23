@@ -23,14 +23,14 @@ function hasMatchingInterface(
     nameDetails: Readonly<NameDetailsConfig>,
     interfaceToUse: MochaInterface
 ): boolean {
-    return interfaceToUse === 'exports' || nameDetails.interface === interfaceToUse;
+    return interfaceToUse === 'require' || nameDetails.interface === interfaceToUse;
 }
 
 function hasMatchingCustomInterface(
     nameDetails: Readonly<NameDetailsConfig>,
     interfaceToUse: MochaInterface
 ): boolean {
-    return nameDetails.interface === 'exports' || hasMatchingInterface(nameDetails, interfaceToUse);
+    return nameDetails.interface === 'require' || hasMatchingInterface(nameDetails, interfaceToUse);
 }
 
 function filterByInterface(
@@ -59,7 +59,7 @@ function buildNameDetailsForInterface(
 }
 
 function getBuiltinNameDetailsForInterface(interfaceToUse: MochaInterface): readonly NameDetails[] {
-    return interfaceToUse === 'exports'
+    return interfaceToUse === 'require'
         ? builtinNameDetailsList
         : buildNameDetailsForInterface(builtinNames, interfaceToUse);
 }

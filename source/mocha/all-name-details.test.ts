@@ -2,10 +2,10 @@ import assert from 'node:assert';
 import { getAllNames } from './all-name-details.js';
 
 describe('all-name-details', function () {
-    it('includes custom names for the exports interface', function () {
+    it('includes custom names for the require interface', function () {
         const names = getAllNames([
             { name: 'custom', type: 'suite', interface: 'BDD' }
-        ], 'exports');
+        ], 'require');
 
         assert.ok(names.some((nameDetails) => {
             return nameDetails.path.join('.') === 'custom';
