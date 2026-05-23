@@ -126,7 +126,7 @@ For maintainers: the rules table below is generated, and the headers in `documen
 | :-------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------- | :- | :- | :- | :- | :- |
 | [consistent-interface](documentation/rules/consistent-interface.md)                           | Enforces consistent use of mocha interfaces                             | ✅  |    |    | 🔧 |    |
 | [consistent-spacing-between-blocks](documentation/rules/consistent-spacing-between-blocks.md) | Require consistent spacing between blocks                               | ✅  |    |    | 🔧 |    |
-| [consistent-structure](documentation/rules/consistent-structure.md)                           | Require consistent structure for Mocha test entities                    |    |    | ✅  |    |    |
+| [consistent-structure](documentation/rules/consistent-structure.md)                           | Require consistent structure for Mocha test entities                    | ✅  |    |    |    |    |
 | [handle-done-callback](documentation/rules/handle-done-callback.md)                           | Enforces handling of callbacks for async tests                          | ✅  |    |    |    |    |
 | [max-top-level-suites](documentation/rules/max-top-level-suites.md)                           | Enforce the number of top-level suites in a single file                 | ✅  |    |    |    |    |
 | [no-async-suite](documentation/rules/no-async-suite.md)                                       | Disallow async functions passed to a suite                              | ✅  |    |    | 🔧 |    |
@@ -144,7 +144,6 @@ For maintainers: the rules table below is generated, and the headers in `documen
 | [no-return-from-async](documentation/rules/no-return-from-async.md)                           | Disallow returning from an async test or hook                           |    |    | ✅  |    |    |
 | [no-root-hooks](documentation/rules/no-root-hooks.md)                                         | Disallow root hooks                                                     |    | ✅  |    |    |    |
 | [no-setup-in-describe](documentation/rules/no-setup-in-describe.md)                           | Disallow setup in describe blocks                                       | ✅  |    |    |    |    |
-| [no-sibling-hooks](documentation/rules/no-sibling-hooks.md)                                   | Disallow duplicate uses of a hook at the same level inside a suite      | ✅  |    |    |    |    |
 | [no-synchronous-tests](documentation/rules/no-synchronous-tests.md)                           | Disallow synchronous tests                                              |    |    | ✅  |    |    |
 | [prefer-arrow-callback](documentation/rules/prefer-arrow-callback.md)                         | Require using arrow functions for callbacks                             |    |    | ✅  | 🔧 |    |
 | [valid-suite-title](documentation/rules/valid-suite-title.md)                                 | Require suite descriptions to match a pre-configured regular expression |    |    | ✅  |    |    |
