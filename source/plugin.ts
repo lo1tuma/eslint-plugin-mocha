@@ -30,7 +30,7 @@ import { validTestTitleRule } from './rules/valid-test-title.js';
 const pluginMeta = await readClosestPackageMetadata(import.meta.url);
 
 const allRules: Linter.RulesRecord = {
-    'mocha/consistent-structure': 'error',
+    'mocha/consistent-structure': ['error', { order: 'hooks-tests-suites', disallowMixedTestsAndSuites: true }],
     'mocha/handle-done-callback': 'error',
     'mocha/max-top-level-suites': 'error',
     'mocha/no-async-suite': 'error',
