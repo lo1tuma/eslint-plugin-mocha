@@ -1,4 +1,5 @@
 import { RuleTester } from 'eslint';
+import { withInterface } from '../mocha-interface-test-cases.js';
 import { noGlobalTestsRule } from './no-global-tests.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
@@ -7,7 +8,7 @@ const expectedErrorMessage = 'Unexpected global mocha test.';
 ruleTester.run('no-global-tests', noGlobalTestsRule, {
     valid: [
         'describe();',
-        'suite();',
+        withInterface('TDD', 'suite();'),
         'context();',
         'describe("", function () { it(); });',
         'describe("", function () { it.only(); });',
@@ -17,10 +18,10 @@ ruleTester.run('no-global-tests', noGlobalTestsRule, {
         'describe("", function () { test.skip(); });',
         'describe.only("", function () { it(); });',
         'describe.skip("", function () { it(); });',
-        'suite("", function () { it(); });',
-        'suite("", function () { test(); });',
-        'suite.only("", function () { it(); });',
-        'suite.skip("", function () { it(); });',
+        withInterface('TDD', 'suite("", function () { it(); });'),
+        withInterface('TDD', 'suite("", function () { test(); });'),
+        withInterface('TDD', 'suite.only("", function () { it(); });'),
+        withInterface('TDD', 'suite.skip("", function () { it(); });'),
         'context("", function () { it(); });',
         'context("", function () { test(); });',
         'context.only("", function () { it(); });',
@@ -59,26 +60,26 @@ ruleTester.run('no-global-tests', noGlobalTestsRule, {
             code: 'it["skip"]();',
             errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
-        {
+        withInterface('TDD', {
             code: 'test();',
             errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
-        },
-        {
+        }),
+        withInterface('TDD', {
             code: 'test.only();',
             errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
-        },
-        {
+        }),
+        withInterface('TDD', {
             code: 'test["only"]();',
             errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
-        },
-        {
+        }),
+        withInterface('TDD', {
             code: 'test.skip();',
             errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
-        },
-        {
+        }),
+        withInterface('TDD', {
             code: 'test["skip"]();',
             errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
-        },
+        }),
         {
             code: 'specify();',
             errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]

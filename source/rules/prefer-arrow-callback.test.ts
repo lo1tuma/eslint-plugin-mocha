@@ -9,6 +9,7 @@
 // ------------------------------------------------------------------------------
 
 import { RuleTester } from 'eslint';
+import { withInterface } from '../mocha-interface-test-cases.js';
 import { preferArrowCallbackRule } from './prefer-arrow-callback.js';
 
 const ruleTester = new RuleTester({
@@ -49,16 +50,16 @@ ruleTester.run('prefer-arrow-callback', preferArrowCallbackRule, {
         'xcontext("name", function bar() {});',
         'context.only("name", function bar() {});',
         'context.skip("name", function bar() {});',
-        'suite("name", function bar() {});',
-        'suite.only("name", function bar() {});',
-        'suite.skip("name", function bar() {});',
+        withInterface('TDD', 'suite("name", function bar() {});'),
+        withInterface('TDD', 'suite.only("name", function bar() {});'),
+        withInterface('TDD', 'suite.skip("name", function bar() {});'),
         'it("name", function bar() {});',
         'it.only("name", function bar() {});',
         'it.skip("name", function bar() {});',
         'xit("name", function bar() {});',
-        'test("name", function bar() {});',
-        'test.only("name", function bar() {});',
-        'test.skip("name", function bar() {});',
+        withInterface('TDD', 'test("name", function bar() {});'),
+        withInterface('TDD', 'test.only("name", function bar() {});'),
+        withInterface('TDD', 'test.skip("name", function bar() {});'),
         'specify("name", function bar() {});',
         'specify.only("name", function bar() {});',
         'specify.skip("name", function bar() {});',

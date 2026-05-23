@@ -1,5 +1,6 @@
 import { RuleTester, type Scope } from 'eslint';
 import assert from 'node:assert';
+import { withInterface } from '../mocha-interface-test-cases.js';
 import { findParamInScope, handleDoneCallbackRule } from './handle-done-callback.js';
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
@@ -20,8 +21,8 @@ ruleTester.run('handle-done-callback', handleDoneCallbackRule, {
         'it("", function (done) { done(new Error("foo")); });',
         'it("", function (done) { promise.then(done).catch(done); });',
         'it.only("", function (done) { done(); });',
-        'test("", function (done) { done(); });',
-        'test.only("", function (done) { done(); });',
+        withInterface('TDD', 'test("", function (done) { done(); });'),
+        withInterface('TDD', 'test.only("", function (done) { done(); });'),
         'before(function (done) { done(); });',
         'after(function (done) { done(); });',
         'beforeEach(function (done) { done(); });',
@@ -66,14 +67,14 @@ ruleTester.run('handle-done-callback', handleDoneCallbackRule, {
             code: 'it.only("", function (done) { });',
             errors: [{ message: 'Expected "done" callback to be handled.', column: 23, line: 1 }]
         },
-        {
+        withInterface('TDD', {
             code: 'test("", function (done) { });',
             errors: [{ message: 'Expected "done" callback to be handled.', column: 20, line: 1 }]
-        },
-        {
+        }),
+        withInterface('TDD', {
             code: 'test.only("", function (done) { });',
             errors: [{ message: 'Expected "done" callback to be handled.', column: 25, line: 1 }]
-        },
+        }),
         {
             code: 'specify("", function (done) { });',
             errors: [{ message: 'Expected "done" callback to be handled.', column: 23, line: 1 }]

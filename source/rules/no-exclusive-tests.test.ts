@@ -1,5 +1,6 @@
 import { type Rule, RuleTester, type SourceCode } from 'eslint';
 import assert from 'node:assert';
+import { withInterface } from '../mocha-interface-test-cases.js';
 import {
     createExclusiveTestReportDescriptor,
     fixExclusiveTest,
@@ -32,15 +33,15 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
         'it()',
         'describe.skip()',
         'it.skip()',
-        'suite()',
-        'test()',
-        'suite.skip()',
-        'test.skip()',
+        withInterface('TDD', 'suite()'),
+        withInterface('TDD', 'test()'),
+        withInterface('TDD', 'suite.skip()'),
+        withInterface('TDD', 'test.skip()'),
         'context()',
         'context.skip()',
         'var appliedOnly = describe.only; appliedOnly.apply(describe)',
         'var calledOnly = it.only; calledOnly.call(it)',
-        'var dynamicOnly = "onl"; dynamicOnly += "y"; suite[dynamicOnly]()',
+        withInterface('TDD', 'var dynamicOnly = "onl"; dynamicOnly += "y"; suite[dynamicOnly]()'),
         'function foo() { var it; it.only(); }',
         'specify()',
         'specify.skip()',
@@ -165,7 +166,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 suggestions: [{ messageId: 'removeExclusiveModifier', output: 'it()' }]
             }]
         },
-        {
+        withInterface('TDD', {
             code: 'suite.only()',
             errors: [{
                 message: expectedErrorMessage,
@@ -173,8 +174,8 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 line: 1,
                 suggestions: [{ messageId: 'removeExclusiveModifier', output: 'suite()' }]
             }]
-        },
-        {
+        }),
+        withInterface('TDD', {
             code: 'suite["only"]()',
             errors: [{
                 message: expectedErrorMessage,
@@ -182,8 +183,8 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 line: 1,
                 suggestions: [{ messageId: 'removeExclusiveModifier', output: 'suite()' }]
             }]
-        },
-        {
+        }),
+        withInterface('TDD', {
             code: 'test.only()',
             errors: [{
                 message: expectedErrorMessage,
@@ -191,8 +192,8 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 line: 1,
                 suggestions: [{ messageId: 'removeExclusiveModifier', output: 'test()' }]
             }]
-        },
-        {
+        }),
+        withInterface('TDD', {
             code: 'test["only"]()',
             errors: [{
                 message: expectedErrorMessage,
@@ -200,7 +201,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 line: 1,
                 suggestions: [{ messageId: 'removeExclusiveModifier', output: 'test()' }]
             }]
-        },
+        }),
         {
             code: 'context.only()',
             errors: [{
