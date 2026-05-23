@@ -6,7 +6,11 @@
 
 <!-- end auto-generated rule header -->
 
-Mocha has several interfaces such as `BDD`, `TDD`, `Require`, `Exports`, `QUnit` etc. Usually Mocha injects the variables and functions of the selected interface into the global scope. When using the `Require` interface, named imports from `mocha` are used instead. This rule enforces a consistent `BDD` or `TDD` interface for imported Mocha interface methods, and it also reports imported Mocha interface methods when `settings.mocha.interface` is configured for globals.
+Mocha has several interfaces such as `BDD`, `TDD`, `Require`, `Exports`, and `QUnit`. This plugin supports Mocha's `BDD`, `TDD`, and `Require` interfaces.
+
+It does not support Mocha's `Exports` or `QUnit` interfaces, or third-party UIs with different syntax. Many rules depend on suite, test, and hook calls being represented as nested call expressions, which those interfaces do not provide consistently.
+
+Usually Mocha injects the variables and functions of the selected interface into the global scope. When using the `Require` interface, named imports from `mocha` are used instead. This rule enforces a consistent `BDD` or `TDD` interface for imported Mocha interface methods, and it also reports imported Mocha interface methods when `settings.mocha.interface` is configured for globals.
 
 ## Options
 
