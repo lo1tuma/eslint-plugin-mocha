@@ -114,8 +114,8 @@ describe('settings', function () {
         });
 
         it('returns the given valid interface', function () {
-            const result = getInterface({ 'mocha/interface': 'exports' });
-            assert.strictEqual(result, 'exports');
+            const result = getInterface({ 'mocha/interface': 'require' });
+            assert.strictEqual(result, 'require');
         });
 
         it('returns the given valid nested interface', function () {
