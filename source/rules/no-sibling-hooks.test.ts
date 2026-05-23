@@ -37,6 +37,51 @@ ruleTester.run('no-sibling-hooks', noSiblingHooksRule, {
         },
         [
             'describe(function() {',
+            '    before(function() {});',
+            '    function runSomeTests() {',
+            '        before(function() {});',
+            '        it(function() {});',
+            '    }',
+            '    function runSomeOtherTests() {',
+            '        before(function() {});',
+            '        it(function() {});',
+            '    }',
+            '    context(function() {',
+            '        before(function() {});',
+            '        context(function() {',
+            '            runSomeTests();',
+            '        });',
+            '        context(function() {',
+            '            runSomeOtherTests();',
+            '        });',
+            '    });',
+            '    context(function() {',
+            '        before(function() {});',
+            '        context(function() {',
+            '            runSomeTests();',
+            '        });',
+            '        context(function() {',
+            '            runSomeOtherTests();',
+            '        });',
+            '    });',
+            '});'
+        ]
+            .join('\n'),
+        [
+            'describe(function() {',
+            '    before(function() {});',
+            '    const runSomeTests = () => {',
+            '        before(function() {});',
+            '        it(function() {});',
+            '    };',
+            '    context(function() {',
+            '        runSomeTests();',
+            '    });',
+            '});'
+        ]
+            .join('\n'),
+        [
+            'describe(function() {',
             '    describe.only(function() {',
             '        before(function() {});',
             '    });',
@@ -247,6 +292,19 @@ ruleTester.run('no-sibling-hooks', noSiblingHooksRule, {
                 'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
             },
             errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 5, line: 6 }]
+        },
+        {
+            code: [
+                'function createSuite() {',
+                '    describe(function() {',
+                '        before(function() {});',
+                '        before(function() {});',
+                '    });',
+                '}',
+                'createSuite();'
+            ]
+                .join('\n'),
+            errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 9, line: 4 }]
         },
         {
             code: [
