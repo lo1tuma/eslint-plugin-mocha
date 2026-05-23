@@ -1,8 +1,10 @@
+import * as typescriptParser from '@typescript-eslint/parser';
 import { RuleTester, type Scope } from 'eslint';
 import assert from 'node:assert';
 import { withInterface } from '../mocha-interface-test-cases.js';
 import { findParamInScope, handleDoneCallbackRule } from './handle-done-callback.js';
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
+const typescriptLanguageOptions = { parser: typescriptParser };
 
 ruleTester.run('handle-done-callback', handleDoneCallbackRule, {
     valid: [
@@ -35,6 +37,10 @@ ruleTester.run('handle-done-callback', handleDoneCallbackRule, {
         {
             code: 'it.skip("", function (done) { });',
             options: [{ ignorePending: true }]
+        },
+        {
+            code: 'before(async function setupApplication(this: Mocha.Context) { this.timeout(6000); });',
+            languageOptions: typescriptLanguageOptions
         }
     ],
 
@@ -115,6 +121,11 @@ ruleTester.run('handle-done-callback', handleDoneCallbackRule, {
         {
             code: 'it("", function (done) { var foo = done; });',
             errors: [{ message: 'Expected "done" callback to be handled.', column: 18, line: 1 }]
+        },
+        {
+            code: 'it("", function (this: Mocha.Context, done) { });',
+            languageOptions: typescriptLanguageOptions,
+            errors: [{ message: 'Expected "done" callback to be handled.', column: 39, line: 1 }]
         }
     ]
 });
