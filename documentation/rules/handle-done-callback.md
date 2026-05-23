@@ -64,6 +64,14 @@ before(function (done) {
 });
 ```
 
+When linting TypeScript, a typed `this` parameter is not treated as a `done` callback:
+
+```ts
+before(function (this: Mocha.Context) {
+    this.timeout(6000);
+});
+```
+
 ## Options
 
 This rule supports one option:
