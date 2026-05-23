@@ -18,10 +18,10 @@ import { noNestedTestsRule } from './rules/no-nested-tests.js';
 import { noPendingTestsRule } from './rules/no-pending-tests.js';
 import { noReturnAndCallbackRule } from './rules/no-return-and-callback.js';
 import { noReturnFromAsyncRule } from './rules/no-return-from-async.js';
+import { noRootHooksRule } from './rules/no-root-hooks.js';
 import { noSetupInDescribeRule } from './rules/no-setup-in-describe.js';
 import { noSiblingHooksRule } from './rules/no-sibling-hooks.js';
 import { noSynchronousTestsRule } from './rules/no-synchronous-tests.js';
-import { noTopLevelHooksRule } from './rules/no-top-level-hooks.js';
 import { preferArrowCallbackRule } from './rules/prefer-arrow-callback.js';
 import { validSuiteTitleRule } from './rules/valid-suite-title.js';
 import { validTestTitleRule } from './rules/valid-test-title.js';
@@ -46,7 +46,7 @@ const allRules: Linter.RulesRecord = {
     'mocha/no-setup-in-describe': 'error',
     'mocha/no-sibling-hooks': 'error',
     'mocha/no-synchronous-tests': 'error',
-    'mocha/no-top-level-hooks': 'error',
+    'mocha/no-root-hooks': 'error',
     'mocha/prefer-arrow-callback': 'error',
     'mocha/consistent-spacing-between-blocks': 'error',
     'mocha/consistent-interface': ['error', { interface: 'BDD' }],
@@ -73,7 +73,7 @@ const recommendedRules: Linter.RulesRecord = {
     'mocha/no-setup-in-describe': 'error',
     'mocha/no-sibling-hooks': 'error',
     'mocha/no-synchronous-tests': 'off',
-    'mocha/no-top-level-hooks': 'warn',
+    'mocha/no-root-hooks': 'warn',
     'mocha/prefer-arrow-callback': 'off',
     'mocha/valid-suite-title': 'off',
     'mocha/valid-test-title': 'off',
@@ -100,7 +100,7 @@ const rules = {
     'no-setup-in-describe': noSetupInDescribeRule,
     'no-sibling-hooks': noSiblingHooksRule,
     'no-synchronous-tests': noSynchronousTestsRule,
-    'no-top-level-hooks': noTopLevelHooksRule,
+    'no-root-hooks': noRootHooksRule,
     'prefer-arrow-callback': preferArrowCallbackRule,
     'consistent-spacing-between-blocks': consistentSpacingBetweenBlocksRule,
     'consistent-interface': consistentInterfaceRule,

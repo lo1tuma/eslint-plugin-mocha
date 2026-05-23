@@ -1,16 +1,16 @@
 import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 
-export const noTopLevelHooksRule: Readonly<Rule.RuleModule> = {
+export const noRootHooksRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'problem',
         languages: ['js/js'],
         docs: {
-            description: 'Disallow top-level hooks',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-top-level-hooks.md'
+            description: 'Disallow root hooks',
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-root-hooks.md'
         },
         messages: {
-            unexpectedTopLevelHook: 'Unexpected use of Mocha `{{name}}` hook outside of a test suite'
+            unexpectedRootHook: 'Unexpected use of Mocha `{{name}}` hook outside of a test suite'
         },
         schema: []
     },
@@ -24,7 +24,7 @@ export const noTopLevelHooksRule: Readonly<Rule.RuleModule> = {
 
                     context.report({
                         node,
-                        messageId: 'unexpectedTopLevelHook',
+                        messageId: 'unexpectedRootHook',
                         data: { name: visitorContext.name }
                     });
                 }
