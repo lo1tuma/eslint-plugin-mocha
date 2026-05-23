@@ -14,6 +14,7 @@ import { noHooksForSingleCaseRule } from './rules/no-hooks-for-single-case.js';
 import { noHooksRule } from './rules/no-hooks.js';
 import { noIdenticalTitleRule } from './rules/no-identical-title.js';
 import { noMochaArrowsRule } from './rules/no-mocha-arrows.js';
+import { noNestedSuitesRule } from './rules/no-nested-suites.js';
 import { noNestedTestsRule } from './rules/no-nested-tests.js';
 import { noPendingTestsRule } from './rules/no-pending-tests.js';
 import { noReturnAndCallbackRule } from './rules/no-return-and-callback.js';
@@ -43,6 +44,7 @@ const allRules: Linter.RulesRecord = {
     'mocha/no-hooks-for-single-case': 'error',
     'mocha/no-identical-title': 'error',
     'mocha/no-mocha-arrows': 'error',
+    'mocha/no-nested-suites': 'error',
     'mocha/no-nested-tests': 'error',
     'mocha/no-pending-tests': 'error',
     'mocha/no-return-and-callback': 'error',
@@ -70,6 +72,7 @@ const recommendedRules: Linter.RulesRecord = {
     'mocha/no-hooks-for-single-case': 'off',
     'mocha/no-identical-title': 'error',
     'mocha/no-mocha-arrows': 'error',
+    'mocha/no-nested-suites': 'off',
     'mocha/no-nested-tests': 'error',
     'mocha/no-pending-tests': 'warn',
     'mocha/no-return-and-callback': 'error',
@@ -97,6 +100,7 @@ const rules = {
     'no-hooks-for-single-case': noHooksForSingleCaseRule,
     'no-identical-title': noIdenticalTitleRule,
     'no-mocha-arrows': noMochaArrowsRule,
+    'no-nested-suites': noNestedSuitesRule,
     'no-nested-tests': noNestedTestsRule,
     'no-pending-tests': noPendingTestsRule,
     'no-return-and-callback': noReturnAndCallbackRule,

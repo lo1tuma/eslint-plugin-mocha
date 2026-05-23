@@ -137,6 +137,7 @@ For maintainers: the rules table below is generated, and the headers in `documen
 | [no-hooks-for-single-case](documentation/rules/no-hooks-for-single-case.md)                   | Disallow hooks for a single test or test suite                          |    |    | ✅  |    |    |
 | [no-identical-title](documentation/rules/no-identical-title.md)                               | Disallow identical titles                                               | ✅  |    |    |    |    |
 | [no-mocha-arrows](documentation/rules/no-mocha-arrows.md)                                     | Disallow arrow functions as arguments to mocha functions                | ✅  |    |    | 🔧 |    |
+| [no-nested-suites](documentation/rules/no-nested-suites.md)                                   | Disallow suites to be nested within other suites                        |    |    | ✅  |    |    |
 | [no-nested-tests](documentation/rules/no-nested-tests.md)                                     | Disallow tests to be nested within other tests                          | ✅  |    |    |    |    |
 | [no-pending-tests](documentation/rules/no-pending-tests.md)                                   | Disallow pending tests                                                  |    | ✅  |    |    | 💡 |
 | [no-return-and-callback](documentation/rules/no-return-and-callback.md)                       | Disallow returning in a test or hook function that uses a callback      | ✅  |    |    |    |    |
