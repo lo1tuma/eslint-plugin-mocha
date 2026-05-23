@@ -3,6 +3,7 @@ import globals from 'globals';
 import { readClosestPackageMetadata } from './package-metadata.js';
 import { consistentInterfaceRule } from './rules/consistent-interface.js';
 import { consistentSpacingBetweenBlocksRule } from './rules/consistent-spacing-between-blocks.js';
+import { consistentStructureRule } from './rules/consistent-structure.js';
 import { handleDoneCallbackRule } from './rules/handle-done-callback.js';
 import { maxTopLevelSuitesRule } from './rules/max-top-level-suites.js';
 import { noAsyncSuiteRule } from './rules/no-async-suite.js';
@@ -29,6 +30,7 @@ import { validTestTitleRule } from './rules/valid-test-title.js';
 const pluginMeta = await readClosestPackageMetadata(import.meta.url);
 
 const allRules: Linter.RulesRecord = {
+    'mocha/consistent-structure': 'error',
     'mocha/handle-done-callback': 'error',
     'mocha/max-top-level-suites': 'error',
     'mocha/no-async-suite': 'error',
@@ -56,6 +58,7 @@ const allRules: Linter.RulesRecord = {
 };
 
 const recommendedRules: Linter.RulesRecord = {
+    'mocha/consistent-structure': 'off',
     'mocha/handle-done-callback': 'error',
     'mocha/max-top-level-suites': ['error', { limit: 1 }],
     'mocha/no-async-suite': 'error',
@@ -83,6 +86,7 @@ const recommendedRules: Linter.RulesRecord = {
 };
 
 const rules = {
+    'consistent-structure': consistentStructureRule,
     'handle-done-callback': handleDoneCallbackRule,
     'max-top-level-suites': maxTopLevelSuitesRule,
     'no-async-suite': noAsyncSuiteRule,
