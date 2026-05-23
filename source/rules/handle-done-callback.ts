@@ -63,7 +63,13 @@ export const handleDoneCallbackRule: Readonly<Rule.RuleModule> = {
         function isReferenceHandled(reference: Readonly<Scope.Reference>): boolean {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- eslint core typing omits parent
             const node = reference.identifier as Rule.Node;
-            return getParentNode(node).type === 'CallExpression';
+            const parent = getParentNode(node);
+
+            return (
+                parent.type === 'CallExpression' ||
+                (parent.type === 'Property' && parent.value === node) ||
+                (parent.type === 'AssignmentExpression' && parent.right === node)
+            );
         }
 
         function hasHandledReferences(references: readonly Scope.Reference[]): boolean {
