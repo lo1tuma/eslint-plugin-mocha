@@ -1,4 +1,5 @@
 import { RuleTester } from 'eslint';
+import { withInterface } from '../mocha-interface-test-cases.js';
 import { noEmptyTitleRule } from './no-empty-title.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
@@ -20,13 +21,13 @@ ruleTester.run('no-empty-title', noEmptyTitleRule, {
         'it.only("some text")',
         'it("some text", function() { })',
 
-        'suite("some text")',
-        'suite.only("some text")',
-        'suite("some text", function() { })',
+        withInterface('TDD', 'suite("some text")'),
+        withInterface('TDD', 'suite.only("some text")'),
+        withInterface('TDD', 'suite("some text", function() { })'),
 
-        'test("some text")',
-        'test.only("some text")',
-        'test("some text", function() { })',
+        withInterface('TDD', 'test("some text")'),
+        withInterface('TDD', 'test.only("some text")'),
+        withInterface('TDD', 'test("some text", function() { })'),
 
         'var dynamicTitle = "foo"; it(dynamicTitle, function() {});',
         'it(dynamicTitle, function() {});',
@@ -94,22 +95,22 @@ ruleTester.run('no-empty-title', noEmptyTitleRule, {
     ],
 
     invalid: [
-        {
+        withInterface('TDD', {
             code: 'test()',
             errors: [{ message: defaultErrorMessage, ...firstLine }]
-        },
-        {
+        }),
+        withInterface('TDD', {
             code: 'test(function() { })',
             errors: [{ message: defaultErrorMessage, ...firstLine }]
-        },
-        {
+        }),
+        withInterface('TDD', {
             code: 'test("", function() { })',
             errors: [{ message: defaultErrorMessage, ...firstLine }]
-        },
-        {
+        }),
+        withInterface('TDD', {
             code: 'test("      ", function() { })',
             errors: [{ message: defaultErrorMessage, ...firstLine }]
-        },
+        }),
 
         {
             options: [{ message: 'Custom Error' }],
