@@ -103,6 +103,10 @@ forEach([1, 2, 3]).describeModule.modifier("example", function (n) {});
 - `type`: Selects `suite`, `testCase`, or `hook`.
 - `interface`: Selects `BDD`, `TDD`, or `require`. The default is `BDD`. With `require`, rule resolution uses named `import` statements instead of globals. `mocha/consistent-interface` also reports named imports of Mocha interface methods when this setting is `BDD` or `TDD`, which helps catch accidental `require`-style usage and interface misconfiguration earlier.
 
+The plugin supports Mocha's `BDD`, `TDD`, and `Require` interfaces. It does not support Mocha's `Exports` or `QUnit` interfaces, or third-party UIs with different syntax. Many rules depend on suite, test, and hook calls being represented as nested call expressions, which those interfaces do not provide consistently.
+
+For wrapper APIs that still expose suite, test, or hook call functions, use `additionalCustomNames`.
+
 ## Rules
 
 For maintainers: the rules table below is generated, and the headers in `documentation/rules/*.md` are partly generated. Refresh them with `npx just update-eslint-docs`.
