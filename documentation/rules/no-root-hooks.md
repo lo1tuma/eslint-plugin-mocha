@@ -1,15 +1,16 @@
-# Disallow top-level hooks (`mocha/no-top-level-hooks`)
+# Disallow root hooks (`mocha/no-root-hooks`)
 
 ⚠️ This rule _warns_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 
 <!-- end auto-generated rule header -->
 
-Mocha proposes hooks that allow code to be run before or after every or all tests. This helps define a common setup or teardown process for every test.
-These hooks should only be declared inside test suites, as they would otherwise be run before or after every test or test suite of the project, even if the test suite of the file they were declared in was skipped. This can lead to very confusing and unwanted effects.
+Mocha calls hooks declared outside a suite [root hooks](https://mochajs.org/features/hooks/#root-level-hooks). They run before or after tests in the root suite, which can be surprising when a file's own suites are skipped.
+
+This rule disallows root hooks and requires hooks to be declared inside a suite.
 
 ## Rule Details
 
-This rule looks for every call to `before`, `after`, `beforeEach` and `afterEach` that are not in a test suite.
+This rule looks for every call to `before`, `after`, `beforeEach` and `afterEach` that is not in a test suite.
 
 The following patterns are considered warnings:
 
