@@ -1,9 +1,9 @@
 import { RuleTester } from 'eslint';
-import { noTopLevelHooksRule } from './no-top-level-hooks.js';
+import { noRootHooksRule } from './no-root-hooks.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
-ruleTester.run('no-top-level-hooks', noTopLevelHooksRule, {
+ruleTester.run('no-root-hooks', noRootHooksRule, {
     valid: [
         'describe(function() { before(function() {}); });',
         'describe(function() { after(function() {}); });',

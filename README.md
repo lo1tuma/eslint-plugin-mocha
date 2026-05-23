@@ -135,10 +135,10 @@ For maintainers: the rules table below is generated, and the headers in `documen
 | [no-pending-tests](documentation/rules/no-pending-tests.md)                                   | Disallow pending tests                                                  |    | ✅  |    |    | 💡 |
 | [no-return-and-callback](documentation/rules/no-return-and-callback.md)                       | Disallow returning in a test or hook function that uses a callback      | ✅  |    |    |    |    |
 | [no-return-from-async](documentation/rules/no-return-from-async.md)                           | Disallow returning from an async test or hook                           |    |    | ✅  |    |    |
+| [no-root-hooks](documentation/rules/no-root-hooks.md)                                         | Disallow root hooks                                                     |    | ✅  |    |    |    |
 | [no-setup-in-describe](documentation/rules/no-setup-in-describe.md)                           | Disallow setup in describe blocks                                       | ✅  |    |    |    |    |
 | [no-sibling-hooks](documentation/rules/no-sibling-hooks.md)                                   | Disallow duplicate uses of a hook at the same level inside a suite      | ✅  |    |    |    |    |
 | [no-synchronous-tests](documentation/rules/no-synchronous-tests.md)                           | Disallow synchronous tests                                              |    |    | ✅  |    |    |
-| [no-top-level-hooks](documentation/rules/no-top-level-hooks.md)                               | Disallow top-level hooks                                                |    | ✅  |    |    |    |
 | [prefer-arrow-callback](documentation/rules/prefer-arrow-callback.md)                         | Require using arrow functions for callbacks                             |    |    | ✅  | 🔧 |    |
 | [valid-suite-title](documentation/rules/valid-suite-title.md)                                 | Require suite descriptions to match a pre-configured regular expression |    |    | ✅  |    |    |
 | [valid-test-title](documentation/rules/valid-test-title.md)                                   | Require test descriptions to match a pre-configured regular expression  |    |    | ✅  |    |    |
