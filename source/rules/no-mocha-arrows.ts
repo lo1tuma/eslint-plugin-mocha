@@ -8,8 +8,20 @@ function extractSourceTextByRange(sourceCode: Readonly<SourceCode>, start: numbe
     return sourceCode.text.slice(start, end).trim();
 }
 
+function getTriviaBetweenArrowAndBody(
+    sourceCode: Readonly<SourceCode>,
+    fn: Readonly<ArrowFunctionExpression>
+): string {
+    const arrow = sourceCode.getTokenBefore(fn.body);
+    return sourceCode.text.slice(arrow!.range[1], fn.body.range![0]);
+}
+
 // eslint-disable-next-line max-statements -- we need to refactor this function to reduce complexity
-function formatFunctionHead(sourceCode: Readonly<SourceCode>, fn: Readonly<ArrowFunctionExpression>): string {
+function formatFunctionHead(
+    sourceCode: Readonly<SourceCode>,
+    fn: Readonly<ArrowFunctionExpression>,
+    includeTriviaAfterArrow = true
+): string {
     const arrow = sourceCode.getTokenBefore(fn.body);
     const beforeArrowToken = sourceCode.getTokenBefore(arrow!);
     let firstToken = sourceCode.getFirstToken(fn);
@@ -35,11 +47,9 @@ function formatFunctionHead(sourceCode: Readonly<SourceCode>, fn: Readonly<Arrow
         beforeArrowToken!.range[1],
         arrow!.range[0]
     );
-    const afterArrowComment = extractSourceTextByRange(
-        sourceCode,
-        arrow!.range[1],
-        fn.body.range![0]
-    );
+    const afterArrowComment = includeTriviaAfterArrow
+        ? extractSourceTextByRange(sourceCode, arrow!.range[1], fn.body.range![0])
+        : '';
     const paramsFullText = firstToken!.type === 'Punctuator'
         ? `${params}${beforeArrowComment}${afterArrowComment}`
         : `(${params}${beforeArrowComment})${afterArrowComment}`;
@@ -61,7 +71,18 @@ function fixArrowFunction(
         );
     }
 
+    const triviaBetweenArrowAndBody = getTriviaBetweenArrowAndBody(sourceCode, fn);
     const bodyText = sourceCode.getText(fn.body);
+
+    if (triviaBetweenArrowAndBody.includes('//')) {
+        return fixer.replaceTextRange(
+            fn.range!,
+            `${formatFunctionHead(sourceCode, fn, false)}{${
+                triviaBetweenArrowAndBody.replace(/^[ \t]+(?=\r?\n)/u, '')
+            }return ${bodyText}; }`
+        );
+    }
+
     return fixer.replaceTextRange(
         fn.range!,
         `${formatFunctionHead(sourceCode, fn)}{ return ${bodyText}; }`
