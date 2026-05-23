@@ -56,6 +56,10 @@ it('foo', function (done) {
     });
 });
 
+it('foo', function (done) {
+    asyncFunction({ callback: done });
+});
+
 before(function (done) {
     asyncInitialization(function () {
         initialized = true;
