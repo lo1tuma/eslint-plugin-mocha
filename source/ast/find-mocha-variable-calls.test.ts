@@ -15,7 +15,7 @@ function findCalls(
         create(ruleContext) {
             return {
                 'Program:exit'() {
-                    calls = findMochaVariableCalls(ruleContext, names as (readonly NameDetails[]), 'BDD');
+                    calls = findMochaVariableCalls(ruleContext, names as (readonly NameDetails[]), 'BDD', false);
                 }
             };
         }
