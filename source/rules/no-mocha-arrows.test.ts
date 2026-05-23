@@ -95,6 +95,11 @@ ruleTester.run('no-mocha-arrows', noMochaArrowsRule, {
             output: 'it(/*one*/async function/*two*/(done)/*three*//*four*/ { return assert(something, false); })'
         },
         {
+            code: 'it(() => \n//hello\nassert(hello, false))',
+            errors,
+            output: 'it(function() {\n//hello\nreturn assert(hello, false); })'
+        },
+        {
             code: 'const foo = () => {}; foo("", () => {}); it(() => { assert(something, false); })',
             errors: [{ message: expectedErrorMessage, column: 42, line: 1 }],
             output: 'const foo = () => {}; foo("", () => {}); it(function() { assert(something, false); })'
