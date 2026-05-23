@@ -65,7 +65,7 @@ function createStructureLayer(scopeNode: StructureLayer['scopeNode']): Readonly<
     };
 }
 
-function isNestedStatementBoundary(node: Rule.Node): boolean {
+export function isNestedStatementBoundary(node: Rule.Node): boolean {
     return node.type.endsWith('Statement') || node.type.endsWith('Declaration') || isFunction(node);
 }
 
@@ -85,7 +85,7 @@ function isDirectStatementInScope(scopeNode: StructureLayer['scopeNode'], node: 
     return current.type === 'ExpressionStatement';
 }
 
-function getTopLevelMochaExpression(node: Rule.Node): Rule.Node {
+export function getTopLevelMochaExpression(node: Rule.Node): Rule.Node {
     const parent = getParentNode(node);
 
     if (isMemberExpression(parent)) {
@@ -95,7 +95,7 @@ function getTopLevelMochaExpression(node: Rule.Node): Rule.Node {
     return node;
 }
 
-function getStructureEntityKind(visitorContext: Readonly<VisitorContext>): StructureEntityKind {
+export function getStructureEntityKind(visitorContext: Readonly<VisitorContext>): StructureEntityKind {
     if (visitorContext.type === 'suite' || visitorContext.type === 'testCase' || visitorContext.type === 'hook') {
         return visitorContext.type;
     }
@@ -175,7 +175,7 @@ function replaceCurrentLayer(layers: StructureLayer[], nextLayer: Readonly<Struc
     layers.splice(-1, 1, nextLayer);
 }
 
-function getDirectStructureContext(
+export function getDirectStructureContext(
     layers: readonly StructureLayer[],
     visitorContext: Readonly<VisitorContext>
 ): Readonly<DirectStructureContext> | null {
