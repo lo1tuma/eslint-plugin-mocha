@@ -1,6 +1,7 @@
 /* eslint-disable import/max-dependencies -- needs to be refactored */
 import type { Rule } from 'eslint';
 import { reduceWithArgs } from '../list.js';
+import { getAllNames } from '../mocha/all-name-details.js';
 import type { MochaInterface } from '../mocha/descriptors.js';
 import { type NameDetails, reformatLastPathSegmentWithCallExpressions } from '../mocha/name-details.js';
 import { isSamePath } from '../mocha/path.js';
@@ -111,17 +112,46 @@ function isResultWithConstantPath(result: Readonly<ResolvedReference>): boolean 
     return isConstantPath(result.path);
 }
 
+type SplitCustomNames = {
+    readonly exports: readonly NameDetails[];
+    readonly globals: readonly NameDetails[];
+};
+
+function splitCustomNamesByInterface(customNames: readonly NameDetails[]): Readonly<SplitCustomNames> {
+    return {
+        exports: customNames.filter((nameDetails) => {
+            return nameDetails.interface === 'exports';
+        }),
+        globals: customNames.filter((nameDetails) => {
+            return nameDetails.interface !== 'exports';
+        })
+    };
+}
+
 export function findMochaVariableCalls(
     context: Readonly<Rule.RuleContext>,
-    names: readonly NameDetails[],
-    interfaceToUse: MochaInterface
+    customNames: readonly NameDetails[],
+    interfaceToUse: MochaInterface,
+    includeAllInterfaces: boolean
 ): readonly ResolvedReferenceWithNameDetails[] {
     const { sourceCode } = context;
-    const references = interfaceToUse === 'exports'
-        ? findImportReferencesByName(context, names, 'mocha')
-        : findGlobalReferencesByName(context, names);
+    const builtinNames = getAllNames([], interfaceToUse, includeAllInterfaces);
+    const builtinReferences = interfaceToUse === 'exports'
+        ? findImportReferencesByName(context, builtinNames, 'mocha')
+        : findGlobalReferencesByName(context, builtinNames);
+    const customNamesByInterface = splitCustomNamesByInterface(customNames);
+    const customExportReferences = findImportReferencesByName(
+        context,
+        customNamesByInterface.exports,
+        null
+    );
+    const customGlobalReferences = findGlobalReferencesByName(context, customNamesByInterface.globals);
 
-    const resolvedReferences = resolveAliasedReferences(sourceCode, references);
+    const resolvedReferences = resolveAliasedReferences(sourceCode, [
+        ...builtinReferences,
+        ...customExportReferences,
+        ...customGlobalReferences
+    ]);
 
     const constantResolvedReferences = reduceWithArgs(resolvedReferences, shouldProcessReference, []);
 
@@ -131,6 +161,6 @@ export function findMochaVariableCalls(
         filteredReferences,
         shouldAddReferenceToResults,
         [],
-        names
+        [...builtinNames, ...customNames]
     );
 }

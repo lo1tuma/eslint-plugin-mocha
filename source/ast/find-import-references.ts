@@ -1,34 +1,62 @@
 import type { Rule, Scope, SourceCode } from 'eslint';
 import type { Except } from 'type-fest';
-import { filterWithArgs, flatMapWithArgs, mapWithArgs } from '../list.js';
+import { flatMapWithArgs, mapWithArgs } from '../list.js';
 import type { NameDetails } from '../mocha/name-details.js';
 import { getUniqueBaseNames } from '../mocha/path.js';
+import { isRecord } from '../record.js';
 import { type DynamicPath, isConstantPath } from './member-expression.js';
 import { getParentNode } from './node-types.js';
 import { findParentNodeAndPathForIdentifier, type ResolvedReference } from './resolved-reference.js';
 
-function isLiteralWithValue(node: Except<Rule.Node, 'parent'>, expectedValue: string): boolean {
-    return node.type === 'Literal' && node.value === expectedValue;
+function isLiteralWithValue(node: Except<Rule.Node, 'parent'>, expectedValue: string | null): boolean {
+    return node.type === 'Literal' && (expectedValue === null || node.value === expectedValue);
+}
+
+type ImportSpecifierNode = {
+    readonly type: 'ImportSpecifier';
+    readonly imported: {
+        readonly name: string;
+    };
+};
+
+type ImportBindingDefinition = Readonly<Scope.Definition> & {
+    readonly type: 'ImportBinding';
+    readonly node: Readonly<ImportSpecifierNode>;
+};
+
+type NamedImportBindingVariable = Readonly<Scope.Variable> & {
+    readonly defs: readonly [ImportBindingDefinition, ...(readonly Scope.Definition[])];
+};
+
+function isImportSpecifierNode(node: unknown): node is Readonly<ImportSpecifierNode> {
+    return isRecord(node) &&
+        node.type === 'ImportSpecifier' &&
+        isRecord(node.imported) &&
+        typeof node.imported.name === 'string';
 }
 
 function isExclusiveNamedImportBindingWithMatchingSource(
     variable: Readonly<Scope.Variable>,
-    expectedSource: string
-): boolean {
+    expectedSource: string | null
+): variable is NamedImportBindingVariable {
     const importDef = variable.defs[0];
+    const importNode: unknown = importDef?.node;
 
     return (
         importDef !== undefined &&
         importDef.type === 'ImportBinding' &&
+        isImportSpecifierNode(importNode) &&
         isLiteralWithValue(importDef.parent.source, expectedSource)
     );
 }
 
 function getAllNamedImportBindingVariables(
     moduleScope: Readonly<Scope.Scope>,
-    expectedSource: string
-): readonly Scope.Variable[] {
-    return filterWithArgs(moduleScope.variables, isExclusiveNamedImportBindingWithMatchingSource, expectedSource);
+    expectedSource: string | null
+): readonly NamedImportBindingVariable[] {
+    return moduleScope.variables.filter((variable): variable is NamedImportBindingVariable => {
+        return isExclusiveNamedImportBindingWithMatchingSource(variable, expectedSource);
+    });
 }
 
 function isNonAssignmentReference(reference: Readonly<Scope.Reference>): boolean {
@@ -71,18 +99,13 @@ function resolveImportPathWithOriginalName(
 }
 
 function resolveReferencesForNamedImport(
-    variable: Readonly<Scope.Variable>,
+    variable: Readonly<NamedImportBindingVariable>,
     sourceCode: Readonly<SourceCode>,
     identifierNames: readonly string[]
 ): readonly ResolvedReference[] {
-    const importDef = variable.defs[0];
-    if (importDef !== undefined) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- filtered to import bindings above
-        const originalName = (importDef.node as { imported: { name: string; }; }).imported.name;
-
-        if (identifierNames.includes(originalName)) {
-            return mapWithArgs(variable.references, resolveImportPathWithOriginalName, sourceCode, originalName);
-        }
+    const originalName = variable.defs[0].node.imported.name;
+    if (identifierNames.includes(originalName)) {
+        return mapWithArgs(variable.references, resolveImportPathWithOriginalName, sourceCode, originalName);
     }
 
     return [];
@@ -92,7 +115,7 @@ function processNamedImports(
     sourceCode: Readonly<SourceCode>,
     moduleScope: Readonly<Scope.Scope>,
     identifierNames: readonly string[],
-    importSource: string
+    importSource: string | null
 ): readonly ResolvedReference[] {
     const namedImportVariables = getAllNamedImportBindingVariables(moduleScope, importSource);
     const constantNamedImports = namedImportVariables.filter(isBindingConstant);
@@ -103,7 +126,7 @@ function processNamedImports(
 export function findImportReferencesByName(
     context: Readonly<Rule.RuleContext>,
     nameDetailsList: readonly NameDetails[],
-    importSource: string
+    importSource: string | null
 ): readonly ResolvedReference[] {
     const { sourceCode } = context;
     const { globalScope } = sourceCode.scopeManager;

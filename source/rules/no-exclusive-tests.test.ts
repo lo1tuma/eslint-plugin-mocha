@@ -76,6 +76,14 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 sourceType: 'module'
             },
             settings: { mocha: { interface: 'BDD' } }
+        },
+        {
+            code: 'import { it } from "../helpers.js"; it.only()',
+            languageOptions: {
+                ecmaVersion: 2018,
+                sourceType: 'module'
+            },
+            settings: { mocha: { interface: 'exports' } }
         }
     ],
 
@@ -358,6 +366,25 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 column: 7,
                 line: 1,
                 suggestions: [{ messageId: 'removeExclusiveModifier', output: 'a.b.c()' }]
+            }]
+        },
+        {
+            code: 'import { custom } from "../helpers.js"; custom.only()',
+            languageOptions: {
+                ecmaVersion: 2018,
+                sourceType: 'module'
+            },
+            settings: {
+                'mocha/additionalCustomNames': [{ name: 'custom', type: 'testCase', interface: 'exports' }]
+            },
+            errors: [{
+                message: expectedErrorMessage,
+                column: 48,
+                line: 1,
+                suggestions: [{
+                    messageId: 'removeExclusiveModifier',
+                    output: 'import { custom } from "../helpers.js"; custom()'
+                }]
             }]
         }
     ]
