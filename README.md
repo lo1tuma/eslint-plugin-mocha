@@ -127,7 +127,7 @@ For maintainers: the rules table below is generated, and the headers in `documen
 | [consistent-interface](documentation/rules/consistent-interface.md)                           | Enforces consistent use of mocha interfaces                             | ✅  |    |    | 🔧 |    |
 | [consistent-spacing-between-blocks](documentation/rules/consistent-spacing-between-blocks.md) | Require consistent spacing between blocks                               | ✅  |    |    | 🔧 |    |
 | [consistent-structure](documentation/rules/consistent-structure.md)                           | Require consistent structure for Mocha test entities                    | ✅  |    |    |    |    |
-| [handle-done-callback](documentation/rules/handle-done-callback.md)                           | Enforces handling of callbacks for async tests                          | ✅  |    |    |    |    |
+| [handle-done-callback](documentation/rules/handle-done-callback.md)                           | Enforces handling of callbacks for async tests in every branch          | ✅  |    |    |    |    |
 | [max-top-level-suites](documentation/rules/max-top-level-suites.md)                           | Enforce the number of top-level suites in a single file                 | ✅  |    |    |    |    |
 | [no-async-suite](documentation/rules/no-async-suite.md)                                       | Disallow async functions passed to a suite                              | ✅  |    |    | 🔧 |    |
 | [no-empty-title](documentation/rules/no-empty-title.md)                                       | Disallow empty test descriptions                                        | ✅  |    |    |    |    |
