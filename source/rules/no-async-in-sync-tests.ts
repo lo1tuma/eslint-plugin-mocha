@@ -1,0 +1,368 @@
+import type { Rule, SourceCode } from 'eslint';
+import type { Except } from 'type-fest';
+import { createMochaVisitors } from '../ast/mocha-visitors.js';
+import { type AnyFunction, isFunction, isIdentifier } from '../ast/node-types.js';
+import { asRuleNode } from '../done-callback-paths.js';
+import { isRecord } from '../record.js';
+
+type TraversableNode = Except<Rule.Node, 'parent'>;
+type CallExpression = Extract<TraversableNode, { type: 'CallExpression'; }>;
+type UnexpectedAsyncOperation = {
+    messageId: 'unexpectedCallbackAsyncOperation' | 'unexpectedPromiseAsyncOperation';
+    node: TraversableNode;
+};
+
+type TypeCheckerLike = {
+    getPromisedTypeOfPromise: (type: unknown) => unknown;
+};
+
+type ProgramLike = {
+    getTypeChecker: () => Readonly<TypeCheckerLike>;
+};
+
+type ParserServicesWithTypeInformation = {
+    program: Readonly<ProgramLike>;
+    getTypeAtLocation: (node: Readonly<Rule.Node>) => unknown;
+};
+
+const errorCallbackNames = new Set(['err', 'error']);
+const promiseMethodNames = new Set(['then', 'catch', 'finally']);
+
+function isNode(value: unknown): value is TraversableNode {
+    return typeof value === 'object' && value !== null && 'type' in value;
+}
+
+function getNodeProperty(node: TraversableNode, key: string): unknown {
+    return Reflect.get(node, key);
+}
+
+function visitChildNodes(
+    sourceCode: Readonly<SourceCode>,
+    node: TraversableNode,
+    visitor: (childNode: TraversableNode) => void
+): void {
+    for (const key of sourceCode.visitorKeys[node.type] ?? []) {
+        const value = getNodeProperty(node, key);
+
+        if (Array.isArray(value)) {
+            value.forEach((item) => {
+                if (isNode(item)) {
+                    visitor(item);
+                }
+            });
+        } else if (isNode(value)) {
+            visitor(value);
+        }
+    }
+}
+
+function visitWithoutNestedFunctions(
+    sourceCode: Readonly<SourceCode>,
+    node: TraversableNode,
+    visitor: (childNode: TraversableNode) => void
+): void {
+    visitor(node);
+
+    if (isFunction(node)) {
+        return;
+    }
+
+    visitChildNodes(sourceCode, node, (childNode) => {
+        visitWithoutNestedFunctions(sourceCode, childNode, visitor);
+    });
+}
+
+export function collectCandidateExpressions(
+    sourceCode: Readonly<SourceCode>,
+    body: Readonly<AnyFunction['body']>
+): TraversableNode[] {
+    if (body.type !== 'BlockStatement') {
+        return [body];
+    }
+
+    const expressions: TraversableNode[] = [];
+
+    for (const statement of body.body) {
+        visitWithoutNestedFunctions(sourceCode, statement, (node) => {
+            if (node.type === 'ExpressionStatement') {
+                expressions.push(node.expression);
+            } else if (node.type === 'ReturnStatement' && node.argument !== null && node.argument !== undefined) {
+                expressions.push(node.argument);
+            }
+        });
+    }
+
+    return expressions;
+}
+
+function collectReturnedExpressions(
+    sourceCode: Readonly<SourceCode>,
+    body: Readonly<AnyFunction['body']>
+): readonly TraversableNode[] {
+    if (body.type !== 'BlockStatement') {
+        return [body];
+    }
+
+    const expressions: TraversableNode[] = [];
+
+    for (const statement of body.body) {
+        visitWithoutNestedFunctions(sourceCode, statement, (node) => {
+            if (node.type === 'ReturnStatement' && node.argument !== null && node.argument !== undefined) {
+                expressions.push(node.argument);
+            }
+        });
+    }
+
+    return expressions;
+}
+
+function isGetPromisedTypeOfPromise(value: unknown): value is TypeCheckerLike['getPromisedTypeOfPromise'] {
+    return typeof value === 'function';
+}
+
+function isTypeCheckerLike(value: unknown): value is TypeCheckerLike {
+    return isRecord(value) && isGetPromisedTypeOfPromise(value.getPromisedTypeOfPromise);
+}
+
+function isGetTypeChecker(value: unknown): value is ProgramLike['getTypeChecker'] {
+    return typeof value === 'function';
+}
+
+function isProgramLike(value: unknown): value is ProgramLike {
+    return isRecord(value) &&
+        isGetTypeChecker(value.getTypeChecker) &&
+        isTypeCheckerLike(value.getTypeChecker());
+}
+
+function isGetTypeAtLocation(value: unknown): value is ParserServicesWithTypeInformation['getTypeAtLocation'] {
+    return typeof value === 'function';
+}
+
+export function getParserServicesWithTypeInformation(
+    sourceCode: Readonly<SourceCode>
+): Readonly<ParserServicesWithTypeInformation> | undefined {
+    const services: unknown = sourceCode.parserServices;
+
+    if (!isRecord(services)) {
+        return undefined;
+    }
+
+    if (!isGetTypeAtLocation(services.getTypeAtLocation) || !isProgramLike(services.program)) {
+        return undefined;
+    }
+
+    return {
+        program: services.program,
+        getTypeAtLocation: services.getTypeAtLocation
+    };
+}
+
+export function hasPromiseLikeType(
+    parserServices: Readonly<ParserServicesWithTypeInformation>,
+    expression: Readonly<TraversableNode>
+): boolean {
+    try {
+        const type = parserServices.getTypeAtLocation(asRuleNode(expression));
+        return parserServices.program.getTypeChecker().getPromisedTypeOfPromise(type) !== undefined;
+    } catch {
+        return false;
+    }
+}
+
+function isTypeScriptThisParameter(param: AnyFunction['params'][number] | undefined): boolean {
+    return param !== undefined && isIdentifier(param) && param.name === 'this';
+}
+
+function getFirstMeaningfulParameter(node: Readonly<AnyFunction>): AnyFunction['params'][number] | undefined {
+    const [firstParam, secondParam] = node.params;
+    return isTypeScriptThisParameter(firstParam) ? secondParam : firstParam;
+}
+
+function hasDoneCallbackParameter(node: Readonly<AnyFunction>): boolean {
+    return getFirstMeaningfulParameter(node) !== undefined;
+}
+
+export function unwrapChainExpression(node: Readonly<TraversableNode>): Readonly<TraversableNode> {
+    return node.type === 'ChainExpression' ? node.expression : node;
+}
+
+function getNamedPropertyName(
+    node: Readonly<Extract<TraversableNode, { type: 'MemberExpression'; }>>
+): string | undefined {
+    return !node.computed && node.property.type === 'Identifier' ? node.property.name : undefined;
+}
+
+function getComputedStringPropertyName(
+    node: Readonly<Extract<TraversableNode, { type: 'MemberExpression'; }>>
+): string | undefined {
+    return node.computed && node.property.type === 'Literal' && typeof node.property.value === 'string'
+        ? node.property.value
+        : undefined;
+}
+
+function getStaticPropertyName(node: Readonly<TraversableNode>): string | undefined {
+    if (node.type !== 'MemberExpression') {
+        return undefined;
+    }
+
+    return getNamedPropertyName(node) ?? getComputedStringPropertyName(node);
+}
+
+function isPromiseMethodCall(node: Readonly<CallExpression>): boolean {
+    const callee = unwrapChainExpression(node.callee);
+
+    return promiseMethodNames.has(getStaticPropertyName(callee) ?? '');
+}
+
+function collectCallExpressions(
+    sourceCode: Readonly<SourceCode>,
+    expression: Readonly<TraversableNode>
+): readonly Readonly<CallExpression>[] {
+    const callExpressions: CallExpression[] = [];
+
+    visitWithoutNestedFunctions(sourceCode, expression, (node) => {
+        if (node.type === 'CallExpression') {
+            callExpressions.push(node);
+        }
+    });
+
+    return callExpressions;
+}
+
+function findPromiseMethodCall(
+    sourceCode: Readonly<SourceCode>,
+    expression: Readonly<TraversableNode>
+): Readonly<CallExpression | undefined> {
+    return collectCallExpressions(sourceCode, expression).find(isPromiseMethodCall);
+}
+
+function hasErrorFirstCallback(node: Readonly<AnyFunction>): boolean {
+    const firstParam = getFirstMeaningfulParameter(node);
+
+    return firstParam !== undefined &&
+        firstParam.type === 'Identifier' &&
+        errorCallbackNames.has(firstParam.name);
+}
+
+function hasInlineErrorFirstCallback(node: Readonly<CallExpression>): boolean {
+    return node.arguments.some((argument) => {
+        return isFunction(argument) && hasErrorFirstCallback(argument);
+    });
+}
+
+function findCallbackBasedAsyncCall(
+    sourceCode: Readonly<SourceCode>,
+    expression: Readonly<TraversableNode>
+): Readonly<CallExpression | undefined> {
+    return collectCallExpressions(sourceCode, expression).find(hasInlineErrorFirstCallback);
+}
+
+function returnsPromiseToMocha(
+    sourceCode: Readonly<SourceCode>,
+    parserServices: Readonly<ParserServicesWithTypeInformation> | undefined,
+    node: Readonly<AnyFunction>
+): boolean {
+    return collectReturnedExpressions(sourceCode, node.body).some((expression) => {
+        return parserServices === undefined
+            ? findPromiseMethodCall(sourceCode, expression) !== undefined
+            : hasPromiseLikeType(parserServices, expression);
+    });
+}
+
+function isSynchronousMochaCallback(
+    sourceCode: Readonly<SourceCode>,
+    parserServices: Readonly<ParserServicesWithTypeInformation> | undefined,
+    node: Readonly<AnyFunction>
+): boolean {
+    return node.async !== true &&
+        !hasDoneCallbackParameter(node) &&
+        !returnsPromiseToMocha(sourceCode, parserServices, node);
+}
+
+function findUnexpectedAsyncOperation(
+    sourceCode: Readonly<SourceCode>,
+    parserServices: Readonly<ParserServicesWithTypeInformation> | undefined,
+    expression: Readonly<TraversableNode>
+): Readonly<UnexpectedAsyncOperation> | undefined {
+    if (parserServices !== undefined && hasPromiseLikeType(parserServices, expression)) {
+        return {
+            node: expression,
+            messageId: 'unexpectedPromiseAsyncOperation'
+        };
+    }
+
+    const promiseMethodCall = parserServices === undefined
+        ? findPromiseMethodCall(sourceCode, expression)
+        : undefined;
+
+    if (promiseMethodCall !== undefined) {
+        return {
+            node: promiseMethodCall,
+            messageId: 'unexpectedPromiseAsyncOperation'
+        };
+    }
+
+    const callbackBasedAsyncCall = findCallbackBasedAsyncCall(sourceCode, expression);
+
+    return callbackBasedAsyncCall === undefined
+        ? undefined
+        : {
+            node: callbackBasedAsyncCall,
+            messageId: 'unexpectedCallbackAsyncOperation'
+        };
+}
+
+function reportUnexpectedAsyncOperation(
+    context: Readonly<Rule.RuleContext>,
+    unexpectedAsyncOperation: Readonly<UnexpectedAsyncOperation>
+): void {
+    context.report({
+        node: asRuleNode(unexpectedAsyncOperation.node),
+        messageId: unexpectedAsyncOperation.messageId
+    });
+}
+
+export const noAsyncInSyncTestsRule: Readonly<Rule.RuleModule> = {
+    meta: {
+        type: 'problem',
+        languages: ['js/js'],
+        docs: {
+            description: 'Disallow async operations in synchronous tests or hooks',
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-async-in-sync-tests.md'
+        },
+        messages: {
+            unexpectedCallbackAsyncOperation:
+                'Unexpected callback-based async operation in a synchronous test or hook.',
+            unexpectedPromiseAsyncOperation: 'Unexpected promise-based async operation in a synchronous test or hook.'
+        },
+        schema: []
+    },
+    create(context) {
+        const { sourceCode } = context;
+        const parserServices = getParserServicesWithTypeInformation(sourceCode);
+
+        function reportUnexpectedAsyncOperations(node: Readonly<Rule.Node>): void {
+            if (!isFunction(node) || !isSynchronousMochaCallback(sourceCode, parserServices, node)) {
+                return;
+            }
+
+            for (const expression of collectCandidateExpressions(sourceCode, node.body)) {
+                const unexpectedAsyncOperation = findUnexpectedAsyncOperation(sourceCode, parserServices, expression);
+
+                if (unexpectedAsyncOperation !== undefined) {
+                    reportUnexpectedAsyncOperation(context, unexpectedAsyncOperation);
+                }
+            }
+        }
+
+        return createMochaVisitors(context, {
+            anyTestEntityCallback(visitorContext) {
+                if (visitorContext.type !== 'testCase' && visitorContext.type !== 'hook') {
+                    return;
+                }
+
+                reportUnexpectedAsyncOperations(visitorContext.node);
+            }
+        });
+    }
+};

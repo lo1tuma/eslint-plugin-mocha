@@ -1,0 +1,210 @@
+import * as typescriptParser from '@typescript-eslint/parser';
+import { RuleTester, type SourceCode } from 'eslint';
+import assert from 'node:assert';
+import { withInterface } from '../mocha-interface-test-cases.js';
+import { isRecord } from '../record.js';
+import {
+    collectCandidateExpressions,
+    getParserServicesWithTypeInformation,
+    hasPromiseLikeType,
+    noAsyncInSyncTestsRule,
+    unwrapChainExpression
+} from './no-async-in-sync-tests.js';
+
+const slowTypedTestTimeout = 30_000;
+const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
+const { pathname: projectRoot } = new URL('../../', import.meta.url);
+const { pathname: typescriptFilename } = new URL('./no-async-in-sync-tests.fixture.ts', import.meta.url);
+const typescriptLanguageOptions = {
+    parser: typescriptParser,
+    parserOptions: {
+        projectService: { allowDefaultProject: ['source/rules/*.fixture.ts'] },
+        tsconfigRootDir: projectRoot
+    },
+    sourceType: 'module'
+} as const;
+type RuleTesterTestFunction = (testName: string, callback: () => void) => unknown;
+type TimedTest = {
+    timeout: (duration: number) => void;
+};
+
+function getRuleTesterTestFunction(testFn: typeof RuleTester.it): RuleTesterTestFunction {
+    if (testFn === null) {
+        throw new Error('Expected RuleTester.it to be available.');
+    }
+
+    return testFn;
+}
+
+const defaultIt = getRuleTesterTestFunction(RuleTester.it);
+const defaultItOnly = getRuleTesterTestFunction(RuleTester.itOnly);
+
+function hasTimeoutMethod(value: unknown): value is TimedTest {
+    return isRecord(value) && typeof value.timeout === 'function';
+}
+
+function withLongerTimeout(testFn: RuleTesterTestFunction): RuleTesterTestFunction {
+    return function runWithLongerTimeout(testName, callback): void {
+        const testCase = testFn(testName, callback);
+
+        if (hasTimeoutMethod(testCase)) {
+            testCase.timeout(slowTypedTestTimeout);
+        }
+    };
+}
+
+RuleTester.it = withLongerTimeout(defaultIt);
+RuleTester.itOnly = withLongerTimeout(defaultItOnly);
+
+ruleTester.run('no-async-in-sync-tests', noAsyncInSyncTestsRule, {
+    valid: [
+        'it("", function () {});',
+        'it("", function (done) { load(function (error) { done(error); }); });',
+        'it("", async function () { await load(); });',
+        'it("", function () { return load().then(function () {}); });',
+        'it("", () => load().then(function () {}));',
+        'it("", function () { promise[method](cleanup); });',
+        'it("", function () { return 42; });',
+        'before(function () { return task().finally(cleanup); });',
+        'describe("", function () { load().then(function () {}); });',
+        {
+            code: 'it("", function () { queryBuilder().catch(function (reason) {}); });\n' +
+                'declare function queryBuilder(): { catch(callback: (reason: unknown) => number): number; };',
+            filename: typescriptFilename,
+            languageOptions: typescriptLanguageOptions
+        },
+        {
+            code: 'it("", function () { return returnsPromise(); });\n' +
+                'declare function returnsPromise(): Promise<number>;',
+            filename: typescriptFilename,
+            languageOptions: typescriptLanguageOptions
+        },
+        withInterface('TDD', 'test("", function () { return task().then(function () {}); });')
+    ],
+
+    invalid: [
+        {
+            code: 'it("", function () { load(function (error) {}); });',
+            errors: [{ messageId: 'unexpectedCallbackAsyncOperation' }]
+        },
+        {
+            code: 'it("", function () { load(function (err, result) { use(result); }); });',
+            errors: [{ messageId: 'unexpectedCallbackAsyncOperation' }]
+        },
+        {
+            code: 'it("", function () { return load(function (error) {}); });',
+            errors: [{ messageId: 'unexpectedCallbackAsyncOperation' }]
+        },
+        {
+            code: 'it("", function () { load().then(function () {}); });',
+            errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
+        },
+        {
+            code: 'it("", function () { something(load().catch(function (reason) {})); });',
+            errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
+        },
+        {
+            code: 'it("", function () { promise["then"](cleanup); });',
+            errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
+        },
+        {
+            code: 'it("", function () { promise?.then(cleanup); });',
+            languageOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
+        },
+        {
+            code: 'it("", () => load(function (error) {}));',
+            languageOptions: { ecmaVersion: 6 },
+            errors: [{ messageId: 'unexpectedCallbackAsyncOperation' }]
+        },
+        {
+            code: 'before(function () { initialize(function (error) {}); });',
+            errors: [{ messageId: 'unexpectedCallbackAsyncOperation' }]
+        },
+        withInterface('TDD', {
+            code: 'test("", function () { task().finally(cleanup); });',
+            errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
+        }),
+        {
+            code: 'it("", function () { returnsPromise(); });\n' +
+                'declare function returnsPromise(): Promise<number>;',
+            filename: typescriptFilename,
+            languageOptions: typescriptLanguageOptions,
+            errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
+        },
+        {
+            code: 'it("", function () { load(function (error) {}); });\n' +
+                'declare function load(callback: (error: Error | null) => void): void;',
+            filename: typescriptFilename,
+            languageOptions: typescriptLanguageOptions,
+            errors: [{ messageId: 'unexpectedCallbackAsyncOperation' }]
+        },
+        {
+            code: 'it("", function (this: Mocha.Context) { returnsPromise(); });\n' +
+                'declare function returnsPromise(): Promise<number>;',
+            filename: typescriptFilename,
+            languageOptions: typescriptLanguageOptions,
+            errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
+        }
+    ]
+});
+
+RuleTester.it = defaultIt;
+RuleTester.itOnly = defaultItOnly;
+
+describe('no-async-in-sync-tests helpers', function () {
+    it('getParserServicesWithTypeInformation() ignores non-object parser services', function () {
+        const result = getParserServicesWithTypeInformation({
+            parserServices: null
+        } as unknown as SourceCode);
+
+        assert.strictEqual(result, undefined);
+    });
+
+    it('getParserServicesWithTypeInformation() ignores parser services without typed accessors', function () {
+        const result = getParserServicesWithTypeInformation({
+            parserServices: {}
+        } as unknown as SourceCode);
+
+        assert.strictEqual(result, undefined);
+    });
+
+    it('hasPromiseLikeType() returns false when typed access throws', function () {
+        const result = hasPromiseLikeType({
+            getTypeAtLocation() {
+                throw new Error('boom');
+            },
+            program: {
+                getTypeChecker() {
+                    return {
+                        getPromisedTypeOfPromise() {
+                            return true;
+                        }
+                    };
+                }
+            }
+        }, { type: 'Identifier' } as never);
+
+        assert.strictEqual(result, false);
+    });
+
+    it('collectCandidateExpressions() ignores nodes without configured visitor keys', function () {
+        const result = collectCandidateExpressions({
+            visitorKeys: {}
+        } as unknown as SourceCode, {
+            type: 'BlockStatement',
+            body: [{ type: 'UnknownStatement' }]
+        } as never);
+
+        assert.deepStrictEqual(result, []);
+    });
+
+    it('unwrapChainExpression() returns the inner expression for optional chains', function () {
+        const result = unwrapChainExpression({
+            type: 'ChainExpression',
+            expression: { type: 'Identifier', name: 'promise' }
+        } as never);
+
+        assert.deepStrictEqual(result, { type: 'Identifier', name: 'promise' });
+    });
+});
