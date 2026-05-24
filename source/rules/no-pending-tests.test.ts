@@ -2,7 +2,6 @@ import { type Rule, RuleTester, type SourceCode } from 'eslint';
 import assert from 'node:assert';
 import { withInterface } from '../mocha-interface-test-cases.js';
 import {
-    checkPendingCallback,
     checkPendingSuite,
     checkPendingTestCase,
     fixPendingMemberExpression,
@@ -439,26 +438,6 @@ describe('no-pending-tests helpers', function () {
             }),
             {
                 modifier: 'pending',
-                node: asRuleNode({ type: 'Identifier' })
-            },
-            { allowSkippedWithComment: false }
-        );
-
-        assert.deepStrictEqual(reports, []);
-    });
-
-    it('checkPendingCallback() ignores non-function nodes', function () {
-        const reports: string[] = [];
-
-        checkPendingCallback(
-            asRuleContext({
-                report() {
-                    reports.push('reported');
-                },
-                sourceCode: asSourceCode({ visitorKeys: {} })
-            }),
-            {
-                modifier: null,
                 node: asRuleNode({ type: 'Identifier' })
             },
             { allowSkippedWithComment: false }
