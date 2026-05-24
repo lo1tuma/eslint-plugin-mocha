@@ -1,204 +1,97 @@
-import { findVariable } from '@eslint-community/eslint-utils';
-import type { Rule, Scope, SourceCode } from 'eslint';
-import type { Except } from 'type-fest';
+import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
+import { type AnyFunction, isFunction, isIdentifier } from '../ast/node-types.js';
+import type { CallbackHandlingOperation } from '../callback-handling-state.js';
 import {
-    type AnyFunction,
-    type BlockStatement,
-    isBlockStatement,
-    isFunction,
-    isIdentifier
-} from '../ast/node-types.js';
-import { asRuleNode } from '../done-callback-paths.js';
+    asRuleNode,
+    asRuleNodeOrNull,
+    getMemberExpressionBindingAndProperty,
+    getTrackedBinding,
+    type TrackedBinding
+} from '../done-callback-paths.js';
+import { collectRepeatedCallbackHandlingNodes } from '../repeated-callback-handling-paths.js';
 
-type TraversableNode = Except<Rule.Node, 'parent'>;
-type Statement = BlockStatement['body'][number];
-type CallExpression = Extract<TraversableNode, { type: 'CallExpression'; }>;
+type TrackedFunctionState = {
+    callbackBinding: TrackedBinding;
+    codePath: Readonly<Rule.CodePath>;
+    currentSegments: Set<Rule.CodePathSegment>;
+    operationsBySegmentId: Map<string, CallbackHandlingOperation[]>;
+};
 
-function isTypeScriptThisParameter(param: AnyFunction['params'][number] | undefined): boolean {
-    return param !== undefined && isIdentifier(param) && param.name === 'this';
+type FunctionState = {
+    tracked: TrackedFunctionState | undefined;
+    upper: FunctionState | null;
+};
+
+function isTypeScriptThisParameter(param: AnyFunction['params'][number]): boolean {
+    return isIdentifier(param) && param.name === 'this';
 }
 
-function getFirstMeaningfulParameter(node: Readonly<AnyFunction>): AnyFunction['params'][number] | undefined {
-    const [firstParam, secondParam] = node.params;
-    return isTypeScriptThisParameter(firstParam) ? secondParam : firstParam;
-}
+function getDoneCallback(
+    functionExpression: Readonly<AnyFunction>
+): AnyFunction['params'][number] | undefined {
+    const [firstParam, secondParam] = functionExpression.params;
 
-function getDoneCallbackVariable(
-    sourceCode: Readonly<SourceCode>,
-    node: Readonly<AnyFunction>
-): Readonly<Scope.Variable | null | undefined> {
-    const callbackParameter = getFirstMeaningfulParameter(node);
-
-    if (callbackParameter?.type !== 'Identifier') {
+    if (firstParam === undefined) {
         return undefined;
     }
 
-    return findVariable(sourceCode.getScope(asRuleNode(callbackParameter)), callbackParameter.name);
+    return isTypeScriptThisParameter(firstParam) ? secondParam : firstParam;
 }
 
-function getNodeProperty(node: TraversableNode, key: string): unknown {
-    return Reflect.get(node, key);
-}
-
-function isNode(value: unknown): value is TraversableNode {
-    return typeof value === 'object' && value !== null && 'type' in value;
-}
-
-function visitChildNodes(
-    sourceCode: Readonly<SourceCode>,
-    node: TraversableNode,
-    visitor: (childNode: TraversableNode) => void
+function pushOperation(
+    operationsBySegmentId: Map<string, CallbackHandlingOperation[]>,
+    segmentId: string,
+    operation: Readonly<CallbackHandlingOperation>
 ): void {
-    for (const key of sourceCode.visitorKeys[node.type] ?? []) {
-        const value = getNodeProperty(node, key);
+    const operations = operationsBySegmentId.get(segmentId);
 
-        if (Array.isArray(value)) {
-            value.forEach((item) => {
-                if (isNode(item)) {
-                    visitor(item);
-                }
-            });
-        } else if (isNode(value)) {
-            visitor(value);
-        }
-    }
-}
-
-function visitWithoutNestedFunctions(
-    sourceCode: Readonly<SourceCode>,
-    node: TraversableNode,
-    visitor: (childNode: TraversableNode) => void
-): void {
-    visitor(node);
-
-    if (isFunction(node)) {
+    if (operations === undefined) {
+        operationsBySegmentId.set(segmentId, [operation]);
         return;
     }
 
-    visitChildNodes(sourceCode, node, (childNode) => {
-        visitWithoutNestedFunctions(sourceCode, childNode, visitor);
+    operations.push(operation);
+}
+
+function createTrackedFunctionState(
+    sourceCode: Readonly<Rule.RuleContext['sourceCode']>,
+    trackedCallbackNodes: Readonly<WeakSet<Rule.Node>>,
+    codePath: Readonly<Rule.CodePath>,
+    node: Readonly<Rule.Node>
+): TrackedFunctionState | undefined {
+    if (!trackedCallbackNodes.has(node) || !isFunction(node)) {
+        return undefined;
+    }
+
+    const callback = getDoneCallback(node);
+
+    if (callback === undefined || callback.type !== 'Identifier') {
+        return undefined;
+    }
+
+    return {
+        callbackBinding: getTrackedBinding(sourceCode, callback),
+        codePath,
+        currentSegments: new Set(),
+        operationsBySegmentId: new Map()
+    };
+}
+
+function reportDoneTwice(context: Readonly<Rule.RuleContext>, trackedFunction: Readonly<TrackedFunctionState>): void {
+    const reportedNodes = collectRepeatedCallbackHandlingNodes({
+        callbackBinding: trackedFunction.callbackBinding,
+        codePath: trackedFunction.codePath,
+        operationsBySegmentId: trackedFunction.operationsBySegmentId,
+        sourceCode: context.sourceCode
     });
-}
 
-function isDoneCallbackCall(
-    sourceCode: Readonly<SourceCode>,
-    node: TraversableNode,
-    doneCallbackVariable: Readonly<Scope.Variable>
-): node is CallExpression {
-    return node.type === 'CallExpression' &&
-        node.callee.type === 'Identifier' &&
-        findVariable(sourceCode.getScope(asRuleNode(node.callee)), node.callee.name) === doneCallbackVariable;
-}
-
-function collectDoneCallbackCalls(
-    sourceCode: Readonly<SourceCode>,
-    statement: Readonly<Statement>,
-    doneCallbackVariable: Readonly<Scope.Variable>
-): readonly Readonly<CallExpression>[] {
-    const doneCallbackCalls: CallExpression[] = [];
-
-    visitWithoutNestedFunctions(sourceCode, statement, (childNode) => {
-        if (isDoneCallbackCall(sourceCode, childNode, doneCallbackVariable)) {
-            doneCallbackCalls.push(childNode);
-        }
-    });
-
-    return doneCallbackCalls;
-}
-
-function isFlowExitStatement(statement: Readonly<Statement>): boolean {
-    return statement.type === 'ReturnStatement' ||
-        statement.type === 'ThrowStatement' ||
-        statement.type === 'BreakStatement' ||
-        statement.type === 'ContinueStatement';
-}
-
-function reportDoneCallbackCall(context: Readonly<Rule.RuleContext>, callExpression: Readonly<CallExpression>): void {
-    context.report({
-        node: callExpression,
-        messageId: 'unexpectedDoneTwice'
-    });
-}
-
-function findRepeatedDoneCallbackCall(
-    doneCallbackCalls: readonly Readonly<CallExpression>[],
-    seenDoneCallbackCall: boolean
-): Readonly<CallExpression | undefined> {
-    const [firstDoneCallbackCall, secondDoneCallbackCall] = doneCallbackCalls;
-
-    if (secondDoneCallbackCall !== undefined) {
-        return secondDoneCallbackCall;
+    for (const node of reportedNodes) {
+        context.report({
+            node,
+            messageId: 'unexpectedDoneTwice'
+        });
     }
-
-    return seenDoneCallbackCall ? firstDoneCallbackCall : undefined;
-}
-
-function shouldRememberDoneCallbackCall(
-    statement: Readonly<Statement>,
-    firstDoneCallbackCall: Readonly<CallExpression | undefined>
-): boolean {
-    return firstDoneCallbackCall !== undefined && !isFlowExitStatement(statement);
-}
-
-function getSeenDoneCallbackCall(
-    statement: Readonly<Statement>,
-    firstDoneCallbackCall: Readonly<CallExpression | undefined>,
-    seenDoneCallbackCall: boolean
-): boolean {
-    if (isFlowExitStatement(statement)) {
-        return false;
-    }
-
-    return shouldRememberDoneCallbackCall(statement, firstDoneCallbackCall) || seenDoneCallbackCall;
-}
-
-function inspectBlockStatements(
-    context: Readonly<Rule.RuleContext>,
-    blockStatement: Readonly<BlockStatement>,
-    doneCallbackVariable: Readonly<Scope.Variable>
-): void {
-    let seenDoneCallbackCall = false;
-
-    for (const statement of blockStatement.body) {
-        const doneCallbackCalls = collectDoneCallbackCalls(context.sourceCode, statement, doneCallbackVariable);
-        const [firstDoneCallbackCall] = doneCallbackCalls;
-        const repeatedDoneCallbackCall = findRepeatedDoneCallbackCall(doneCallbackCalls, seenDoneCallbackCall);
-
-        if (repeatedDoneCallbackCall !== undefined) {
-            reportDoneCallbackCall(context, repeatedDoneCallbackCall);
-        }
-
-        seenDoneCallbackCall = getSeenDoneCallbackCall(statement, firstDoneCallbackCall, seenDoneCallbackCall);
-    }
-}
-
-function inspectNodeRecursively(
-    context: Readonly<Rule.RuleContext>,
-    node: TraversableNode,
-    doneCallbackVariable: Readonly<Scope.Variable>
-): void {
-    if (isBlockStatement(node)) {
-        inspectBlockStatements(context, node, doneCallbackVariable);
-    }
-
-    visitChildNodes(context.sourceCode, node, (childNode) => {
-        inspectNodeRecursively(context, childNode, doneCallbackVariable);
-    });
-}
-
-export function checkNodeForDoneTwice(context: Readonly<Rule.RuleContext>, node: Readonly<Rule.Node>): void {
-    if (!isFunction(node)) {
-        return;
-    }
-
-    const doneCallbackVariable = getDoneCallbackVariable(context.sourceCode, node);
-
-    if (doneCallbackVariable === undefined || doneCallbackVariable === null) {
-        return;
-    }
-
-    inspectNodeRecursively(context, node.body, doneCallbackVariable);
 }
 
 export const noDoneTwiceRule: Readonly<Rule.RuleModule> = {
@@ -215,9 +108,134 @@ export const noDoneTwiceRule: Readonly<Rule.RuleModule> = {
         schema: []
     },
     create(context) {
+        const trackedCallbackNodes = new WeakSet<Rule.Node>();
+        let currentFunction: FunctionState | null = null;
+
+        function recordOperation(operation: Readonly<CallbackHandlingOperation>): void {
+            const trackedFunction = currentFunction?.tracked;
+
+            if (trackedFunction === undefined) {
+                return;
+            }
+
+            for (const segment of trackedFunction.currentSegments) {
+                pushOperation(trackedFunction.operationsBySegmentId, segment.id, operation);
+            }
+        }
+
+        function trackMochaCallback(node: Readonly<Rule.Node>): void {
+            trackedCallbackNodes.add(node);
+        }
+
         return createMochaVisitors(context, {
-            anyTestEntityCallback(visitorContext) {
-                checkNodeForDoneTwice(context, visitorContext.node);
+            testCaseCallback(visitorContext) {
+                trackMochaCallback(visitorContext.node);
+            },
+
+            hookCallback(visitorContext) {
+                trackMochaCallback(visitorContext.node);
+            },
+
+            onCodePathStart(codePath, node) {
+                currentFunction = {
+                    tracked: createTrackedFunctionState(context.sourceCode, trackedCallbackNodes, codePath, node),
+                    upper: currentFunction
+                };
+            },
+
+            onCodePathEnd() {
+                const trackedFunction = currentFunction?.tracked;
+
+                if (trackedFunction !== undefined) {
+                    reportDoneTwice(context, trackedFunction);
+                }
+
+                currentFunction = currentFunction?.upper ?? null;
+            },
+
+            onCodePathSegmentStart(segment) {
+                currentFunction?.tracked?.currentSegments.add(segment);
+            },
+
+            onCodePathSegmentEnd(segment) {
+                currentFunction?.tracked?.currentSegments.delete(segment);
+            },
+
+            'CallExpression:exit'(node) {
+                recordOperation({ node, type: 'call' });
+            },
+
+            'VariableDeclarator:exit'(node) {
+                if (node.id.type === 'Identifier') {
+                    recordOperation({
+                        source: asRuleNodeOrNull(node.init),
+                        target: getTrackedBinding(context.sourceCode, node.id),
+                        type: 'bindingAssignment'
+                    });
+                }
+            },
+
+            'AssignmentExpression:exit'(node) {
+                if (node.left.type === 'Identifier') {
+                    recordOperation({
+                        source: asRuleNode(node.right),
+                        target: getTrackedBinding(context.sourceCode, node.left),
+                        type: 'bindingAssignment'
+                    });
+                    return;
+                }
+
+                if (node.left.type === 'MemberExpression') {
+                    const bindingAndProperty = getMemberExpressionBindingAndProperty(context.sourceCode, node.left);
+
+                    if (bindingAndProperty !== undefined) {
+                        recordOperation({
+                            propertyName: bindingAndProperty.propertyName,
+                            source: asRuleNode(node.right),
+                            target: bindingAndProperty.binding,
+                            type: 'containerPropertyAssignment'
+                        });
+                    }
+                }
+            },
+
+            'UpdateExpression:exit'(node) {
+                if (node.argument.type === 'Identifier') {
+                    recordOperation({
+                        source: null,
+                        target: getTrackedBinding(context.sourceCode, node.argument),
+                        type: 'bindingAssignment'
+                    });
+                    return;
+                }
+
+                if (node.argument.type === 'MemberExpression') {
+                    const bindingAndProperty = getMemberExpressionBindingAndProperty(context.sourceCode, node.argument);
+
+                    if (bindingAndProperty !== undefined) {
+                        recordOperation({
+                            propertyName: bindingAndProperty.propertyName,
+                            source: null,
+                            target: bindingAndProperty.binding,
+                            type: 'containerPropertyAssignment'
+                        });
+                    }
+                }
+            },
+
+            'UnaryExpression:exit'(node) {
+                if (node.operator === 'delete' && node.argument.type === 'MemberExpression') {
+                    const bindingAndProperty = getMemberExpressionBindingAndProperty(context.sourceCode, node.argument);
+
+                    if (bindingAndProperty !== undefined) {
+                        recordOperation({
+                            propertyName: bindingAndProperty.propertyName,
+                            source: null,
+                            target: bindingAndProperty.binding,
+                            type: 'containerPropertyAssignment'
+                        });
+                    }
+                }
             }
         });
     }
