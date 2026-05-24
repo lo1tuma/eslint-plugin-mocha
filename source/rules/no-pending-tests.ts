@@ -291,7 +291,7 @@ export function checkPendingSuite(
     }
 }
 
-export function checkPendingCallback(
+function checkPendingCallback(
     context: Readonly<Rule.RuleContext>,
     visitorContext: PendingVisitorContext,
     configuration: Readonly<PendingRuleConfiguration>
