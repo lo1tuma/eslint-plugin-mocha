@@ -50,7 +50,7 @@ You can limit which async styles are allowed:
 
 ```js
 rules: {
-    "mocha/no-synchronous-tests": ["warn", { "allowed": ["async", "callback", "promise"] }]
+    "mocha/no-synchronous-tests": ["warn", { "allowedAsyncMethods": ["async", "callback", "promise"] }]
 },
 ```
 
