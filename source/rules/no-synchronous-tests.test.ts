@@ -126,7 +126,7 @@ ruleTester.run('no-synchronous-tests', noSynchronousTestsRule, {
             errors: [{ message: 'Unexpected synchronous test.', column: 12, line: 1 }]
         },
         {
-            options: [{ allowed: ['callback', 'async'] }],
+            options: [{ allowedAsyncMethods: ['callback', 'async'] }],
             code: 'it("", function () { return promise(); });',
             errors: [{ message: 'Unexpected synchronous test.', column: 8, line: 1 }]
         }
