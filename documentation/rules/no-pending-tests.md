@@ -10,6 +10,22 @@ Mocha supports pending tests. These are tests with no implementation, such as `i
 
 This rule intentionally does not support the `--fix` CLI option. Many editors apply ESLint fixes on save, and silently enabling skipped tests again would be a bad default while debugging. For direct `.skip` and `xdescribe()`-style calls, the rule does provide ESLint suggestions so you can remove the pending modifier explicitly.
 
+## Options
+
+This rule supports the following options:
+
+- `allowSkippedWithComment`: Allows explicit skip forms when they have an immediately preceding comment with no blank line. This applies to `.skip`, `xdescribe()`, `xit()`, and equivalent configured custom names. It does not allow bare pending tests such as `it('name');`. Defaults to `false`.
+
+```json
+{
+    "rules": {
+        "mocha/no-pending-tests": ["error", {
+            "allowSkippedWithComment": true
+        }]
+    }
+}
+```
+
 ## Rule Details
 
 This rule looks for `it`, `test`, and `specify` function calls with only one argument, where the argument is a string literal.
@@ -50,6 +66,16 @@ suite('foo', function () {});
 test('foo', function () {});
 suite.only('bar', function () {});
 test.only('bar', function () {});
+```
+
+With `{ "allowSkippedWithComment": true }`, these explicit skip forms are also allowed:
+
+```js
+// SKIP pending #201
+it.skip('foo', function () {});
+
+/* SKIP pending #202 */
+xdescribe('bar', function () {});
 ```
 
 ## When Not To Use It
