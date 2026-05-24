@@ -135,7 +135,7 @@ For maintainers: the rules table below is generated, and the headers in `documen
 | [no-exclusive-tests](documentation/rules/no-exclusive-tests.md)                               | Disallow exclusive tests                                                |    | ✅  |    |    | 💡 |
 | [no-exports](documentation/rules/no-exports.md)                                               | Disallow exports from test files                                        | ✅  |    |    |    | 💡 |
 | [no-hooks](documentation/rules/no-hooks.md)                                                   | Disallow hooks                                                          |    |    | ✅  |    |    |
-| [no-hooks-for-single-case](documentation/rules/no-hooks-for-single-case.md)                   | Disallow hooks for a single test or test suite                          |    |    | ✅  |    |    |
+| [no-hooks-for-single-child](documentation/rules/no-hooks-for-single-child.md)                 | Disallow hooks with a single direct child                               |    |    | ✅  |    |    |
 | [no-identical-title](documentation/rules/no-identical-title.md)                               | Disallow identical titles                                               | ✅  |    |    |    |    |
 | [no-mocha-arrows](documentation/rules/no-mocha-arrows.md)                                     | Disallow arrow functions as arguments to mocha functions                | ✅  |    |    | 🔧 |    |
 | [no-nested-suites](documentation/rules/no-nested-suites.md)                                   | Disallow suites to be nested within other suites                        |    |    | ✅  |    |    |

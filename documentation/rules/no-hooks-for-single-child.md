@@ -1,20 +1,20 @@
-# Disallow hooks for a single test or test suite (`mocha/no-hooks-for-single-case`)
+# Disallow hooks with a single direct child (`mocha/no-hooks-for-single-child`)
 
 🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 
 <!-- end auto-generated rule header -->
 
-Mocha proposes hooks that allow code to be run before or after every or all tests. This helps define a common setup or teardown process for every test. These hooks are not useful when there is only one test case, as it would then make more sense to move the hooks' operations in the test directly.
+Mocha proposes hooks that allow code to be run before or after every or all tests. This helps define a common setup or teardown process for every test. These hooks are not useful when there is only one direct child test or suite at the same level, because it is usually clearer to move the setup or teardown closer to that child.
 
 ## Rule Details
 
-This rule looks for every call to `before`, `after`, `beforeEach` and `afterEach` and reports them if they are called when there is less than two tests and/or tests suites in the same test suite.
+This rule looks for every call to `before`, `after`, `beforeEach` and `afterEach` and reports them when the surrounding suite level has only one direct child test or direct child suite.
 
 The following patterns are considered warnings:
 
 ```js
 describe('foo', function () {
-    before(function () {/* ... */}); // Not allowed as there is only a test suite next to this hook.
+    before(function () {/* ... */}); // Not allowed because there is only one direct child suite next to this hook.
 
     describe('bar', function () {
         /* ... */
@@ -22,7 +22,7 @@ describe('foo', function () {
 });
 
 describe('foo', function () {
-    after(function () {/* ... */}); // Not allowed as there is only a test case next to this hook.
+    after(function () {/* ... */}); // Not allowed because there is only one direct child test next to this hook.
 
     it('should XYZ', function () {
         /* ... */
@@ -30,7 +30,7 @@ describe('foo', function () {
 });
 
 describe('foo', function () {
-    beforeEach(function () {/* ... */}); // Not allowed as there is no test suites or cases next to this hook.
+    beforeEach(function () {/* ... */}); // Not allowed because there are no direct child tests or suites next to this hook.
 });
 ```
 
@@ -71,7 +71,7 @@ This rule supports the following options:
 ```json
 {
     "rules": {
-        "mocha/no-hooks-for-single-case": ["error", { "allow": ["after"] }]
+        "mocha/no-hooks-for-single-child": ["error", { "allow": ["after"] }]
     }
 }
 ```

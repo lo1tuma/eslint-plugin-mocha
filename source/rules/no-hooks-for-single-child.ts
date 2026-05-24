@@ -46,17 +46,17 @@ function ensureEndsWithParens(value: unknown): string {
     return value;
 }
 
-export const noHooksForSingleCaseRule: Readonly<Rule.RuleModule> = {
+export const noHooksForSingleChildRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
         languages: ['js/js'],
         docs: {
-            description: 'Disallow hooks for a single test or test suite',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-hooks-for-single-case.md'
+            description: 'Disallow hooks with a single direct child',
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-hooks-for-single-child.md'
         },
         defaultOptions: [defaultOption],
         messages: {
-            unexpectedHookForSingleTest: 'Unexpected use of Mocha `{{name}}` hook for a single test case'
+            unexpectedHookForSingleChild: 'Unexpected use of Mocha `{{name}}` hook with only one direct child.'
         },
         schema: [optionSchema]
     },
@@ -87,7 +87,7 @@ export const noHooksForSingleCaseRule: Readonly<Rule.RuleModule> = {
                         .forEach((hookNode) => {
                             context.report({
                                 node: hookNode.node,
-                                messageId: 'unexpectedHookForSingleTest',
+                                messageId: 'unexpectedHookForSingleChild',
                                 data: { name: hookNode.name }
                             });
                         });
