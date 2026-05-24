@@ -8,7 +8,7 @@ import { convertNameToPathArray, isSamePath } from '../mocha/path.js';
 import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 
 const FUNCTION = 1;
-const DESCRIBE = 2;
+const SUITE = 2;
 const optionSchema = {
     type: 'object',
     properties: {
@@ -26,10 +26,10 @@ type Option = InferSchemaOption<typeof optionSchema>;
 type ResolvedOption = Option & { allow: string[]; };
 const defaultOption: ResolvedOption = { allow: [] };
 
-function isNestedInDescribeBlock(nesting: readonly number[]): boolean {
+function isNestedInSuiteBlock(nesting: readonly number[]): boolean {
     return (
         nesting.length > 0 &&
-        nesting.lastIndexOf(FUNCTION) < nesting.lastIndexOf(DESCRIBE)
+        nesting.lastIndexOf(FUNCTION) < nesting.lastIndexOf(SUITE)
     );
 }
 
@@ -69,19 +69,19 @@ function normalizeAllowedCall(value: unknown): readonly string[] {
     return [...path.slice(0, -1), ensureEndsWithParens(lastPathSegment)];
 }
 
-export const noSetupInDescribeRule: Readonly<Rule.RuleModule> = {
+export const noSetupInSuiteRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
         languages: ['js/js'],
         docs: {
-            description: 'Disallow setup in describe blocks',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-setup-in-describe.md'
+            description: 'Disallow setup in suite blocks',
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-setup-in-suite.md'
         },
         defaultOptions: [defaultOption],
         messages: {
-            unexpectedFunctionCall: 'Unexpected function call in describe block.',
+            unexpectedFunctionCall: 'Unexpected function call in suite block.',
             unexpectedMemberExpression:
-                'Unexpected member expression in describe block. Member expressions may call functions via getters.'
+                'Unexpected member expression in suite block. Member expressions may call functions via getters.'
         },
         schema: [optionSchema]
     },
@@ -108,15 +108,15 @@ export const noSetupInDescribeRule: Readonly<Rule.RuleModule> = {
             return node.parent.type === 'CallExpression' && node.parent.callee === node && isAllowedCall(node.parent);
         }
 
-        function handleCallExpressionInDescribe(node: Readonly<CallExpression>): void {
-            if (isNestedInDescribeBlock(nesting) && !isSuiteConfigCall(node) && !isAllowedCall(node)) {
+        function handleCallExpressionInSuite(node: Readonly<CallExpression>): void {
+            if (isNestedInSuiteBlock(nesting) && !isSuiteConfigCall(node) && !isAllowedCall(node)) {
                 reportCallExpression(context, node);
             }
         }
 
         return createMochaVisitors(context, {
             suite(visitorContext) {
-                nesting.push(DESCRIBE);
+                nesting.push(SUITE);
                 suiteNodes.add(visitorContext.node);
             },
 
@@ -128,13 +128,13 @@ export const noSetupInDescribeRule: Readonly<Rule.RuleModule> = {
                 if (nesting.length === 0) {
                     return;
                 }
-                handleCallExpressionInDescribe(node);
+                handleCallExpressionInSuite(node);
             },
 
             nonMochaMemberExpression(node) {
                 if (
                     !suiteNodes.has(node.parent) &&
-                    isNestedInDescribeBlock(nesting) &&
+                    isNestedInSuiteBlock(nesting) &&
                     !isSuiteConfigCall(node.parent) &&
                     !isAllowedCallMemberExpression(node)
                 ) {

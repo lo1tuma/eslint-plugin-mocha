@@ -21,7 +21,7 @@ import { noPendingTestsRule } from './rules/no-pending-tests.js';
 import { noReturnAndCallbackRule } from './rules/no-return-and-callback.js';
 import { noReturnFromAsyncRule } from './rules/no-return-from-async.js';
 import { noRootHooksRule } from './rules/no-root-hooks.js';
-import { noSetupInDescribeRule } from './rules/no-setup-in-describe.js';
+import { noSetupInSuiteRule } from './rules/no-setup-in-suite.js';
 import { noSynchronousTestsRule } from './rules/no-synchronous-tests.js';
 import { noTopLevelTestsRule } from './rules/no-top-level-tests.js';
 import { preferArrowCallbackRule } from './rules/prefer-arrow-callback.js';
@@ -51,7 +51,7 @@ const allRules: Linter.RulesRecord = {
     'mocha/no-pending-tests': 'error',
     'mocha/no-return-and-callback': 'error',
     'mocha/no-return-from-async': 'error',
-    'mocha/no-setup-in-describe': 'error',
+    'mocha/no-setup-in-suite': 'error',
     'mocha/no-synchronous-tests': 'error',
     'mocha/no-root-hooks': 'error',
     'mocha/prefer-arrow-callback': 'error',
@@ -80,7 +80,7 @@ const recommendedRules: Linter.RulesRecord = {
     'mocha/no-pending-tests': 'warn',
     'mocha/no-return-and-callback': 'error',
     'mocha/no-return-from-async': 'off',
-    'mocha/no-setup-in-describe': 'error',
+    'mocha/no-setup-in-suite': 'error',
     'mocha/no-synchronous-tests': 'off',
     'mocha/no-root-hooks': 'warn',
     'mocha/prefer-arrow-callback': 'off',
@@ -109,7 +109,7 @@ const rules = {
     'no-pending-tests': noPendingTestsRule,
     'no-return-and-callback': noReturnAndCallbackRule,
     'no-return-from-async': noReturnFromAsyncRule,
-    'no-setup-in-describe': noSetupInDescribeRule,
+    'no-setup-in-suite': noSetupInSuiteRule,
     'no-synchronous-tests': noSynchronousTestsRule,
     'no-root-hooks': noRootHooksRule,
     'prefer-arrow-callback': preferArrowCallbackRule,

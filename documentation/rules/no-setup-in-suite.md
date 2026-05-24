@@ -1,10 +1,10 @@
-# Disallow setup in describe blocks (`mocha/no-setup-in-describe`)
+# Disallow setup in suite blocks (`mocha/no-setup-in-suite`)
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 
 <!-- end auto-generated rule header -->
 
-Setup for test cases in mocha should be done in `before`, `beforeEach`, or `it` blocks. Unfortunately there is nothing stopping you from doing setup directly inside a `describe` block.
+Setup for test cases in mocha should be done in `before`, `beforeEach`, or `it` blocks. Unfortunately there is nothing stopping you from doing setup directly inside a suite block.
 
 ```js
 describe('something', function () {
@@ -16,10 +16,10 @@ describe('something', function () {
 });
 ```
 
-Any setup directly in a `describe` is run before all tests execute. This is undesirable primarily for two reasons:
+Any setup directly in a suite body is run before all tests execute. This is undesirable primarily for two reasons:
 
 1. When doing TDD in a large codebase, all setup is run for tests that don't have `only` set. This can add a substantial amount of time per iteration.
-2. If global state is altered by the setup of another describe block, your test may be affected.
+2. If global state is altered by the setup of another suite block, your test may be affected.
 
 For this rule, "setup" means code that executes immediately while the suite callback itself is evaluated. That includes work done directly in the suite body before any tests run, even when the code looks harmless.
 
@@ -31,7 +31,7 @@ If you're using [dynamically generated tests](https://mochajs.org/#dynamically-g
 
 ## Rule Details
 
-This rule looks for all function calls and use of the dot operator which are nested directly in a describe block.
+This rule looks for all function calls and use of the dot operator which are nested directly in a suite block.
 
 The following patterns are considered problems:
 
@@ -91,7 +91,7 @@ Entries may be written with or without `()`. Dotted names are supported.
 ```json
 {
     "rules": {
-        "mocha/no-setup-in-describe": ["error", {
+        "mocha/no-setup-in-suite": ["error", {
             "allow": ["Symbol", "Object.freeze"]
         }]
     }
