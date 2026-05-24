@@ -1,18 +1,22 @@
-# Disallow empty test descriptions (`mocha/no-empty-title`)
+# Disallow empty suite and test descriptions (`mocha/no-empty-title`)
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 
 <!-- end auto-generated rule header -->
 
-This rule enforces you to specify the suite/test descriptions for each test.
+This rule enforces non-empty descriptions for Mocha suites and test cases.
 
 ## Rule Details
 
-This rule checks each mocha test function to have a non-empty description.
+This rule checks suite and test descriptions when they can be evaluated statically.
 
 The following patterns are considered problems:
 
 ```js
+describe();
+
+describe('   ', function () {});
+
 it();
 
 suite('');
@@ -32,16 +36,22 @@ describe('foo', function () {
 suite('foo', function () {
     test('bar');
 });
+
+const dynamicTitle = getTitle();
+it(dynamicTitle, function () {});
 ```
 
 ## Options
 
-Example of a custom rule configuration:
+This rule accepts one optional object:
+
+- `message`: a custom error message to use instead of the default message
+
+Example:
 
 ```js
 rules: {
     "mocha/no-empty-title": [ "warn", {
-        testNames: ["it", "specify", "test", "mytestname"],
         message: 'custom error message'
     } ]
 }
