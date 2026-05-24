@@ -2,6 +2,7 @@ import { type Rule, RuleTester, type SourceCode } from 'eslint';
 import assert from 'node:assert';
 import { withInterface } from '../mocha-interface-test-cases.js';
 import {
+    checkPendingCallback,
     checkPendingSuite,
     checkPendingTestCase,
     fixPendingMemberExpression,
@@ -67,6 +68,15 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
             code: '// SKIP pending #201\ntest.skip("works", function() {})',
             options: [allowSkippedWithCommentOption]
         }),
+        {
+            code: '// SKIP pending #201\nit("works", function() { this.skip(); })',
+            options: [allowSkippedWithCommentOption]
+        },
+        {
+            code: '// SKIP pending #201\nbefore(function() { this.skip(); })',
+            options: [allowSkippedWithCommentOption]
+        },
+        'it("works", function() { function later() { this.skip(); } later.call(this); })',
         {
             code: 'xcustom()',
             settings: {
@@ -374,6 +384,23 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                 suggestions: [{ messageId: 'removePendingModifier', output: 'custom()' }]
             }]
         },
+        {
+            code: 'it("works", function() { this.skip(); })',
+            errors: [{ message: expectedErrorMessage, column: 31, line: 1 }]
+        },
+        {
+            code: 'before(function() { this.skip(); })',
+            errors: [{ message: expectedErrorMessage, column: 26, line: 1 }]
+        },
+        {
+            code: 'it("works", function() { (() => this.skip())(); })',
+            errors: [{ message: expectedErrorMessage, column: 38, line: 1 }]
+        },
+        {
+            code: 'it("works", function() { this.skip(); })',
+            options: [allowSkippedWithCommentOption],
+            errors: [{ message: expectedMissingCommentMessage, column: 31, line: 1 }]
+        },
         withInterface('TDD', {
             code: 'var dynamicOnly = "skip"; suite[dynamicOnly]()',
             errors: [{ message: expectedErrorMessage, column: 33, line: 1 }]
@@ -412,6 +439,26 @@ describe('no-pending-tests helpers', function () {
             }),
             {
                 modifier: 'pending',
+                node: asRuleNode({ type: 'Identifier' })
+            },
+            { allowSkippedWithComment: false }
+        );
+
+        assert.deepStrictEqual(reports, []);
+    });
+
+    it('checkPendingCallback() ignores non-function nodes', function () {
+        const reports: string[] = [];
+
+        checkPendingCallback(
+            asRuleContext({
+                report() {
+                    reports.push('reported');
+                },
+                sourceCode: asSourceCode({ visitorKeys: {} })
+            }),
+            {
+                modifier: null,
                 node: asRuleNode({ type: 'Identifier' })
             },
             { allowSkippedWithComment: false }

@@ -14,7 +14,7 @@ This rule intentionally does not support the `--fix` CLI option. Many editors ap
 
 This rule supports the following options:
 
-- `allowSkippedWithComment`: Allows explicit skip forms when they have an immediately preceding comment with no blank line. This applies to `.skip`, `xdescribe()`, `xit()`, and equivalent configured custom names. It does not allow bare pending tests such as `it('name');`. Defaults to `false`.
+- `allowSkippedWithComment`: Allows explicit skip forms when they have an immediately preceding comment with no blank line. This applies to `.skip`, `xdescribe()`, `xit()`, `this.skip()`, and equivalent configured custom names. It does not allow bare pending tests such as `it('name');`. Defaults to `false`.
 
 ```json
 {
@@ -43,11 +43,13 @@ describe['skip']('bar', function () {});
 it['skip']('bar', function () {});
 xdescribe('baz', function () {});
 xit('baz', function () {});
+it('qux', function () { this.skip(); });
 
 suite.skip('foo', function () {});
 test.skip('foo', function () {});
 suite['skip']('bar', function () {});
 test['skip']('bar', function () {});
+beforeEach(function () { this.skip(); });
 ```
 
 These patterns are not considered warnings:
@@ -76,6 +78,9 @@ it.skip('foo', function () {});
 
 /* SKIP pending #202 */
 xdescribe('bar', function () {});
+
+// SKIP pending #203
+before(function () { this.skip(); });
 ```
 
 ## When Not To Use It
