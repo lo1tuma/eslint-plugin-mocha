@@ -8,12 +8,29 @@ Mocha only waits for asynchronous work when a test or hook uses one of Mocha's a
 
 This rule catches suspicious async work inside callbacks that Mocha still treats as synchronous.
 
+## Options
+
+This rule supports the following options:
+
+- `allowedAsyncMethods`: Allows specific scheduling APIs that would otherwise be reported, such as `setTimeout` or `process.nextTick`. Defaults to `[]`.
+
+```json
+{
+    "rules": {
+        "mocha/no-async-in-sync-tests": ["error", {
+            "allowedAsyncMethods": ["setTimeout"]
+        }]
+    }
+}
+```
+
 ## Rule Details
 
 The rule checks synchronous Mocha tests and hooks for two patterns:
 
 - Promise-based work that is started without being returned.
 - Callback-based work where an inline callback starts with an `err` or `error` parameter.
+- Scheduled async work started via APIs such as `setTimeout`, `queueMicrotask`, or `process.nextTick`.
 
 When TypeScript parser services with type information are available, promise detection uses the exact `PromiseLike` return type of the expression. Without type information, the rule falls back to `.then()`, `.catch()`, and `.finally()` call chains.
 
@@ -36,6 +53,12 @@ it('loads data', function () {
 before(function () {
     initialize().finally(cleanup);
 });
+
+it('schedules work', function () {
+    process.nextTick(function () {
+        expect(true).to.equal(true);
+    });
+});
 ```
 
 These patterns would not be considered warnings:
@@ -57,6 +80,10 @@ it('loads data', function () {
     return loadData().then(function (result) {
         expect(result).to.deep.equal({ ok: true });
     });
+});
+
+it('schedules work explicitly', function (done) {
+    setTimeout(done, 0);
 });
 ```
 

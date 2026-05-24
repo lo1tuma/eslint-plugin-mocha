@@ -15,6 +15,7 @@ const slowTypedTestTimeout = 30_000;
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const { pathname: projectRoot } = new URL('../../', import.meta.url);
 const { pathname: typescriptFilename } = new URL('./no-async-in-sync-tests.fixture.ts', import.meta.url);
+const allowSetTimeoutOption = { allowedAsyncMethods: ['setTimeout'] };
 const typescriptLanguageOptions = {
     parser: typescriptParser,
     parserOptions: {
@@ -65,8 +66,13 @@ ruleTester.run('no-async-in-sync-tests', noAsyncInSyncTestsRule, {
         'it("", () => load().then(function () {}));',
         'it("", function () { promise[method](cleanup); });',
         'it("", function () { return 42; });',
+        'it("", function (done) { setTimeout(done, 0); });',
         'before(function () { return task().finally(cleanup); });',
         'describe("", function () { load().then(function () {}); });',
+        {
+            code: 'it("", function () { setTimeout(work, 0); });',
+            options: [allowSetTimeoutOption]
+        },
         {
             code: 'it("", function () { queryBuilder().catch(function (reason) {}); });\n' +
                 'declare function queryBuilder(): { catch(callback: (reason: unknown) => number): number; };',
@@ -106,6 +112,18 @@ ruleTester.run('no-async-in-sync-tests', noAsyncInSyncTestsRule, {
         {
             code: 'it("", function () { promise["then"](cleanup); });',
             errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
+        },
+        {
+            code: 'it("", function () { setTimeout(work, 0); });',
+            errors: [{ messageId: 'unexpectedScheduledAsyncOperation' }]
+        },
+        {
+            code: 'it("", function () { process.nextTick(work); });',
+            errors: [{ messageId: 'unexpectedScheduledAsyncOperation' }]
+        },
+        {
+            code: 'it("", function () { globalThis.queueMicrotask(work); });',
+            errors: [{ messageId: 'unexpectedScheduledAsyncOperation' }]
         },
         {
             code: 'it("", function () { promise?.then(cleanup); });',

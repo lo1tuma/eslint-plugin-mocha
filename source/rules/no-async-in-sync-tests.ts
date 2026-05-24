@@ -1,14 +1,20 @@
 import type { Rule, SourceCode } from 'eslint';
 import type { Except } from 'type-fest';
+import { extractMemberExpressionPath, isConstantPath } from '../ast/member-expression.js';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { type AnyFunction, isFunction, isIdentifier } from '../ast/node-types.js';
 import { asRuleNode } from '../done-callback-paths.js';
+import { stripCallExpressions } from '../mocha/name-details.js';
 import { isRecord } from '../record.js';
+import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 
 type TraversableNode = Except<Rule.Node, 'parent'>;
 type CallExpression = Extract<TraversableNode, { type: 'CallExpression'; }>;
 type UnexpectedAsyncOperation = {
-    messageId: 'unexpectedCallbackAsyncOperation' | 'unexpectedPromiseAsyncOperation';
+    messageId:
+        | 'unexpectedCallbackAsyncOperation'
+        | 'unexpectedPromiseAsyncOperation'
+        | 'unexpectedScheduledAsyncOperation';
     node: TraversableNode;
 };
 
@@ -27,6 +33,39 @@ type ParserServicesWithTypeInformation = {
 
 const errorCallbackNames = new Set(['err', 'error']);
 const promiseMethodNames = new Set(['then', 'catch', 'finally']);
+const knownScheduledAsyncMethods = new Set([
+    'setImmediate',
+    'setInterval',
+    'setTimeout',
+    'queueMicrotask',
+    'process.nextTick',
+    'global.setImmediate',
+    'global.setInterval',
+    'global.setTimeout',
+    'global.queueMicrotask',
+    'globalThis.setImmediate',
+    'globalThis.setInterval',
+    'globalThis.setTimeout',
+    'globalThis.queueMicrotask',
+    'window.setInterval',
+    'window.setTimeout',
+    'window.queueMicrotask'
+]);
+const optionSchema = {
+    type: 'object',
+    properties: {
+        allowedAsyncMethods: {
+            type: 'array',
+            items: {
+                type: 'string'
+            }
+        }
+    },
+    additionalProperties: false
+} as const satisfies RuleSchema;
+type Option = InferSchemaOption<typeof optionSchema>;
+type ResolvedOption = Option & { allowedAsyncMethods: string[]; };
+const defaultOption: ResolvedOption = { allowedAsyncMethods: [] };
 
 function isNode(value: unknown): value is TraversableNode {
     return typeof value === 'object' && value !== null && 'type' in value;
@@ -257,6 +296,36 @@ function findCallbackBasedAsyncCall(
     return collectCallExpressions(sourceCode, expression).find(hasInlineErrorFirstCallback);
 }
 
+function normalizeCalledMethodPath(nodePath: readonly string[]): string {
+    return stripCallExpressions(nodePath).join('.');
+}
+
+function isScheduledAsyncCall(
+    sourceCode: Readonly<SourceCode>,
+    node: Readonly<CallExpression>,
+    allowedAsyncMethods: ReadonlySet<string>
+): boolean {
+    const path = extractMemberExpressionPath(sourceCode, asRuleNode(node.callee));
+
+    if (!isConstantPath(path)) {
+        return false;
+    }
+
+    const calledMethod = normalizeCalledMethodPath(path);
+
+    return knownScheduledAsyncMethods.has(calledMethod) && !allowedAsyncMethods.has(calledMethod);
+}
+
+function findScheduledAsyncCall(
+    sourceCode: Readonly<SourceCode>,
+    expression: Readonly<TraversableNode>,
+    allowedAsyncMethods: ReadonlySet<string>
+): Readonly<CallExpression | undefined> {
+    return collectCallExpressions(sourceCode, expression).find((callExpression) => {
+        return isScheduledAsyncCall(sourceCode, callExpression, allowedAsyncMethods);
+    });
+}
+
 function returnsPromiseToMocha(
     sourceCode: Readonly<SourceCode>,
     parserServices: Readonly<ParserServicesWithTypeInformation> | undefined,
@@ -279,37 +348,74 @@ function isSynchronousMochaCallback(
         !returnsPromiseToMocha(sourceCode, parserServices, node);
 }
 
-function findUnexpectedAsyncOperation(
+function createUnexpectedAsyncOperation(
+    node: Readonly<TraversableNode>,
+    messageId: UnexpectedAsyncOperation['messageId']
+): Readonly<UnexpectedAsyncOperation> {
+    return { node, messageId };
+}
+
+function findUnexpectedPromiseAsyncOperation(
     sourceCode: Readonly<SourceCode>,
     parserServices: Readonly<ParserServicesWithTypeInformation> | undefined,
     expression: Readonly<TraversableNode>
-): Readonly<UnexpectedAsyncOperation> | undefined {
+): Readonly<UnexpectedAsyncOperation | undefined> {
     if (parserServices !== undefined && hasPromiseLikeType(parserServices, expression)) {
-        return {
-            node: expression,
-            messageId: 'unexpectedPromiseAsyncOperation'
-        };
+        return createUnexpectedAsyncOperation(expression, 'unexpectedPromiseAsyncOperation');
     }
 
     const promiseMethodCall = parserServices === undefined
         ? findPromiseMethodCall(sourceCode, expression)
         : undefined;
 
-    if (promiseMethodCall !== undefined) {
-        return {
-            node: promiseMethodCall,
-            messageId: 'unexpectedPromiseAsyncOperation'
-        };
+    return promiseMethodCall === undefined
+        ? undefined
+        : createUnexpectedAsyncOperation(promiseMethodCall, 'unexpectedPromiseAsyncOperation');
+}
+
+function findUnexpectedScheduledAsyncOperation(
+    sourceCode: Readonly<SourceCode>,
+    expression: Readonly<TraversableNode>,
+    allowedAsyncMethods: ReadonlySet<string>
+): Readonly<UnexpectedAsyncOperation | undefined> {
+    const scheduledAsyncCall = findScheduledAsyncCall(sourceCode, expression, allowedAsyncMethods);
+
+    return scheduledAsyncCall === undefined
+        ? undefined
+        : createUnexpectedAsyncOperation(scheduledAsyncCall, 'unexpectedScheduledAsyncOperation');
+}
+
+function findUnexpectedAsyncOperation(
+    sourceCode: Readonly<SourceCode>,
+    parserServices: Readonly<ParserServicesWithTypeInformation> | undefined,
+    expression: Readonly<TraversableNode>,
+    allowedAsyncMethods: ReadonlySet<string>
+): Readonly<UnexpectedAsyncOperation> | undefined {
+    const unexpectedPromiseAsyncOperation = findUnexpectedPromiseAsyncOperation(
+        sourceCode,
+        parserServices,
+        expression
+    );
+
+    if (unexpectedPromiseAsyncOperation !== undefined) {
+        return unexpectedPromiseAsyncOperation;
+    }
+
+    const unexpectedScheduledAsyncOperation = findUnexpectedScheduledAsyncOperation(
+        sourceCode,
+        expression,
+        allowedAsyncMethods
+    );
+
+    if (unexpectedScheduledAsyncOperation !== undefined) {
+        return unexpectedScheduledAsyncOperation;
     }
 
     const callbackBasedAsyncCall = findCallbackBasedAsyncCall(sourceCode, expression);
 
     return callbackBasedAsyncCall === undefined
         ? undefined
-        : {
-            node: callbackBasedAsyncCall,
-            messageId: 'unexpectedCallbackAsyncOperation'
-        };
+        : createUnexpectedAsyncOperation(callbackBasedAsyncCall, 'unexpectedCallbackAsyncOperation');
 }
 
 function reportUnexpectedAsyncOperation(
@@ -330,15 +436,19 @@ export const noAsyncInSyncTestsRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow async operations in synchronous tests or hooks',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-async-in-sync-tests.md'
         },
+        defaultOptions: [defaultOption],
         messages: {
             unexpectedCallbackAsyncOperation:
                 'Unexpected callback-based async operation in a synchronous test or hook.',
-            unexpectedPromiseAsyncOperation: 'Unexpected promise-based async operation in a synchronous test or hook.'
+            unexpectedPromiseAsyncOperation: 'Unexpected promise-based async operation in a synchronous test or hook.',
+            unexpectedScheduledAsyncOperation: 'Unexpected scheduled async operation in a synchronous test or hook.'
         },
-        schema: []
+        schema: [optionSchema]
     },
     create(context) {
         const { sourceCode } = context;
+        const { allowedAsyncMethods } = getRuleOption<ResolvedOption>(context);
+        const allowedAsyncMethodSet = new Set(allowedAsyncMethods);
         const parserServices = getParserServicesWithTypeInformation(sourceCode);
 
         function reportUnexpectedAsyncOperations(node: Readonly<Rule.Node>): void {
@@ -347,7 +457,12 @@ export const noAsyncInSyncTestsRule: Readonly<Rule.RuleModule> = {
             }
 
             for (const expression of collectCandidateExpressions(sourceCode, node.body)) {
-                const unexpectedAsyncOperation = findUnexpectedAsyncOperation(sourceCode, parserServices, expression);
+                const unexpectedAsyncOperation = findUnexpectedAsyncOperation(
+                    sourceCode,
+                    parserServices,
+                    expression,
+                    allowedAsyncMethodSet
+                );
 
                 if (unexpectedAsyncOperation !== undefined) {
                     reportUnexpectedAsyncOperation(context, unexpectedAsyncOperation);
