@@ -1,13 +1,13 @@
 import { type Rule, RuleTester } from 'eslint';
 import assert from 'node:assert';
 import { withInterface } from '../mocha-interface-test-cases.js';
-import { noSetupInDescribeRule } from './no-setup-in-describe.js';
+import { noSetupInSuiteRule } from './no-setup-in-suite.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
-const memberExpressionError = 'Unexpected member expression in describe block. ' +
+const memberExpressionError = 'Unexpected member expression in suite block. ' +
     'Member expressions may call functions via getters.';
 
-ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
+ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
     valid: [
         'it()',
         'it(); it(); it()',
@@ -131,7 +131,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
             code: 'suite("", function () { this.timeout(42); a(); });',
             errors: [
                 {
-                    message: 'Unexpected function call in describe block.',
+                    message: 'Unexpected function call in suite block.',
                     line: 1,
                     column: 43
                 }
@@ -141,7 +141,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
             code: 'suite("", function () { a(); });',
             errors: [
                 {
-                    message: 'Unexpected function call in describe block.',
+                    message: 'Unexpected function call in suite block.',
                     line: 1,
                     column: 25
                 }
@@ -151,7 +151,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
             code: 'describe("", function () { a(); });',
             errors: [
                 {
-                    message: 'Unexpected function call in describe block.',
+                    message: 'Unexpected function call in suite block.',
                     line: 1,
                     column: 28
                 }
@@ -162,7 +162,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
             languageOptions: { ecmaVersion: 2015 },
             errors: [
                 {
-                    message: 'Unexpected function call in describe block.',
+                    message: 'Unexpected function call in suite block.',
                     line: 1,
                     column: 22
                 }
@@ -179,7 +179,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
             },
             errors: [
                 {
-                    message: 'Unexpected function call in describe block.',
+                    message: 'Unexpected function call in suite block.',
                     line: 1,
                     column: 23
                 }
@@ -233,7 +233,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
             code: 'describe("", function () { this.a(); });',
             errors: [
                 {
-                    message: 'Unexpected function call in describe block.',
+                    message: 'Unexpected function call in suite block.',
                     line: 1,
                     column: 28
                 },
@@ -265,7 +265,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
             code: 'describe("", function () { it("", function () {}).a(); });',
             errors: [
                 {
-                    message: 'Unexpected function call in describe block.',
+                    message: 'Unexpected function call in suite block.',
                     line: 1,
                     column: 28
                 },
@@ -275,7 +275,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
                     column: 28
                 },
                 {
-                    message: 'Unexpected function call in describe block.',
+                    message: 'Unexpected function call in suite block.',
                     line: 1,
                     column: 28
                 }
@@ -285,7 +285,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
             code: 'describe("", function () { something("", function () {}).timeout(); });',
             errors: [
                 {
-                    message: 'Unexpected function call in describe block.',
+                    message: 'Unexpected function call in suite block.',
                     line: 1,
                     column: 28
                 },
@@ -295,7 +295,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
                     column: 28
                 },
                 {
-                    message: 'Unexpected function call in describe block.',
+                    message: 'Unexpected function call in suite block.',
                     line: 1,
                     column: 28
                 }
@@ -305,7 +305,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
             code: 'describe("", function () { const token = Symbol("bar"); it(); })',
             errors: [
                 {
-                    message: 'Unexpected function call in describe block.',
+                    message: 'Unexpected function call in suite block.',
                     line: 1,
                     column: 42
                 }
@@ -316,7 +316,7 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
             options: [{ allow: ['Symbol'] }],
             errors: [
                 {
-                    message: 'Unexpected function call in describe block.',
+                    message: 'Unexpected function call in suite block.',
                     line: 1,
                     column: 57
                 }
@@ -336,10 +336,10 @@ ruleTester.run('no-setup-in-describe', noSetupInDescribeRule, {
     ]
 });
 
-describe('no-setup-in-describe create()', function () {
+describe('no-setup-in-suite create()', function () {
     it('normalizes non-string allow entries when invoked directly', function () {
-        noSetupInDescribeRule.create({
-            id: 'no-setup-in-describe',
+        noSetupInSuiteRule.create({
+            id: 'no-setup-in-suite',
             options: [{ allow: [42] }],
             settings: {},
             sourceCode: {
