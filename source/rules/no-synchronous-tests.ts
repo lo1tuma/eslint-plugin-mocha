@@ -8,7 +8,7 @@ const asyncMethods = ['async', 'callback', 'promise'] as const;
 const optionSchema = {
     type: 'object',
     properties: {
-        allowed: {
+        allowedAsyncMethods: {
             type: 'array',
             items: {
                 type: 'string',
@@ -23,8 +23,8 @@ const optionSchema = {
 
 type Option = InferSchemaOption<typeof optionSchema>;
 type AsyncMethod = (typeof asyncMethods)[number];
-type ResolvedOption = Option & { allowed: AsyncMethod[]; };
-const defaultOption: ResolvedOption = { allowed: Array.from(asyncMethods) };
+type ResolvedOption = Option & { allowedAsyncMethods: AsyncMethod[]; };
+const defaultOption: ResolvedOption = { allowedAsyncMethods: Array.from(asyncMethods) };
 type AsyncCheck = (functionExpression: Readonly<Rule.Node>) => boolean;
 
 function hasAsyncCallback(functionExpression: Readonly<Rule.Node>): boolean {
@@ -83,7 +83,7 @@ export const noSynchronousTestsRule: Readonly<Rule.RuleModule> = {
         schema: [optionSchema]
     },
     create(context) {
-        const { allowed: allowedAsyncMethods } = getRuleOption<ResolvedOption>(context);
+        const { allowedAsyncMethods } = getRuleOption<ResolvedOption>(context);
         const asyncChecks = allowedAsyncMethods.map<AsyncCheck>((method) => {
             return asyncChecksByMethod[method];
         });
