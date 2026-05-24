@@ -316,6 +316,16 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
             errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
         },
         {
+            code: 'xdescribe("works", function() {})',
+            options: [allowSkippedWithCommentOption],
+            errors: [{
+                message: expectedMissingCommentMessage,
+                column: 1,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'describe("works", function() {})' }]
+            }]
+        },
+        {
             code: 'it.skip("works", function() {})',
             options: [allowSkippedWithCommentOption],
             errors: [{

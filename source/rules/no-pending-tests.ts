@@ -47,6 +47,7 @@ type Locatable = {
 type KnownLocation = Locatable & {
     readonly loc: NonNullable<Locatable['loc']>;
 };
+type KnownLocationComment = EstreeComment & KnownLocation;
 
 export function isCallbackMissing(node: CallExpression): boolean {
     const [firstArgument] = node.arguments;
@@ -123,11 +124,7 @@ function isAdjacentToComment(comment: EstreeComment, node: Readonly<Rule.Node>):
         node.loc.start.line - comment.loc.end.line <= 1;
 }
 
-function isStandaloneLeadingComment(sourceCode: Readonly<SourceCode>, comment: EstreeComment): boolean {
-    if (!hasKnownLocation(comment)) {
-        return false;
-    }
-
+function isStandaloneLeadingComment(sourceCode: Readonly<SourceCode>, comment: KnownLocationComment): boolean {
     const tokenBeforeComment = sourceCode.getTokenBefore(comment, { includeComments: true });
 
     return tokenBeforeComment === null ||
@@ -142,6 +139,7 @@ export function hasAdjacentLeadingComment(
     const lastComment = sourceCode.getCommentsBefore(node).at(-1);
 
     return lastComment !== undefined &&
+        hasKnownLocation(lastComment) &&
         isAdjacentToComment(lastComment, node) &&
         isStandaloneLeadingComment(sourceCode, lastComment);
 }
