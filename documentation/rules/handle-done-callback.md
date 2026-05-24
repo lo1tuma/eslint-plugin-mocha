@@ -1,4 +1,4 @@
-# Enforces handling of callbacks for async tests (`mocha/handle-done-callback`)
+# Enforces handling of callbacks for async tests in every branch (`mocha/handle-done-callback`)
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 
@@ -23,6 +23,7 @@ In this example, the `done` callback is never called, so the test times out.
 ## Rule Details
 
 This rule checks functions passed to `it`, `test`, `specify`, and the standard Mocha hooks.
+The callback must be called or handed off on every reachable path that completes normally.
 
 The following patterns are considered warnings:
 
@@ -33,6 +34,12 @@ it('foo', function (done) {
     asyncFunction(function (err, result) {
         expect(err).to.not.exist;
     });
+});
+
+it('foo', function (done) {
+    if (ready) {
+        done();
+    }
 });
 
 before(function (done) {
@@ -47,6 +54,14 @@ These patterns would not be considered warnings:
 ```js
 it('foo', function (done) {
     done();
+});
+
+it('foo', function (done) {
+    if (ready) {
+        done();
+    } else {
+        setTimeout(done, 0);
+    }
 });
 
 it('foo', function (done) {
@@ -67,6 +82,8 @@ before(function (done) {
     });
 });
 ```
+
+Declaring a nested function that calls `done` does not count unless the current path actually calls or hands off the callback.
 
 When linting TypeScript, a typed `this` parameter is not treated as a `done` callback:
 
