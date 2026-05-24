@@ -11,7 +11,7 @@ import { noAsyncSuiteRule } from './rules/no-async-suite.js';
 import { noEmptyTitleRule } from './rules/no-empty-title.js';
 import { noExclusiveTestsRule } from './rules/no-exclusive-tests.js';
 import { noExportsRule } from './rules/no-exports.js';
-import { noHooksForSingleCaseRule } from './rules/no-hooks-for-single-case.js';
+import { noHooksForSingleChildRule } from './rules/no-hooks-for-single-child.js';
 import { noHooksRule } from './rules/no-hooks.js';
 import { noIdenticalTitleRule } from './rules/no-identical-title.js';
 import { noMochaArrowsRule } from './rules/no-mocha-arrows.js';
@@ -43,7 +43,7 @@ const allRules: Linter.RulesRecord = {
     'mocha/no-exports': 'error',
     'mocha/no-top-level-tests': 'error',
     'mocha/no-hooks': 'error',
-    'mocha/no-hooks-for-single-case': 'error',
+    'mocha/no-hooks-for-single-child': 'error',
     'mocha/no-identical-title': 'error',
     'mocha/no-mocha-arrows': 'error',
     'mocha/no-nested-suites': 'error',
@@ -72,7 +72,7 @@ const recommendedRules: Linter.RulesRecord = {
     'mocha/no-exports': 'error',
     'mocha/no-top-level-tests': 'error',
     'mocha/no-hooks': 'off',
-    'mocha/no-hooks-for-single-case': 'off',
+    'mocha/no-hooks-for-single-child': 'off',
     'mocha/no-identical-title': 'error',
     'mocha/no-mocha-arrows': 'error',
     'mocha/no-nested-suites': 'off',
@@ -101,7 +101,7 @@ const rules = {
     'no-exports': noExportsRule,
     'no-top-level-tests': noTopLevelTestsRule,
     'no-hooks': noHooksRule,
-    'no-hooks-for-single-case': noHooksForSingleCaseRule,
+    'no-hooks-for-single-child': noHooksForSingleChildRule,
     'no-identical-title': noIdenticalTitleRule,
     'no-mocha-arrows': noMochaArrowsRule,
     'no-nested-suites': noNestedSuitesRule,
