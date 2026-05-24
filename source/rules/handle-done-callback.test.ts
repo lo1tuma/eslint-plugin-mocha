@@ -17,14 +17,29 @@ ruleTester.run('handle-done-callback', handleDoneCallbackRule, {
         'it("", function (done) { done(); });',
         'it("", function () { callback(); });',
         'it("", function (callback) { callback(); });',
-        'it("", function (done) { if (a) { done(); } });',
-        'it("", function (done) { function foo() { done(); } });',
+        'it("", function (done) { if (a) { done(); } else { done(); } });',
+        'it("", function (done) { if (a) { setTimeout(done, 300); } else { done(); } });',
+        'it("", function (done) { if (a) { var next = done; next(); } else { done(); } });',
+        'it("", function (done) { var next; if (a) { next = done; } else { next = done; } next(); });',
         'it("", function (done) { setTimeout(done, 300); });',
         'it("", function (done) { var obj = { someFunc: done }; somethingThatCallsSomeFuncOnObj(obj); });',
+        'it("", function (done) { var obj = {}; if (a) { obj.someFunc = done; } else { obj.someFunc = done; } somethingThatCallsSomeFuncOnObj(obj); });',
         'it("", function (done) { somethingThatCallsSomeFuncOnObj({ someFunc: done }); });',
+        'it("", function (done) { somethingThatCallsSomeFuncOnObj({ "someFunc": done }); });',
         'it("", function (done) { obj.someFunc = done; somethingThatCallsSomeFuncOnObj(obj); });',
+        'it("", function (done) { var key = "someFunc"; var obj = {}; obj[key] = done; somethingThatCallsSomeFuncOnObj(obj[key]); });',
+        'it("", function (done) { var obj = {}; obj["someFunc"] = done; somethingThatCallsSomeFuncOnObj(obj); });',
         'it("", function (done) { done(new Error("foo")); });',
         'it("", function (done) { promise.then(done).catch(done); });',
+        'it("", function (done) { var [next] = [done]; done(); });',
+        'it("", function (done) { ({ current: next } = source); done(); });',
+        'it("", function (done) { factory().someFunc = done; done(); });',
+        'it("", function (done) { var count = 0; count++; done(); });',
+        'it("", function (done) { var obj = { someFunc: done }; obj.someFunc++; done(); });',
+        'it("", function (done) { factory().someFunc++; done(); });',
+        'it("", function (done) { typeof done; done(); });',
+        'it("", function (done) { delete factory().someFunc; done(); });',
+        'it("", function (done) { var obj = { someFunc: done }; delete obj.someFunc; done(); });',
         'it.only("", function (done) { done(); });',
         withInterface('TDD', 'test("", function (done) { done(); });'),
         withInterface('TDD', 'test.only("", function (done) { done(); });'),
@@ -40,6 +55,10 @@ ruleTester.run('handle-done-callback', handleDoneCallbackRule, {
         {
             code: 'it.skip("", function (done) { });',
             options: [{ ignorePending: true }]
+        },
+        {
+            code: 'it("", function (done) { (done as number)++; done(); });',
+            languageOptions: typescriptLanguageOptions
         },
         {
             code: 'before(async function setupApplication(this: Mocha.Context) { this.timeout(6000); });',
@@ -70,6 +89,44 @@ ruleTester.run('handle-done-callback', handleDoneCallbackRule, {
         },
         {
             code: 'it("", function (done) { asyncFunction(function (error) { expect(error).to.be.null; }); });',
+            errors: [{ message: 'Expected "done" callback to be handled.', column: 18, line: 1 }]
+        },
+        {
+            code: 'it("", function (done) { if (a) { done(); } });',
+            errors: [{ message: 'Expected "done" callback to be handled.', column: 18, line: 1 }]
+        },
+        {
+            code: 'it("", function (done) { function foo() { done(); } });',
+            errors: [{ message: 'Expected "done" callback to be handled.', column: 18, line: 1 }]
+        },
+        {
+            code: 'it("", function (done) { if (a) { setTimeout(done, 300); } });',
+            errors: [{ message: 'Expected "done" callback to be handled.', column: 18, line: 1 }]
+        },
+        {
+            code: 'it("", function (done) { var next; if (a) { next = done; } next(); });',
+            errors: [{ message: 'Expected "done" callback to be handled.', column: 18, line: 1 }]
+        },
+        {
+            code: 'it("", function (done) { done = other; done(); });',
+            errors: [{ message: 'Expected "done" callback to be handled.', column: 18, line: 1 }]
+        },
+        {
+            code: 'it("", function (done) { var obj = {}; if (a) { obj.someFunc = done; } ' +
+                'somethingThatCallsSomeFuncOnObj(obj); });',
+            errors: [{ message: 'Expected "done" callback to be handled.', column: 18, line: 1 }]
+        },
+        {
+            code: 'it("", function (done) { somethingThatCallsSomeFuncOnObj({ [someFunc]: done }); });',
+            errors: [{ message: 'Expected "done" callback to be handled.', column: 18, line: 1 }]
+        },
+        {
+            code: 'it("", function (done) { var key = "someFunc"; var obj = {}; obj[key] = done; ' +
+                'delete obj[key]; somethingThatCallsSomeFuncOnObj(obj[key]); });',
+            errors: [{ message: 'Expected "done" callback to be handled.', column: 18, line: 1 }]
+        },
+        {
+            code: 'it("", function (done) { somethingThatCallsSomeFuncOnObj(obj.someFunc); });',
             errors: [{ message: 'Expected "done" callback to be handled.', column: 18, line: 1 }]
         },
         {
@@ -134,6 +191,17 @@ ruleTester.run('handle-done-callback', handleDoneCallbackRule, {
 });
 
 describe('handle-done-callback helpers', function () {
+    it('findParamInScope() returns parameter variables', function () {
+        const variable = { defs: [{ type: 'Parameter' }] };
+        const result = findParamInScope('done', {
+            set: new Map([
+                ['done', variable]
+            ])
+        } as unknown as Scope.Scope);
+
+        assert.strictEqual(result, variable);
+    });
+
     it('findParamInScope() ignores non-parameter variables', function () {
         const result = findParamInScope('done', {
             set: new Map([
