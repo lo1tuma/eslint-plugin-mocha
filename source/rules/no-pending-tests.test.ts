@@ -11,6 +11,8 @@ import {
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const expectedErrorMessage = 'Unexpected pending mocha test.';
+const expectedMissingCommentMessage = 'Unexpected skipped mocha test without a preceding comment.';
+const allowSkippedWithCommentOption = { allowSkippedWithComment: true };
 
 function asRuleContext(ruleContext: Record<string, unknown>): Rule.RuleContext {
     return ruleContext as unknown as Rule.RuleContext;
@@ -54,11 +56,30 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
         'var calledOnly = it.skip; calledOnly.call(it)',
         withInterface('TDD', 'var dynamicOnly = "ski"; dynamicOnly += String.fromCharCode(112); suite[dynamicOnly]()'),
         {
+            code: '// SKIP pending #201\nit.skip("works", function() {})',
+            options: [allowSkippedWithCommentOption]
+        },
+        {
+            code: '/* SKIP pending #201 */ xdescribe("works", function() {})',
+            options: [allowSkippedWithCommentOption]
+        },
+        withInterface('TDD', {
+            code: '// SKIP pending #201\ntest.skip("works", function() {})',
+            options: [allowSkippedWithCommentOption]
+        }),
+        {
             code: 'xcustom()',
             settings: {
                 mocha: {
                     additionalCustomNames: [{ name: 'custom', type: 'testCase', interface: 'TDD' }]
                 }
+            }
+        },
+        {
+            code: '// SKIP pending #201\nxcustom()',
+            options: [allowSkippedWithCommentOption],
+            settings: {
+                'mocha/additionalCustomNames': [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
             }
         }
     ],
@@ -289,6 +310,70 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                 suggestions: [{ messageId: 'removePendingModifier', output: 'custom()' }]
             }]
         },
+        {
+            code: 'it("is pending")',
+            options: [allowSkippedWithCommentOption],
+            errors: [{ message: expectedErrorMessage, column: 1, line: 1 }]
+        },
+        {
+            code: 'xdescribe("works", function() {})',
+            options: [allowSkippedWithCommentOption],
+            errors: [{
+                message: expectedMissingCommentMessage,
+                column: 1,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'describe("works", function() {})' }]
+            }]
+        },
+        {
+            code: 'it.skip("works", function() {})',
+            options: [allowSkippedWithCommentOption],
+            errors: [{
+                message: expectedMissingCommentMessage,
+                column: 4,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'it("works", function() {})' }]
+            }]
+        },
+        {
+            code: '// SKIP pending #201\n\nit.skip("works", function() {})',
+            options: [allowSkippedWithCommentOption],
+            errors: [{
+                message: expectedMissingCommentMessage,
+                column: 4,
+                line: 3,
+                suggestions: [{
+                    messageId: 'removePendingModifier',
+                    output: '// SKIP pending #201\n\nit("works", function() {})'
+                }]
+            }]
+        },
+        {
+            code: 'something(); // SKIP pending #201\nit.skip("works", function() {})',
+            options: [allowSkippedWithCommentOption],
+            errors: [{
+                message: expectedMissingCommentMessage,
+                column: 4,
+                line: 2,
+                suggestions: [{
+                    messageId: 'removePendingModifier',
+                    output: 'something(); // SKIP pending #201\nit("works", function() {})'
+                }]
+            }]
+        },
+        {
+            code: 'xcustom()',
+            options: [allowSkippedWithCommentOption],
+            settings: {
+                'mocha/additionalCustomNames': [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
+            },
+            errors: [{
+                message: expectedMissingCommentMessage,
+                column: 1,
+                line: 1,
+                suggestions: [{ messageId: 'removePendingModifier', output: 'custom()' }]
+            }]
+        },
         withInterface('TDD', {
             code: 'var dynamicOnly = "skip"; suite[dynamicOnly]()',
             errors: [{ message: expectedErrorMessage, column: 33, line: 1 }]
@@ -309,7 +394,8 @@ describe('no-pending-tests helpers', function () {
             {
                 modifier: null,
                 node: asRuleNode({ type: 'Identifier' })
-            }
+            },
+            { allowSkippedWithComment: false }
         );
 
         assert.deepStrictEqual(reports, []);
@@ -327,7 +413,8 @@ describe('no-pending-tests helpers', function () {
             {
                 modifier: 'pending',
                 node: asRuleNode({ type: 'Identifier' })
-            }
+            },
+            { allowSkippedWithComment: false }
         );
 
         assert.deepStrictEqual(reports, []);

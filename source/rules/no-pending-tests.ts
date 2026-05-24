@@ -1,4 +1,5 @@
 import type { Rule, SourceCode } from 'eslint';
+import type { Comment as EstreeComment } from 'estree';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import {
     type CallExpression,
@@ -8,11 +9,45 @@ import {
     isMemberExpression,
     type MemberExpression
 } from '../ast/node-types.js';
+import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
+
+const optionSchema = {
+    type: 'object',
+    properties: {
+        allowSkippedWithComment: {
+            type: 'boolean'
+        }
+    },
+    additionalProperties: false
+} as const satisfies RuleSchema;
+
+type Option = InferSchemaOption<typeof optionSchema>;
+type ResolvedOption = Option & { allowSkippedWithComment: boolean; };
+type PendingRuleConfiguration = {
+    readonly allowSkippedWithComment: boolean;
+};
+
+const defaultOption: ResolvedOption = {
+    allowSkippedWithComment: false
+};
 
 type PendingVisitorContext = {
     readonly node: Rule.Node;
     readonly modifier: string | null;
 };
+type Locatable = {
+    readonly loc?:
+        | {
+            readonly start: { readonly line: number; };
+            readonly end: { readonly line: number; };
+        }
+        | null
+        | undefined;
+};
+type KnownLocation = Locatable & {
+    readonly loc: NonNullable<Locatable['loc']>;
+};
+type KnownLocationComment = EstreeComment & KnownLocation;
 
 export function isCallbackMissing(node: CallExpression): boolean {
     const [firstArgument] = node.arguments;
@@ -77,12 +112,58 @@ function canSuggestPendingTest(node: Readonly<CallExpression>): boolean {
     return (isIdentifier(node.callee) && node.callee.name.startsWith('x')) || isPendingMemberExpression(node.callee);
 }
 
-export function reportSkipped(context: Readonly<Rule.RuleContext>, node: CallExpression): void {
+function hasKnownLocation(
+    value: Locatable
+): value is KnownLocation {
+    return value.loc !== undefined && value.loc !== null;
+}
+
+function isAdjacentToComment(comment: EstreeComment, node: Readonly<Rule.Node>): boolean {
+    return hasKnownLocation(comment) &&
+        hasKnownLocation(node) &&
+        node.loc.start.line - comment.loc.end.line <= 1;
+}
+
+function isStandaloneLeadingComment(sourceCode: Readonly<SourceCode>, comment: KnownLocationComment): boolean {
+    const tokenBeforeComment = sourceCode.getTokenBefore(comment, { includeComments: true });
+
+    return tokenBeforeComment === null ||
+        !hasKnownLocation(tokenBeforeComment) ||
+        tokenBeforeComment.loc.end.line < comment.loc.start.line;
+}
+
+export function hasAdjacentLeadingComment(
+    sourceCode: Readonly<SourceCode>,
+    node: Readonly<Rule.Node>
+): boolean {
+    const lastComment = sourceCode.getCommentsBefore(node).at(-1);
+
+    return lastComment !== undefined &&
+        hasKnownLocation(lastComment) &&
+        isAdjacentToComment(lastComment, node) &&
+        isStandaloneLeadingComment(sourceCode, lastComment);
+}
+
+function shouldAllowSkippedWithComment(
+    context: Readonly<Rule.RuleContext>,
+    node: Readonly<CallExpression>,
+    configuration: Readonly<PendingRuleConfiguration>
+): boolean {
+    return configuration.allowSkippedWithComment &&
+        canSuggestPendingTest(node) &&
+        hasAdjacentLeadingComment(context.sourceCode, node);
+}
+
+export function reportSkipped(
+    context: Readonly<Rule.RuleContext>,
+    node: CallExpression,
+    messageId: 'unexpectedPendingTest' | 'unexpectedSkippedTestWithoutComment'
+): void {
     const nodeToReport = node.callee.type === 'MemberExpression' ? node.callee.property : node.callee;
 
     context.report({
         node: nodeToReport,
-        messageId: 'unexpectedPendingTest',
+        messageId,
         ...(canSuggestPendingTest(node)
             ? {
                 suggest: [{
@@ -98,7 +179,8 @@ export function reportSkipped(context: Readonly<Rule.RuleContext>, node: CallExp
 
 export function checkPendingTestCase(
     context: Readonly<Rule.RuleContext>,
-    visitorContext: PendingVisitorContext
+    visitorContext: PendingVisitorContext,
+    configuration: Readonly<PendingRuleConfiguration>
 ): void {
     if (!isCallExpression(visitorContext.node)) {
         return;
@@ -110,20 +192,37 @@ export function checkPendingTestCase(
             messageId: 'unexpectedPendingTest'
         });
     } else if (visitorContext.modifier === 'pending') {
-        reportSkipped(context, visitorContext.node);
+        if (shouldAllowSkippedWithComment(context, visitorContext.node, configuration)) {
+            return;
+        }
+
+        reportSkipped(
+            context,
+            visitorContext.node,
+            configuration.allowSkippedWithComment ? 'unexpectedSkippedTestWithoutComment' : 'unexpectedPendingTest'
+        );
     }
 }
 
 export function checkPendingSuite(
     context: Readonly<Rule.RuleContext>,
-    visitorContext: PendingVisitorContext
+    visitorContext: PendingVisitorContext,
+    configuration: Readonly<PendingRuleConfiguration>
 ): void {
     if (!isCallExpression(visitorContext.node)) {
         return;
     }
 
     if (visitorContext.modifier === 'pending') {
-        reportSkipped(context, visitorContext.node);
+        if (shouldAllowSkippedWithComment(context, visitorContext.node, configuration)) {
+            return;
+        }
+
+        reportSkipped(
+            context,
+            visitorContext.node,
+            configuration.allowSkippedWithComment ? 'unexpectedSkippedTestWithoutComment' : 'unexpectedPendingTest'
+        );
     }
 }
 
@@ -135,21 +234,25 @@ export const noPendingTestsRule: Rule.RuleModule = {
             description: 'Disallow pending tests',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-pending-tests.md'
         },
+        defaultOptions: [defaultOption],
         hasSuggestions: true,
         messages: {
             unexpectedPendingTest: 'Unexpected pending mocha test.',
+            unexpectedSkippedTestWithoutComment: 'Unexpected skipped mocha test without a preceding comment.',
             removePendingModifier: 'Remove the pending modifier from this Mocha call.'
         },
-        schema: []
+        schema: [optionSchema]
     },
     create(context) {
+        const configuration = getRuleOption<ResolvedOption>(context);
+
         return createMochaVisitors(context, {
             testCase(visitorContext) {
-                checkPendingTestCase(context, visitorContext);
+                checkPendingTestCase(context, visitorContext, configuration);
             },
 
             suite(visitorContext) {
-                checkPendingSuite(context, visitorContext);
+                checkPendingSuite(context, visitorContext, configuration);
             }
         });
     }
