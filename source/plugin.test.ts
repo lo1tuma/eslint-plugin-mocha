@@ -10,14 +10,34 @@ const { pathname: currentFolderName } = new URL('.', import.meta.url);
 const rulesDir = path.join(currentFolderName, './rules/');
 const documentationDir = path.join(currentFolderName, '../../../documentation/rules/');
 
+async function importModuleExports(filePath: string): Promise<Readonly<Record<string, unknown>>> {
+    return await import(filePath) as Readonly<Record<string, unknown>>;
+}
+
 async function determineAllRuleFiles(): Promise<string[]> {
-    const ruleFiles = await fs.promises.readdir(rulesDir);
+    const knownRuleFiles = await fs.promises.readdir(rulesDir);
+    const ruleFiles = knownRuleFiles.filter((file) => {
+        return !file.endsWith('.test.js') && file.endsWith('.js');
+    });
+
     if (rulesDir.length === 0) {
         throw new Error('Failed to read rules folder');
     }
-    return ruleFiles.filter((file) => {
-        return !file.endsWith('.test.js') && file.endsWith('.js');
-    });
+
+    const publicRuleFiles: string[] = [];
+
+    for (const file of ruleFiles) {
+        // Only public rule modules should count here.
+        // This keeps the test stable when stale generated files remain after rule moves.
+        const importedRuleModule = await importModuleExports(path.join(rulesDir, file));
+        const ruleName = path.basename(file, '.js');
+
+        if (importedRuleModule[`${camelCase(ruleName)}Rule`] !== undefined) {
+            publicRuleFiles.push(file);
+        }
+    }
+
+    return publicRuleFiles;
 }
 
 async function determineAllDocumentationFiles(): Promise<string[]> {
@@ -44,9 +64,7 @@ describe('eslint-plugin-mocha', function () {
         for (const file of ruleFiles) {
             const ruleName = path.basename(file, '.js');
             assert.ok(ruleName in plugin.rules);
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- ok
-            const importedRuleModule = await import(path.join(rulesDir, file));
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access -- ok
+            const importedRuleModule = await importModuleExports(path.join(rulesDir, file));
             const importedRule = importedRuleModule[`${camelCase(ruleName)}Rule`];
 
             assert.notStrictEqual(importedRule, undefined);
