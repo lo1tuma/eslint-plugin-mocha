@@ -1,9 +1,13 @@
 import { type Rule, RuleTester } from 'eslint';
 import assert from 'node:assert';
-import { noHooksForSingleCaseRule } from './no-hooks-for-single-case.js';
+import { noHooksForSingleChildRule } from './no-hooks-for-single-child.js';
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
-ruleTester.run('no-hooks-for-single-case', noHooksForSingleCaseRule, {
+function singleChildError(name: string): string {
+    return `Unexpected use of Mocha \`${name}\` hook with only one direct child.`;
+}
+
+ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
     valid: [
         [
             'describe(function() {',
@@ -207,7 +211,7 @@ ruleTester.run('no-hooks-for-single-case', noHooksForSingleCaseRule, {
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 5, line: 2 }]
+            errors: [{ message: singleChildError('before()'), column: 5, line: 2 }]
         },
         {
             code: [
@@ -217,7 +221,7 @@ ruleTester.run('no-hooks-for-single-case', noHooksForSingleCaseRule, {
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 5, line: 2 }]
+            errors: [{ message: singleChildError('before()'), column: 5, line: 2 }]
         },
         {
             code: [
@@ -227,7 +231,7 @@ ruleTester.run('no-hooks-for-single-case', noHooksForSingleCaseRule, {
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 5, line: 3 }]
+            errors: [{ message: singleChildError('before()'), column: 5, line: 3 }]
         },
         {
             code: [
@@ -237,7 +241,7 @@ ruleTester.run('no-hooks-for-single-case', noHooksForSingleCaseRule, {
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Unexpected use of Mocha `after()` hook for a single test case', column: 5, line: 2 }]
+            errors: [{ message: singleChildError('after()'), column: 5, line: 2 }]
         },
         {
             code: [
@@ -248,7 +252,7 @@ ruleTester.run('no-hooks-for-single-case', noHooksForSingleCaseRule, {
             ]
                 .join('\n'),
             errors: [
-                { message: 'Unexpected use of Mocha `beforeEach()` hook for a single test case', column: 5, line: 2 }
+                { message: singleChildError('beforeEach()'), column: 5, line: 2 }
             ]
         },
         {
@@ -260,7 +264,7 @@ ruleTester.run('no-hooks-for-single-case', noHooksForSingleCaseRule, {
             ]
                 .join('\n'),
             errors: [
-                { message: 'Unexpected use of Mocha `afterEach()` hook for a single test case', column: 5, line: 2 }
+                { message: singleChildError('afterEach()'), column: 5, line: 2 }
             ]
         },
         {
@@ -269,7 +273,7 @@ ruleTester.run('no-hooks-for-single-case', noHooksForSingleCaseRule, {
                 'it(function() {});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 1, line: 1 }]
+            errors: [{ message: singleChildError('before()'), column: 1, line: 1 }]
         },
         {
             code: [
@@ -279,7 +283,7 @@ ruleTester.run('no-hooks-for-single-case', noHooksForSingleCaseRule, {
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 5, line: 2 }]
+            errors: [{ message: singleChildError('before()'), column: 5, line: 2 }]
         },
         {
             code: [
@@ -289,7 +293,7 @@ ruleTester.run('no-hooks-for-single-case', noHooksForSingleCaseRule, {
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 5, line: 2 }]
+            errors: [{ message: singleChildError('before()'), column: 5, line: 2 }]
         },
         {
             code: [
@@ -299,7 +303,7 @@ ruleTester.run('no-hooks-for-single-case', noHooksForSingleCaseRule, {
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 5, line: 2 }]
+            errors: [{ message: singleChildError('before()'), column: 5, line: 2 }]
         },
         {
             code: [
@@ -313,7 +317,7 @@ ruleTester.run('no-hooks-for-single-case', noHooksForSingleCaseRule, {
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 9, line: 5 }]
+            errors: [{ message: singleChildError('before()'), column: 9, line: 5 }]
         },
         {
             code: [
@@ -324,7 +328,7 @@ ruleTester.run('no-hooks-for-single-case', noHooksForSingleCaseRule, {
             ]
                 .join('\n'),
             options: [{ allow: ['before'] }],
-            errors: [{ message: 'Unexpected use of Mocha `after()` hook for a single test case', column: 5, line: 2 }]
+            errors: [{ message: singleChildError('after()'), column: 5, line: 2 }]
         },
         {
             code: [
@@ -338,7 +342,7 @@ ruleTester.run('no-hooks-for-single-case', noHooksForSingleCaseRule, {
                     additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
                 }
             },
-            errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 5, line: 2 }]
+            errors: [{ message: singleChildError('before()'), column: 5, line: 2 }]
         },
         {
             code: [
@@ -350,15 +354,15 @@ ruleTester.run('no-hooks-for-single-case', noHooksForSingleCaseRule, {
             settings: {
                 'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
             },
-            errors: [{ message: 'Unexpected use of Mocha `before()` hook for a single test case', column: 5, line: 2 }]
+            errors: [{ message: singleChildError('before()'), column: 5, line: 2 }]
         }
     ]
 });
 
-describe('no-hooks-for-single-case create()', function () {
+describe('no-hooks-for-single-child create()', function () {
     it('normalizes non-string allow entries when invoked directly', function () {
-        noHooksForSingleCaseRule.create({
-            id: 'no-hooks-for-single-case',
+        noHooksForSingleChildRule.create({
+            id: 'no-hooks-for-single-child',
             options: [{ allow: [42] }],
             settings: {},
             sourceCode: {
