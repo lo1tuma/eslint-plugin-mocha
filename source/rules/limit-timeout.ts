@@ -1,9 +1,10 @@
 import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { type CallExpression, isCallExpression } from '../ast/node-types.js';
+import { isCallExpression } from '../ast/node-types.js';
 import {
     getStaticNumericConfigValue,
     isDisabledTimeoutValue,
+    type MochaConfigCallExpression,
     visitMochaContextConfigCalls
 } from '../mocha/config-call.js';
 import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
@@ -82,16 +83,16 @@ function validateOption(option: Readonly<Option>): void {
 
 function reportUnexpectedTimeout(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>,
+    node: MochaConfigCallExpression,
     descriptor: Readonly<ReportMessageDetails>
 ): void {
     context.report({
         ...descriptor,
-        node: node.callee.type === 'MemberExpression' ? node.callee.property : node.callee
+        node: node.callee.property
     });
 }
 
-function reportDisabledTimeout(context: Readonly<Rule.RuleContext>, node: Readonly<CallExpression>): void {
+function reportDisabledTimeout(context: Readonly<Rule.RuleContext>, node: MochaConfigCallExpression): void {
     reportUnexpectedTimeout(context, node, {
         messageId: 'unexpectedDisabledTimeout'
     });
@@ -99,7 +100,7 @@ function reportDisabledTimeout(context: Readonly<Rule.RuleContext>, node: Readon
 
 function reportTimeoutAboveMax(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>,
+    node: MochaConfigCallExpression,
     maximumValue: number,
     timeoutValue: number
 ): void {
@@ -114,7 +115,7 @@ function reportTimeoutAboveMax(
 
 function reportTimeoutOutsideRange(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>,
+    node: MochaConfigCallExpression,
     option: Readonly<Extract<Option, { mode: 'range'; }>>,
     timeoutValue: number
 ): void {
@@ -130,14 +131,14 @@ function reportTimeoutOutsideRange(
 
 function readStaticTimeoutValue(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>
+    node: MochaConfigCallExpression
 ): number | null {
     return getStaticNumericConfigValue(node, context.sourceCode);
 }
 
 function checkDisabledTimeoutCall(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>,
+    node: MochaConfigCallExpression,
     timeoutValue: number
 ): void {
     if (isDisabledTimeoutValue(timeoutValue)) {
@@ -147,7 +148,7 @@ function checkDisabledTimeoutCall(
 
 function checkMaximumTimeoutCall(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>,
+    node: MochaConfigCallExpression,
     maximumValue: number,
     timeoutValue: number
 ): void {
@@ -158,7 +159,7 @@ function checkMaximumTimeoutCall(
 
 function checkTimeoutRangeCall(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>,
+    node: MochaConfigCallExpression,
     option: Readonly<Extract<Option, { mode: 'range'; }>>,
     timeoutValue: number
 ): void {
@@ -169,7 +170,7 @@ function checkTimeoutRangeCall(
 
 function checkConfiguredTimeoutCall(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>,
+    node: MochaConfigCallExpression,
     option: Exclude<Option, { mode: 'disallow'; }>,
     timeoutValue: number
 ): void {
@@ -208,7 +209,7 @@ export const limitTimeoutRule: Readonly<Rule.RuleModule> = {
         const option = getRuleOption<Option>(context);
         validateOption(option);
 
-        function checkTimeoutCall(node: Readonly<CallExpression>): void {
+        function checkTimeoutCall(node: MochaConfigCallExpression): void {
             if (option.mode === 'disallow') {
                 reportUnexpectedTimeout(context, node, {
                     messageId: 'unexpectedTimeout'
@@ -227,8 +228,14 @@ export const limitTimeoutRule: Readonly<Rule.RuleModule> = {
 
         return createMochaVisitors(context, {
             config(visitorContext) {
-                if (visitorContext.config === 'timeout' && isCallExpression(visitorContext.node)) {
-                    checkTimeoutCall(visitorContext.node);
+                const { node } = visitorContext;
+
+                if (
+                    visitorContext.config === 'timeout' &&
+                    isCallExpression(node) &&
+                    node.callee.type === 'MemberExpression'
+                ) {
+                    checkTimeoutCall(node as MochaConfigCallExpression);
                 }
             },
 

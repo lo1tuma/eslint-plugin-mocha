@@ -6,13 +6,16 @@ import {
     isFunction,
     isIdentifier,
     isLiteral,
-    isMemberExpression
+    isMemberExpression,
+    type MemberExpression
 } from '../ast/node-types.js';
 import { type TraversableNode, visitChildNodes } from '../ast/visit-child-nodes.js';
 import { configCallNames, type MochaConfigCall } from './descriptors.js';
 
 const suiteConfig = new Set<string>(configCallNames);
 const maximumTimeout = Number.parseInt('2147483647', 10);
+
+export type MochaConfigCallExpression = Readonly<CallExpression> & { readonly callee: MemberExpression; };
 
 function isMochaConfigCallName(value: string): value is MochaConfigCall {
     return suiteConfig.has(value);
@@ -71,7 +74,7 @@ export function getConfigPropertyName(node: Readonly<CallExpression>): MochaConf
 export function isMochaContextConfigCall(
     node: Readonly<TraversableNode>,
     configName?: MochaConfigCall
-): node is CallExpression {
+): node is MochaConfigCallExpression {
     if (!isCallExpression(node)) {
         return false;
     }
@@ -112,7 +115,7 @@ export function visitMochaContextConfigCalls(
     sourceCode: Readonly<SourceCode>,
     node: Readonly<TraversableNode>,
     configName: MochaConfigCall,
-    visitor: (callExpression: Readonly<CallExpression>) => void
+    visitor: (callExpression: MochaConfigCallExpression) => void
 ): void {
     if (isMochaContextConfigCall(node, configName)) {
         visitor(node);
