@@ -1,0 +1,124 @@
+import { RuleTester } from 'eslint';
+import { withInterface } from '../mocha-interface-test-cases.js';
+import { limitSlowRule } from './limit-slow.js';
+
+const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
+const unexpectedSlow = 'Unexpected use of Mocha slow threshold configuration.';
+
+ruleTester.run('limit-slow', limitSlowRule, {
+    valid: [
+        'it("works", function () {});',
+        'it("works", function () {}).timeout(5000);',
+        {
+            code: 'it("works", function () {}).slow();',
+            options: [{ mode: 'max', max: 200 }]
+        },
+        {
+            code: 'describe("suite", function () { this.slow(200); });',
+            options: [{ mode: 'max', max: 200 }]
+        },
+        {
+            code: 'it("works", function () { this["slow"](200); });',
+            options: [{ mode: 'range', min: 50, max: 200 }]
+        },
+        {
+            code: 'it("works", function () { (() => this.slow(200))(); });',
+            languageOptions: { ecmaVersion: 2015 },
+            options: [{ mode: 'range', min: 50, max: 200 }]
+        },
+        {
+            code: 'it("works", function () { function later() { this.slow(300); } });',
+            options: [{ mode: 'max', max: 200 }]
+        },
+        {
+            code: 'const slowThreshold = 200; it("works", function () {}).slow(slowThreshold);',
+            languageOptions: { ecmaVersion: 2015 },
+            options: [{ mode: 'max', max: 200 }]
+        },
+        {
+            code: 'import { it } from "mocha"; it("works", function () {}).slow(200);',
+            languageOptions: {
+                ecmaVersion: 2018,
+                sourceType: 'module'
+            },
+            options: [{ mode: 'max', max: 200 }],
+            settings: { mocha: { interface: 'require' } }
+        },
+        {
+            code: 'custom("works", function () {}).slow(200);',
+            options: [{ mode: 'max', max: 200 }],
+            settings: {
+                mocha: {
+                    additionalCustomNames: [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
+                }
+            }
+        },
+        withInterface('TDD', {
+            code: 'test("works", function () {}).slow(200);',
+            options: [{ mode: 'range', min: 50, max: 200 }]
+        })
+    ],
+
+    invalid: [
+        {
+            code: 'it("works", function () {}).slow(200);',
+            errors: [{ message: unexpectedSlow }]
+        },
+        {
+            code: 'describe("suite", function () { this.slow(200); });',
+            errors: [{ message: unexpectedSlow }]
+        },
+        {
+            code: 'it("works", function () { (() => this.slow(200))(); });',
+            languageOptions: { ecmaVersion: 2015 },
+            errors: [{ message: unexpectedSlow }]
+        },
+        {
+            code: 'it("works", function () {}).slow(300);',
+            options: [{ mode: 'max', max: 200 }],
+            errors: [{
+                message: 'Unexpected Mocha slow value 300. Maximum allowed is 200.'
+            }]
+        },
+        {
+            code: 'const slowThreshold = 300; it("works", function () {}).slow(slowThreshold);',
+            languageOptions: { ecmaVersion: 2015 },
+            options: [{ mode: 'max', max: 200 }],
+            errors: [{
+                message: 'Unexpected Mocha slow value 300. Maximum allowed is 200.'
+            }]
+        },
+        {
+            code: 'it("works", function () {}).slow(25);',
+            options: [{ mode: 'range', min: 50, max: 200 }],
+            errors: [{
+                message: 'Unexpected Mocha slow value 25. Expected a value between 50 and 200.'
+            }]
+        },
+        {
+            code: 'describe("suite", function () { this["slow"](250); });',
+            options: [{ mode: 'range', min: 50, max: 200 }],
+            errors: [{
+                message: 'Unexpected Mocha slow value 250. Expected a value between 50 and 200.'
+            }]
+        },
+        {
+            code: 'import { it } from "mocha"; it("works", function () {}).slow(200);',
+            languageOptions: {
+                ecmaVersion: 2018,
+                sourceType: 'module'
+            },
+            settings: { mocha: { interface: 'require' } },
+            errors: [{ message: unexpectedSlow }]
+        },
+        {
+            code: 'custom("works", function () {}).slow(200);',
+            settings: {
+                mocha: {
+                    additionalCustomNames: [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
+                }
+            },
+            errors: [{ message: unexpectedSlow }]
+        }
+    ]
+});
