@@ -446,6 +446,39 @@ describe('no-pending-tests helpers', function () {
         assert.deepStrictEqual(reports, []);
     });
 
+    it('checkPendingSuite() handles this.skip() calls when skipped comments are allowed', function () {
+        const reports: string[] = [];
+
+        checkPendingSuite(
+            asRuleContext({
+                report() {
+                    reports.push('reported');
+                },
+                sourceCode: asSourceCode({
+                    getCommentsBefore() {
+                        return [];
+                    }
+                })
+            }),
+            {
+                modifier: 'pending',
+                node: asRuleNode({
+                    arguments: [],
+                    callee: {
+                        computed: false,
+                        object: { type: 'ThisExpression' },
+                        property: { name: 'skip', type: 'Identifier' },
+                        type: 'MemberExpression'
+                    },
+                    type: 'CallExpression'
+                })
+            },
+            { allowSkippedWithComment: true }
+        );
+
+        assert.deepStrictEqual(reports, ['reported']);
+    });
+
     it('isPendingMemberExpression() returns false for non-member-expression callees', function () {
         const result = isPendingMemberExpression({ type: 'Identifier', name: 'xdescribe' } as never);
 
