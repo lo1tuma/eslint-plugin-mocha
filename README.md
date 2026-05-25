@@ -144,6 +144,7 @@ For maintainers: the rules table below is generated, and the headers in `documen
 | [no-async-in-sync-tests](documentation/rules/no-async-in-sync-tests.md)                       | Disallow async operations in synchronous tests or hooks                 |    |    | ✅  |    |    |
 | [no-async-suite](documentation/rules/no-async-suite.md)                                       | Disallow async functions passed to a suite                              | ✅  |    |    | 🔧 |    |
 | [no-code-after-done](documentation/rules/no-code-after-done.md)                               | Disallow executing code after calling a Mocha callback                  | ✅  |    |    |    |    |
+| [no-conditional-tests](documentation/rules/no-conditional-tests.md)                           | Disallow conditional suite and test declarations                        |    |    | ✅  |    |    |
 | [no-done-twice](documentation/rules/no-done-twice.md)                                         | Disallow calling a Mocha callback more than once                        | ✅  |    |    |    |    |
 | [no-empty-title](documentation/rules/no-empty-title.md)                                       | Disallow empty suite and test descriptions                              | ✅  |    |    |    |    |
 | [no-exclusive-tests](documentation/rules/no-exclusive-tests.md)                               | Disallow exclusive tests                                                |    | ✅  |    |    | 💡 |
