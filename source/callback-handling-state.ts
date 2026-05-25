@@ -20,8 +20,9 @@ const knownSingleCallbackDelegates = new Set(
         .split(' ')
 );
 
-type MemberExpressionNode = Parameters<Exclude<Rule.RuleListener['MemberExpression'], undefined>>[0];
 type PropertyNode = Parameters<Exclude<Rule.RuleListener['Property'], undefined>>[0];
+type CallExpressionNode = Parameters<Exclude<Rule.RuleListener['CallExpression'], undefined>>[0];
+type MemberExpressionNode = Parameters<Exclude<Rule.RuleListener['MemberExpression'], undefined>>[0];
 type CallbackReferenceState = {
     aliasBindings: Set<TrackedBinding>;
     containerPropertiesByBinding: Map<TrackedBinding, Set<string>>;
@@ -31,11 +32,13 @@ export type CallbackPathState = {
     handledReferences: CallbackReferenceState;
     unhandledReferences: CallbackReferenceState;
 };
-type PropertyLike =
-    | Readonly<Pick<MemberExpressionNode, 'computed' | 'object' | 'property' | 'type'>>
-    | Readonly<Pick<PropertyNode, 'computed' | 'key' | 'type'>>;
+type PropertyLike = Readonly<Pick<PropertyNode, 'computed' | 'key' | 'type'>>;
 
 export type CallbackHandlingOperation =
+    | {
+        node: CallExpressionNode;
+        type: 'call';
+    }
     | {
         node: Rule.Node;
         propertyName: string | undefined;
@@ -48,10 +51,6 @@ export type CallbackHandlingOperation =
         source: Readonly<Rule.Node> | null;
         target: TrackedBinding;
         type: 'bindingAssignment';
-    }
-    | {
-        node: Rule.Node;
-        type: 'call';
     };
 
 export type CallbackHandlingContext = {
@@ -118,7 +117,7 @@ export function arePathStatesSame(
 }
 
 function getNamedPropertyName(node: PropertyLike): string | undefined {
-    const keyNode = node.type === 'MemberExpression' ? node.property : node.key;
+    const keyNode = node.key;
 
     if (keyNode.type === 'Identifier') {
         return keyNode.name;
@@ -138,8 +137,7 @@ function getStaticPropertyName(
         return getNamedPropertyName(node);
     }
 
-    const keyNode = node.type === 'MemberExpression' ? node.property : node.key;
-    return getStringIfConstant(keyNode, sourceCode.getScope(asRuleNode(node))) ?? undefined;
+    return getStringIfConstant(node.key, sourceCode.getScope(asRuleNode(node))) ?? undefined;
 }
 
 function isTrackedPropertyAccess(
@@ -331,13 +329,9 @@ function getNormalizedCallPath(
 
 function isKnownSingleCallbackDelegateCall(
     sourceCode: Readonly<Rule.RuleContext['sourceCode']>,
-    node: Readonly<Extract<CallbackHandlingOperation, { type: 'call'; }>['node']>,
+    node: Readonly<CallExpressionNode>,
     state: Readonly<CallbackReferenceState>
 ): boolean {
-    if (node.type !== 'CallExpression') {
-        return false;
-    }
-
     const normalizedCallPath = getNormalizedCallPath(sourceCode, asRuleNode(node.callee));
 
     if (normalizedCallPath === undefined || !knownSingleCallbackDelegates.has(normalizedCallPath)) {
@@ -355,10 +349,6 @@ function isCallbackHandlingCall(
     operation: Readonly<Extract<CallbackHandlingOperation, { type: 'call'; }>>,
     state: Readonly<CallbackReferenceState>
 ): boolean {
-    if (operation.node.type !== 'CallExpression') {
-        return false;
-    }
-
     return isCallbackExpression(sourceCode, asRuleNode(operation.node.callee), state) ||
         isKnownSingleCallbackDelegateCall(sourceCode, operation.node, state);
 }
