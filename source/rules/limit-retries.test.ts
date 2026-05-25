@@ -1,4 +1,5 @@
-import { RuleTester } from 'eslint';
+import { Linter, RuleTester } from 'eslint';
+import assert from 'node:assert';
 import { withInterface } from '../mocha-interface-test-cases.js';
 import { limitRetriesRule } from './limit-retries.js';
 
@@ -121,4 +122,26 @@ ruleTester.run('limit-retries', limitRetriesRule, {
             errors: [{ message: unexpectedRetries }]
         }
     ]
+});
+
+describe('limit-retries', function () {
+    it('throws when the configured range is invalid', function () {
+        const linter = new Linter();
+
+        assert.throws(
+            function () {
+                linter.verify('it("works", function () {}).retries(2);', {
+                    plugins: { 'test-plugin': { rules: { 'limit-retries': limitRetriesRule } } },
+                    languageOptions: { sourceType: 'script' },
+                    rules: {
+                        'test-plugin/limit-retries': ['error', { mode: 'range', min: 2, max: 1 }]
+                    }
+                });
+            },
+            function (error: unknown) {
+                return error instanceof Error &&
+                    error.message.includes('`min` must be less than or equal to `max`.');
+            }
+        );
+    });
 });
