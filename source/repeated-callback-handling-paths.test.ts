@@ -1,7 +1,7 @@
 import type { Rule, Scope, SourceCode } from 'eslint';
 import assert from 'node:assert';
-import { collectRepeatedCallbackHandlingNodes } from './repeated-callback-handling-paths.js';
 import type { CallbackHandlingOperation } from './callback-handling-state.js';
+import { collectRepeatedCallbackHandlingNodes } from './repeated-callback-handling-paths.js';
 
 type MutableSegment = {
     id: string;

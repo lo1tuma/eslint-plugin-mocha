@@ -2,6 +2,7 @@ import type { Rule } from 'eslint';
 import {
     arePathStatesSame,
     type CallbackHandlingContext,
+    type CallbackHandlingOperation,
     clonePathState,
     createEntryState,
     getCodeAfterCallbackHandlingNode,
@@ -16,6 +17,20 @@ type PendingSegmentCollection = {
     reportedNodes: Rule.Node[];
 };
 
+function getRepeatedCallbackHandlingNode(
+    context: Readonly<CallbackHandlingContext>,
+    pathState: ReturnType<typeof clonePathState>,
+    operation: Readonly<CallbackHandlingOperation>
+): Rule.Node | undefined {
+    if (operation.type !== 'call' || !pathState.callbackHandled) {
+        return undefined;
+    }
+
+    return getCodeAfterCallbackHandlingNode(context.sourceCode, pathState, operation) === undefined
+        ? operation.node
+        : undefined;
+}
+
 function collectSegmentRepeatedCallbackHandlingNodes(
     context: Readonly<CallbackHandlingContext>,
     entryState: ReturnType<typeof clonePathState>,
@@ -25,11 +40,7 @@ function collectSegmentRepeatedCallbackHandlingNodes(
     let nextState = clonePathState(entryState);
 
     for (const operation of context.operationsBySegmentId.get(segment.id) ?? []) {
-        const repeatedCallbackHandlingNode = operation.type === 'call' &&
-                nextState.callbackHandled &&
-                getCodeAfterCallbackHandlingNode(context.sourceCode, nextState, operation) === undefined
-            ? operation.node
-            : undefined;
+        const repeatedCallbackHandlingNode = getRepeatedCallbackHandlingNode(context, nextState, operation);
 
         if (repeatedCallbackHandlingNode !== undefined) {
             reportedNodes.push(repeatedCallbackHandlingNode);
