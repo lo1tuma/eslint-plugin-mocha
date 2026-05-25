@@ -104,7 +104,8 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
         'describe(function() { describe(function() {}); describe(function() {}); });',
         'describe(function() { it(function() {}); it(function() {}); });',
         {
-            code: 'describe(function() { before(function() {}); beforeEach(function() {}); afterEach(function() {}); after(function() {}); });',
+            code:
+                'describe(function() { before(function() {}); beforeEach(function() {}); afterEach(function() {}); after(function() {}); });',
             options: [{ hookOrder: 'setup-teardown' }]
         },
         {
@@ -135,7 +136,8 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
                 '    teardown(function() {});',
                 '    suiteTeardown(function() {});',
                 '});'
-            ].join('\n'),
+            ]
+                .join('\n'),
             options: [{ hookOrder: 'setup-teardown' }]
         }),
         {
@@ -161,7 +163,8 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
                 '    forEach([ 1 ]).afterEach(function() {});',
                 '    forEach([ 1 ]).after(function() {});',
                 '});'
-            ].join('\n'),
+            ]
+                .join('\n'),
             options: [{ hookOrder: 'setup-teardown' }],
             settings: {
                 mocha: {
@@ -278,7 +281,8 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
                 '    forEach([ 1 ]).afterEach(function() {});',
                 '    forEach([ 1 ]).beforeEach(function() {});',
                 '});'
-            ].join('\n'),
+            ]
+                .join('\n'),
             options: [{ hookOrder: 'setup-teardown' }],
             settings: {
                 mocha: {
