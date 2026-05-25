@@ -5,6 +5,7 @@ import { consistentInterfaceRule } from './rules/consistent-interface.js';
 import { consistentSpacingBetweenBlocksRule } from './rules/consistent-spacing-between-blocks.js';
 import { consistentStructureRule } from './rules/consistent-structure.js';
 import { handleDoneCallbackRule } from './rules/handle-done-callback.js';
+import { limitTimeoutRule } from './rules/limit-timeout.js';
 import { maxTopLevelSuitesRule } from './rules/max-top-level-suites.js';
 import { noAsyncAndDoneRule } from './rules/no-async-and-done.js';
 import { noAsyncInSyncTestsRule } from './rules/no-async-in-sync-tests.js';
@@ -39,6 +40,7 @@ const allRules: Linter.RulesRecord = {
         { order: 'hooks-tests-suites', disallowDuplicateHooks: true, disallowMixedTestsAndSuites: true }
     ],
     'mocha/handle-done-callback': 'error',
+    'mocha/limit-timeout': 'error',
     'mocha/max-top-level-suites': 'error',
     'mocha/no-async-and-done': 'error',
     'mocha/no-async-in-sync-tests': 'error',
@@ -71,6 +73,7 @@ const allRules: Linter.RulesRecord = {
 const recommendedRules: Linter.RulesRecord = {
     'mocha/consistent-structure': ['error', { disallowDuplicateHooks: true }],
     'mocha/handle-done-callback': 'error',
+    'mocha/limit-timeout': 'off',
     'mocha/max-top-level-suites': ['error', { limit: 1 }],
     'mocha/no-async-and-done': 'error',
     'mocha/no-async-in-sync-tests': 'off',
@@ -103,6 +106,7 @@ const recommendedRules: Linter.RulesRecord = {
 const rules = {
     'consistent-structure': consistentStructureRule,
     'handle-done-callback': handleDoneCallbackRule,
+    'limit-timeout': limitTimeoutRule,
     'max-top-level-suites': maxTopLevelSuitesRule,
     'no-async-and-done': noAsyncAndDoneRule,
     'no-async-in-sync-tests': noAsyncInSyncTestsRule,

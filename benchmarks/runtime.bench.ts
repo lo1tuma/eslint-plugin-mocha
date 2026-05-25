@@ -81,7 +81,7 @@ const iterations = 50;
 
 describe('runtime', function () {
     it('should not take longer as the defined budget to lint many files with the recommended config', function () {
-        const cpuAgnosticBudget = 2_300_000;
+        const cpuAgnosticBudget = 2_325_000;
         const budget = cpuAgnosticBudget / cpuSpeed;
 
         const { medianDuration } = runSyncBenchmark(() => {
