@@ -19,13 +19,16 @@ npm install --save-dev eslint-plugin-mocha
 
 ## Configure
 
-Use the plugin with ESLint's [flat config](https://eslint.org/docs/latest/use/configure/configuration-files-new):
+Use the plugin with ESLint's [flat config](https://eslint.org/docs/latest/use/configure/configuration-files-new). Apply it only to Mocha test files, and adjust `files` to match your project:
 
 ```js
 import mochaPlugin from "eslint-plugin-mocha";
 
 export default [
-    mochaPlugin.configs.recommended
+    {
+        files: ["test/**/*.js"],
+        ...mochaPlugin.configs.recommended
+    }
 ];
 ```
 
@@ -38,7 +41,10 @@ export default [
 import mochaPlugin from "eslint-plugin-mocha";
 
 export default [
-    mochaPlugin.configs.all
+    {
+        files: ["test/**/*.js"],
+        ...mochaPlugin.configs.all
+    }
 ];
 ```
 
