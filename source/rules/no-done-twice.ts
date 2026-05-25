@@ -168,6 +168,7 @@ export const noDoneTwiceRule: Readonly<Rule.RuleModule> = {
             'VariableDeclarator:exit'(node) {
                 if (node.id.type === 'Identifier') {
                     recordOperation({
+                        node,
                         source: asRuleNodeOrNull(node.init),
                         target: getTrackedBinding(context.sourceCode, node.id),
                         type: 'bindingAssignment'
@@ -178,6 +179,7 @@ export const noDoneTwiceRule: Readonly<Rule.RuleModule> = {
             'AssignmentExpression:exit'(node) {
                 if (node.left.type === 'Identifier') {
                     recordOperation({
+                        node,
                         source: asRuleNode(node.right),
                         target: getTrackedBinding(context.sourceCode, node.left),
                         type: 'bindingAssignment'
@@ -190,6 +192,7 @@ export const noDoneTwiceRule: Readonly<Rule.RuleModule> = {
 
                     if (bindingAndProperty !== undefined) {
                         recordOperation({
+                            node,
                             propertyName: bindingAndProperty.propertyName,
                             source: asRuleNode(node.right),
                             target: bindingAndProperty.binding,
@@ -202,6 +205,7 @@ export const noDoneTwiceRule: Readonly<Rule.RuleModule> = {
             'UpdateExpression:exit'(node) {
                 if (node.argument.type === 'Identifier') {
                     recordOperation({
+                        node,
                         source: null,
                         target: getTrackedBinding(context.sourceCode, node.argument),
                         type: 'bindingAssignment'
@@ -214,6 +218,7 @@ export const noDoneTwiceRule: Readonly<Rule.RuleModule> = {
 
                     if (bindingAndProperty !== undefined) {
                         recordOperation({
+                            node,
                             propertyName: bindingAndProperty.propertyName,
                             source: null,
                             target: bindingAndProperty.binding,
@@ -229,6 +234,7 @@ export const noDoneTwiceRule: Readonly<Rule.RuleModule> = {
 
                     if (bindingAndProperty !== undefined) {
                         recordOperation({
+                            node,
                             propertyName: bindingAndProperty.propertyName,
                             source: null,
                             target: bindingAndProperty.binding,
