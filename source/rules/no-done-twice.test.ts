@@ -11,12 +11,18 @@ ruleTester.run('no-done-twice', noDoneTwiceRule, {
         'it("title", function(done) { done(); });',
         'it("title", function(done) { const foo = done; foo(); });',
         'it("title", function(finish) { finish(); });',
+        'it("title", function() { work(); });',
+        'it("title", function([finish]) { finish(); });',
         'it("title", function(done) { return done(); done(); });',
         'it("title", function(done) { if (failed) { done(error); } else { done(); } });',
         'it("title", function(done) { var finish = done; if (failed) { finish(error); } else { done(); } });',
         'it("title", function(done) { if (failed) { setTimeout(done, 0); } else { done(); } });',
         'it("title", function(done) { var finish = done; if (failed) { setTimeout(finish, 0); } else { done(); } });',
         'it("title", function(done) { var callbacks = { complete: done }; if (failed) { setTimeout(callbacks.complete, 0); } else { callbacks.complete(); } });',
+        'it("title", function(done) { let finish = done; finish++; done(); });',
+        'it("title", function(done) { var callbacks = { complete: done }; callbacks.complete++; done(); });',
+        'it("title", function(done) { var callbacks = { complete: done }; delete callbacks.complete; done(); });',
+        'it("title", function(done) { getCallbacks().complete = done; done(); });',
         'it("title", function(done) { handler(function () { done(); done(); }); });',
         'beforeEach(function(done) { done(); });',
         'notMocha("title", function(done) { done(); done(); });',
@@ -68,6 +74,20 @@ ruleTester.run('no-done-twice', noDoneTwiceRule, {
         {
             code: 'it("title", function(done) { var callbacks = { complete: done }; ' +
                 'setTimeout(callbacks.complete, 0); callbacks.complete(); });',
+            errors: [{ message }]
+        },
+        {
+            code: 'it("title", function(done) { let finish; finish = done; finish(); finish(); });',
+            errors: [{ message }]
+        },
+        {
+            code: 'it("title", function(done) { var callbacks = {}; callbacks.complete = done; ' +
+                'callbacks.complete(); callbacks.complete(); });',
+            errors: [{ message }]
+        },
+        {
+            code: 'it("title", function(done) { var callbacks = {}; callbacks["complete"] = done; ' +
+                'callbacks.complete(); callbacks.complete(); });',
             errors: [{ message }]
         },
         {
