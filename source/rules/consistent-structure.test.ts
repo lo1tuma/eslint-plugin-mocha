@@ -104,6 +104,24 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
         'describe(function() { describe(function() {}); describe(function() {}); });',
         'describe(function() { it(function() {}); it(function() {}); });',
         {
+            code:
+                'describe(function() { before(function() {}); beforeEach(function() {}); afterEach(function() {}); after(function() {}); });',
+            options: [{ hookOrder: 'setup-teardown' }]
+        },
+        {
+            code: 'before(function() {}); beforeEach(function() {}); afterEach(function() {}); after(function() {});',
+            options: [{ hookOrder: 'setup-teardown' }]
+        },
+        {
+            code: 'describe(function() { around(function() {}); before(function() {}); });',
+            options: [{ hookOrder: 'setup-teardown' }],
+            settings: {
+                mocha: {
+                    additionalCustomNames: [{ name: 'around', type: 'hook', interface: 'BDD' }]
+                }
+            }
+        },
+        {
             code: 'describe(function() { it(function() {}); describe(function() {}); });',
             options: [{ order: 'hooks-tests-suites' }]
         },
@@ -119,6 +137,18 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
             code: 'suite(function() { setup(function() {}); suite(function() {}); suite(function() {}); });',
             options: [{ order: 'hooks-tests-suites', disallowMixedTestsAndSuites: true }]
         }),
+        withInterface('TDD', {
+            code: [
+                'suite(function() {',
+                '    suiteSetup(function() {});',
+                '    setup(function() {});',
+                '    teardown(function() {});',
+                '    suiteTeardown(function() {});',
+                '});'
+            ]
+                .join('\n'),
+            options: [{ hookOrder: 'setup-teardown' }]
+        }),
         {
             code: [
                 'foo(function() {',
@@ -131,6 +161,28 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
             settings: {
                 mocha: {
                     additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
+                }
+            }
+        },
+        {
+            code: [
+                'describe(function() {',
+                '    forEach([ 1 ]).before(function() {});',
+                '    forEach([ 1 ]).beforeEach(function() {});',
+                '    forEach([ 1 ]).afterEach(function() {});',
+                '    forEach([ 1 ]).after(function() {});',
+                '});'
+            ]
+                .join('\n'),
+            options: [{ hookOrder: 'setup-teardown' }],
+            settings: {
+                mocha: {
+                    additionalCustomNames: [
+                        { name: 'forEach().before', type: 'hook', interface: 'BDD' },
+                        { name: 'forEach().beforeEach', type: 'hook', interface: 'BDD' },
+                        { name: 'forEach().afterEach', type: 'hook', interface: 'BDD' },
+                        { name: 'forEach().after', type: 'hook', interface: 'BDD' }
+                    ]
                 }
             }
         }
@@ -146,6 +198,15 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
             code: 'describe(function() { describe(function() {}); before(function() {}); });',
             options: [{ order: 'hooks-tests-suites' }],
             errors: [{ message: 'Unexpected hook after a child suite.', column: 48, line: 1 }]
+        },
+        {
+            code: 'describe(function() { beforeEach(function() {}); before(function() {}); });',
+            options: [{ hookOrder: 'setup-teardown' }],
+            errors: [{
+                message: 'Unexpected Mocha `before()` hook after `beforeEach()` hook.',
+                column: 50,
+                line: 1
+            }]
         },
         {
             code: 'describe(function() { describe(function() {}); it(function() {}); });',
@@ -194,6 +255,15 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
                 { message: 'Unexpected mix of test cases and child suites at the same level.', column: 42, line: 1 }
             ]
         }),
+        withInterface('TDD', {
+            code: 'suite(function() { teardown(function() {}); setup(function() {}); });',
+            options: [{ hookOrder: 'setup-teardown' }],
+            errors: [{
+                message: 'Unexpected Mocha `setup()` hook after `teardown()` hook.',
+                column: 45,
+                line: 1
+            }]
+        }),
         {
             code: [
                 'foo(function() {',
@@ -210,6 +280,29 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
             },
             errors: [{
                 message: 'Unexpected mix of test cases and child suites at the same level.',
+                column: 5,
+                line: 3
+            }]
+        },
+        {
+            code: [
+                'describe(function() {',
+                '    forEach([ 1 ]).afterEach(function() {});',
+                '    forEach([ 1 ]).beforeEach(function() {});',
+                '});'
+            ]
+                .join('\n'),
+            options: [{ hookOrder: 'setup-teardown' }],
+            settings: {
+                mocha: {
+                    additionalCustomNames: [
+                        { name: 'forEach().beforeEach', type: 'hook', interface: 'BDD' },
+                        { name: 'forEach().afterEach', type: 'hook', interface: 'BDD' }
+                    ]
+                }
+            },
+            errors: [{
+                message: 'Unexpected Mocha `forEach().beforeEach()` hook after `forEach().afterEach()` hook.',
                 column: 5,
                 line: 3
             }]
@@ -276,6 +369,8 @@ describe('consistent-structure helpers', function () {
                 hasReportedMixedStructure: false,
                 hasSeenSuite: false,
                 hasSeenTestCase: false,
+                highestSeenHookOrderName: null,
+                highestSeenHookOrderRank: null,
                 highestSeenKind: null,
                 scopeNode: suiteBody as never,
                 usedHookNames: new Set()

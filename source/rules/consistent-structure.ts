@@ -15,6 +15,10 @@ import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-
 const optionSchema = {
     type: 'object',
     properties: {
+        hookOrder: {
+            type: 'string',
+            enum: ['setup-teardown', 'off']
+        },
         order: {
             type: 'string',
             enum: ['hooks-tests-suites', 'off']
@@ -32,6 +36,7 @@ const optionSchema = {
 type Option = InferSchemaOption<typeof optionSchema>;
 type ResolvedOption = Option & {
     disallowDuplicateHooks: boolean;
+    hookOrder: 'off' | 'setup-teardown';
     order: 'hooks-tests-suites' | 'off';
     disallowMixedTestsAndSuites: boolean;
 };
@@ -40,6 +45,8 @@ type StructureLayer = {
     hasReportedMixedStructure: boolean;
     hasSeenSuite: boolean;
     hasSeenTestCase: boolean;
+    highestSeenHookOrderName: string | null;
+    highestSeenHookOrderRank: number | null;
     highestSeenKind: StructureEntityKind | null;
     scopeNode: AnyFunction['body'] | Program;
     usedHookNames: Set<string>;
@@ -51,10 +58,14 @@ type DirectStructureContext = {
 type TrackedStructureContext = DirectStructureContext & {
     visitorContext: Readonly<VisitorContext>;
 };
-type StructureTrackingOptions = Pick<ResolvedOption, 'disallowDuplicateHooks' | 'disallowMixedTestsAndSuites'>;
+type StructureTrackingOptions = Pick<
+    ResolvedOption,
+    'disallowDuplicateHooks' | 'disallowMixedTestsAndSuites' | 'hookOrder'
+>;
 
 const defaultOption: ResolvedOption = {
     disallowDuplicateHooks: false,
+    hookOrder: 'off',
     order: 'off',
     disallowMixedTestsAndSuites: false
 };
@@ -63,12 +74,24 @@ const entityRank: Readonly<Record<StructureEntityKind, number>> = {
     testCase: 1,
     suite: 2
 };
+const hookOrderRank: Readonly<Record<string, number>> = {
+    'before()': 0,
+    'suiteSetup()': 0,
+    'beforeEach()': 1,
+    'setup()': 1,
+    'afterEach()': 2,
+    'teardown()': 2,
+    'after()': 3,
+    'suiteTeardown()': 3
+};
 
 function createStructureLayer(scopeNode: StructureLayer['scopeNode']): Readonly<StructureLayer> {
     return {
         hasReportedMixedStructure: false,
         hasSeenSuite: false,
         hasSeenTestCase: false,
+        highestSeenHookOrderName: null,
+        highestSeenHookOrderRank: null,
         highestSeenKind: null,
         scopeNode,
         usedHookNames: new Set()
@@ -175,29 +198,119 @@ function shouldReportDuplicateHook(
     return currentKind === 'hook' && layer.usedHookNames.has(visitorContext.name);
 }
 
+type OrderedHook = {
+    name: string;
+    rank: number;
+};
+
+function getTerminalName(name: string): string {
+    const lastSeparatorIndex = name.lastIndexOf('.');
+
+    return lastSeparatorIndex === -1 ? name : name.slice(lastSeparatorIndex + 1);
+}
+
+function getOrderedHook(name: string): Readonly<OrderedHook> | null {
+    const rank = hookOrderRank[getTerminalName(name)];
+
+    if (rank === undefined) {
+        return null;
+    }
+
+    return { name, rank };
+}
+
+function reportUnexpectedHookOrder(
+    context: Readonly<Rule.RuleContext>,
+    visitorContext: Readonly<VisitorContext>,
+    previousHook: string
+): void {
+    context.report({
+        node: visitorContext.node,
+        messageId: 'unexpectedHookOrder',
+        data: { currentHook: visitorContext.name, previousHook }
+    });
+}
+
+function getTrackedOrderedHook(
+    currentKind: StructureEntityKind,
+    visitorContext: Readonly<VisitorContext>
+): Readonly<OrderedHook> | null {
+    if (currentKind !== 'hook') {
+        return null;
+    }
+
+    return getOrderedHook(visitorContext.name);
+}
+
+function shouldReportHookOrder(
+    layer: Readonly<StructureLayer>,
+    hookOrder: ResolvedOption['hookOrder'],
+    orderedHook: Readonly<OrderedHook> | null
+): orderedHook is OrderedHook {
+    return hookOrder === 'setup-teardown' &&
+        orderedHook !== null &&
+        layer.highestSeenHookOrderRank !== null &&
+        orderedHook.rank < layer.highestSeenHookOrderRank;
+}
+
 function isSuiteBodyLayer(layer: Readonly<StructureLayer>): boolean {
     return !isProgram(layer.scopeNode);
 }
 
-function createTrackedLayer(
+function shouldRememberHighestSeenHookOrder(
+    layer: Readonly<StructureLayer>,
+    orderedHook: Readonly<OrderedHook> | null
+): orderedHook is OrderedHook {
+    return orderedHook !== null &&
+        (layer.highestSeenHookOrderRank === null || orderedHook.rank > layer.highestSeenHookOrderRank);
+}
+
+function getUsedHookNames(
     layer: Readonly<StructureLayer>,
     currentKind: StructureEntityKind,
-    visitorContext: Readonly<VisitorContext>,
-    hasReportedMixedStructure: boolean
-): Readonly<StructureLayer> {
+    visitorContext: Readonly<VisitorContext>
+): Readonly<Set<string>> {
     const usedHookNames = new Set(layer.usedHookNames);
 
     if (currentKind === 'hook') {
         usedHookNames.add(visitorContext.name);
     }
 
+    return usedHookNames;
+}
+
+function getTrackedOrderedHookForLayer(
+    trackedStructureContext: Readonly<TrackedStructureContext>,
+    hookOrder: ResolvedOption['hookOrder']
+): Readonly<OrderedHook> | null {
+    return hookOrder === 'setup-teardown'
+        ? getTrackedOrderedHook(trackedStructureContext.currentKind, trackedStructureContext.visitorContext)
+        : null;
+}
+
+function createTrackedLayer(
+    layer: Readonly<StructureLayer>,
+    trackedStructureContext: Readonly<TrackedStructureContext>,
+    hasReportedMixedStructure: boolean,
+    hookOrder: ResolvedOption['hookOrder']
+): Readonly<StructureLayer> {
+    const { currentKind, visitorContext } = trackedStructureContext;
+    const trackedOrderedHook = getTrackedOrderedHookForLayer(trackedStructureContext, hookOrder);
+    const remembersHighestSeenHookOrder = shouldRememberHighestSeenHookOrder(layer, trackedOrderedHook);
+
     return {
         hasReportedMixedStructure: layer.hasReportedMixedStructure || hasReportedMixedStructure,
         hasSeenSuite: layer.hasSeenSuite || currentKind === 'suite',
         hasSeenTestCase: layer.hasSeenTestCase || currentKind === 'testCase',
+        highestSeenHookOrderName: remembersHighestSeenHookOrder
+            ? trackedOrderedHook.name
+            : layer.highestSeenHookOrderName,
+        highestSeenHookOrderRank: remembersHighestSeenHookOrder
+            ? trackedOrderedHook.rank
+            : layer.highestSeenHookOrderRank,
         highestSeenKind: getHighestSeenKind(layer.highestSeenKind, currentKind),
         scopeNode: layer.scopeNode,
-        usedHookNames
+        usedHookNames: getUsedHookNames(layer, currentKind, visitorContext)
     };
 }
 
@@ -240,29 +353,77 @@ function reportDuplicateHook(context: Readonly<Rule.RuleContext>, visitorContext
     });
 }
 
+function reportMixedStructureIfNeeded(
+    context: Readonly<Rule.RuleContext>,
+    trackedStructureContext: Readonly<TrackedStructureContext>,
+    disallowMixedTestsAndSuites: boolean
+): boolean {
+    const { currentKind, currentLayer, visitorContext } = trackedStructureContext;
+    const shouldReport = isSuiteBodyLayer(currentLayer) &&
+        disallowMixedTestsAndSuites &&
+        shouldReportMixedStructure(currentLayer, currentKind);
+
+    if (shouldReport) {
+        reportMixedStructure(context, visitorContext);
+    }
+
+    return shouldReport;
+}
+
+function reportDuplicateHookIfNeeded(
+    context: Readonly<Rule.RuleContext>,
+    trackedStructureContext: Readonly<TrackedStructureContext>,
+    disallowDuplicateHooks: boolean
+): void {
+    const { currentKind, currentLayer, visitorContext } = trackedStructureContext;
+
+    if (disallowDuplicateHooks && shouldReportDuplicateHook(currentLayer, currentKind, visitorContext)) {
+        reportDuplicateHook(context, visitorContext);
+    }
+}
+
+function reportUnexpectedHookOrderIfNeeded(
+    context: Readonly<Rule.RuleContext>,
+    trackedStructureContext: Readonly<TrackedStructureContext>,
+    hookOrder: ResolvedOption['hookOrder']
+): void {
+    const { currentKind, currentLayer, visitorContext } = trackedStructureContext;
+
+    if (
+        hookOrder === 'off' ||
+        currentLayer.highestSeenHookOrderName === null ||
+        currentLayer.highestSeenHookOrderRank === null
+    ) {
+        return;
+    }
+
+    const orderedHook = getTrackedOrderedHook(currentKind, visitorContext);
+
+    if (shouldReportHookOrder(currentLayer, hookOrder, orderedHook)) {
+        reportUnexpectedHookOrder(context, visitorContext, currentLayer.highestSeenHookOrderName);
+    }
+}
+
 function trackStructureLayer(
     context: Readonly<Rule.RuleContext>,
     layers: StructureLayer[],
     trackedStructureContext: Readonly<TrackedStructureContext>,
     options: Readonly<StructureTrackingOptions>
 ): void {
-    const { currentKind, currentLayer, visitorContext } = trackedStructureContext;
-    const { disallowDuplicateHooks, disallowMixedTestsAndSuites } = options;
-    const reportsMixedStructure = isSuiteBodyLayer(currentLayer) &&
-        disallowMixedTestsAndSuites &&
-        shouldReportMixedStructure(currentLayer, currentKind);
-    const reportsDuplicateHook = disallowDuplicateHooks &&
-        shouldReportDuplicateHook(currentLayer, currentKind, visitorContext);
+    const { currentLayer } = trackedStructureContext;
+    const { disallowDuplicateHooks, disallowMixedTestsAndSuites, hookOrder } = options;
+    const reportsMixedStructure = reportMixedStructureIfNeeded(
+        context,
+        trackedStructureContext,
+        disallowMixedTestsAndSuites
+    );
 
-    if (reportsMixedStructure) {
-        reportMixedStructure(context, visitorContext);
-    }
-
-    if (reportsDuplicateHook) {
-        reportDuplicateHook(context, visitorContext);
-    }
-
-    replaceCurrentLayer(layers, createTrackedLayer(currentLayer, currentKind, visitorContext, reportsMixedStructure));
+    reportDuplicateHookIfNeeded(context, trackedStructureContext, disallowDuplicateHooks);
+    reportUnexpectedHookOrderIfNeeded(context, trackedStructureContext, hookOrder);
+    replaceCurrentLayer(
+        layers,
+        createTrackedLayer(currentLayer, trackedStructureContext, reportsMixedStructure, hookOrder)
+    );
 }
 
 export const consistentStructureRule: Readonly<Rule.RuleModule> = {
@@ -278,13 +439,16 @@ export const consistentStructureRule: Readonly<Rule.RuleModule> = {
             unexpectedHookAfterSuite: 'Unexpected hook after a child suite.',
             unexpectedHookAfterTest: 'Unexpected hook after a test case.',
             unexpectedDuplicateHook: 'Unexpected use of duplicate Mocha `{{name}}` hook',
+            unexpectedHookOrder: 'Unexpected Mocha `{{currentHook}}` hook after `{{previousHook}}` hook.',
             unexpectedMixedTestsAndSuites: 'Unexpected mix of test cases and child suites at the same level.',
             unexpectedTestAfterSuite: 'Unexpected test case after a child suite.'
         },
         schema: [optionSchema]
     },
     create(context) {
-        const { order, disallowDuplicateHooks, disallowMixedTestsAndSuites } = getRuleOption<ResolvedOption>(context);
+        const { order, disallowDuplicateHooks, disallowMixedTestsAndSuites, hookOrder } = getRuleOption<
+            ResolvedOption
+        >(context);
         const layers: StructureLayer[] = [];
 
         function registerStructure(visitorContext: Readonly<VisitorContext>): void {
@@ -305,7 +469,7 @@ export const consistentStructureRule: Readonly<Rule.RuleModule> = {
                 context,
                 layers,
                 { ...directStructureContext, visitorContext },
-                { disallowDuplicateHooks, disallowMixedTestsAndSuites }
+                { disallowDuplicateHooks, disallowMixedTestsAndSuites, hookOrder }
             );
         }
 
