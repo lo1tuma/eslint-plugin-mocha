@@ -41,7 +41,6 @@ const allRules: Linter.RulesRecord = {
         'error',
         {
             order: 'hooks-tests-suites',
-            hookOrder: 'setup-teardown',
             disallowDuplicateHooks: true,
             disallowMixedTestsAndSuites: true
         }
