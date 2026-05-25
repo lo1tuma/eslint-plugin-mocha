@@ -1,6 +1,6 @@
 import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { isCallExpression } from '../ast/node-types.js';
+import { type CallExpression, isCallExpression } from '../ast/node-types.js';
 import {
     getStaticNumericConfigValue,
     isDisabledTimeoutValue,
@@ -74,6 +74,10 @@ type ReportMessageDetails = {
     readonly messageId: TimeoutMessageId;
     readonly data?: Record<string, string>;
 };
+
+function hasMemberCallee(node: Readonly<CallExpression>): node is MochaConfigCallExpression {
+    return node.callee.type === 'MemberExpression';
+}
 
 function validateOption(option: Readonly<Option>): void {
     if (option.mode === 'range' && option.min > option.max) {
@@ -233,9 +237,9 @@ export const limitTimeoutRule: Readonly<Rule.RuleModule> = {
                 if (
                     visitorContext.config === 'timeout' &&
                     isCallExpression(node) &&
-                    node.callee.type === 'MemberExpression'
+                    hasMemberCallee(node)
                 ) {
-                    checkTimeoutCall(node as MochaConfigCallExpression);
+                    checkTimeoutCall(node);
                 }
             },
 
