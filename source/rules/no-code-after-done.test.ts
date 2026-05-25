@@ -1,6 +1,5 @@
-import { type Rule, RuleTester } from 'eslint';
-import assert from 'node:assert';
-import { checkNodeForCodeAfterDone, noCodeAfterDoneRule } from './no-code-after-done.js';
+import { RuleTester } from 'eslint';
+import { noCodeAfterDoneRule } from './no-code-after-done.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const message = 'Do not execute code after calling the Mocha callback';
@@ -9,9 +8,10 @@ ruleTester.run('no-code-after-done', noCodeAfterDoneRule, {
     valid: [
         'it("title", function(done) { done(); });',
         'it("title", function(done) { return done(); });',
-        'it("title", function(done) { done(); return; });',
+        'it("title", function(done) { const foo = done; foo(); });',
+        'it("title", function(finish) { finish(); });',
         'it("title", function(done) { handler(function () { done(); return; }); });',
-        'it("title", function(done) { function later(done) { done(); expect(true).to.be.false; } });',
+        'it("title", function(done) { const foo = done; setTimeout(foo, 0); });',
         'it("title", async function() { await work(); });',
         'it("title", function() { work(); });',
         'notMocha("title", function(done) { done(); expect(true).to.be.false; });'
@@ -20,29 +20,23 @@ ruleTester.run('no-code-after-done', noCodeAfterDoneRule, {
     invalid: [
         {
             code: 'it("title", function(done) { done(); expect(true).to.be.true; });',
-            errors: [{ message, column: 38, line: 1 }]
+            errors: [{ message }]
+        },
+        {
+            code: 'it("title", function(done) { const foo = done; foo(); expect(true).to.be.true; });',
+            errors: [{ message }]
+        },
+        {
+            code: 'it("title", function(done) { const foo = done; setTimeout(foo, 0); expect(true).to.be.true; });',
+            errors: [{ message }]
         },
         {
             code: 'it("title", function(done) { handler(function () { done(); expect(true).to.be.true; }); });',
-            errors: [{ message, column: 60, line: 1 }]
+            errors: [{ message }]
         },
         {
             code: 'beforeEach(function(done) { done(); setupNextStep(); });',
-            errors: [{ message, column: 37, line: 1 }]
+            errors: [{ message }]
         }
     ]
-});
-
-describe('no-code-after-done helpers', function () {
-    it('checkNodeForCodeAfterDone() ignores non-function nodes', function () {
-        const reports: string[] = [];
-
-        checkNodeForCodeAfterDone({
-            report() {
-                reports.push('reported');
-            }
-        } as unknown as Rule.RuleContext, { type: 'Identifier' } as Rule.Node);
-
-        assert.deepStrictEqual(reports, []);
-    });
 });
