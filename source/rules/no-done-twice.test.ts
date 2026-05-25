@@ -9,6 +9,7 @@ const typescriptLanguageOptions = { parser: typescriptParser };
 ruleTester.run('no-done-twice', noDoneTwiceRule, {
     valid: [
         'it("title", function(done) { done(); });',
+        'it("title", function(done) { const foo = done; foo(); });',
         'it("title", function(finish) { finish(); });',
         'it("title", function(done) { return done(); done(); });',
         'it("title", function(done) { if (failed) { done(error); } else { done(); } });',
@@ -29,6 +30,10 @@ ruleTester.run('no-done-twice', noDoneTwiceRule, {
     invalid: [
         {
             code: 'it("title", function(done) { done(); done(); });',
+            errors: [{ message }]
+        },
+        {
+            code: 'it("title", function(done) { const foo = done; foo(); foo(); });',
             errors: [{ message }]
         },
         {
