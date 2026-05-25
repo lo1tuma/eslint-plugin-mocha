@@ -1,7 +1,11 @@
 import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { type CallExpression, isCallExpression } from '../ast/node-types.js';
-import { getStaticNumericConfigValue, visitMochaContextConfigCalls } from '../mocha/config-call.js';
+import { isCallExpression } from '../ast/node-types.js';
+import {
+    getStaticNumericConfigValue,
+    type MochaConfigCallExpression,
+    visitMochaContextConfigCalls
+} from '../mocha/config-call.js';
 import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 
 const optionSchema = {
@@ -68,18 +72,18 @@ function validateOption(option: Readonly<Option>): void {
 
 function reportUnexpectedSlow(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>,
+    node: MochaConfigCallExpression,
     descriptor: Readonly<ReportMessageDetails>
 ): void {
     context.report({
         ...descriptor,
-        node: node.callee.type === 'MemberExpression' ? node.callee.property : node.callee
+        node: node.callee.property
     });
 }
 
 function reportSlowAboveMax(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>,
+    node: MochaConfigCallExpression,
     maximumValue: number,
     slowValue: number
 ): void {
@@ -94,7 +98,7 @@ function reportSlowAboveMax(
 
 function reportSlowOutsideRange(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>,
+    node: MochaConfigCallExpression,
     option: Readonly<Extract<Option, { mode: 'range'; }>>,
     slowValue: number
 ): void {
@@ -110,14 +114,14 @@ function reportSlowOutsideRange(
 
 function readStaticSlowValue(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>
+    node: MochaConfigCallExpression
 ): number | null {
     return getStaticNumericConfigValue(node, context.sourceCode);
 }
 
 function checkMaximumSlowCall(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>,
+    node: MochaConfigCallExpression,
     maximumValue: number,
     slowValue: number
 ): void {
@@ -128,7 +132,7 @@ function checkMaximumSlowCall(
 
 function checkSlowRangeCall(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>,
+    node: MochaConfigCallExpression,
     option: Readonly<Extract<Option, { mode: 'range'; }>>,
     slowValue: number
 ): void {
@@ -139,7 +143,7 @@ function checkSlowRangeCall(
 
 function checkConfiguredSlowCall(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>,
+    node: MochaConfigCallExpression,
     option: Exclude<Option, { mode: 'disallow'; }>,
     slowValue: number
 ): void {
@@ -172,7 +176,7 @@ export const limitSlowRule: Readonly<Rule.RuleModule> = {
         const option = getRuleOption<Option>(context);
         validateOption(option);
 
-        function checkSlowCall(node: Readonly<CallExpression>): void {
+        function checkSlowCall(node: MochaConfigCallExpression): void {
             if (option.mode === 'disallow') {
                 reportUnexpectedSlow(context, node, {
                     messageId: 'unexpectedSlow'
@@ -191,8 +195,14 @@ export const limitSlowRule: Readonly<Rule.RuleModule> = {
 
         return createMochaVisitors(context, {
             config(visitorContext) {
-                if (visitorContext.config === 'slow' && isCallExpression(visitorContext.node)) {
-                    checkSlowCall(visitorContext.node);
+                const { node } = visitorContext;
+
+                if (
+                    visitorContext.config === 'slow' &&
+                    isCallExpression(node) &&
+                    node.callee.type === 'MemberExpression'
+                ) {
+                    checkSlowCall(node as MochaConfigCallExpression);
                 }
             },
 
