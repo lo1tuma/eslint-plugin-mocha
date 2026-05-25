@@ -32,7 +32,9 @@ export default [
 ## Configs
 
 - `mochaPlugin.configs.recommended`: Practical defaults for most projects.
-- `mochaPlugin.configs.all`: Enables every rule.
+- `mochaPlugin.configs.all`: Enables every rule. This config may change when new
+  rules are added, so it is better suited for trying the full rule set than
+  for stable long-term lint output.
 
 ```js
 import mochaPlugin from "eslint-plugin-mocha";
