@@ -237,6 +237,7 @@ describe('consistent-structure helpers', function () {
         assert.throws(
             function () {
                 getStructureEntityKind({
+                    config: 'timeout',
                     interface: 'BDD',
                     modifier: null,
                     name: 'timeout',
@@ -251,6 +252,7 @@ describe('consistent-structure helpers', function () {
     it('getDirectStructureContext() returns null when no structure layer exists', function () {
         const { expression: node } = readExpression('foo;');
         const result = getDirectStructureContext([], {
+            config: null,
             interface: 'BDD',
             modifier: null,
             name: 'describe',
@@ -279,6 +281,7 @@ describe('consistent-structure helpers', function () {
                 usedHookNames: new Set()
             }],
             {
+                config: null,
                 interface: 'BDD',
                 modifier: null,
                 name: 'it',

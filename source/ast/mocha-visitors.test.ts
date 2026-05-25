@@ -34,6 +34,37 @@ ruleTester.run('mocha-visitors', programOnlyRule, {
     invalid: []
 });
 
+const configDispatchRule: Readonly<Rule.RuleModule> = {
+    meta: {
+        schema: []
+    },
+    create(ruleContext) {
+        return createMochaVisitors(ruleContext, {
+            config(visitorContext) {
+                if (visitorContext.config === 'timeout') {
+                    ruleContext.report({
+                        node: visitorContext.node,
+                        message: `timeout:${visitorContext.name}`
+                    });
+                }
+            }
+        });
+    }
+};
+
+ruleTester.run('mocha-visitors config dispatch', configDispatchRule, {
+    valid: [
+        'it("name", function () {});',
+        'beforeEach(function () { this.timeout(1000); });'
+    ],
+    invalid: [
+        {
+            code: 'it("name", function () {}).timeout(1000);',
+            errors: [{ message: 'timeout:it().timeout()' }]
+        }
+    ]
+});
+
 describe('mocha visitor helpers', function () {
     it('dispatchCallback() ignores non-call-expression nodes', function () {
         let called = false;
@@ -41,6 +72,7 @@ describe('mocha visitor helpers', function () {
         dispatchCallback(function () {
             called = true;
         }, {
+            config: null,
             interface: 'BDD',
             modifier: null,
             name: 'it()',
