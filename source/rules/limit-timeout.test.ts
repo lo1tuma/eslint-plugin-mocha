@@ -1,4 +1,5 @@
-import { RuleTester } from 'eslint';
+import { Linter, RuleTester } from 'eslint';
+import assert from 'node:assert';
 import { withInterface } from '../mocha-interface-test-cases.js';
 import { limitTimeoutRule } from './limit-timeout.js';
 
@@ -142,4 +143,26 @@ ruleTester.run('limit-timeout', limitTimeoutRule, {
             errors: [{ message: unexpectedTimeout }]
         }
     ]
+});
+
+describe('limit-timeout', function () {
+    it('throws when the configured range is invalid', function () {
+        const linter = new Linter();
+
+        assert.throws(
+            function () {
+                linter.verify('it("works", function () {}).timeout(5000);', {
+                    plugins: { 'test-plugin': { rules: { 'limit-timeout': limitTimeoutRule } } },
+                    languageOptions: { sourceType: 'script' },
+                    rules: {
+                        'test-plugin/limit-timeout': ['error', { mode: 'range', min: 10, max: 1 }]
+                    }
+                });
+            },
+            function (error: unknown) {
+                return error instanceof Error &&
+                    error.message.includes('`min` must be less than or equal to `max`.');
+            }
+        );
+    });
 });
