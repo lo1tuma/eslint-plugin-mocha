@@ -129,6 +129,7 @@ For maintainers: the rules table below is generated, and the headers in `documen
 | [consistent-structure](documentation/rules/consistent-structure.md)                           | Require consistent structure for Mocha test entities                    | ✅  |    |    |    |    |
 | [handle-done-callback](documentation/rules/handle-done-callback.md)                           | Enforces handling of callbacks for async tests in every branch          | ✅  |    |    |    |    |
 | [limit-retries](documentation/rules/limit-retries.md)                                         | Enforce limits for Mocha retries                                        |    |    | ✅  |    |    |
+| [limit-slow](documentation/rules/limit-slow.md)                                               | Enforce limits for Mocha slow thresholds                                |    |    | ✅  |    |    |
 | [limit-timeout](documentation/rules/limit-timeout.md)                                         | Enforce limits for Mocha timeouts                                       |    |    | ✅  |    |    |
 | [max-top-level-suites](documentation/rules/max-top-level-suites.md)                           | Enforce the number of top-level suites in a single file                 | ✅  |    |    |    |    |
 | [no-async-and-done](documentation/rules/no-async-and-done.md)                                 | Disallow async functions that also use a Mocha callback                 | ✅  |    |    |    |    |
