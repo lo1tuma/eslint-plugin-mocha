@@ -13,4 +13,9 @@ declare module '@eslint-community/eslint-utils' {
         node: Node,
         initialScope?: Scope.Scope | null
     ): string | null;
+
+    export function getStaticValue(
+        node: Node,
+        initialScope?: Scope.Scope | null
+    ): { value: unknown; optional?: true; } | null;
 }

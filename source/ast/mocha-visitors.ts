@@ -1,13 +1,14 @@
 import type { Rule, SourceCode } from 'eslint';
 import type { Except } from 'type-fest';
 import { getAllCustomNameDetails, getCustomNameDetailsForInterface } from '../mocha/all-name-details.js';
-import type { MochaEntityType, MochaInterface, MochaModifier } from '../mocha/descriptors.js';
+import type { MochaConfigCall, MochaEntityType, MochaInterface, MochaModifier } from '../mocha/descriptors.js';
 import { getAdditionalNames, getInterface } from '../settings.js';
 import { findMochaVariableCalls, type ResolvedReferenceWithNameDetails } from './find-mocha-variable-calls.js';
 import {
     type AnyFunctionExpressionNode,
     getFunctionExpressionLastArgument
 } from './function-expression-arguments.js';
+import { createListenerRecord } from './listener-record.js';
 import { isCallExpression } from './node-types.js';
 
 type MochaVisitor = (context: Readonly<VisitorContext>) => void;
@@ -18,6 +19,8 @@ type MemberExpressionNode = Parameters<ExpressionListener<'MemberExpression'>>[0
 type CallExpressionNodeVisitor = (node: CallExpressionNode) => void;
 type MochaCallbackVisitor = (context: Readonly<CallbackVisitorContext>) => void;
 type TestEntityVisitors = {
+    config?: MochaVisitor | undefined;
+    'config:exit'?: MochaVisitor | undefined;
     testCase?: MochaVisitor | undefined;
     'testCase:exit'?: MochaVisitor | undefined;
     testCaseCallback?: MochaCallbackVisitor | undefined;
@@ -76,6 +79,7 @@ export type VisitorContext = {
     name: string;
     node: Rule.Node;
     type: MochaEntityType;
+    config: MochaConfigCall | null;
     modifier: MochaModifier | null;
     interface: MochaInterface;
 };
@@ -86,6 +90,7 @@ type CachedMochaCall = {
 };
 
 type CallExpressionDispatchers = {
+    readonly config?: MochaVisitor | undefined;
     readonly testCase?: MochaVisitor | undefined;
     readonly testCaseCallback?: MochaCallbackVisitor | undefined;
     readonly suite?: MochaVisitor | undefined;
@@ -147,6 +152,7 @@ function createContext(reference: Readonly<ResolvedReferenceWithNameDetails>): R
         name: reference.name,
         node: reference.node,
         type: reference.nameDetails.type,
+        config: reference.nameDetails.config,
         modifier: reference.nameDetails.modifier,
         interface: reference.nameDetails.interface
     };
@@ -225,11 +231,12 @@ function dispatchCallExpressionContext(
     dispatchers: Readonly<CallExpressionDispatchers>,
     cachedMochaCall: Readonly<CachedMochaCall>
 ): void {
+    const context = createContext(cachedMochaCall.reference);
+
     if (kind === MochaEntityKind.Config) {
+        group?.visitor?.(context);
         return;
     }
-
-    const context = createContext(cachedMochaCall.reference);
 
     dispatchSpecificCallExpressionContext(group, dispatchers, context);
     dispatchers.anyTestEntity?.(context);
@@ -240,7 +247,7 @@ function createCallExpressionDispatcher(
     dispatchers: Readonly<CallExpressionDispatchers>
 ): CallExpressionDispatcher | undefined {
     const groups = {
-        [MochaEntityKind.Config]: undefined,
+        [MochaEntityKind.Config]: createCallExpressionDispatchGroup(dispatchers.config, undefined),
         [MochaEntityKind.TestCase]: createCallExpressionDispatchGroup(
             dispatchers.testCase,
             dispatchers.testCaseCallback,
@@ -256,14 +263,19 @@ function createCallExpressionDispatcher(
             dispatchers.hookCallback
         )
     } as const satisfies Readonly<Record<MochaEntityKind, Readonly<CallExpressionDispatchGroup> | undefined>>;
+    const hasDispatcher = [
+        groups[MochaEntityKind.Config],
+        groups[MochaEntityKind.TestCase],
+        groups[MochaEntityKind.Suite],
+        groups[MochaEntityKind.Hook],
+        dispatchers.anyTestEntity,
+        dispatchers.anyTestEntityCallback
+    ]
+        .some((dispatcher) => {
+            return dispatcher !== undefined;
+        });
 
-    if (
-        groups[MochaEntityKind.TestCase] === undefined &&
-        groups[MochaEntityKind.Suite] === undefined &&
-        groups[MochaEntityKind.Hook] === undefined &&
-        dispatchers.anyTestEntity === undefined &&
-        dispatchers.anyTestEntityCallback === undefined
-    ) {
+    if (!hasDispatcher) {
         return undefined;
     }
 
@@ -365,6 +377,8 @@ function splitMochaVisitors(visitors: Readonly<MochaVisitors>): Readonly<SplitMo
         nonMochaFunctionExpression,
         'mochaFunctionExpression:exit': mochaFunctionExpressionExit,
         'nonMochaFunctionExpression:exit': nonMochaFunctionExpressionExit,
+        config,
+        'config:exit': configExit,
         testCase,
         'testCase:exit': testCaseExit,
         testCaseCallback,
@@ -422,6 +436,7 @@ function splitMochaVisitors(visitors: Readonly<MochaVisitors>): Readonly<SplitMo
             }
         },
         enterDispatchers: {
+            config,
             testCase,
             testCaseCallback,
             suite,
@@ -433,6 +448,7 @@ function splitMochaVisitors(visitors: Readonly<MochaVisitors>): Readonly<SplitMo
             anyTestEntityCallback
         },
         exitDispatchers: {
+            config: configExit,
             testCase: testCaseExit,
             testCaseCallback: testCaseCallbackExit,
             suite: suiteExit,
@@ -471,18 +487,6 @@ function createExpressionRuleListener<Node extends FunctionExpressionNode | Memb
     return function (node): void {
         expressionVisitor(cachedMochaCallsByNode, node, listenerSet);
     };
-}
-
-function createListenerRecord<Name extends keyof Rule.RuleListener>(
-    name: Name,
-    listener: Rule.RuleListener[Name]
-): Partial<Rule.RuleListener> {
-    const listeners: Partial<Rule.RuleListener> = {};
-    if (listener !== undefined) {
-        listeners[name] = listener;
-    }
-
-    return listeners;
 }
 
 function createSpecificVisitors(
