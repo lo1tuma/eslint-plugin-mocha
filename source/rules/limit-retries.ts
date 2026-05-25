@@ -1,7 +1,11 @@
 import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { type CallExpression, isCallExpression } from '../ast/node-types.js';
-import { getStaticNumericConfigValue, visitMochaContextConfigCalls } from '../mocha/config-call.js';
+import { isCallExpression } from '../ast/node-types.js';
+import {
+    getStaticNumericConfigValue,
+    type MochaConfigCallExpression,
+    visitMochaContextConfigCalls
+} from '../mocha/config-call.js';
 import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 
 const optionSchema = {
@@ -68,18 +72,18 @@ function validateOption(option: Readonly<Option>): void {
 
 function reportUnexpectedRetries(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>,
+    node: MochaConfigCallExpression,
     descriptor: Readonly<ReportMessageDetails>
 ): void {
     context.report({
         ...descriptor,
-        node: node.callee.type === 'MemberExpression' ? node.callee.property : node.callee
+        node: node.callee.property
     });
 }
 
 function reportRetriesAboveMax(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>,
+    node: MochaConfigCallExpression,
     maximumValue: number,
     retryValue: number
 ): void {
@@ -94,7 +98,7 @@ function reportRetriesAboveMax(
 
 function reportRetriesOutsideRange(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>,
+    node: MochaConfigCallExpression,
     option: Readonly<Extract<Option, { mode: 'range'; }>>,
     retryValue: number
 ): void {
@@ -110,14 +114,14 @@ function reportRetriesOutsideRange(
 
 function readStaticRetryValue(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>
+    node: MochaConfigCallExpression
 ): number | null {
     return getStaticNumericConfigValue(node, context.sourceCode);
 }
 
 function checkMaximumRetriesCall(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>,
+    node: MochaConfigCallExpression,
     maximumValue: number,
     retryValue: number
 ): void {
@@ -128,7 +132,7 @@ function checkMaximumRetriesCall(
 
 function checkRetriesRangeCall(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>,
+    node: MochaConfigCallExpression,
     option: Readonly<Extract<Option, { mode: 'range'; }>>,
     retryValue: number
 ): void {
@@ -139,7 +143,7 @@ function checkRetriesRangeCall(
 
 function checkConfiguredRetriesCall(
     context: Readonly<Rule.RuleContext>,
-    node: Readonly<CallExpression>,
+    node: MochaConfigCallExpression,
     option: Exclude<Option, { mode: 'disallow'; }>,
     retryValue: number
 ): void {
@@ -172,7 +176,7 @@ export const limitRetriesRule: Readonly<Rule.RuleModule> = {
         const option = getRuleOption<Option>(context);
         validateOption(option);
 
-        function checkRetriesCall(node: Readonly<CallExpression>): void {
+        function checkRetriesCall(node: MochaConfigCallExpression): void {
             if (option.mode === 'disallow') {
                 reportUnexpectedRetries(context, node, {
                     messageId: 'unexpectedRetries'
@@ -191,8 +195,14 @@ export const limitRetriesRule: Readonly<Rule.RuleModule> = {
 
         return createMochaVisitors(context, {
             config(visitorContext) {
-                if (visitorContext.config === 'retries' && isCallExpression(visitorContext.node)) {
-                    checkRetriesCall(visitorContext.node);
+                const { node } = visitorContext;
+
+                if (
+                    visitorContext.config === 'retries' &&
+                    isCallExpression(node) &&
+                    node.callee.type === 'MemberExpression'
+                ) {
+                    checkRetriesCall(node as MochaConfigCallExpression);
                 }
             },
 
