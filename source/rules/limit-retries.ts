@@ -1,6 +1,6 @@
 import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { isCallExpression } from '../ast/node-types.js';
+import { type CallExpression, isCallExpression } from '../ast/node-types.js';
 import {
     getStaticNumericConfigValue,
     type MochaConfigCallExpression,
@@ -61,6 +61,10 @@ type ReportMessageDetails = {
     readonly messageId: RetryMessageId;
     readonly data?: Record<string, string>;
 };
+
+function hasMemberCallee(node: Readonly<CallExpression>): node is MochaConfigCallExpression {
+    return node.callee.type === 'MemberExpression';
+}
 
 const defaultOption: Option = { mode: 'disallow' };
 
@@ -200,9 +204,9 @@ export const limitRetriesRule: Readonly<Rule.RuleModule> = {
                 if (
                     visitorContext.config === 'retries' &&
                     isCallExpression(node) &&
-                    node.callee.type === 'MemberExpression'
+                    hasMemberCallee(node)
                 ) {
-                    checkRetriesCall(node as MochaConfigCallExpression);
+                    checkRetriesCall(node);
                 }
             },
 
