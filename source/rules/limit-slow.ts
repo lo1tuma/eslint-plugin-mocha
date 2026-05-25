@@ -1,6 +1,6 @@
 import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { isCallExpression } from '../ast/node-types.js';
+import { type CallExpression, isCallExpression } from '../ast/node-types.js';
 import {
     getStaticNumericConfigValue,
     type MochaConfigCallExpression,
@@ -61,6 +61,10 @@ type ReportMessageDetails = {
     readonly messageId: SlowMessageId;
     readonly data?: Record<string, string>;
 };
+
+function hasMemberCallee(node: Readonly<CallExpression>): node is MochaConfigCallExpression {
+    return node.callee.type === 'MemberExpression';
+}
 
 const defaultOption: Option = { mode: 'disallow' };
 
@@ -200,9 +204,9 @@ export const limitSlowRule: Readonly<Rule.RuleModule> = {
                 if (
                     visitorContext.config === 'slow' &&
                     isCallExpression(node) &&
-                    node.callee.type === 'MemberExpression'
+                    hasMemberCallee(node)
                 ) {
-                    checkSlowCall(node as MochaConfigCallExpression);
+                    checkSlowCall(node);
                 }
             },
 
