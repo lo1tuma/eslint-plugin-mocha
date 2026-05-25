@@ -13,11 +13,7 @@ ruleTester.run('no-conditional-tests', noConditionalTestsRule, {
         'condition ? afterEach(function () {}) : after(function () {});',
         withInterface('TDD', 'suite("suite", function () { test("works", function () {}); });'),
         {
-            code: [
-                'foo("suite", function () {',
-                '    bar("works", function () {});',
-                '});'
-            ].join('\n'),
+            code: 'foo("suite", function () { bar("works", function () {}); });',
             settings: {
                 mocha: {
                     additionalCustomNames: [
@@ -50,9 +46,7 @@ ruleTester.run('no-conditional-tests', noConditionalTestsRule, {
             errors: [{ message: 'Unexpected conditional Mocha suite or test declaration.', column: 14, line: 1 }]
         }),
         {
-            code: [
-                'foo && bar("works", function () {});'
-            ].join('\n'),
+            code: 'foo && bar("works", function () {});',
             settings: {
                 mocha: {
                     additionalCustomNames: [{ name: 'bar', type: 'testCase', interface: 'BDD' }]
