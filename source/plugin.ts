@@ -6,6 +6,7 @@ import { consistentSpacingBetweenBlocksRule } from './rules/consistent-spacing-b
 import { consistentStructureRule } from './rules/consistent-structure.js';
 import { handleDoneCallbackRule } from './rules/handle-done-callback.js';
 import { limitRetriesRule } from './rules/limit-retries.js';
+import { limitSlowRule } from './rules/limit-slow.js';
 import { limitTimeoutRule } from './rules/limit-timeout.js';
 import { maxTopLevelSuitesRule } from './rules/max-top-level-suites.js';
 import { noAsyncAndDoneRule } from './rules/no-async-and-done.js';
@@ -42,6 +43,7 @@ const allRules: Linter.RulesRecord = {
     ],
     'mocha/handle-done-callback': 'error',
     'mocha/limit-retries': 'error',
+    'mocha/limit-slow': 'error',
     'mocha/limit-timeout': 'error',
     'mocha/max-top-level-suites': 'error',
     'mocha/no-async-and-done': 'error',
@@ -76,6 +78,7 @@ const recommendedRules: Linter.RulesRecord = {
     'mocha/consistent-structure': ['error', { disallowDuplicateHooks: true }],
     'mocha/handle-done-callback': 'error',
     'mocha/limit-retries': 'off',
+    'mocha/limit-slow': 'off',
     'mocha/limit-timeout': 'off',
     'mocha/max-top-level-suites': ['error', { limit: 1 }],
     'mocha/no-async-and-done': 'error',
@@ -110,6 +113,7 @@ const rules = {
     'consistent-structure': consistentStructureRule,
     'handle-done-callback': handleDoneCallbackRule,
     'limit-retries': limitRetriesRule,
+    'limit-slow': limitSlowRule,
     'limit-timeout': limitTimeoutRule,
     'max-top-level-suites': maxTopLevelSuitesRule,
     'no-async-and-done': noAsyncAndDoneRule,
