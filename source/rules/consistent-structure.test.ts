@@ -113,6 +113,15 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
             options: [{ hookOrder: 'setup-teardown' }]
         },
         {
+            code: 'describe(function() { around(function() {}); before(function() {}); });',
+            options: [{ hookOrder: 'setup-teardown' }],
+            settings: {
+                mocha: {
+                    additionalCustomNames: [{ name: 'around', type: 'hook', interface: 'BDD' }]
+                }
+            }
+        },
+        {
             code: 'describe(function() { it(function() {}); describe(function() {}); });',
             options: [{ order: 'hooks-tests-suites' }]
         },
