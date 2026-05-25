@@ -13,6 +13,7 @@ import { noAsyncAndDoneRule } from './rules/no-async-and-done.js';
 import { noAsyncInSyncTestsRule } from './rules/no-async-in-sync-tests.js';
 import { noAsyncSuiteRule } from './rules/no-async-suite.js';
 import { noCodeAfterDoneRule } from './rules/no-code-after-done.js';
+import { noConditionalTestsRule } from './rules/no-conditional-tests.js';
 import { noDoneTwiceRule } from './rules/no-done-twice.js';
 import { noEmptyTitleRule } from './rules/no-empty-title.js';
 import { noExclusiveTestsRule } from './rules/no-exclusive-tests.js';
@@ -50,6 +51,7 @@ const allRules: Linter.RulesRecord = {
     'mocha/no-async-in-sync-tests': 'error',
     'mocha/no-async-suite': 'error',
     'mocha/no-code-after-done': 'error',
+    'mocha/no-conditional-tests': 'error',
     'mocha/no-done-twice': 'error',
     'mocha/no-exclusive-tests': 'error',
     'mocha/no-exports': 'error',
@@ -85,6 +87,7 @@ const recommendedRules: Linter.RulesRecord = {
     'mocha/no-async-in-sync-tests': 'off',
     'mocha/no-async-suite': 'error',
     'mocha/no-code-after-done': 'error',
+    'mocha/no-conditional-tests': 'off',
     'mocha/no-done-twice': 'error',
     'mocha/no-exclusive-tests': 'warn',
     'mocha/no-exports': 'error',
@@ -120,6 +123,7 @@ const rules = {
     'no-async-in-sync-tests': noAsyncInSyncTestsRule,
     'no-async-suite': noAsyncSuiteRule,
     'no-code-after-done': noCodeAfterDoneRule,
+    'no-conditional-tests': noConditionalTestsRule,
     'no-done-twice': noDoneTwiceRule,
     'no-exclusive-tests': noExclusiveTestsRule,
     'no-exports': noExportsRule,
