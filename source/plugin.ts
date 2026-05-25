@@ -39,7 +39,12 @@ const pluginMeta = await readClosestPackageMetadata(import.meta.url);
 const allRules: Linter.RulesRecord = {
     'mocha/consistent-structure': [
         'error',
-        { order: 'hooks-tests-suites', disallowDuplicateHooks: true, disallowMixedTestsAndSuites: true }
+        {
+            order: 'hooks-tests-suites',
+            hookOrder: 'setup-teardown',
+            disallowDuplicateHooks: true,
+            disallowMixedTestsAndSuites: true
+        }
     ],
     'mocha/handle-done-callback': 'error',
     'mocha/limit-retries': 'error',
