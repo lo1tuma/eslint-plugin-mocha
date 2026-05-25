@@ -132,6 +132,7 @@ For maintainers: the rules table below is generated, and the headers in `documen
 | [no-async-and-done](documentation/rules/no-async-and-done.md)                                 | Disallow async functions that also use a Mocha callback                 | ✅  |    |    |    |    |
 | [no-async-in-sync-tests](documentation/rules/no-async-in-sync-tests.md)                       | Disallow async operations in synchronous tests or hooks                 |    |    | ✅  |    |    |
 | [no-async-suite](documentation/rules/no-async-suite.md)                                       | Disallow async functions passed to a suite                              | ✅  |    |    | 🔧 |    |
+| [no-code-after-done](documentation/rules/no-code-after-done.md)                               | Disallow executing code after calling a Mocha callback                  | ✅  |    |    |    |    |
 | [no-empty-title](documentation/rules/no-empty-title.md)                                       | Disallow empty suite and test descriptions                              | ✅  |    |    |    |    |
 | [no-exclusive-tests](documentation/rules/no-exclusive-tests.md)                               | Disallow exclusive tests                                                |    | ✅  |    |    | 💡 |
 | [no-exports](documentation/rules/no-exports.md)                                               | Disallow exports from test files                                        | ✅  |    |    |    | 💡 |
