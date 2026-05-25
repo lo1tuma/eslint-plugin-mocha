@@ -1,38 +1,41 @@
 import type { Rule, SourceCode } from 'eslint';
+import type { Except } from 'type-fest';
 import { getAllCustomNameDetails, getCustomNameDetailsForInterface } from '../mocha/all-name-details.js';
 import type { MochaEntityType, MochaInterface, MochaModifier } from '../mocha/descriptors.js';
 import { getAdditionalNames, getInterface } from '../settings.js';
 import { findMochaVariableCalls, type ResolvedReferenceWithNameDetails } from './find-mocha-variable-calls.js';
+import {
+    type AnyFunctionExpressionNode,
+    getFunctionExpressionLastArgument
+} from './function-expression-arguments.js';
 import { isCallExpression } from './node-types.js';
 
 type MochaVisitor = (context: Readonly<VisitorContext>) => void;
 type ExpressionListener<Name extends keyof Rule.RuleListener> = Exclude<Rule.RuleListener[Name], undefined>;
 type CallExpressionNode = Parameters<ExpressionListener<'CallExpression'>>[0];
-type MemberExpressionNode = Parameters<ExpressionListener<'MemberExpression'>>[0];
 type FunctionExpressionNode = Parameters<ExpressionListener<'FunctionExpression'>>[0];
-type ArrowFunctionExpressionNode = Parameters<ExpressionListener<'ArrowFunctionExpression'>>[0];
-type AnyFunctionExpressionNode = ArrowFunctionExpressionNode | FunctionExpressionNode;
+type MemberExpressionNode = Parameters<ExpressionListener<'MemberExpression'>>[0];
 type CallExpressionNodeVisitor = (node: CallExpressionNode) => void;
-
+type MochaCallbackVisitor = (context: Readonly<CallbackVisitorContext>) => void;
 type TestEntityVisitors = {
     testCase?: MochaVisitor | undefined;
     'testCase:exit'?: MochaVisitor | undefined;
-    testCaseCallback?: MochaVisitor | undefined;
-    'testCaseCallback:exit'?: MochaVisitor | undefined;
+    testCaseCallback?: MochaCallbackVisitor | undefined;
+    'testCaseCallback:exit'?: MochaCallbackVisitor | undefined;
     suite?: MochaVisitor | undefined;
     'suite:exit'?: MochaVisitor | undefined;
-    suiteCallback?: MochaVisitor | undefined;
-    'suiteCallback:exit'?: MochaVisitor | undefined;
+    suiteCallback?: MochaCallbackVisitor | undefined;
+    'suiteCallback:exit'?: MochaCallbackVisitor | undefined;
     hook?: MochaVisitor | undefined;
     'hook:exit'?: MochaVisitor | undefined;
-    hookCallback?: MochaVisitor | undefined;
-    'hookCallback:exit'?: MochaVisitor | undefined;
+    hookCallback?: MochaCallbackVisitor | undefined;
+    'hookCallback:exit'?: MochaCallbackVisitor | undefined;
     suiteOrTestCase?: MochaVisitor | undefined;
     'suiteOrTestCase:exit'?: MochaVisitor | undefined;
     anyTestEntity?: MochaVisitor | undefined;
     'anyTestEntity:exit'?: MochaVisitor | undefined;
-    anyTestEntityCallback?: MochaVisitor | undefined;
-    'anyTestEntityCallback:exit'?: MochaVisitor | undefined;
+    anyTestEntityCallback?: MochaCallbackVisitor | undefined;
+    'anyTestEntityCallback:exit'?: MochaCallbackVisitor | undefined;
 };
 
 type MochaSpecificVisitors = TestEntityVisitors & {
@@ -69,21 +72,6 @@ const enum MochaEntityKind {
     Hook
 }
 
-function isAnyFunctionExpression(
-    node: Readonly<CallExpressionNode['arguments'][number]>
-): node is AnyFunctionExpressionNode {
-    return node.type === 'FunctionExpression' || node.type === 'ArrowFunctionExpression';
-}
-
-function getFunctionExpressionLastArgument(
-    node: Readonly<CallExpressionNode>
-): Readonly<AnyFunctionExpressionNode | undefined> {
-    const lastArgument = node.arguments.at(-1);
-    return lastArgument !== undefined && isAnyFunctionExpression(lastArgument)
-        ? lastArgument
-        : undefined;
-}
-
 export type VisitorContext = {
     name: string;
     node: Rule.Node;
@@ -91,7 +79,7 @@ export type VisitorContext = {
     modifier: MochaModifier | null;
     interface: MochaInterface;
 };
-
+type CallbackVisitorContext = Except<VisitorContext, 'node'> & { node: AnyFunctionExpressionNode; };
 type CachedMochaCall = {
     readonly kind: MochaEntityKind;
     readonly reference: Readonly<ResolvedReferenceWithNameDetails>;
@@ -99,20 +87,20 @@ type CachedMochaCall = {
 
 type CallExpressionDispatchers = {
     readonly testCase?: MochaVisitor | undefined;
-    readonly testCaseCallback?: MochaVisitor | undefined;
+    readonly testCaseCallback?: MochaCallbackVisitor | undefined;
     readonly suite?: MochaVisitor | undefined;
-    readonly suiteCallback?: MochaVisitor | undefined;
+    readonly suiteCallback?: MochaCallbackVisitor | undefined;
     readonly hook?: MochaVisitor | undefined;
-    readonly hookCallback?: MochaVisitor | undefined;
+    readonly hookCallback?: MochaCallbackVisitor | undefined;
     readonly suiteOrTestCase?: MochaVisitor | undefined;
     readonly anyTestEntity?: MochaVisitor | undefined;
-    readonly anyTestEntityCallback?: MochaVisitor | undefined;
+    readonly anyTestEntityCallback?: MochaCallbackVisitor | undefined;
 };
 
 type CallExpressionDispatcher = (cachedMochaCall: Readonly<CachedMochaCall>) => void;
 type CallExpressionDispatchGroup = {
     readonly visitor?: MochaVisitor | undefined;
-    readonly callbackVisitor?: MochaVisitor | undefined;
+    readonly callbackVisitor?: MochaCallbackVisitor | undefined;
     readonly includeSuiteOrTestCase: boolean;
 };
 type SplitMochaVisitors = {
@@ -187,7 +175,7 @@ function createMochaCallCache(
 
 function createCallExpressionDispatchGroup(
     visitor: MochaVisitor | undefined,
-    callbackVisitor: MochaVisitor | undefined,
+    callbackVisitor: MochaCallbackVisitor | undefined,
     includeSuiteOrTestCase = false
 ): Readonly<CallExpressionDispatchGroup> | undefined {
     if (visitor === undefined && callbackVisitor === undefined && !includeSuiteOrTestCase) {
@@ -202,7 +190,7 @@ function createCallExpressionDispatchGroup(
 }
 
 export function dispatchCallback(
-    visitor: MochaVisitor | undefined,
+    visitor: MochaCallbackVisitor | undefined,
     context: Readonly<VisitorContext>
 ): void {
     const callbackNode = isCallExpression(context.node)

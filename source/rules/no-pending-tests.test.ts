@@ -68,6 +68,15 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
             options: [allowSkippedWithCommentOption]
         }),
         {
+            code: '// SKIP pending #201\nit("works", function() { this.skip(); })',
+            options: [allowSkippedWithCommentOption]
+        },
+        {
+            code: '// SKIP pending #201\nbefore(function() { this.skip(); })',
+            options: [allowSkippedWithCommentOption]
+        },
+        'it("works", function() { function later() { this.skip(); } later.call(this); })',
+        {
             code: 'xcustom()',
             settings: {
                 mocha: {
@@ -374,6 +383,23 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                 suggestions: [{ messageId: 'removePendingModifier', output: 'custom()' }]
             }]
         },
+        {
+            code: 'it("works", function() { this.skip(); })',
+            errors: [{ message: expectedErrorMessage, column: 31, line: 1 }]
+        },
+        {
+            code: 'before(function() { this.skip(); })',
+            errors: [{ message: expectedErrorMessage, column: 26, line: 1 }]
+        },
+        {
+            code: 'it("works", function() { (() => this.skip())(); })',
+            errors: [{ message: expectedErrorMessage, column: 38, line: 1 }]
+        },
+        {
+            code: 'it("works", function() { this.skip(); })',
+            options: [allowSkippedWithCommentOption],
+            errors: [{ message: expectedMissingCommentMessage, column: 31, line: 1 }]
+        },
         withInterface('TDD', {
             code: 'var dynamicOnly = "skip"; suite[dynamicOnly]()',
             errors: [{ message: expectedErrorMessage, column: 33, line: 1 }]
@@ -418,6 +444,39 @@ describe('no-pending-tests helpers', function () {
         );
 
         assert.deepStrictEqual(reports, []);
+    });
+
+    it('checkPendingSuite() handles this.skip() calls when skipped comments are allowed', function () {
+        const reports: string[] = [];
+
+        checkPendingSuite(
+            asRuleContext({
+                report() {
+                    reports.push('reported');
+                },
+                sourceCode: asSourceCode({
+                    getCommentsBefore() {
+                        return [];
+                    }
+                })
+            }),
+            {
+                modifier: 'pending',
+                node: asRuleNode({
+                    arguments: [],
+                    callee: {
+                        computed: false,
+                        object: { type: 'ThisExpression' },
+                        property: { name: 'skip', type: 'Identifier' },
+                        type: 'MemberExpression'
+                    },
+                    type: 'CallExpression'
+                })
+            },
+            { allowSkippedWithComment: true }
+        );
+
+        assert.deepStrictEqual(reports, ['reported']);
     });
 
     it('isPendingMemberExpression() returns false for non-member-expression callees', function () {
