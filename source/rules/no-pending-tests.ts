@@ -1,8 +1,8 @@
 import type { Rule, SourceCode } from 'eslint';
 import type { Comment as EstreeComment } from 'estree';
-import type { Except } from 'type-fest';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import {
+    type AnyFunction,
     type CallExpression,
     getParentNode,
     isCallExpression,
@@ -12,6 +12,7 @@ import {
     isMemberExpression,
     type MemberExpression
 } from '../ast/node-types.js';
+import { type TraversableNode, visitChildNodes } from '../ast/visit-child-nodes.js';
 import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 
 const optionSchema = {
@@ -51,7 +52,6 @@ type KnownLocation = Locatable & {
     readonly loc: NonNullable<Locatable['loc']>;
 };
 type KnownLocationComment = EstreeComment & KnownLocation;
-type TraversableNode = Except<Rule.Node, 'parent'>;
 
 export function isCallbackMissing(node: CallExpression): boolean {
     const [firstArgument] = node.arguments;
@@ -173,34 +173,6 @@ function shouldAllowSkippedWithComment(
         hasAdjacentLeadingComment(context.sourceCode, node);
 }
 
-function getNodeProperty(node: TraversableNode, key: string): unknown {
-    return Reflect.get(node, key);
-}
-
-function isNode(value: unknown): value is TraversableNode {
-    return typeof value === 'object' && value !== null && 'type' in value;
-}
-
-function visitChildNodes(
-    sourceCode: Readonly<SourceCode>,
-    node: TraversableNode,
-    visitor: (childNode: TraversableNode) => void
-): void {
-    for (const key of sourceCode.visitorKeys[node.type] ?? []) {
-        const value = getNodeProperty(node, key);
-
-        if (Array.isArray(value)) {
-            value.forEach((item) => {
-                if (isNode(item)) {
-                    visitor(item);
-                }
-            });
-        } else if (isNode(value)) {
-            visitor(value);
-        }
-    }
-}
-
 function visitThisSkipCalls(
     sourceCode: Readonly<SourceCode>,
     node: TraversableNode,
@@ -293,16 +265,12 @@ export function checkPendingSuite(
 
 function checkPendingCallback(
     context: Readonly<Rule.RuleContext>,
-    visitorContext: PendingVisitorContext,
+    callbackNode: Readonly<AnyFunction>,
     configuration: Readonly<PendingRuleConfiguration>
 ): void {
-    if (!isFunction(visitorContext.node)) {
-        return;
-    }
+    const callbackParent = getParentNode(callbackNode);
 
-    const callbackParent = getParentNode(visitorContext.node);
-
-    visitThisSkipCalls(context.sourceCode, visitorContext.node.body, (thisSkipCall) => {
+    visitThisSkipCalls(context.sourceCode, callbackNode.body, (thisSkipCall) => {
         if (
             configuration.allowSkippedWithComment &&
             (hasAdjacentLeadingComment(context.sourceCode, thisSkipCall) ||
@@ -349,7 +317,7 @@ export const noPendingTestsRule: Rule.RuleModule = {
             },
 
             anyTestEntityCallback(visitorContext) {
-                checkPendingCallback(context, visitorContext, configuration);
+                checkPendingCallback(context, visitorContext.node, configuration);
             }
         });
     }
