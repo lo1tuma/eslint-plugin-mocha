@@ -86,12 +86,12 @@ const recommendedRules: Linter.RulesRecord = {
     'mocha/limit-retries': 'off',
     'mocha/limit-slow': 'off',
     'mocha/limit-timeout': 'off',
-    'mocha/max-top-level-suites': ['error', { limit: 1 }],
+    'mocha/max-top-level-suites': 'off',
     'mocha/no-async-and-done': 'error',
-    'mocha/no-async-in-sync-tests': 'off',
+    'mocha/no-async-in-sync-tests': 'error',
     'mocha/no-async-suite': 'error',
     'mocha/no-code-after-done': 'error',
-    'mocha/no-conditional-tests': 'off',
+    'mocha/no-conditional-tests': 'error',
     'mocha/no-done-twice': 'error',
     'mocha/no-exclusive-tests': 'warn',
     'mocha/no-exports': 'error',
@@ -105,15 +105,15 @@ const recommendedRules: Linter.RulesRecord = {
     'mocha/no-pending-tests': 'warn',
     'mocha/no-return-and-callback': 'error',
     'mocha/no-return-from-async': 'off',
-    'mocha/no-setup-in-suite': 'error',
+    'mocha/no-setup-in-suite': 'off',
     'mocha/no-synchronous-tests': 'off',
-    'mocha/no-root-hooks': 'warn',
+    'mocha/no-root-hooks': 'off',
     'mocha/prefer-arrow-callback': 'off',
     'mocha/valid-suite-title': 'off',
     'mocha/valid-test-title': 'off',
     'mocha/no-empty-title': 'error',
-    'mocha/consistent-spacing-between-blocks': 'error',
-    'mocha/consistent-interface': ['error', { interface: 'BDD' }]
+    'mocha/consistent-spacing-between-blocks': 'off',
+    'mocha/consistent-interface': 'off'
 };
 
 const rules = {
