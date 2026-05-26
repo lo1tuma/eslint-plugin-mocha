@@ -11,6 +11,7 @@
     "dependencies": {
         "@eslint-community/eslint-utils": "4.4.1",
         "globals": "15.14.0",
+        "json-schema-to-ts": "3.1.1",
         "type-fest": "4.40.0"
     },
     "devDependencies": {
@@ -23,17 +24,18 @@
         "@enormora/eslint-config-node": "0.0.27",
         "@enormora/eslint-config-typescript": "0.0.37",
         "@packtory/cli": "0.0.5",
+        "@types/estree": "1.0.9",
         "@types/mocha": "10.0.10",
         "@typescript-eslint/parser": "8.59.3",
         "c8": "11.0.0",
         "change-case": "5.4.4",
         "coveralls": "3.1.1",
+        "dependency-cruiser": "17.4.2",
         "dprint": "0.48.0",
         "dprint-plugin-yaml": "0.6.0",
         "eslint": "10.4.0",
         "eslint-doc-generator": "2.0.2",
         "eslint-plugin-eslint-plugin": "6.4.0",
-        "json-schema-to-ts": "3.1.1",
         "markdownlint-cli": "0.43.0",
         "mocha": "11.1.0",
         "pr-log": "6.1.1",
