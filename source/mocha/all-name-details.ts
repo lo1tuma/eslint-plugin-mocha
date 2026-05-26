@@ -12,12 +12,12 @@ export type CustomNameConfig = Pick<NameDetailsConfig, 'interface'> & {
     type: CustomMochaEntityType;
 };
 
-export function nameConfigToNameDetails(nameConfig: Readonly<CustomNameConfig>): Readonly<NameDetailsConfig> {
+function nameConfigToNameDetails(nameConfig: Readonly<CustomNameConfig>): Readonly<NameDetailsConfig> {
     const { name, ...rest } = nameConfig;
     return { path: convertNameToPathArray(name), modifier: null, config: null, ...rest };
 }
 
-export const builtinNameDetailsList = buildAllNameDetailsWithVariants(builtinNames);
+const builtinNameDetailsList = buildAllNameDetailsWithVariants(builtinNames);
 
 function hasMatchingInterface(
     nameDetails: Readonly<NameDetailsConfig>,
