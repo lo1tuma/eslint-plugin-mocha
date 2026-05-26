@@ -14,12 +14,15 @@ eslint *options:
 
 eslint-fix: (eslint '--fix')
 
+lint-dependencies:
+    depcruise --config dependency-cruiser.config.js './source/**/*.ts' './benchmarks/**/*.ts' './*.js' './*.cjs'
+
 lint-docs:
     markdownlint '**/*.md'
 
 lint-eslint-docs: (update-eslint-docs '--check')
 
-lint: lint-docs lint-eslint-docs eslint
+lint: lint-docs lint-eslint-docs eslint lint-dependencies
 
 lint-fix: eslint-fix format-fix
 
