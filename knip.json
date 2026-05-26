@@ -1,0 +1,27 @@
+{
+    "$schema": "https://unpkg.com/knip@5/schema.json",
+    "entry": [
+        "benchmarks/**/*.ts",
+        "source/**/*.test.ts",
+        "source/third-party-type-definitions.d.ts!",
+        "dependency-cruiser.config.js",
+        "packtory.config.js"
+    ],
+    "project": [
+        "benchmarks/**/*.ts",
+        "source/**/*.ts!",
+        "source/**/*.d.ts!",
+        "*.js",
+        "!source/mocha-interface-test-cases.ts!",
+        "!source/**/*.test.ts!"
+    ],
+    "ignoreDependencies": [
+        "c8",
+        "coveralls",
+        "dprint",
+        "eslint-doc-generator",
+        "markdownlint-cli",
+        "pr-log"
+    ],
+    "ignoreBinaries": []
+}

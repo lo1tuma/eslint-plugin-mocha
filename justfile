@@ -17,12 +17,16 @@ eslint-fix: (eslint '--fix')
 lint-dependencies:
     depcruise --config dependency-cruiser.config.js './source/**/*.ts' './benchmarks/**/*.ts' './*.js' './*.cjs'
 
+lint-unused-code:
+    knip
+    knip --production --dependencies --files
+
 lint-docs:
     markdownlint '**/*.md'
 
 lint-eslint-docs: (update-eslint-docs '--check')
 
-lint: lint-docs lint-eslint-docs eslint lint-dependencies
+lint: lint-docs lint-eslint-docs eslint lint-dependencies lint-unused-code
 
 lint-fix: eslint-fix format-fix
 

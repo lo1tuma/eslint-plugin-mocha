@@ -57,19 +57,19 @@ export function isAssignmentProperty(property: ObjectPattern['properties'][numbe
     return property.type === 'Property';
 }
 
-export type FunctionExpression = NodeType<'FunctionExpression'>;
-export type FunctionDeclaration = NodeType<'FunctionDeclaration'>;
+type FunctionExpression = NodeType<'FunctionExpression'>;
+type FunctionDeclaration = NodeType<'FunctionDeclaration'>;
 export type ArrowFunctionExpression = NodeType<'ArrowFunctionExpression'>;
 
 export function isArrowFunctionExpression(node: Except<Rule.Node, 'parent'>): node is ArrowFunctionExpression {
     return node.type === 'ArrowFunctionExpression';
 }
 
-export function isFunctionExpression(node: Except<Rule.Node, 'parent'>): node is FunctionExpression {
+function isFunctionExpression(node: Except<Rule.Node, 'parent'>): node is FunctionExpression {
     return node.type === 'FunctionExpression';
 }
 
-export function isFunctionDeclaration(node: Except<Rule.Node, 'parent'>): node is FunctionDeclaration {
+function isFunctionDeclaration(node: Except<Rule.Node, 'parent'>): node is FunctionDeclaration {
     return node.type === 'FunctionDeclaration';
 }
 
@@ -78,8 +78,6 @@ export type AnyFunction = ArrowFunctionExpression | FunctionDeclaration | Functi
 export function isFunction(node: Except<Rule.Node, 'parent'>): node is AnyFunction {
     return isFunctionExpression(node) || isArrowFunctionExpression(node) || isFunctionDeclaration(node);
 }
-
-export type MetaProperty = NodeType<'MetaProperty'>;
 
 export type Literal = NodeType<'Literal'>;
 

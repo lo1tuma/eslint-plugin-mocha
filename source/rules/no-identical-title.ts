@@ -15,7 +15,7 @@ function newLayer(): Readonly<Layer> {
     };
 }
 
-export function extractTitleArgument(node: Readonly<Rule.Node>): string | null {
+function extractTitleArgument(node: Readonly<Rule.Node>): string | null {
     if (isCallExpression(node)) {
         const [firstArg] = node.arguments;
         if (firstArg !== undefined && isLiteral(firstArg)) {
