@@ -70,7 +70,7 @@ export default [
     },
     {
         ...nodeConfigFileConfig,
-        files: ['eslint.config.js']
+        files: ['dependency-cruiser.config.js', 'eslint.config.js', 'packtory.config.js']
     },
     {
         ...mochaConfig,
