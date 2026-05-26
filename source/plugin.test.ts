@@ -8,6 +8,7 @@ import plugin from './plugin.js';
 const { pathname: currentFolderName } = new URL('.', import.meta.url);
 
 const rulesDir = path.join(currentFolderName, './rules/');
+const sourceRulesDir = path.join(currentFolderName, '../../../source/rules/');
 const documentationDir = path.join(currentFolderName, '../../../documentation/rules/');
 
 async function importModuleExports(filePath: string): Promise<Readonly<Record<string, unknown>>> {
@@ -15,9 +16,15 @@ async function importModuleExports(filePath: string): Promise<Readonly<Record<st
 }
 
 async function determineAllRuleFiles(): Promise<string[]> {
+    const knownSourceRuleFiles = await fs.promises.readdir(sourceRulesDir);
+    const sourceRuleFiles = new Set(knownSourceRuleFiles.flatMap((file) => {
+        return !file.endsWith('.test.ts') && file.endsWith('.ts')
+            ? [`${path.basename(file, '.ts')}.js`]
+            : [];
+    }));
     const knownRuleFiles = await fs.promises.readdir(rulesDir);
     const ruleFiles = knownRuleFiles.filter((file) => {
-        return !file.endsWith('.test.js') && file.endsWith('.js');
+        return !file.endsWith('.test.js') && file.endsWith('.js') && sourceRuleFiles.has(file);
     });
 
     if (rulesDir.length === 0) {

@@ -1,4 +1,4 @@
-# Disallow returning in a test or hook function that uses a callback (`mocha/no-return-and-callback`)
+# Disallow returning in a test or hook function that uses a callback (`mocha/no-return-and-done`)
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 
