@@ -1,6 +1,7 @@
 {
     "extends": ["config:base"],
     "commitMessagePrefix": "⬆️ ",
+    "commitMessageExtra": "{{#if isGroup}}{{#if newValue}}to {{newValue}}{{/if}}{{else}}from {{displayFrom}} to {{displayTo}}{{/if}}",
     "labels": ["renovate", "upgrade"],
     "dependencyDashboard": false,
     "rebaseStalePrs": true,
