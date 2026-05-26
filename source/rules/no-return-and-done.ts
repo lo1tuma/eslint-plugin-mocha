@@ -2,18 +2,12 @@ import type { Rule } from 'eslint';
 import type { Except } from 'type-fest';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { type AnyFunction, isFunction, type ReturnStatement } from '../ast/node-types.js';
-import { findReturnStatement, isReturnOfUndefined } from '../ast/return-statement.js';
-
-function reportIfShortArrowFunction(context: Readonly<Rule.RuleContext>, node: Readonly<AnyFunction>): boolean {
-    if (node.body.type !== 'BlockStatement') {
-        context.report({
-            node: node.body,
-            messageId: 'implicitReturnWithCallback'
-        });
-        return true;
-    }
-    return false;
-}
+import { getIdentifierCallbackParameter } from '../mocha/callback-parameter.js';
+import {
+    isLiteralOrUndefinedReturn,
+    reportIfImplicitReturn,
+    reportUnexpectedReturnInBlock
+} from './mocha-return-rule.js';
 
 function isFunctionCallWithName(node: Except<Rule.Node, 'parent'> | null | undefined, name: string): boolean {
     return node !== undefined && node !== null && node.type === 'CallExpression' &&
@@ -22,7 +16,7 @@ function isFunctionCallWithName(node: Except<Rule.Node, 'parent'> | null | undef
 }
 
 function isAllowedReturnStatement(node: Readonly<ReturnStatement>, callbackName: string): boolean {
-    if (isReturnOfUndefined(node) || node.argument?.type === 'Literal') {
+    if (isLiteralOrUndefinedReturn(node)) {
         return true;
     }
 
@@ -34,29 +28,23 @@ export function reportIfFunctionWithBlock(
     node: Readonly<AnyFunction>,
     callbackName: string
 ): void {
-    if (node.body.type !== 'BlockStatement') {
-        return;
-    }
-    const returnStatement = findReturnStatement(node.body.body);
-    if (returnStatement !== undefined && !isAllowedReturnStatement(returnStatement, callbackName)) {
-        context.report({
-            node: returnStatement,
-            messageId: 'unexpectedReturnWithCallback'
-        });
-    }
+    reportUnexpectedReturnInBlock(context, node, 'unexpectedReturnWithCallback', (returnStatement) => {
+        return isAllowedReturnStatement(returnStatement, callbackName);
+    });
 }
 
 export function checkNodeForReturnAndDone(context: Readonly<Rule.RuleContext>, node: Readonly<Rule.Node>): void {
     if (!isFunction(node)) {
         return;
     }
-    const [firstParam] = node.params;
-    if (firstParam?.type !== 'Identifier') {
+    const callbackParameter = getIdentifierCallbackParameter(node);
+
+    if (callbackParameter === undefined) {
         return;
     }
 
-    if (!reportIfShortArrowFunction(context, node)) {
-        reportIfFunctionWithBlock(context, node, firstParam.name);
+    if (!reportIfImplicitReturn(context, node, 'implicitReturnWithCallback')) {
+        reportIfFunctionWithBlock(context, node, callbackParameter.name);
     }
 }
 

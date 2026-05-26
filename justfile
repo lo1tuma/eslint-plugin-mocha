@@ -21,12 +21,15 @@ lint-unused-code:
     knip
     knip --production --dependencies --files
 
+lint-duplication *options:
+    jscpd source --config jscpd.json {{options}}
+
 lint-docs:
     markdownlint '**/*.md'
 
 lint-eslint-docs: (update-eslint-docs '--check')
 
-lint: lint-docs lint-eslint-docs eslint lint-dependencies lint-unused-code
+lint: lint-docs lint-eslint-docs eslint lint-dependencies lint-unused-code lint-duplication
 
 lint-fix: eslint-fix format-fix
 

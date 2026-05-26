@@ -4,10 +4,9 @@ import { withInterface } from '../mocha-interface-test-cases.js';
 import {
     consistentStructureRule,
     getDirectStructureContext,
-    getStructureEntityKind,
-    getTopLevelMochaExpression,
-    isNestedStatementBoundary
+    getStructureEntityKind
 } from './consistent-structure.js';
+import { getTopLevelMochaExpression, isNestedStatementBoundary } from './direct-mocha-statement.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
