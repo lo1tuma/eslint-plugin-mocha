@@ -32,11 +32,6 @@ export type NameDetailsConfig = {
     config: MochaConfigCall | null;
 };
 
-export const MODIFIERS = {
-    pending: 'pending',
-    exclusive: 'exclusive'
-};
-
 export const builtinNames: readonly NameDetailsConfig[] = [
     { path: ['describe'], interface: 'BDD', type: 'suite', modifier: null, config: null },
     { path: ['context'], interface: 'BDD', type: 'suite', modifier: null, config: null },

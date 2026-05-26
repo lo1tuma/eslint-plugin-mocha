@@ -53,7 +53,7 @@ type KnownLocation = Locatable & {
 };
 type KnownLocationComment = EstreeComment & KnownLocation;
 
-export function isCallbackMissing(node: CallExpression): boolean {
+function isCallbackMissing(node: CallExpression): boolean {
     const [firstArgument] = node.arguments;
     return firstArgument !== undefined && firstArgument.type === 'Literal' && node.arguments.length === 1;
 }
@@ -191,7 +191,7 @@ function visitThisSkipCalls(
     });
 }
 
-export function reportSkipped(
+function reportSkipped(
     context: Readonly<Rule.RuleContext>,
     node: CallExpression,
     messageId: 'unexpectedPendingTest' | 'unexpectedSkippedTestWithoutComment'
