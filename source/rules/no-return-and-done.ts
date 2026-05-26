@@ -21,24 +21,24 @@ function isFunctionCallWithName(node: Except<Rule.Node, 'parent'> | null | undef
         node.callee.name === name;
 }
 
-function isAllowedReturnStatement(node: Readonly<ReturnStatement>, doneName: string): boolean {
+function isAllowedReturnStatement(node: Readonly<ReturnStatement>, callbackName: string): boolean {
     if (isReturnOfUndefined(node) || node.argument?.type === 'Literal') {
         return true;
     }
 
-    return isFunctionCallWithName(node.argument, doneName);
+    return isFunctionCallWithName(node.argument, callbackName);
 }
 
 export function reportIfFunctionWithBlock(
     context: Readonly<Rule.RuleContext>,
     node: Readonly<AnyFunction>,
-    doneName: string
+    callbackName: string
 ): void {
     if (node.body.type !== 'BlockStatement') {
         return;
     }
     const returnStatement = findReturnStatement(node.body.body);
-    if (returnStatement !== undefined && !isAllowedReturnStatement(returnStatement, doneName)) {
+    if (returnStatement !== undefined && !isAllowedReturnStatement(returnStatement, callbackName)) {
         context.report({
             node: returnStatement,
             messageId: 'unexpectedReturnWithCallback'
@@ -46,7 +46,7 @@ export function reportIfFunctionWithBlock(
     }
 }
 
-export function checkNodeForReturnAndCallback(context: Readonly<Rule.RuleContext>, node: Readonly<Rule.Node>): void {
+export function checkNodeForReturnAndDone(context: Readonly<Rule.RuleContext>, node: Readonly<Rule.Node>): void {
     if (!isFunction(node)) {
         return;
     }
@@ -60,13 +60,13 @@ export function checkNodeForReturnAndCallback(context: Readonly<Rule.RuleContext
     }
 }
 
-export const noReturnAndCallbackRule: Readonly<Rule.RuleModule> = {
+export const noReturnAndDoneRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'problem',
         languages: ['js/js'],
         docs: {
             description: 'Disallow returning in a test or hook function that uses a callback',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-return-and-callback.md'
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-return-and-done.md'
         },
         messages: {
             implicitReturnWithCallback: 'Confusing implicit return in a test with callback',
@@ -77,7 +77,7 @@ export const noReturnAndCallbackRule: Readonly<Rule.RuleModule> = {
     create(context) {
         return createMochaVisitors(context, {
             anyTestEntityCallback(visitorContext) {
-                checkNodeForReturnAndCallback(context, visitorContext.node);
+                checkNodeForReturnAndDone(context, visitorContext.node);
             }
         });
     }
