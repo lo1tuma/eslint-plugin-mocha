@@ -1,5 +1,6 @@
 import type { Rule, SourceCode } from 'eslint';
 import type { Except } from 'type-fest';
+import { isFunction } from './node-types.js';
 
 export type TraversableNode = Except<Rule.Node, 'parent'>;
 
@@ -35,4 +36,20 @@ export function visitChildNodes(
             visitor(value);
         }
     }
+}
+
+export function visitWithoutNestedFunctions(
+    sourceCode: Readonly<SourceCode>,
+    node: TraversableNode,
+    visitor: (childNode: TraversableNode) => void
+): void {
+    visitor(node);
+
+    if (isFunction(node)) {
+        return;
+    }
+
+    visitChildNodes(sourceCode, node, (childNode) => {
+        visitWithoutNestedFunctions(sourceCode, childNode, visitor);
+    });
 }

@@ -32,6 +32,10 @@ export type Operation =
         target: TrackedBinding;
         type: 'bindingAssignment';
     };
+export type TrackedReferenceState = {
+    aliasBindings: ReadonlySet<TrackedBinding>;
+    containerPropertiesByBinding: ReadonlyMap<TrackedBinding, ReadonlySet<string>>;
+};
 
 type PendingPathState = {
     aliasBindings: Set<TrackedBinding>;
@@ -132,14 +136,20 @@ function createInitialState(callbackBinding: TrackedBinding): PendingPathState {
     };
 }
 
+export function cloneTrackedContainerProperties(
+    containerPropertiesByBinding: TrackedReferenceState['containerPropertiesByBinding']
+): Map<TrackedBinding, Set<string>> {
+    return new Map(
+        Array.from(containerPropertiesByBinding, ([binding, properties]) => {
+            return [binding, new Set(properties)] as const;
+        })
+    );
+}
+
 function copyState(state: Readonly<PendingPathState>): PendingPathState {
     return {
         aliasBindings: new Set(state.aliasBindings),
-        containerPropertiesByBinding: new Map(
-            Array.from(state.containerPropertiesByBinding, ([binding, properties]) => {
-                return [binding, new Set(properties)] as const;
-            })
-        ),
+        containerPropertiesByBinding: cloneTrackedContainerProperties(state.containerPropertiesByBinding),
         hasUnhandledPath: state.hasUnhandledPath
     };
 }
@@ -257,7 +267,7 @@ function mergeIncomingStates(previousStates: readonly Readonly<PendingPathState>
 }
 
 function getContainerProperties(
-    state: Readonly<PendingPathState>,
+    state: Readonly<TrackedReferenceState>,
     binding: TrackedBinding
 ): ReadonlySet<string> | undefined {
     return state.containerPropertiesByBinding.get(binding);
@@ -266,7 +276,7 @@ function getContainerProperties(
 function isTrackedPropertyAccess(
     sourceCode: Readonly<SourceCode>,
     node: MemberExpressionLike,
-    state: Readonly<PendingPathState>
+    state: Readonly<TrackedReferenceState>
 ): boolean {
     const bindingAndProperty = getMemberExpressionBindingAndProperty(sourceCode, node);
 
@@ -287,10 +297,10 @@ function isTrackedPropertyAccess(
     return properties.has(bindingAndProperty.propertyName);
 }
 
-function isCallbackExpression(
+export function isTrackedCallbackExpression(
     sourceCode: Readonly<SourceCode>,
     node: Readonly<Rule.Node>,
-    state: Readonly<PendingPathState>
+    state: Readonly<TrackedReferenceState>
 ): boolean {
     if (node.type === 'Identifier') {
         return state.aliasBindings.has(getTrackedBinding(sourceCode, node));
@@ -299,10 +309,10 @@ function isCallbackExpression(
     return node.type === 'MemberExpression' && isTrackedPropertyAccess(sourceCode, node, state);
 }
 
-function collectTrackedObjectProperties(
+export function collectTrackedCallbackObjectProperties(
     sourceCode: Readonly<SourceCode>,
     node: Readonly<ObjectExpressionNode>,
-    state: Readonly<PendingPathState>
+    state: Readonly<TrackedReferenceState>
 ): Set<string> {
     const trackedProperties = new Set<string>();
 
@@ -310,7 +320,7 @@ function collectTrackedObjectProperties(
         if (property.type === 'Property' && property.kind === 'init') {
             const propertyName = getStaticPropertyName(sourceCode, property);
             const isTrackedCallback = propertyName !== undefined &&
-                isCallbackExpression(sourceCode, asRuleNode(property.value), state);
+                isTrackedCallbackExpression(sourceCode, asRuleNode(property.value), state);
 
             if (isTrackedCallback) {
                 trackedProperties.add(propertyName);
@@ -333,7 +343,7 @@ function getContainerPropertiesFromExpression(
     }
 
     if (node.type === 'ObjectExpression') {
-        const trackedProperties = collectTrackedObjectProperties(sourceCode, node, state);
+        const trackedProperties = collectTrackedCallbackObjectProperties(sourceCode, node, state);
 
         return trackedProperties.size > 0 ? trackedProperties : undefined;
     }
@@ -346,7 +356,7 @@ function isHandledHandoffExpression(
     node: Readonly<Rule.Node>,
     state: Readonly<PendingPathState>
 ): boolean {
-    if (isCallbackExpression(sourceCode, node, state)) {
+    if (isTrackedCallbackExpression(sourceCode, node, state)) {
         return true;
     }
 
@@ -358,7 +368,7 @@ function callFinishesPendingPaths(
     node: Readonly<CallExpressionNode>,
     state: Readonly<PendingPathState>
 ): boolean {
-    if (isCallbackExpression(sourceCode, asRuleNode(node.callee), state)) {
+    if (isTrackedCallbackExpression(sourceCode, asRuleNode(node.callee), state)) {
         return true;
     }
 
@@ -377,7 +387,7 @@ function applyBindingSourceValue(
         return state;
     }
 
-    if (isCallbackExpression(sourceCode, operation.source, state)) {
+    if (isTrackedCallbackExpression(sourceCode, operation.source, state)) {
         state.aliasBindings.add(operation.target);
         return state;
     }
@@ -430,7 +440,7 @@ function applyContainerPropertyAssignment(
         operation.propertyName
     );
     const shouldTrackProperty = operation.source !== null &&
-        isCallbackExpression(sourceCode, operation.source, nextState);
+        isTrackedCallbackExpression(sourceCode, operation.source, nextState);
 
     if (shouldTrackProperty) {
         nextProperties.add(operation.propertyName ?? dynamicPropertyName);
@@ -492,7 +502,7 @@ function computeEntryState(
     }));
 }
 
-function enqueueNextSegments(
+export function enqueueNextSegments(
     nextSegments: readonly Readonly<Rule.CodePathSegment>[],
     pendingSegments: Rule.CodePathSegment[],
     queuedSegmentIds: Set<string>

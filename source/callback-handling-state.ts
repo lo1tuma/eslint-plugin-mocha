@@ -1,12 +1,13 @@
-import { getStringIfConstant } from '@eslint-community/eslint-utils';
 import type { Rule } from 'eslint';
 import { extractMemberExpressionPath, isConstantPath } from './ast/member-expression.js';
 import {
     asRuleNode,
-    getMemberExpressionBindingAndProperty,
+    cloneTrackedContainerProperties,
+    collectTrackedCallbackObjectProperties,
     getTrackedBinding,
     haveSameTrackedBindings,
     haveSameTrackedContainerProperties,
+    isTrackedCallbackExpression,
     type TrackedBinding
 } from './done-callback-paths.js';
 import { stripCallExpressions } from './mocha/name-details.js';
@@ -20,9 +21,7 @@ const knownSingleCallbackDelegates = new Set(
         .split(' ')
 );
 
-type PropertyNode = Parameters<Exclude<Rule.RuleListener['Property'], undefined>>[0];
 type CallExpressionNode = Parameters<Exclude<Rule.RuleListener['CallExpression'], undefined>>[0];
-type MemberExpressionNode = Parameters<Exclude<Rule.RuleListener['MemberExpression'], undefined>>[0];
 type CallbackReferenceState = {
     aliasBindings: Set<TrackedBinding>;
     containerPropertiesByBinding: Map<TrackedBinding, Set<string>>;
@@ -32,7 +31,6 @@ export type CallbackPathState = {
     handledReferences: CallbackReferenceState;
     unhandledReferences: CallbackReferenceState;
 };
-type PropertyLike = Readonly<Pick<PropertyNode, 'computed' | 'key' | 'type'>>;
 
 export type CallbackHandlingOperation =
     | {
@@ -78,11 +76,7 @@ function createInitialPathState(callbackBinding: TrackedBinding): CallbackPathSt
 function cloneReferenceState(state: Readonly<CallbackReferenceState>): CallbackReferenceState {
     return {
         aliasBindings: new Set(state.aliasBindings),
-        containerPropertiesByBinding: new Map(
-            Array.from(state.containerPropertiesByBinding, ([binding, properties]) => {
-                return [binding, new Set(properties)] as const;
-            })
-        )
+        containerPropertiesByBinding: cloneTrackedContainerProperties(state.containerPropertiesByBinding)
     };
 }
 
@@ -116,90 +110,6 @@ export function arePathStatesSame(
         areReferenceStatesSame(left.unhandledReferences, right.unhandledReferences);
 }
 
-function getNamedPropertyName(node: PropertyLike): string | undefined {
-    const keyNode = node.key;
-
-    if (keyNode.type === 'Identifier') {
-        return keyNode.name;
-    }
-    if (keyNode.type === 'Literal' && keyNode.value !== null) {
-        return String(keyNode.value);
-    }
-
-    return undefined;
-}
-
-function getStaticPropertyName(
-    sourceCode: Readonly<Rule.RuleContext['sourceCode']>,
-    node: PropertyLike
-): string | undefined {
-    if (!node.computed) {
-        return getNamedPropertyName(node);
-    }
-
-    return getStringIfConstant(node.key, sourceCode.getScope(asRuleNode(node))) ?? undefined;
-}
-
-function isTrackedPropertyAccess(
-    sourceCode: Readonly<Rule.RuleContext['sourceCode']>,
-    node: MemberExpressionNode,
-    state: Readonly<CallbackReferenceState>
-): boolean {
-    const bindingAndProperty = getMemberExpressionBindingAndProperty(sourceCode, node);
-
-    if (bindingAndProperty === undefined) {
-        return false;
-    }
-
-    const trackedProperties = state.containerPropertiesByBinding.get(bindingAndProperty.binding);
-
-    if (trackedProperties === undefined) {
-        return false;
-    }
-
-    if (bindingAndProperty.propertyName === undefined) {
-        return trackedProperties.has(dynamicPropertyName);
-    }
-
-    return trackedProperties.has(bindingAndProperty.propertyName);
-}
-
-function isCallbackExpression(
-    sourceCode: Readonly<Rule.RuleContext['sourceCode']>,
-    node: Readonly<Rule.Node>,
-    state: Readonly<CallbackReferenceState>
-): boolean {
-    if (node.type === 'Identifier') {
-        return state.aliasBindings.has(getTrackedBinding(sourceCode, node));
-    }
-
-    return node.type === 'MemberExpression' && isTrackedPropertyAccess(sourceCode, node, state);
-}
-
-function collectTrackedObjectProperties(
-    sourceCode: Readonly<Rule.RuleContext['sourceCode']>,
-    node: Readonly<Extract<Rule.Node, { type: 'ObjectExpression'; }>>,
-    state: Readonly<CallbackReferenceState>
-): Set<string> {
-    const trackedProperties = new Set<string>();
-
-    for (const property of node.properties) {
-        const shouldTrackProperty = property.type === 'Property' &&
-            property.kind === 'init' &&
-            isCallbackExpression(sourceCode, asRuleNode(property.value), state);
-
-        if (shouldTrackProperty) {
-            const propertyName = getStaticPropertyName(sourceCode, property);
-
-            if (propertyName !== undefined) {
-                trackedProperties.add(propertyName);
-            }
-        }
-    }
-
-    return trackedProperties;
-}
-
 function getContainerPropertiesFromExpression(
     sourceCode: Readonly<Rule.RuleContext['sourceCode']>,
     node: Readonly<Rule.Node>,
@@ -215,7 +125,7 @@ function getContainerPropertiesFromExpression(
         return undefined;
     }
 
-    const trackedProperties = collectTrackedObjectProperties(sourceCode, node, state);
+    const trackedProperties = collectTrackedCallbackObjectProperties(sourceCode, node, state);
     return trackedProperties.size > 0 ? trackedProperties : undefined;
 }
 
@@ -264,7 +174,7 @@ function assignBindingReferenceState(
         return cloneReferenceState(state);
     }
 
-    if (isCallbackExpression(sourceCode, source, state)) {
+    if (isTrackedCallbackExpression(sourceCode, source, state)) {
         return addAliasBindingReferenceState(state, target);
     }
 
@@ -301,7 +211,7 @@ function updateContainerPropertyReferenceState(
 
     nextProperties.delete(trackedProperty);
 
-    if (operation.source !== null && isCallbackExpression(sourceCode, operation.source, nextState)) {
+    if (operation.source !== null && isTrackedCallbackExpression(sourceCode, operation.source, nextState)) {
         nextProperties.add(trackedProperty);
     }
 
@@ -340,7 +250,7 @@ function isKnownSingleCallbackDelegateCall(
 
     return node.arguments.some((argument) => {
         const candidate = argument.type === 'SpreadElement' ? argument.argument : argument;
-        return isCallbackExpression(sourceCode, asRuleNode(candidate), state);
+        return isTrackedCallbackExpression(sourceCode, asRuleNode(candidate), state);
     });
 }
 
@@ -349,7 +259,7 @@ function isCallbackHandlingCall(
     operation: Readonly<Extract<CallbackHandlingOperation, { type: 'call'; }>>,
     state: Readonly<CallbackReferenceState>
 ): boolean {
-    return isCallbackExpression(sourceCode, asRuleNode(operation.node.callee), state) ||
+    return isTrackedCallbackExpression(sourceCode, asRuleNode(operation.node.callee), state) ||
         isKnownSingleCallbackDelegateCall(sourceCode, operation.node, state);
 }
 

@@ -1,41 +1,17 @@
 import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { type AnyFunction, isFunction, type ReturnStatement } from '../ast/node-types.js';
-import { findReturnStatement, isReturnOfUndefined } from '../ast/return-statement.js';
-
-function reportIfShortArrowFunction(context: Readonly<Rule.RuleContext>, node: Readonly<AnyFunction>): boolean {
-    if (node.body.type !== 'BlockStatement') {
-        context.report({
-            node: node.body,
-            messageId: 'implicitReturnWithAsync'
-        });
-        return true;
-    }
-    return false;
-}
-
-function isAllowedReturnStatement(node: Readonly<ReturnStatement>): boolean {
-    const { argument } = node;
-
-    return (isReturnOfUndefined(node) || argument?.type === 'Literal');
-}
+import { type AnyFunction, isFunction } from '../ast/node-types.js';
+import {
+    isLiteralOrUndefinedReturn,
+    reportIfImplicitReturn,
+    reportUnexpectedReturnInBlock
+} from './mocha-return-rule.js';
 
 export function reportIfFunctionWithBlock(
     context: Readonly<Rule.RuleContext>,
     node: Readonly<AnyFunction>
 ): void {
-    if (node.body.type !== 'BlockStatement') {
-        return;
-    }
-
-    const returnStatement = findReturnStatement(node.body.body);
-
-    if (returnStatement !== undefined && !isAllowedReturnStatement(returnStatement)) {
-        context.report({
-            node: returnStatement,
-            messageId: 'unexpectedReturnWithAsync'
-        });
-    }
+    reportUnexpectedReturnInBlock(context, node, 'unexpectedReturnWithAsync', isLiteralOrUndefinedReturn);
 }
 
 export function checkNodeForReturnFromAsync(context: Readonly<Rule.RuleContext>, node: Readonly<Rule.Node>): void {
@@ -46,7 +22,7 @@ export function checkNodeForReturnFromAsync(context: Readonly<Rule.RuleContext>,
         return;
     }
 
-    if (!reportIfShortArrowFunction(context, node)) {
+    if (!reportIfImplicitReturn(context, node, 'implicitReturnWithAsync')) {
         reportIfFunctionWithBlock(context, node);
     }
 }
