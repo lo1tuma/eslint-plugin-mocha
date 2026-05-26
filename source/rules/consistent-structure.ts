@@ -2,15 +2,17 @@ import type { Rule } from 'eslint';
 import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
 import {
     type AnyFunction,
-    getParentNode,
     isBlockStatement,
     isFunction,
-    isMemberExpression,
     isProgram,
     type Program
 } from '../ast/node-types.js';
 import { getLastOrThrow } from '../list.js';
 import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
+import {
+    getTopLevelMochaExpression as getDirectTopLevelMochaExpression,
+    isDirectStatementInScope
+} from './direct-mocha-statement.js';
 
 const optionSchema = {
     type: 'object',
@@ -96,36 +98,6 @@ function createStructureLayer(scopeNode: StructureLayer['scopeNode']): Readonly<
         scopeNode,
         usedHookNames: new Set()
     };
-}
-
-export function isNestedStatementBoundary(node: Rule.Node): boolean {
-    return node.type.endsWith('Statement') || node.type.endsWith('Declaration') || isFunction(node);
-}
-
-function isDirectStatementInScope(scopeNode: StructureLayer['scopeNode'], node: Rule.Node): boolean {
-    let current = node;
-
-    while (getParentNode(current) !== scopeNode) {
-        current = getParentNode(current);
-        if (
-            isNestedStatementBoundary(current) &&
-            !(current.type === 'ExpressionStatement' && getParentNode(current) === scopeNode)
-        ) {
-            return false;
-        }
-    }
-
-    return current.type === 'ExpressionStatement';
-}
-
-export function getTopLevelMochaExpression(node: Rule.Node): Rule.Node {
-    const parent = getParentNode(node);
-
-    if (isMemberExpression(parent)) {
-        return getTopLevelMochaExpression(parent);
-    }
-
-    return node;
 }
 
 export function getStructureEntityKind(visitorContext: Readonly<VisitorContext>): StructureEntityKind {
@@ -328,7 +300,7 @@ export function getDirectStructureContext(
 
     const currentLayer = getLastOrThrow(layers);
 
-    if (!isDirectStatementInScope(currentLayer.scopeNode, getTopLevelMochaExpression(visitorContext.node))) {
+    if (!isDirectStatementInScope(currentLayer.scopeNode, getDirectTopLevelMochaExpression(visitorContext.node))) {
         return null;
     }
 

@@ -1,58 +1,7 @@
 import type { Rule, SourceCode } from 'eslint';
-import type { Except } from 'type-fest';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { type AnyFunction, isFunction } from '../ast/node-types.js';
-
-type TraversableNode = Except<Rule.Node, 'parent'>;
-type ContainsDirectAwait = (node: AnyFunction['body'] | TraversableNode) => boolean;
-
-function isNode(value: unknown): value is TraversableNode {
-    return typeof value === 'object' && value !== null && 'type' in value;
-}
-
-function getNodeProperty(node: TraversableNode, key: string): unknown {
-    return Reflect.get(node, key);
-}
-
-function containsDirectAwaitInValue(
-    containsAwait: ContainsDirectAwait,
-    value: unknown
-): boolean {
-    return isNode(value) && containsAwait(value);
-}
-
-function containsDirectAwaitInValues(
-    containsAwait: ContainsDirectAwait,
-    values: readonly unknown[]
-): boolean {
-    for (const value of values) {
-        if (containsDirectAwaitInValue(containsAwait, value)) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-function containsDirectAwaitInChildNodes(
-    sourceCode: Readonly<SourceCode>,
-    node: TraversableNode,
-    containsAwait: ContainsDirectAwait
-): boolean {
-    for (const key of sourceCode.visitorKeys[node.type] ?? []) {
-        const value = getNodeProperty(node, key);
-
-        if (Array.isArray(value)) {
-            if (containsDirectAwaitInValues(containsAwait, value)) {
-                return true;
-            }
-        } else if (containsDirectAwaitInValue(containsAwait, value)) {
-            return true;
-        }
-    }
-
-    return false;
-}
+import { type TraversableNode, visitChildNodes } from '../ast/visit-child-nodes.js';
 
 export function containsDirectAwait(
     sourceCode: Readonly<SourceCode>,
@@ -62,9 +11,19 @@ export function containsDirectAwait(
         return true;
     }
 
-    return !isFunction(node) && containsDirectAwaitInChildNodes(sourceCode, node, (childNode) => {
-        return containsDirectAwait(sourceCode, childNode);
+    if (isFunction(node)) {
+        return false;
+    }
+
+    let hasDirectAwait = false;
+
+    visitChildNodes(sourceCode, node, (childNode) => {
+        if (!hasDirectAwait && containsDirectAwait(sourceCode, childNode)) {
+            hasDirectAwait = true;
+        }
     });
+
+    return hasDirectAwait;
 }
 
 function isAsyncFunction(node: Rule.Node): node is AnyFunction {

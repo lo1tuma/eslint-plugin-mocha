@@ -5,26 +5,16 @@ import type { CallExpression, MemberExpression } from '../ast/node-types.js';
 import { isSuiteConfigCall } from '../mocha/config-call.js';
 import { reformatLastPathSegmentWithCallExpressions } from '../mocha/name-details.js';
 import { convertNameToPathArray, isSamePath } from '../mocha/path.js';
-import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
+import { getRuleOption } from '../rule-options.js';
+import {
+    allowMochaCallOptionSchema,
+    defaultAllowMochaCallOption,
+    normalizeMochaCallName,
+    type ResolvedAllowMochaCallOption
+} from './mocha-call-allowance.js';
 
 const FUNCTION = 1;
 const SUITE = 2;
-const optionSchema = {
-    type: 'object',
-    properties: {
-        allow: {
-            type: 'array',
-            items: {
-                type: 'string'
-            }
-        }
-    },
-    additionalProperties: false
-} as const satisfies RuleSchema;
-
-type Option = InferSchemaOption<typeof optionSchema>;
-type ResolvedOption = Option & { allow: string[]; };
-const defaultOption: ResolvedOption = { allow: [] };
 
 function isNestedInSuiteBlock(nesting: readonly number[]): boolean {
     return (
@@ -50,23 +40,11 @@ function reportMemberExpression(
     });
 }
 
-function ensureEndsWithParens(value: unknown): string {
-    if (typeof value !== 'string') {
-        return '';
-    }
-
-    if (value.endsWith('()')) {
-        return value;
-    }
-
-    return `${value}()`;
-}
-
 function normalizeAllowedCall(value: unknown): readonly string[] {
-    const path = convertNameToPathArray(ensureEndsWithParens(value));
+    const path = convertNameToPathArray(normalizeMochaCallName(value));
     const [lastPathSegment] = path.slice(-1);
 
-    return [...path.slice(0, -1), ensureEndsWithParens(lastPathSegment)];
+    return [...path.slice(0, -1), normalizeMochaCallName(lastPathSegment)];
 }
 
 export const noSetupInSuiteRule: Readonly<Rule.RuleModule> = {
@@ -77,16 +55,16 @@ export const noSetupInSuiteRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow setup in suite blocks',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-setup-in-suite.md'
         },
-        defaultOptions: [defaultOption],
+        defaultOptions: [defaultAllowMochaCallOption],
         messages: {
             unexpectedFunctionCall: 'Unexpected function call in suite block.',
             unexpectedMemberExpression:
                 'Unexpected member expression in suite block. Member expressions may call functions via getters.'
         },
-        schema: [optionSchema]
+        schema: [allowMochaCallOptionSchema]
     },
     create(context) {
-        const { allow } = getRuleOption<ResolvedOption>(context);
+        const { allow } = getRuleOption<ResolvedAllowMochaCallOption>(context);
         const allowedCalls = allow.map(normalizeAllowedCall);
         const nesting: number[] = [];
         const suiteNodes = new WeakSet();

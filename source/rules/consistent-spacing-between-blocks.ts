@@ -1,16 +1,9 @@
 import type { AST, Rule } from 'eslint';
 import type { Except } from 'type-fest';
 import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
-import {
-    type AnyFunction,
-    getParentNode,
-    isBlockStatement,
-    isFunction,
-    isMemberExpression,
-    isProgram,
-    type Program
-} from '../ast/node-types.js';
+import { type AnyFunction, isBlockStatement, isFunction, isProgram, type Program } from '../ast/node-types.js';
 import { getLastOrThrow } from '../list.js';
+import { getTopLevelMochaExpression, isDirectStatementInScope } from './direct-mocha-statement.js';
 
 const minimumAmountOfLinesBetweenNeeded = 2;
 
@@ -51,34 +44,6 @@ type SpacingCheck = {
     readonly linesBetween: number;
     readonly reportNode: VisitorContext['node'];
 };
-
-function isNestedStatementBoundary(node: Rule.Node): boolean {
-    return node.type.endsWith('Statement') || node.type.endsWith('Declaration') || isFunction(node);
-}
-
-function isDirectStatementInScope(scopeNode: Layer['scopeNode'], node: Rule.Node): boolean {
-    let current = node;
-    while (getParentNode(current) !== scopeNode) {
-        current = getParentNode(current);
-        if (
-            isNestedStatementBoundary(current) &&
-            !(current.type === 'ExpressionStatement' && getParentNode(current) === scopeNode)
-        ) {
-            return false;
-        }
-    }
-
-    return current.type === 'ExpressionStatement';
-}
-
-function getParentWhileMemberExpression(node: Rule.Node): Rule.Node {
-    const parent = getParentNode(node);
-
-    if (isMemberExpression(parent)) {
-        return getParentWhileMemberExpression(parent);
-    }
-    return node;
-}
 
 function getSpacingCheck(
     currentLayer: Readonly<Layer>,
@@ -125,7 +90,7 @@ export const consistentSpacingBetweenBlocksRule: Readonly<Rule.RuleModule> = {
         function addEntityToCurrentLayer(visitorContext: Readonly<VisitorContext>): void {
             const currentLayer = getLastOrThrow(layers);
             if (isDirectStatementInScope(currentLayer.scopeNode, visitorContext.node)) {
-                const statementNode = getParentWhileMemberExpression(visitorContext.node);
+                const statementNode = getTopLevelMochaExpression(visitorContext.node);
                 currentLayer.entities.push({
                     reportNode: visitorContext.node,
                     statementNode,

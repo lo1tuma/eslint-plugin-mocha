@@ -1,0 +1,10 @@
+{
+    "output": "./target/reports/duplication",
+    "minLines": 3,
+    "threshold": 0.5,
+    "reporters": ["console", "json"],
+    "format": ["typescript"],
+    "absolute": false,
+    "gitignore": true,
+    "ignore": ["**/target/**", "**/node_modules/**", "**/*.test.ts", "**/*.d.ts", "**/tsconfig*.json"]
+}

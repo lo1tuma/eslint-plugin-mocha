@@ -20,6 +20,7 @@
         "coveralls",
         "dprint",
         "eslint-doc-generator",
+        "jscpd",
         "markdownlint-cli",
         "pr-log"
     ],
