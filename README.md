@@ -132,19 +132,19 @@ For maintainers: the rules table below is generated, and the headers in `documen
 
 | Name                                                                                          | Description                                                             | 💼 | ⚠️ | 🚫 | 🔧 | 💡 |
 | :-------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------- | :- | :- | :- | :- | :- |
-| [consistent-interface](documentation/rules/consistent-interface.md)                           | Enforces consistent use of mocha interfaces                             | ✅  |    |    | 🔧 |    |
-| [consistent-spacing-between-blocks](documentation/rules/consistent-spacing-between-blocks.md) | Require consistent spacing between blocks                               | ✅  |    |    | 🔧 |    |
+| [consistent-interface](documentation/rules/consistent-interface.md)                           | Enforces consistent use of mocha interfaces                             |    |    | ✅  | 🔧 |    |
+| [consistent-spacing-between-blocks](documentation/rules/consistent-spacing-between-blocks.md) | Require consistent spacing between blocks                               |    |    | ✅  | 🔧 |    |
 | [consistent-structure](documentation/rules/consistent-structure.md)                           | Require consistent structure for Mocha test entities                    | ✅  |    |    |    |    |
 | [handle-done-callback](documentation/rules/handle-done-callback.md)                           | Enforces handling of callbacks for async tests in every branch          | ✅  |    |    |    |    |
 | [limit-retries](documentation/rules/limit-retries.md)                                         | Enforce limits for Mocha retries                                        |    |    | ✅  |    |    |
 | [limit-slow](documentation/rules/limit-slow.md)                                               | Enforce limits for Mocha slow thresholds                                |    |    | ✅  |    |    |
 | [limit-timeout](documentation/rules/limit-timeout.md)                                         | Enforce limits for Mocha timeouts                                       |    |    | ✅  |    |    |
-| [max-top-level-suites](documentation/rules/max-top-level-suites.md)                           | Enforce the number of top-level suites in a single file                 | ✅  |    |    |    |    |
+| [max-top-level-suites](documentation/rules/max-top-level-suites.md)                           | Enforce the number of top-level suites in a single file                 |    |    | ✅  |    |    |
 | [no-async-and-done](documentation/rules/no-async-and-done.md)                                 | Disallow async functions that also use a Mocha callback                 | ✅  |    |    |    |    |
-| [no-async-in-sync-tests](documentation/rules/no-async-in-sync-tests.md)                       | Disallow async operations in synchronous tests or hooks                 |    |    | ✅  |    |    |
+| [no-async-in-sync-tests](documentation/rules/no-async-in-sync-tests.md)                       | Disallow async operations in synchronous tests or hooks                 | ✅  |    |    |    |    |
 | [no-async-suite](documentation/rules/no-async-suite.md)                                       | Disallow async functions passed to a suite                              | ✅  |    |    | 🔧 |    |
 | [no-code-after-done](documentation/rules/no-code-after-done.md)                               | Disallow executing code after calling a Mocha callback                  | ✅  |    |    |    |    |
-| [no-conditional-tests](documentation/rules/no-conditional-tests.md)                           | Disallow conditional suite and test declarations                        |    |    | ✅  |    |    |
+| [no-conditional-tests](documentation/rules/no-conditional-tests.md)                           | Disallow conditional suite and test declarations                        | ✅  |    |    |    |    |
 | [no-done-twice](documentation/rules/no-done-twice.md)                                         | Disallow calling a Mocha callback more than once                        | ✅  |    |    |    |    |
 | [no-empty-title](documentation/rules/no-empty-title.md)                                       | Disallow empty suite and test descriptions                              | ✅  |    |    |    |    |
 | [no-exclusive-tests](documentation/rules/no-exclusive-tests.md)                               | Disallow exclusive tests                                                |    | ✅  |    |    | 💡 |
@@ -158,8 +158,8 @@ For maintainers: the rules table below is generated, and the headers in `documen
 | [no-pending-tests](documentation/rules/no-pending-tests.md)                                   | Disallow pending tests                                                  |    | ✅  |    |    | 💡 |
 | [no-return-and-callback](documentation/rules/no-return-and-callback.md)                       | Disallow returning in a test or hook function that uses a callback      | ✅  |    |    |    |    |
 | [no-return-from-async](documentation/rules/no-return-from-async.md)                           | Disallow returning from an async test or hook                           |    |    | ✅  |    |    |
-| [no-root-hooks](documentation/rules/no-root-hooks.md)                                         | Disallow root hooks                                                     |    | ✅  |    |    |    |
-| [no-setup-in-suite](documentation/rules/no-setup-in-suite.md)                                 | Disallow setup in suite blocks                                          | ✅  |    |    |    |    |
+| [no-root-hooks](documentation/rules/no-root-hooks.md)                                         | Disallow root hooks                                                     |    |    | ✅  |    |    |
+| [no-setup-in-suite](documentation/rules/no-setup-in-suite.md)                                 | Disallow setup in suite blocks                                          |    |    | ✅  |    |    |
 | [no-synchronous-tests](documentation/rules/no-synchronous-tests.md)                           | Disallow synchronous tests                                              |    |    | ✅  |    |    |
 | [no-top-level-tests](documentation/rules/no-top-level-tests.md)                               | Disallow top-level tests                                                | ✅  |    |    |    |    |
 | [prefer-arrow-callback](documentation/rules/prefer-arrow-callback.md)                         | Require using arrow functions for callbacks                             |    |    | ✅  | 🔧 |    |

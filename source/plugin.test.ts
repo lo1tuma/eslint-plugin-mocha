@@ -53,6 +53,20 @@ async function determineAllDocumentationFiles(): Promise<string[]> {
     return documentationFilesWithoutReadme;
 }
 
+function selectRecommendedRuleDecisions(
+    recommendedRules: NonNullable<typeof plugin.configs.recommended.rules>
+): Record<string, unknown> {
+    return {
+        'mocha/max-top-level-suites': recommendedRules['mocha/max-top-level-suites'],
+        'mocha/no-async-in-sync-tests': recommendedRules['mocha/no-async-in-sync-tests'],
+        'mocha/no-conditional-tests': recommendedRules['mocha/no-conditional-tests'],
+        'mocha/no-setup-in-suite': recommendedRules['mocha/no-setup-in-suite'],
+        'mocha/no-root-hooks': recommendedRules['mocha/no-root-hooks'],
+        'mocha/consistent-spacing-between-blocks': recommendedRules['mocha/consistent-spacing-between-blocks'],
+        'mocha/consistent-interface': recommendedRules['mocha/consistent-interface']
+    };
+}
+
 describe('eslint-plugin-mocha', function () {
     it('should expose plugin metadata', async function () {
         assert.deepStrictEqual(plugin.meta, await readClosestPackageMetadata(import.meta.url));
@@ -101,12 +115,24 @@ describe('eslint-plugin-mocha', function () {
             assert.strictEqual(plugin.configs.recommended.plugins.mocha, plugin);
         });
 
-        it('should enable consistent-interface in the recommended config', function () {
-            assert.notStrictEqual(plugin.configs.recommended.rules, undefined);
-            assert.deepStrictEqual(plugin.configs.recommended.rules?.['mocha/consistent-interface'], [
-                'error',
-                { interface: 'BDD' }
-            ]);
+        it('should configure the recommended config as intended', function () {
+            const { rules: recommendedRules } = plugin.configs.recommended;
+
+            assert.notStrictEqual(recommendedRules, undefined);
+            assert.deepStrictEqual(
+                selectRecommendedRuleDecisions(
+                    recommendedRules as NonNullable<typeof plugin.configs.recommended.rules>
+                ),
+                {
+                    'mocha/max-top-level-suites': 'off',
+                    'mocha/no-async-in-sync-tests': 'error',
+                    'mocha/no-conditional-tests': 'error',
+                    'mocha/no-setup-in-suite': 'off',
+                    'mocha/no-root-hooks': 'off',
+                    'mocha/consistent-spacing-between-blocks': 'off',
+                    'mocha/consistent-interface': 'off'
+                }
+            );
         });
     });
 });
