@@ -1,10 +1,10 @@
 import { type Rule, RuleTester } from 'eslint';
 import assert from 'node:assert';
 import {
-    checkNodeForReturnAndCallback,
-    noReturnAndCallbackRule,
+    checkNodeForReturnAndDone,
+    noReturnAndDoneRule,
     reportIfFunctionWithBlock
-} from './no-return-and-callback.js';
+} from './no-return-and-done.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const message = 'Unexpected use of `return` in a test with callback';
@@ -13,7 +13,7 @@ const es6LanguageOptions = {
     ecmaVersion: 6
 } as const;
 
-ruleTester.run('no-return-and-callback', noReturnAndCallbackRule, {
+ruleTester.run('no-return-and-done', noReturnAndDoneRule, {
     valid: [
         'it("title", function(done) { done(); });',
         'it("title", function(done) { foo.then(function() { return done(); }); });',
@@ -125,7 +125,7 @@ ruleTester.run('no-return-and-callback', noReturnAndCallbackRule, {
     ]
 });
 
-describe('no-return-and-callback helpers', function () {
+describe('no-return-and-done helpers', function () {
     it('reportIfFunctionWithBlock() ignores non-block bodies', function () {
         const reports: string[] = [];
 
@@ -140,10 +140,10 @@ describe('no-return-and-callback helpers', function () {
         assert.deepStrictEqual(reports, []);
     });
 
-    it('checkNodeForReturnAndCallback() ignores non-function nodes', function () {
+    it('checkNodeForReturnAndDone() ignores non-function nodes', function () {
         const reports: string[] = [];
 
-        checkNodeForReturnAndCallback({
+        checkNodeForReturnAndDone({
             report() {
                 reports.push('reported');
             }
@@ -152,10 +152,10 @@ describe('no-return-and-callback helpers', function () {
         assert.deepStrictEqual(reports, []);
     });
 
-    it('checkNodeForReturnAndCallback() ignores functions without an identifier callback parameter', function () {
+    it('checkNodeForReturnAndDone() ignores functions without an identifier callback parameter', function () {
         const reports: string[] = [];
 
-        checkNodeForReturnAndCallback({
+        checkNodeForReturnAndDone({
             report() {
                 reports.push('reported');
             }

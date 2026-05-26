@@ -25,7 +25,7 @@ import { noMochaArrowsRule } from './rules/no-mocha-arrows.js';
 import { noNestedSuitesRule } from './rules/no-nested-suites.js';
 import { noNestedTestsRule } from './rules/no-nested-tests.js';
 import { noPendingTestsRule } from './rules/no-pending-tests.js';
-import { noReturnAndCallbackRule } from './rules/no-return-and-callback.js';
+import { noReturnAndDoneRule } from './rules/no-return-and-done.js';
 import { noReturnFromAsyncRule } from './rules/no-return-from-async.js';
 import { noRootHooksRule } from './rules/no-root-hooks.js';
 import { noSetupInSuiteRule } from './rules/no-setup-in-suite.js';
@@ -67,7 +67,7 @@ const allRules: Linter.RulesRecord = {
     'mocha/no-nested-suites': 'error',
     'mocha/no-nested-tests': 'error',
     'mocha/no-pending-tests': 'error',
-    'mocha/no-return-and-callback': 'error',
+    'mocha/no-return-and-done': 'error',
     'mocha/no-return-from-async': 'error',
     'mocha/no-setup-in-suite': 'error',
     'mocha/no-synchronous-tests': 'error',
@@ -103,7 +103,7 @@ const recommendedRules: Linter.RulesRecord = {
     'mocha/no-nested-suites': 'off',
     'mocha/no-nested-tests': 'error',
     'mocha/no-pending-tests': 'warn',
-    'mocha/no-return-and-callback': 'error',
+    'mocha/no-return-and-done': 'error',
     'mocha/no-return-from-async': 'off',
     'mocha/no-setup-in-suite': 'off',
     'mocha/no-synchronous-tests': 'off',
@@ -139,7 +139,7 @@ const rules = {
     'no-nested-suites': noNestedSuitesRule,
     'no-nested-tests': noNestedTestsRule,
     'no-pending-tests': noPendingTestsRule,
-    'no-return-and-callback': noReturnAndCallbackRule,
+    'no-return-and-done': noReturnAndDoneRule,
     'no-return-from-async': noReturnFromAsyncRule,
     'no-setup-in-suite': noSetupInSuiteRule,
     'no-synchronous-tests': noSynchronousTestsRule,
