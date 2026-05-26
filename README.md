@@ -156,7 +156,7 @@ For maintainers: the rules table below is generated, and the headers in `documen
 | [no-nested-suites](documentation/rules/no-nested-suites.md)                                   | Disallow suites to be nested within other suites                        |    |    | ✅  |    |    |
 | [no-nested-tests](documentation/rules/no-nested-tests.md)                                     | Disallow tests to be nested within other tests                          | ✅  |    |    |    |    |
 | [no-pending-tests](documentation/rules/no-pending-tests.md)                                   | Disallow pending tests                                                  |    | ✅  |    |    | 💡 |
-| [no-return-and-callback](documentation/rules/no-return-and-callback.md)                       | Disallow returning in a test or hook function that uses a callback      | ✅  |    |    |    |    |
+| [no-return-and-done](documentation/rules/no-return-and-done.md)                               | Disallow returning in a test or hook function that uses a callback      | ✅  |    |    |    |    |
 | [no-return-from-async](documentation/rules/no-return-from-async.md)                           | Disallow returning from an async test or hook                           |    |    | ✅  |    |    |
 | [no-root-hooks](documentation/rules/no-root-hooks.md)                                         | Disallow root hooks                                                     |    |    | ✅  |    |    |
 | [no-setup-in-suite](documentation/rules/no-setup-in-suite.md)                                 | Disallow setup in suite blocks                                          |    |    | ✅  |    |    |
