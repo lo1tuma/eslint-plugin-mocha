@@ -16,7 +16,8 @@ async function importModuleExports(filePath: string): Promise<Readonly<Record<st
 }
 
 async function determineAllRuleFiles(): Promise<string[]> {
-    const sourceRuleFiles = new Set((await fs.promises.readdir(sourceRulesDir)).flatMap((file) => {
+    const knownSourceRuleFiles = await fs.promises.readdir(sourceRulesDir);
+    const sourceRuleFiles = new Set(knownSourceRuleFiles.flatMap((file) => {
         return !file.endsWith('.test.ts') && file.endsWith('.ts')
             ? [`${path.basename(file, '.ts')}.js`]
             : [];
