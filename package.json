@@ -43,6 +43,15 @@
         "semver": "7.6.3",
         "typescript": "5.7.3"
     },
+    "pr-log": {
+        "collapseRules": [
+            {
+                "label": "upgrade",
+                "pattern": "^⬆️ Update dependency (?<dependency>.+?) from (?<from>.+?) to (?<to>.+?)$",
+                "replace": "⬆️ Update dependency $<dependency> from $<from> to $<to>"
+            }
+        ]
+    },
     "overrides": {
         "yargs": "18.0.0"
     },
