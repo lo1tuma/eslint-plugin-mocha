@@ -1,7 +1,13 @@
 import type { Rule } from 'eslint';
 import type { Except } from 'type-fest';
 import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
-import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
+import { getRuleOption } from '../rule-options.js';
+import {
+    allowMochaCallOptionSchema,
+    defaultAllowMochaCallOption,
+    normalizeMochaCallName,
+    type ResolvedAllowMochaCallOption
+} from './mocha-call-allowance.js';
 
 type Layer = {
     suiteNode: Except<Rule.Node, 'parent'>;
@@ -9,41 +15,12 @@ type Layer = {
     testCount: number;
 };
 
-const optionSchema = {
-    type: 'object',
-    properties: {
-        allow: {
-            type: 'array',
-            items: {
-                type: 'string'
-            }
-        }
-    },
-    additionalProperties: false
-} as const satisfies RuleSchema;
-
-type Option = InferSchemaOption<typeof optionSchema>;
-type ResolvedOption = Option & { allow: string[]; };
-const defaultOption: ResolvedOption = { allow: [] };
-
 function newSuiteLayer(suiteNode: Except<Rule.Node, 'parent'>): Readonly<Layer> {
     return {
         suiteNode,
         hookNodes: [],
         testCount: 0
     };
-}
-
-function ensureEndsWithParens(value: unknown): string {
-    if (typeof value !== 'string') {
-        return '';
-    }
-
-    if (!value.endsWith('()')) {
-        return `${value}()`;
-    }
-
-    return value;
 }
 
 export const noHooksForSingleChildRule: Readonly<Rule.RuleModule> = {
@@ -54,15 +31,15 @@ export const noHooksForSingleChildRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow hooks with a single direct child',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-hooks-for-single-child.md'
         },
-        defaultOptions: [defaultOption],
+        defaultOptions: [defaultAllowMochaCallOption],
         messages: {
             unexpectedHookForSingleChild: 'Unexpected use of Mocha `{{name}}` hook with only one direct child.'
         },
-        schema: [optionSchema]
+        schema: [allowMochaCallOptionSchema]
     },
     create(context) {
-        const { allow } = getRuleOption<ResolvedOption>(context);
-        const allowedHooks = new Set(allow.map(ensureEndsWithParens));
+        const { allow } = getRuleOption<ResolvedAllowMochaCallOption>(context);
+        const allowedHooks = new Set(allow.map(normalizeMochaCallName));
         let layers: Layer[] = [];
 
         function increaseTestCount(): void {

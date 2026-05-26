@@ -1,22 +1,10 @@
 import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { type AnyFunction, isFunction, isIdentifier } from '../ast/node-types.js';
-
-function isTypeScriptThisParameter(param: AnyFunction['params'][number] | undefined): boolean {
-    return param !== undefined && isIdentifier(param) && param.name === 'this';
-}
-
-function getFirstMeaningfulParameter(node: Readonly<AnyFunction>): AnyFunction['params'][number] | undefined {
-    const [firstParam, secondParam] = node.params;
-    return isTypeScriptThisParameter(firstParam) ? secondParam : firstParam;
-}
-
-function hasDoneCallbackParameter(node: Readonly<AnyFunction>): boolean {
-    return getFirstMeaningfulParameter(node) !== undefined;
-}
+import { isFunction } from '../ast/node-types.js';
+import { hasCallbackParameter } from '../mocha/callback-parameter.js';
 
 export function checkNodeForAsyncAndDone(context: Readonly<Rule.RuleContext>, node: Readonly<Rule.Node>): void {
-    if (!isFunction(node) || node.async !== true || !hasDoneCallbackParameter(node)) {
+    if (!isFunction(node) || node.async !== true || !hasCallbackParameter(node)) {
         return;
     }
 

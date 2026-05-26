@@ -1,34 +1,12 @@
 import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
-
-const optionSchema = {
-    type: 'object',
-    properties: {
-        allow: {
-            type: 'array',
-            items: {
-                type: 'string'
-            }
-        }
-    },
-    additionalProperties: false
-} as const satisfies RuleSchema;
-
-type Option = InferSchemaOption<typeof optionSchema>;
-type ResolvedOption = Option & { allow: string[]; };
-const defaultOption: ResolvedOption = { allow: [] };
-
-function ensureEndsWithParens(value: unknown): string {
-    if (typeof value !== 'string') {
-        return '';
-    }
-    if (!value.endsWith('()')) {
-        return `${value}()`;
-    }
-
-    return value;
-}
+import { getRuleOption } from '../rule-options.js';
+import {
+    allowMochaCallOptionSchema,
+    defaultAllowMochaCallOption,
+    normalizeMochaCallName,
+    type ResolvedAllowMochaCallOption
+} from './mocha-call-allowance.js';
 
 export const noHooksRule: Readonly<Rule.RuleModule> = {
     meta: {
@@ -38,16 +16,16 @@ export const noHooksRule: Readonly<Rule.RuleModule> = {
             description: 'Disallow hooks',
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-hooks.md'
         },
-        defaultOptions: [defaultOption],
+        defaultOptions: [defaultAllowMochaCallOption],
         messages: {
             unexpectedHook: 'Unexpected use of Mocha `{{name}}` hook'
         },
-        schema: [optionSchema]
+        schema: [allowMochaCallOptionSchema]
     },
 
     create(context) {
-        const { allow } = getRuleOption<ResolvedOption>(context);
-        const allowList = new Set(allow.map(ensureEndsWithParens));
+        const { allow } = getRuleOption<ResolvedAllowMochaCallOption>(context);
+        const allowList = new Set(allow.map(normalizeMochaCallName));
 
         return createMochaVisitors(context, {
             hook(visitorContext) {

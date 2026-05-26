@@ -1,14 +1,14 @@
 import type { Rule, SourceCode } from 'eslint';
-import type { Except } from 'type-fest';
 import { extractMemberExpressionPath, isConstantPath } from '../ast/member-expression.js';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { type AnyFunction, isFunction, isIdentifier } from '../ast/node-types.js';
+import { type AnyFunction, isFunction } from '../ast/node-types.js';
+import { type TraversableNode, visitWithoutNestedFunctions } from '../ast/visit-child-nodes.js';
 import { asRuleNode } from '../done-callback-paths.js';
+import { getFirstMeaningfulParameter, hasCallbackParameter } from '../mocha/callback-parameter.js';
 import { stripCallExpressions } from '../mocha/name-details.js';
 import { isRecord } from '../record.js';
 import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 
-type TraversableNode = Except<Rule.Node, 'parent'>;
 type CallExpression = Extract<TraversableNode, { type: 'CallExpression'; }>;
 type UnexpectedAsyncOperation = {
     messageId:
@@ -67,53 +67,12 @@ type Option = InferSchemaOption<typeof optionSchema>;
 type ResolvedOption = Option & { allowedAsyncMethods: string[]; };
 const defaultOption: ResolvedOption = { allowedAsyncMethods: [] };
 
-function isNode(value: unknown): value is TraversableNode {
-    return typeof value === 'object' && value !== null && 'type' in value;
-}
+type ExtractedExpression = Readonly<TraversableNode> | undefined;
 
-function getNodeProperty(node: TraversableNode, key: string): unknown {
-    return Reflect.get(node, key);
-}
-
-function visitChildNodes(
+function collectExpressions(
     sourceCode: Readonly<SourceCode>,
-    node: TraversableNode,
-    visitor: (childNode: TraversableNode) => void
-): void {
-    for (const key of sourceCode.visitorKeys[node.type] ?? []) {
-        const value = getNodeProperty(node, key);
-
-        if (Array.isArray(value)) {
-            value.forEach((item) => {
-                if (isNode(item)) {
-                    visitor(item);
-                }
-            });
-        } else if (isNode(value)) {
-            visitor(value);
-        }
-    }
-}
-
-function visitWithoutNestedFunctions(
-    sourceCode: Readonly<SourceCode>,
-    node: TraversableNode,
-    visitor: (childNode: TraversableNode) => void
-): void {
-    visitor(node);
-
-    if (isFunction(node)) {
-        return;
-    }
-
-    visitChildNodes(sourceCode, node, (childNode) => {
-        visitWithoutNestedFunctions(sourceCode, childNode, visitor);
-    });
-}
-
-export function collectCandidateExpressions(
-    sourceCode: Readonly<SourceCode>,
-    body: Readonly<AnyFunction['body']>
+    body: Readonly<AnyFunction['body']>,
+    selectExpression: (node: Readonly<TraversableNode>) => ExtractedExpression
 ): TraversableNode[] {
     if (body.type !== 'BlockStatement') {
         return [body];
@@ -123,10 +82,10 @@ export function collectCandidateExpressions(
 
     for (const statement of body.body) {
         visitWithoutNestedFunctions(sourceCode, statement, (node) => {
-            if (node.type === 'ExpressionStatement') {
-                expressions.push(node.expression);
-            } else if (node.type === 'ReturnStatement' && node.argument !== null && node.argument !== undefined) {
-                expressions.push(node.argument);
+            const expression = selectExpression(node);
+
+            if (expression !== undefined) {
+                expressions.push(expression);
             }
         });
     }
@@ -134,25 +93,30 @@ export function collectCandidateExpressions(
     return expressions;
 }
 
+export function collectCandidateExpressions(
+    sourceCode: Readonly<SourceCode>,
+    body: Readonly<AnyFunction['body']>
+): TraversableNode[] {
+    return collectExpressions(sourceCode, body, (node) => {
+        if (node.type === 'ExpressionStatement') {
+            return node.expression;
+        }
+
+        return node.type === 'ReturnStatement' && node.argument !== null && node.argument !== undefined
+            ? node.argument
+            : undefined;
+    });
+}
+
 function collectReturnedExpressions(
     sourceCode: Readonly<SourceCode>,
     body: Readonly<AnyFunction['body']>
 ): readonly TraversableNode[] {
-    if (body.type !== 'BlockStatement') {
-        return [body];
-    }
-
-    const expressions: TraversableNode[] = [];
-
-    for (const statement of body.body) {
-        visitWithoutNestedFunctions(sourceCode, statement, (node) => {
-            if (node.type === 'ReturnStatement' && node.argument !== null && node.argument !== undefined) {
-                expressions.push(node.argument);
-            }
-        });
-    }
-
-    return expressions;
+    return collectExpressions(sourceCode, body, (node) => {
+        return node.type === 'ReturnStatement' && node.argument !== null && node.argument !== undefined
+            ? node.argument
+            : undefined;
+    });
 }
 
 function isGetPromisedTypeOfPromise(value: unknown): value is TypeCheckerLike['getPromisedTypeOfPromise'] {
@@ -206,19 +170,6 @@ export function hasPromiseLikeType(
     } catch {
         return false;
     }
-}
-
-function isTypeScriptThisParameter(param: AnyFunction['params'][number] | undefined): boolean {
-    return param !== undefined && isIdentifier(param) && param.name === 'this';
-}
-
-function getFirstMeaningfulParameter(node: Readonly<AnyFunction>): AnyFunction['params'][number] | undefined {
-    const [firstParam, secondParam] = node.params;
-    return isTypeScriptThisParameter(firstParam) ? secondParam : firstParam;
-}
-
-function hasDoneCallbackParameter(node: Readonly<AnyFunction>): boolean {
-    return getFirstMeaningfulParameter(node) !== undefined;
 }
 
 export function unwrapChainExpression(node: Readonly<TraversableNode>): Readonly<TraversableNode> {
@@ -344,7 +295,7 @@ function isSynchronousMochaCallback(
     node: Readonly<AnyFunction>
 ): boolean {
     return node.async !== true &&
-        !hasDoneCallbackParameter(node) &&
+        !hasCallbackParameter(node) &&
         !returnsPromiseToMocha(sourceCode, parserServices, node);
 }
 
