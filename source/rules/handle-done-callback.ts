@@ -1,7 +1,7 @@
-import type { Rule, Scope } from 'eslint';
+import type { Rule } from 'eslint';
 import { hasUnhandledReturnPath } from '../done-callback-paths.js';
 import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
-import { createTrackedCallbackVisitors, type TrackedCallbackFunction } from './callback-tracking.js';
+import { createTrackedCallbackVisitors, type DirectTrackedCallbackFunction } from './callback-tracking.js';
 
 const optionSchema = {
     type: 'object',
@@ -17,22 +17,11 @@ type Option = InferSchemaOption<typeof optionSchema>;
 type ResolvedOption = Option & { ignorePending: boolean; };
 const defaultOption: ResolvedOption = { ignorePending: false };
 
-export function findParamInScope(
-    paramName: string,
-    scope: Readonly<Scope.Scope>
-): Readonly<Scope.Variable | undefined> {
-    const variable = scope.set.get(paramName);
-
-    return variable?.defs[0]?.type === 'Parameter' ? variable : undefined;
-}
-
-export function reportUnhandledDoneCallback(
+function reportUnhandledDoneCallback(
     context: Readonly<Rule.RuleContext>,
-    trackedFunction: Readonly<TrackedCallbackFunction>
+    trackedFunction: Readonly<DirectTrackedCallbackFunction>
 ): void {
-    if (trackedFunction.callbackName === undefined || trackedFunction.callbackNode === undefined) {
-        return;
-    }
+    const { callbackName, callbackNode } = trackedFunction;
 
     const hasUnhandledPath = hasUnhandledReturnPath({
         callbackBinding: trackedFunction.callbackBinding,
@@ -46,9 +35,9 @@ export function reportUnhandledDoneCallback(
     }
 
     context.report({
-        node: trackedFunction.callbackNode,
+        node: callbackNode,
         messageId: 'expectedCallback',
-        data: { name: trackedFunction.callbackName }
+        data: { name: callbackName }
     });
 }
 

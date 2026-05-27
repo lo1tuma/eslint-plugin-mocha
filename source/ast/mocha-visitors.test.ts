@@ -1,18 +1,8 @@
 import { type Rule, RuleTester } from 'eslint';
-import assert from 'node:assert';
-import {
-    callExpressionVisitor,
-    createMochaVisitors,
-    dispatchCallback,
-    dispatchSpecificCallExpressionContext
-} from './mocha-visitors.js';
+import { createMochaVisitors } from './mocha-visitors.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 type ProgramNode = Parameters<Exclude<Rule.RuleListener['Program'], undefined>>[0];
-
-function asNode(node: Record<string, unknown>): Rule.Node {
-    return node as unknown as Rule.Node;
-}
 
 function readProgramBody(node: ProgramNode): Readonly<ProgramNode['body']> {
     return node.body;
@@ -70,62 +60,74 @@ ruleTester.run('mocha-visitors config dispatch', configDispatchRule, {
     ]
 });
 
-describe('mocha visitor helpers', function () {
-    it('dispatchCallback() ignores non-call-expression nodes', function () {
-        let called = false;
-
-        dispatchCallback(function () {
-            called = true;
-        }, {
-            config: null,
-            interface: 'BDD',
-            modifier: null,
-            name: 'it()',
-            node: asNode({
-                type: 'Identifier'
-            }),
-            type: 'testCase'
-        });
-
-        assert.strictEqual(called, false);
-    });
-
-    it('callExpressionVisitor() always runs the generic listener', function () {
-        const node = asNode({ type: 'CallExpression' });
-        const cachedMochaCallsByNode = new WeakMap<Rule.Node, { kind: 0; reference: never; }>();
-        let genericCallCount = 0;
-
-        callExpressionVisitor(cachedMochaCallsByNode as never, node as never, {
-            generic() {
-                genericCallCount += 1;
+const isolatedConfigDispatchRule: Readonly<Rule.RuleModule> = {
+    meta: {
+        schema: []
+    },
+    create(ruleContext) {
+        return createMochaVisitors(ruleContext, {
+            config(visitorContext) {
+                if (visitorContext.config === 'timeout') {
+                    ruleContext.report({
+                        node: visitorContext.node,
+                        message: `config:${visitorContext.name}`
+                    });
+                }
+            },
+            anyTestEntity(visitorContext) {
+                if (visitorContext.config === 'timeout') {
+                    ruleContext.report({
+                        node: visitorContext.node,
+                        message: `entity:${visitorContext.name}`
+                    });
+                }
             }
         });
+    }
+};
 
-        assert.strictEqual(genericCallCount, 1);
-    });
+ruleTester.run('mocha-visitors isolates config dispatch', isolatedConfigDispatchRule, {
+    valid: [
+        'it("name", function () {});'
+    ],
+    invalid: [
+        {
+            code: 'it("name", function () {}).timeout(1000);',
+            errors: [{ message: 'config:it().timeout()' }]
+        }
+    ]
+});
 
-    it('dispatchSpecificCallExpressionContext() ignores missing suite-or-test dispatchers', function () {
-        assert.doesNotThrow(() => {
-            dispatchSpecificCallExpressionContext(
-                {
-                    callbackVisitor: undefined,
-                    includeSuiteOrTestCase: true,
-                    visitor: undefined
-                },
-                {},
-                {
-                    config: null,
-                    interface: 'BDD',
-                    modifier: null,
-                    name: 'it()',
-                    node: asNode({
-                        arguments: [],
-                        callee: asNode({ type: 'Identifier', name: 'it' }),
-                        type: 'CallExpression'
-                    }),
-                    type: 'testCase'
-                }
-            );
+const hookDispatchRule: Readonly<Rule.RuleModule> = {
+    meta: {
+        schema: []
+    },
+    create(ruleContext) {
+        return createMochaVisitors(ruleContext, {
+            hook(visitorContext) {
+                ruleContext.report({
+                    node: visitorContext.node,
+                    message: `hook:${visitorContext.type}`
+                });
+            },
+            suiteOrTestCase(visitorContext) {
+                ruleContext.report({
+                    node: visitorContext.node,
+                    message: `suiteOrTestCase:${visitorContext.type}`
+                });
+            }
         });
-    });
+    }
+};
+
+ruleTester.run('mocha-visitors keeps hooks out of suite-or-test-case dispatch', hookDispatchRule, {
+    valid: [
+        'notMocha();'
+    ],
+    invalid: [
+        {
+            code: 'beforeEach(function () {});',
+            errors: [{ message: 'hook:hook' }]
+        }
+    ]
 });

@@ -1,37 +1,8 @@
-import { type Rule, RuleTester } from 'eslint';
-import assert from 'node:assert';
-import {
-    createExportSuggestions,
-    fixRemoveExportKeyword,
-    fixRemoveExportStatement,
-    isLocalNamedExportList,
-    noExportsRule
-} from './no-exports.js';
+import { RuleTester } from 'eslint';
+import { noExportsRule } from './no-exports.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const expectedErrorMessage = 'Unexpected export from a test file';
-
-function asRuleFixer(ruleFixer: Record<string, unknown>): Rule.RuleFixer {
-    return ruleFixer as unknown as Rule.RuleFixer;
-}
-
-function asFixKeywordNode(
-    node: Record<string, unknown>
-): Parameters<typeof fixRemoveExportKeyword>[1] {
-    return node as unknown as Parameters<typeof fixRemoveExportKeyword>[1];
-}
-
-function asFixStatementNode(
-    node: Record<string, unknown>
-): Parameters<typeof fixRemoveExportStatement>[1] {
-    return node as unknown as Parameters<typeof fixRemoveExportStatement>[1];
-}
-
-function asSuggestionNode(
-    node: Record<string, unknown>
-): Parameters<typeof createExportSuggestions>[0] {
-    return node as unknown as Parameters<typeof createExportSuggestions>[0];
-}
 
 ruleTester.run('no-exports', noExportsRule, {
     valid: [
@@ -137,6 +108,15 @@ ruleTester.run('no-exports', noExportsRule, {
                     messageId: 'removeExportKeyword',
                     output: 'describe(function() {}); function foo() {}'
                 }]
+            }]
+        },
+        {
+            code: 'describe(function() {}); export default function() {}',
+            languageOptions: { ecmaVersion: 2019, sourceType: 'module' },
+            errors: [{
+                message: expectedErrorMessage,
+                column: 26,
+                line: 1
             }]
         },
         {
@@ -272,160 +252,4 @@ ruleTester.run('no-exports', noExportsRule, {
             }]
         }
     ]
-});
-
-describe('no-exports helpers', function () {
-    it('fixRemoveExportKeyword() returns null without a declaration', function () {
-        const result = fixRemoveExportKeyword(
-            asRuleFixer({
-                removeRange() {
-                    return null;
-                }
-            }),
-            asFixKeywordNode({
-                type: 'ExportDefaultDeclaration',
-                range: [0, 7]
-            })
-        );
-
-        assert.strictEqual(result, null);
-    });
-
-    it('fixRemoveExportKeyword() returns null without ranges', function () {
-        const result = fixRemoveExportKeyword(
-            asRuleFixer({
-                removeRange() {
-                    return null;
-                }
-            }),
-            asFixKeywordNode({
-                type: 'ExportNamedDeclaration',
-                declaration: {
-                    type: 'VariableDeclaration',
-                    declarations: [],
-                    kind: 'const'
-                },
-                specifiers: [],
-                source: null
-            })
-        );
-
-        assert.strictEqual(result, null);
-    });
-
-    it('fixRemoveExportKeyword() returns null when the declaration range is missing', function () {
-        const result = fixRemoveExportKeyword(
-            asRuleFixer({
-                removeRange() {
-                    return null;
-                }
-            }),
-            asFixKeywordNode({
-                type: 'ExportNamedDeclaration',
-                range: [0, 7],
-                declaration: {
-                    type: 'VariableDeclaration',
-                    declarations: [],
-                    kind: 'const'
-                },
-                specifiers: [],
-                source: null
-            })
-        );
-
-        assert.strictEqual(result, null);
-    });
-
-    it('fixRemoveExportKeyword() returns null when the export range is missing', function () {
-        const result = fixRemoveExportKeyword(
-            asRuleFixer({
-                removeRange() {
-                    return null;
-                }
-            }),
-            asFixKeywordNode({
-                type: 'ExportNamedDeclaration',
-                declaration: {
-                    type: 'VariableDeclaration',
-                    declarations: [],
-                    kind: 'const',
-                    range: [7, 20]
-                },
-                specifiers: [],
-                source: null
-            })
-        );
-
-        assert.strictEqual(result, null);
-    });
-
-    it('fixRemoveExportStatement() returns null without a range', function () {
-        const result = fixRemoveExportStatement(
-            asRuleFixer({
-                removeRange() {
-                    return null;
-                }
-            }),
-            asFixStatementNode({
-                type: 'ExportNamedDeclaration',
-                declaration: null,
-                specifiers: [],
-                source: null
-            })
-        );
-
-        assert.strictEqual(result, null);
-    });
-
-    it('createExportSuggestions() ignores default export expressions', function () {
-        const result = createExportSuggestions(asSuggestionNode({
-            type: 'ExportDefaultDeclaration',
-            declaration: {
-                type: 'Literal',
-                value: 'foo'
-            }
-        }));
-
-        assert.deepStrictEqual(result, []);
-    });
-
-    it('createExportSuggestions() ignores anonymous default export declarations', function () {
-        const result = createExportSuggestions(asSuggestionNode({
-            type: 'ExportDefaultDeclaration',
-            declaration: {
-                type: 'FunctionDeclaration',
-                id: null
-            }
-        }));
-
-        assert.deepStrictEqual(result, []);
-    });
-
-    it('createExportSuggestions() ignores re-export declarations', function () {
-        const result = createExportSuggestions(asSuggestionNode({
-            type: 'ExportNamedDeclaration',
-            declaration: null,
-            specifiers: [],
-            source: {
-                type: 'Literal',
-                value: './foo'
-            }
-        }));
-
-        assert.deepStrictEqual(result, []);
-    });
-
-    it('isLocalNamedExportList() rejects named exports with declarations', function () {
-        const result = isLocalNamedExportList(asSuggestionNode({
-            type: 'ExportNamedDeclaration',
-            declaration: {
-                type: 'VariableDeclaration',
-                declarations: [],
-                kind: 'const'
-            },
-            source: null
-        }));
-
-        assert.strictEqual(result, false);
-    });
 });

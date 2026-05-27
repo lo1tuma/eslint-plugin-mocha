@@ -51,6 +51,14 @@ ruleTester.run('valid-suite-title', validSuiteTitleRule, {
             languageOptions: { ecmaVersion: 2019 },
             options: [{ pattern: '^Foo' }],
             code: 'describe(`${dynamicVar} with template strings`, function () {});'
+        },
+        {
+            options: [{ pattern: '^Foo' }],
+            code: 'describe();'
+        },
+        {
+            options: [{ pattern: '^.$' }],
+            code: 'describe("😀", function () { });'
         }
     ],
 

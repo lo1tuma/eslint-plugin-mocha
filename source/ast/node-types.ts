@@ -9,10 +9,26 @@ export function isMemberExpression(node: Except<Rule.Node, 'parent'>): node is M
     return node.type === 'MemberExpression';
 }
 
+export function expectMemberExpression(node: Readonly<Rule.Node>): MemberExpression {
+    if (isMemberExpression(node)) {
+        return node;
+    }
+
+    throw new TypeError(`Expected MemberExpression node, got ${node.type}.`);
+}
+
 export type CallExpression = NodeType<'CallExpression'>;
 
 export function isCallExpression(node: Except<Rule.Node, 'parent'>): node is CallExpression {
     return node.type === 'CallExpression';
+}
+
+export function expectCallExpression(node: Readonly<Rule.Node>): CallExpression {
+    if (isCallExpression(node)) {
+        return node;
+    }
+
+    throw new TypeError(`Expected CallExpression node, got ${node.type}.`);
 }
 
 export type BlockStatement = NodeType<'BlockStatement'>;

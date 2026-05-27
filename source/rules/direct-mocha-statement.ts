@@ -9,7 +9,7 @@ import {
 
 export type DirectStatementScope = AnyFunction['body'] | Program;
 
-export function isNestedStatementBoundary(node: Rule.Node): boolean {
+function isNestedStatementBoundary(node: Rule.Node): boolean {
     return node.type.endsWith('Statement') || node.type.endsWith('Declaration') || isFunction(node);
 }
 

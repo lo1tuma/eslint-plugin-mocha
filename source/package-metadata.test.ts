@@ -1,146 +1,103 @@
 import assert from 'node:assert';
+import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { createPackageMetadataReader, type PackageMetadata } from './package-metadata.js';
+import { readClosestPackageMetadata } from './package-metadata.js';
 
-type PackageMetadataReaderTestDependencies = {
-    readonly accessCalls: string[];
-    readonly importCalls: string[];
-    readonly readClosestPackageMetadata: (currentModuleUrl: string) => Promise<PackageMetadata>;
-};
+async function withTemporaryProject(
+    files: readonly { path: string; contents: string; }[],
+    runTest: (projectRoot: string) => Promise<void>
+): Promise<void> {
+    const projectRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'eslint-plugin-mocha-package-metadata-'));
 
-function createEnoentError(): Error & { readonly code: string; } {
-    return Object.assign(new Error('ENOENT'), { code: 'ENOENT' });
-}
+    try {
+        for (const file of files) {
+            const filePath = path.join(projectRoot, file.path);
 
-function createPackageMetadataReaderDependencies(
-    existingPackageJsonPaths: readonly string[],
-    packageJsonModules: Record<string, unknown>
-): PackageMetadataReaderTestDependencies {
-    const existingPaths = new Set(existingPackageJsonPaths);
-    const accessCalls: string[] = [];
-    const importCalls: string[] = [];
+            await fs.mkdir(path.dirname(filePath), { recursive: true });
+            await fs.writeFile(filePath, file.contents, 'utf8');
+        }
 
-    return {
-        accessCalls,
-        importCalls,
-        readClosestPackageMetadata: createPackageMetadataReader({
-            async accessFile(packageJsonPath) {
-                accessCalls.push(packageJsonPath);
-
-                if (!existingPaths.has(packageJsonPath)) {
-                    throw createEnoentError();
-                }
-            },
-            async importJsonModule(packageJsonUrl) {
-                importCalls.push(packageJsonUrl);
-                return packageJsonModules[packageJsonUrl];
-            }
-        })
-    };
+        await runTest(projectRoot);
+    } finally {
+        await fs.rm(projectRoot, { recursive: true, force: true });
+    }
 }
 
 describe('package metadata', function () {
     describe('readClosestPackageMetadata()', function () {
         it('reads metadata from the current package folder', async function () {
-            const packageJsonPath = '/virtual/project/package.json';
-            const { accessCalls, importCalls, readClosestPackageMetadata } = createPackageMetadataReaderDependencies(
-                [packageJsonPath],
-                {
-                    [pathToFileURL(packageJsonPath).href]: {
-                        default: {
-                            name: 'eslint-plugin-mocha',
-                            version: '11.3.0'
-                        }
-                    }
-                }
-            );
+            await withTemporaryProject([{
+                path: 'package.json',
+                contents: JSON.stringify({
+                    name: 'eslint-plugin-mocha',
+                    version: '11.3.0'
+                })
+            }], async function (projectRoot) {
+                const result = await readClosestPackageMetadata(
+                    pathToFileURL(path.join(projectRoot, 'plugin.js')).href
+                );
 
-            const result = await readClosestPackageMetadata('file:///virtual/project/plugin.js');
-
-            assert.deepStrictEqual(result, {
-                name: 'eslint-plugin-mocha',
-                version: '11.3.0'
+                assert.deepStrictEqual(result, {
+                    name: 'eslint-plugin-mocha',
+                    version: '11.3.0'
+                });
             });
-            assert.deepStrictEqual(accessCalls, [packageJsonPath]);
-            assert.deepStrictEqual(importCalls, [pathToFileURL(packageJsonPath).href]);
         });
 
         it('reads metadata from an ancestor package folder', async function () {
-            const moduleFilePath = '/virtual/project/target/build/source/plugin.js';
-            const packageJsonPath = '/virtual/project/package.json';
-            const { accessCalls, importCalls, readClosestPackageMetadata } = createPackageMetadataReaderDependencies(
-                [packageJsonPath],
-                {
-                    [pathToFileURL(packageJsonPath).href]: {
-                        default: {
-                            name: 'eslint-plugin-mocha',
-                            version: '11.3.0'
-                        }
-                    }
-                }
-            );
+            await withTemporaryProject([{
+                path: 'package.json',
+                contents: JSON.stringify({
+                    name: 'eslint-plugin-mocha',
+                    version: '11.3.0'
+                })
+            }], async function (projectRoot) {
+                const moduleFilePath = path.join(projectRoot, 'target/build/source/plugin.js');
+                const result = await readClosestPackageMetadata(pathToFileURL(moduleFilePath).href);
 
-            const result = await readClosestPackageMetadata(pathToFileURL(moduleFilePath).href);
-
-            assert.deepStrictEqual(result, {
-                name: 'eslint-plugin-mocha',
-                version: '11.3.0'
+                assert.deepStrictEqual(result, {
+                    name: 'eslint-plugin-mocha',
+                    version: '11.3.0'
+                });
             });
-            assert.deepStrictEqual(accessCalls, [
-                path.join('/virtual/project/target/build/source', 'package.json'),
-                path.join('/virtual/project/target/build', 'package.json'),
-                path.join('/virtual/project/target', 'package.json'),
-                packageJsonPath
-            ]);
-            assert.deepStrictEqual(importCalls, [pathToFileURL(packageJsonPath).href]);
         });
 
         it('throws when the nearest package.json is missing required metadata', async function () {
-            const packageJsonPath = '/virtual/project/package.json';
-            const { readClosestPackageMetadata } = createPackageMetadataReaderDependencies(
-                [packageJsonPath],
-                {
-                    [pathToFileURL(packageJsonPath).href]: {
-                        default: { name: 'eslint-plugin-mocha' }
-                    }
-                }
-            );
+            await withTemporaryProject([{
+                path: 'package.json',
+                contents: JSON.stringify({ name: 'eslint-plugin-mocha' })
+            }], async function (projectRoot) {
+                const packageJsonPath = path.join(projectRoot, 'package.json');
 
-            await assert.rejects(
-                async function () {
-                    await readClosestPackageMetadata('file:///virtual/project/plugin.js');
-                },
-                function (error: unknown) {
-                    return error instanceof Error &&
-                        error.message === `Missing package name or version in ${packageJsonPath}`;
-                }
-            );
+                await assert.rejects(
+                    async function () {
+                        await readClosestPackageMetadata(pathToFileURL(path.join(projectRoot, 'plugin.js')).href);
+                    },
+                    function (error: unknown) {
+                        return error instanceof Error &&
+                            error.message === `Missing package name or version in ${packageJsonPath}`;
+                    }
+                );
+            });
         });
 
-        it('throws when the imported package module has no default export', async function () {
-            const packageJsonPath = '/virtual/project/package.json';
-            const { readClosestPackageMetadata } = createPackageMetadataReaderDependencies(
-                [packageJsonPath],
-                {
-                    [pathToFileURL(packageJsonPath).href]: {}
-                }
-            );
-
-            await assert.rejects(
-                async function () {
-                    await readClosestPackageMetadata('file:///virtual/project/plugin.js');
-                },
-                function (error: unknown) {
-                    return error instanceof Error &&
-                        error.message === `Missing default export in ${packageJsonPath}`;
-                }
-            );
+        it('rethrows invalid package.json parse errors', async function () {
+            await withTemporaryProject([{
+                path: 'package.json',
+                contents: '{'
+            }], async function (projectRoot) {
+                await assert.rejects(
+                    async function () {
+                        await readClosestPackageMetadata(pathToFileURL(path.join(projectRoot, 'plugin.js')).href);
+                    },
+                    SyntaxError
+                );
+            });
         });
 
         it('throws when no package.json can be found', async function () {
-            const { readClosestPackageMetadata } = createPackageMetadataReaderDependencies([], {});
-
             await assert.rejects(
                 async function () {
                     await readClosestPackageMetadata('file:///virtual/project/plugin.js');
@@ -151,72 +108,80 @@ describe('package metadata', function () {
             );
         });
 
-        it('rethrows non-ENOENT access errors', async function () {
-            const expectedError = new Error('permission denied');
-            const readClosestPackageMetadata = createPackageMetadataReader({
-                async accessFile() {
-                    throw expectedError;
-                },
-                async importJsonModule() {
-                    throw new Error('This should not be called');
+        it('rethrows package.json access errors that are not ENOENT', async function () {
+            await withTemporaryProject([{
+                path: 'source/package.json',
+                contents: JSON.stringify({
+                    name: 'eslint-plugin-mocha',
+                    version: '11.3.0'
+                })
+            }, {
+                path: 'source/plugin.js',
+                contents: ''
+            }], async function (projectRoot) {
+                const sourceFolder = path.join(projectRoot, 'source');
+
+                await fs.chmod(sourceFolder, 0o000);
+
+                try {
+                    await assert.rejects(
+                        async function () {
+                            await readClosestPackageMetadata(
+                                pathToFileURL(path.join(projectRoot, 'source/plugin.js')).href
+                            );
+                        },
+                        function (error: unknown) {
+                            return error instanceof Error &&
+                                'code' in error &&
+                                typeof error.code === 'string' &&
+                                error.code !== 'ENOENT';
+                        }
+                    );
+                } finally {
+                    await fs.chmod(sourceFolder, 0o700);
                 }
             });
-
-            await assert.rejects(
-                async function () {
-                    await readClosestPackageMetadata('file:///virtual/project/plugin.js');
-                },
-                function (error: unknown) {
-                    return error === expectedError;
-                }
-            );
         });
 
         it('throws when the package module default export is not a record', async function () {
-            const packageJsonPath = '/virtual/project/package.json';
-            const { readClosestPackageMetadata } = createPackageMetadataReaderDependencies(
-                [packageJsonPath],
-                {
-                    [pathToFileURL(packageJsonPath).href]: {
-                        default: ['eslint-plugin-mocha']
-                    }
-                }
-            );
+            await withTemporaryProject([{
+                path: 'package.json',
+                contents: JSON.stringify(['eslint-plugin-mocha'])
+            }], async function (projectRoot) {
+                const packageJsonPath = path.join(projectRoot, 'package.json');
 
-            await assert.rejects(
-                async function () {
-                    await readClosestPackageMetadata('file:///virtual/project/plugin.js');
-                },
-                function (error: unknown) {
-                    return error instanceof Error &&
-                        error.message === `Missing package name or version in ${packageJsonPath}`;
-                }
-            );
+                await assert.rejects(
+                    async function () {
+                        await readClosestPackageMetadata(pathToFileURL(path.join(projectRoot, 'plugin.js')).href);
+                    },
+                    function (error: unknown) {
+                        return error instanceof Error &&
+                            error.message === `Missing package name or version in ${packageJsonPath}`;
+                    }
+                );
+            });
         });
 
         it('throws when the package name is not a string', async function () {
-            const packageJsonPath = '/virtual/project/package.json';
-            const { readClosestPackageMetadata } = createPackageMetadataReaderDependencies(
-                [packageJsonPath],
-                {
-                    [pathToFileURL(packageJsonPath).href]: {
-                        default: {
-                            name: 1,
-                            version: '11.3.0'
-                        }
-                    }
-                }
-            );
+            await withTemporaryProject([{
+                path: 'package.json',
+                contents: JSON.stringify({
+                    name: 1,
+                    version: '11.3.0'
+                })
+            }], async function (projectRoot) {
+                const packageJsonPath = path.join(projectRoot, 'package.json');
 
-            await assert.rejects(
-                async function () {
-                    await readClosestPackageMetadata('file:///virtual/project/plugin.js');
-                },
-                function (error: unknown) {
-                    return error instanceof Error &&
-                        error.message === `Missing package name or version in ${packageJsonPath}`;
-                }
-            );
+                await assert.rejects(
+                    async function () {
+                        await readClosestPackageMetadata(pathToFileURL(path.join(projectRoot, 'plugin.js')).href);
+                    },
+                    function (error: unknown) {
+                        return error instanceof Error &&
+                            error.message === `Missing package name or version in ${packageJsonPath}`;
+                    }
+                );
+            });
         });
     });
 });

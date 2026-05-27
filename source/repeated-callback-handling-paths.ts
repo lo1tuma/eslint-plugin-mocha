@@ -7,7 +7,7 @@ import {
     getCodeAfterCallbackHandlingNode
 } from './callback-handling-state.js';
 
-export function getRepeatedCallbackHandlingNode(
+function getRepeatedCallbackHandlingNode(
     context: Readonly<CallbackHandlingContext>,
     pathState: Readonly<CallbackPathState>,
     operation: Readonly<CallbackHandlingOperation>

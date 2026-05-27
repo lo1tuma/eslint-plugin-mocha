@@ -1,17 +1,9 @@
 import * as typescriptParser from '@typescript-eslint/parser';
-import { RuleTester, type SourceCode } from 'eslint';
+import { Linter, RuleTester } from 'eslint';
 import assert from 'node:assert';
 import { withInterface } from '../mocha-interface-test-cases.js';
 import { isRecord } from '../record.js';
-import {
-    collectCandidateExpressions,
-    getComputedStringPropertyName,
-    getParserServicesWithTypeInformation,
-    hasErrorFirstCallback,
-    hasPromiseLikeType,
-    noAsyncInSyncTestsRule,
-    unwrapChainExpression
-} from './no-async-in-sync-tests.js';
+import { noAsyncInSyncTestsRule } from './no-async-in-sync-tests.js';
 
 const slowTypedTestTimeout = 30_000;
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
@@ -72,6 +64,46 @@ function withLongerTimeout(testFn: RuleTesterTestFunction): RuleTesterTestFuncti
             testCase.timeout(slowTypedTestTimeout);
         }
     };
+}
+
+function verifyWithParserServices(parserServices: unknown): readonly Linter.LintMessage[] {
+    const linter = new Linter({ configType: 'flat' });
+
+    return linter.verify('it("", function () { returnsPromise(); });', [{
+        languageOptions: {
+            ecmaVersion: 2020,
+            sourceType: 'script',
+            parser: {
+                parseForESLint(code: string, options: Record<string, unknown>) {
+                    const parsed = typescriptParser.parseForESLint(code, {
+                        ...options,
+                        comment: true,
+                        filePath: typescriptFilename,
+                        loc: true,
+                        range: true,
+                        sourceType: 'script',
+                        tokens: true
+                    });
+
+                    return {
+                        ast: parsed.ast,
+                        scopeManager: parsed.scopeManager,
+                        services: parserServices
+                    };
+                }
+            }
+        },
+        plugins: {
+            mocha: {
+                rules: {
+                    'no-async-in-sync-tests': noAsyncInSyncTestsRule
+                }
+            }
+        },
+        rules: {
+            'mocha/no-async-in-sync-tests': 'error'
+        }
+    }]);
 }
 
 RuleTester.it = withLongerTimeout(defaultIt);
@@ -189,173 +221,83 @@ ruleTester.run('no-async-in-sync-tests', noAsyncInSyncTestsRule, {
 RuleTester.it = defaultIt;
 RuleTester.itOnly = defaultItOnly;
 
-describe('no-async-in-sync-tests helpers', function () {
-    it('hasErrorFirstCallback() ignores non-Identifier first parameters', function () {
-        const result = hasErrorFirstCallback({
-            params: [{
-                type: 'AssignmentPattern',
-                name: 'error'
-            }]
-        } as never);
+describe('no-async-in-sync-tests metadata', function () {
+    it('defaults to allowing no additional async methods', function () {
+        assert.deepStrictEqual(noAsyncInSyncTestsRule.meta?.defaultOptions, [{ allowedAsyncMethods: [] }]);
+    });
+});
 
-        assert.strictEqual(result, false);
+describe('no-async-in-sync-tests parser services', function () {
+    it('ignores missing parser services', function () {
+        assert.deepStrictEqual(verifyWithParserServices(null), []);
     });
 
-    it('getParserServicesWithTypeInformation() ignores non-object parser services', function () {
-        const result = getParserServicesWithTypeInformation({
-            parserServices: null
-        } as unknown as SourceCode);
-
-        assert.strictEqual(result, undefined);
+    it('ignores parser services without type access', function () {
+        assert.deepStrictEqual(verifyWithParserServices({}), []);
     });
 
-    it('getParserServicesWithTypeInformation() ignores parser services without typed accessors', function () {
-        const result = getParserServicesWithTypeInformation({
-            parserServices: {}
-        } as unknown as SourceCode);
-
-        assert.strictEqual(result, undefined);
-    });
-
-    it('getParserServicesWithTypeInformation() ignores parser services without getTypeAtLocation()', function () {
-        const result = getParserServicesWithTypeInformation({
-            parserServices: {
-                program: {
-                    getTypeChecker() {
-                        return {
-                            getPromisedTypeOfPromise() {
-                                return undefined;
-                            }
-                        };
-                    }
+    it('ignores parser services without a type checker', function () {
+        assert.deepStrictEqual(
+            verifyWithParserServices({
+                getTypeAtLocation() {
+                    return {};
                 }
-            }
-        } as unknown as SourceCode);
-
-        assert.strictEqual(result, undefined);
+            }),
+            []
+        );
     });
 
-    it('getParserServicesWithTypeInformation() ignores parser services without getTypeChecker()', function () {
-        const result = getParserServicesWithTypeInformation({
-            parserServices: {
+    it('ignores parser services without promised type inspection', function () {
+        assert.deepStrictEqual(
+            verifyWithParserServices({
                 getTypeAtLocation() {
-                    return undefined;
-                },
-                program: {}
-            }
-        } as unknown as SourceCode);
-
-        assert.strictEqual(result, undefined);
-    });
-
-    it('getParserServicesWithTypeInformation() ignores parser services without getPromisedTypeOfPromise()', function () {
-        const result = getParserServicesWithTypeInformation({
-            parserServices: {
-                getTypeAtLocation() {
-                    return undefined;
+                    return {};
                 },
                 program: {
                     getTypeChecker() {
                         return {};
                     }
                 }
-            }
-        } as unknown as SourceCode);
-
-        assert.strictEqual(result, undefined);
+            }),
+            []
+        );
     });
 
-    it('hasPromiseLikeType() returns false when typed access throws', function () {
-        const result = hasPromiseLikeType({
-            getTypeAtLocation() {
-                throw new Error('boom');
-            },
-            program: {
-                getTypeChecker() {
-                    return {
-                        getPromisedTypeOfPromise() {
-                            return true;
-                        }
-                    };
+    it('ignores parser services with a non-function promised type accessor', function () {
+        assert.deepStrictEqual(
+            verifyWithParserServices({
+                getTypeAtLocation() {
+                    return {};
+                },
+                program: {
+                    getTypeChecker() {
+                        return {
+                            getPromisedTypeOfPromise: {}
+                        };
+                    }
                 }
-            }
-        }, { type: 'Identifier' } as never);
-
-        assert.strictEqual(result, false);
+            }),
+            []
+        );
     });
 
-    it('collectCandidateExpressions() ignores nodes without configured visitor keys', function () {
-        const result = collectCandidateExpressions({
-            visitorKeys: {}
-        } as unknown as SourceCode, {
-            type: 'BlockStatement',
-            body: [{ type: 'UnknownStatement' }]
-        } as never);
-
-        assert.deepStrictEqual(result, []);
-    });
-
-    it('collectCandidateExpressions() ignores return statements without arguments', function () {
-        const result = collectCandidateExpressions({
-            visitorKeys: {}
-        } as unknown as SourceCode, {
-            type: 'BlockStatement',
-            body: [{ type: 'ReturnStatement', argument: null }]
-        } as never);
-
-        assert.deepStrictEqual(result, []);
-    });
-
-    it('collectCandidateExpressions() ignores return statements with an absent argument', function () {
-        const result = collectCandidateExpressions({
-            visitorKeys: {}
-        } as unknown as SourceCode, {
-            type: 'BlockStatement',
-            body: [{ type: 'ReturnStatement' }]
-        } as never);
-
-        assert.deepStrictEqual(result, []);
-    });
-
-    it('collectCandidateExpressions() ignores non-return statements with argument properties', function () {
-        const result = collectCandidateExpressions({
-            visitorKeys: {}
-        } as unknown as SourceCode, {
-            type: 'BlockStatement',
-            body: [{ type: 'ThrowStatement', argument: { type: 'Identifier', name: 'error' } }]
-        } as never);
-
-        assert.deepStrictEqual(result, []);
-    });
-
-    it('unwrapChainExpression() returns the inner expression for optional chains', function () {
-        const result = unwrapChainExpression({
-            type: 'ChainExpression',
-            expression: { type: 'Identifier', name: 'promise' }
-        } as never);
-
-        assert.deepStrictEqual(result, { type: 'Identifier', name: 'promise' });
-    });
-
-    it('getComputedStringPropertyName() ignores computed properties without string literals', function () {
-        const result = getComputedStringPropertyName({
-            computed: true,
-            property: { type: 'Literal', value: 0 }
-        } as never);
-
-        assert.strictEqual(result, undefined);
-    });
-
-    it('getComputedStringPropertyName() ignores non-computed literal properties', function () {
-        const result = getComputedStringPropertyName({
-            computed: false,
-            property: { type: 'Literal', value: 'then' }
-        } as never);
-
-        assert.strictEqual(result, undefined);
-    });
-
-    it('should declare an empty default allow-list', function () {
-        assert.deepStrictEqual(noAsyncInSyncTestsRule.meta?.defaultOptions, [{ allowedAsyncMethods: [] }]);
+    it('ignores type lookup failures', function () {
+        assert.deepStrictEqual(
+            verifyWithParserServices({
+                getTypeAtLocation() {
+                    throw new Error('boom');
+                },
+                program: {
+                    getTypeChecker() {
+                        return {
+                            getPromisedTypeOfPromise() {
+                                return {};
+                            }
+                        };
+                    }
+                }
+            }),
+            []
+        );
     });
 });

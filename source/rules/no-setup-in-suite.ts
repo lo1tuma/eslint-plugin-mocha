@@ -20,11 +20,7 @@ function isNestedInSuiteBlock(nesting: readonly number[]): boolean {
     return nesting.at(-1) === SUITE;
 }
 
-export function enterNestedFunction(nesting: number[]): void {
-    if (nesting.length === 0) {
-        return;
-    }
-
+function enterNestedFunction(nesting: number[]): void {
     nesting.push(FUNCTION);
 }
 
@@ -126,9 +122,7 @@ export const noSetupInSuiteRule: Readonly<Rule.RuleModule> = {
                 enterNestedFunction(nesting);
             },
             'FunctionDeclaration:exit'() {
-                if (nesting.length > 0) {
-                    nesting.pop();
-                }
+                nesting.pop();
             },
 
             FunctionExpression(node) {
@@ -137,7 +131,7 @@ export const noSetupInSuiteRule: Readonly<Rule.RuleModule> = {
                 }
             },
             'FunctionExpression:exit'(node) {
-                if (nesting.length > 0 && !suiteNodes.has(node.parent)) {
+                if (!suiteNodes.has(node.parent)) {
                     nesting.pop();
                 }
             },
@@ -148,7 +142,7 @@ export const noSetupInSuiteRule: Readonly<Rule.RuleModule> = {
                 }
             },
             'ArrowFunctionExpression:exit'(node) {
-                if (nesting.length > 0 && !suiteNodes.has(node.parent)) {
+                if (!suiteNodes.has(node.parent)) {
                     nesting.pop();
                 }
             }

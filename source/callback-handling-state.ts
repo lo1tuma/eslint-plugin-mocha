@@ -1,7 +1,8 @@
 import type { Rule } from 'eslint';
 import { extractMemberExpressionPath, isConstantPath } from './ast/member-expression.js';
+import { asRuleNode } from './ast/rule-node.js';
+import { stripCallExpressions } from './mocha/name-details.js';
 import {
-    asRuleNode,
     cloneTrackedContainerProperties,
     collectTrackedCallbackObjectProperties,
     getTrackedBinding,
@@ -9,8 +10,7 @@ import {
     haveSameTrackedContainerProperties,
     isTrackedCallbackExpression,
     type TrackedBinding
-} from './done-callback-paths.js';
-import { stripCallExpressions } from './mocha/name-details.js';
+} from './tracked-callback-reference-state.js';
 
 const dynamicPropertyName = '<dynamic>';
 const knownSingleCallbackDelegates = new Set(

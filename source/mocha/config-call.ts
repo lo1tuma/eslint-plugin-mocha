@@ -65,7 +65,7 @@ function getMochaContextConfigExpression(
         : callee;
 }
 
-export function getFirstArgument(
+function getFirstArgument(
     node: Readonly<CallExpression>
 ): Readonly<CallExpression['arguments'][number]> | undefined {
     const [firstArgument] = node.arguments;
@@ -73,11 +73,7 @@ export function getFirstArgument(
     return firstArgument?.type === 'SpreadElement' ? undefined : firstArgument;
 }
 
-export function getConfigPropertyName(node: Readonly<CallExpression>): MochaConfigCall | null {
-    return getPropertyName(node.callee);
-}
-
-export function isMochaContextConfigCall(
+function isMochaContextConfigCall(
     node: Readonly<TraversableNode>,
     configName?: MochaConfigCall
 ): node is MochaConfigCallExpression {

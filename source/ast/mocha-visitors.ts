@@ -106,7 +106,7 @@ type CallExpressionDispatcher = (cachedMochaCall: Readonly<CachedMochaCall>) => 
 type CallExpressionDispatchGroup = {
     readonly visitor?: MochaVisitor | undefined;
     readonly callbackVisitor?: MochaCallbackVisitor | undefined;
-    readonly includeSuiteOrTestCase: boolean;
+    readonly suiteOrTestCaseVisitor?: MochaVisitor | undefined;
 };
 type SplitMochaVisitors = {
     readonly callExpressionListeners: {
@@ -182,20 +182,20 @@ function createMochaCallCache(
 function createCallExpressionDispatchGroup(
     visitor: MochaVisitor | undefined,
     callbackVisitor: MochaCallbackVisitor | undefined,
-    includeSuiteOrTestCase = false
+    suiteOrTestCaseVisitor: MochaVisitor | undefined
 ): Readonly<CallExpressionDispatchGroup> | undefined {
-    if (visitor === undefined && callbackVisitor === undefined && !includeSuiteOrTestCase) {
+    if (visitor === undefined && callbackVisitor === undefined && suiteOrTestCaseVisitor === undefined) {
         return undefined;
     }
 
     return {
         visitor,
         callbackVisitor,
-        includeSuiteOrTestCase
+        suiteOrTestCaseVisitor
     };
 }
 
-export function dispatchCallback(
+function dispatchCallback(
     visitor: MochaCallbackVisitor | undefined,
     context: Readonly<VisitorContext>
 ): void {
@@ -209,9 +209,8 @@ export function dispatchCallback(
     }
 }
 
-export function dispatchSpecificCallExpressionContext(
+function dispatchSpecificCallExpressionContext(
     group: Readonly<CallExpressionDispatchGroup> | undefined,
-    dispatchers: Readonly<CallExpressionDispatchers>,
     context: Readonly<VisitorContext>
 ): void {
     if (group === undefined) {
@@ -219,9 +218,7 @@ export function dispatchSpecificCallExpressionContext(
     }
 
     group.visitor?.(context);
-    if (group.includeSuiteOrTestCase) {
-        dispatchers.suiteOrTestCase?.(context);
-    }
+    group.suiteOrTestCaseVisitor?.(context);
     dispatchCallback(group.callbackVisitor, context);
 }
 
@@ -238,7 +235,7 @@ function dispatchCallExpressionContext(
         return;
     }
 
-    dispatchSpecificCallExpressionContext(group, dispatchers, context);
+    dispatchSpecificCallExpressionContext(group, context);
     dispatchers.anyTestEntity?.(context);
     dispatchCallback(dispatchers.anyTestEntityCallback, context);
 }
@@ -247,20 +244,21 @@ function createCallExpressionDispatcher(
     dispatchers: Readonly<CallExpressionDispatchers>
 ): CallExpressionDispatcher | undefined {
     const groups = {
-        [MochaEntityKind.Config]: createCallExpressionDispatchGroup(dispatchers.config, undefined),
+        [MochaEntityKind.Config]: createCallExpressionDispatchGroup(dispatchers.config, undefined, undefined),
         [MochaEntityKind.TestCase]: createCallExpressionDispatchGroup(
             dispatchers.testCase,
             dispatchers.testCaseCallback,
-            dispatchers.suiteOrTestCase !== undefined
+            dispatchers.suiteOrTestCase
         ),
         [MochaEntityKind.Suite]: createCallExpressionDispatchGroup(
             dispatchers.suite,
             dispatchers.suiteCallback,
-            dispatchers.suiteOrTestCase !== undefined
+            dispatchers.suiteOrTestCase
         ),
         [MochaEntityKind.Hook]: createCallExpressionDispatchGroup(
             dispatchers.hook,
-            dispatchers.hookCallback
+            dispatchers.hookCallback,
+            undefined
         )
     } as const satisfies Readonly<Record<MochaEntityKind, Readonly<CallExpressionDispatchGroup> | undefined>>;
     const hasDispatcher = [
@@ -289,7 +287,7 @@ function createCallExpressionDispatcher(
     };
 }
 
-export function callExpressionVisitor(
+function callExpressionVisitor(
     cachedMochaCallsByNode: Readonly<WeakMap<Rule.Node, Readonly<CachedMochaCall>>>,
     node: CallExpressionNode,
     listenerSet: Readonly<CallExpressionListenerSet>

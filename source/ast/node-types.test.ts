@@ -1,6 +1,11 @@
 import type { Rule } from 'eslint';
 import assert from 'node:assert';
-import { getParentNode, isLiteral } from './node-types.js';
+import {
+    expectCallExpression,
+    expectMemberExpression,
+    getParentNode,
+    isLiteral
+} from './node-types.js';
 
 function asNode(node: Record<string, unknown>): Rule.Node {
     return node as unknown as Rule.Node;
@@ -26,5 +31,38 @@ describe('node type helpers', function () {
 
     it('isLiteral() rejects non-literal nodes', function () {
         assert.strictEqual(isLiteral(asNode({ type: 'Identifier' })), false);
+    });
+
+    it('expectCallExpression() returns call expression nodes', function () {
+        const node = asNode({ type: 'CallExpression', callee: asNode({ type: 'Identifier' }), arguments: [] });
+
+        assert.strictEqual(expectCallExpression(node), node);
+    });
+
+    it('expectCallExpression() throws for other node types', function () {
+        assert.throws(function () {
+            expectCallExpression(asNode({ type: 'Identifier' }));
+        }, function (error: unknown) {
+            return error instanceof Error && error.message === 'Expected CallExpression node, got Identifier.';
+        });
+    });
+
+    it('expectMemberExpression() returns member expression nodes', function () {
+        const node = asNode({
+            type: 'MemberExpression',
+            object: asNode({ type: 'Identifier' }),
+            property: asNode({ type: 'Identifier' }),
+            computed: false
+        });
+
+        assert.strictEqual(expectMemberExpression(node), node);
+    });
+
+    it('expectMemberExpression() throws for other node types', function () {
+        assert.throws(function () {
+            expectMemberExpression(asNode({ type: 'Identifier' }));
+        }, function (error: unknown) {
+            return error instanceof Error && error.message === 'Expected MemberExpression node, got Identifier.';
+        });
     });
 });

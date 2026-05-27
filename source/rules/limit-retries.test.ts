@@ -9,6 +9,7 @@ const unexpectedRetries = 'Unexpected use of Mocha retry configuration.';
 ruleTester.run('limit-retries', limitRetriesRule, {
     valid: [
         'it("works", function () {});',
+        'retries(2);',
         'it("works", function () {}).timeout(5000);',
         {
             code: 'it("works", function () {}).retries();',

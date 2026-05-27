@@ -37,28 +37,25 @@ type CreateVisitors = (
     checkTitle: (visitorContext: Readonly<VisitorContext>) => void
 ) => Rule.RuleListener;
 
-export function normalizeOptions(options: Readonly<ResolvedOption>): Readonly<NormalizedOptions> {
+function normalizeOptions(options: Readonly<ResolvedOption>): Readonly<NormalizedOptions> {
     const { pattern: stringPattern, message } = options;
     const pattern = new RegExp(stringPattern, 'u');
 
-    return { pattern, message: typeof message === 'string' ? message : undefined };
+    return { pattern, message };
 }
 
-export function hasValidOrNoDescription(
+function hasValidOrNoDescription(
     context: Readonly<Rule.RuleContext>,
     mochaCallExpression: Readonly<CallExpression>,
     pattern: Readonly<RegExp>
 ): boolean {
     const descriptionArgument = mochaCallExpression.arguments[0];
-
-    if (descriptionArgument === undefined) {
-        return true;
-    }
-
-    const description = getStringIfConstant(
-        descriptionArgument,
-        context.sourceCode.getScope(mochaCallExpression)
-    );
+    const description = descriptionArgument === undefined
+        ? null
+        : getStringIfConstant(
+            descriptionArgument,
+            context.sourceCode.getScope(mochaCallExpression)
+        );
 
     return description === null || pattern.test(description);
 }
