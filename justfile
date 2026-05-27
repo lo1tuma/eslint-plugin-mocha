@@ -45,6 +45,9 @@ test-unit: compile-unit-tests
 test-unit-with-coverage: compile-unit-tests
     c8 mocha --spec 'target/build/source/**/*.test.js'
 
+test-mutation:
+    stryker run
+
 test-bench:
     tsc --build benchmarks/tsconfig.json
     mocha -t 2400000 --spec 'target/build/benchmarks/**/*.bench.js'

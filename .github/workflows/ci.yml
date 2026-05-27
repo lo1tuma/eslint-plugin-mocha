@@ -35,6 +35,20 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   path-to-lcov: ./target/coverage/lcov.info
                   parallel: true
+    mutation-testing:
+        runs-on: ubuntu-latest
+        name: Mutation testing
+        steps:
+            - uses: actions/checkout@v4
+            - name: Use Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 26
+            - name: Install dependencies
+              run: npm ci
+            - name: Run mutation tests
+              run: npx just test-mutation
+              timeout-minutes: 30
     coverage:
         needs: build
         runs-on: ubuntu-latest
