@@ -9,7 +9,7 @@ import {
     getFunctionExpressionLastArgument
 } from './function-expression-arguments.js';
 import { createListenerRecord } from './listener-record.js';
-import { isCallExpression } from './node-types.js';
+import { expectCallExpression } from './node-types.js';
 
 type MochaVisitor = (context: Readonly<VisitorContext>) => void;
 type ExpressionListener<Name extends keyof Rule.RuleListener> = Exclude<Rule.RuleListener[Name], undefined>;
@@ -199,9 +199,7 @@ function dispatchCallback(
     visitor: MochaCallbackVisitor | undefined,
     context: Readonly<VisitorContext>
 ): void {
-    const callbackNode = isCallExpression(context.node)
-        ? getFunctionExpressionLastArgument(context.node)
-        : undefined;
+    const callbackNode = getFunctionExpressionLastArgument(expectCallExpression(context.node));
 
     if (callbackNode !== undefined) {
         const callbackContext = { ...context, node: callbackNode };

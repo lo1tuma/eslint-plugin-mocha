@@ -5,6 +5,7 @@ import { expectNodeRange } from '../ast/node-location.js';
 import {
     type AnyFunction,
     expectCallExpression,
+    expectMemberExpression,
     getParentNode,
     isFunction,
     isIdentifier,
@@ -32,6 +33,8 @@ type PendingRuleConfiguration = {
     readonly allowSkippedWithComment: boolean;
 };
 type CallExpression = Extract<TraversableNode, { type: 'CallExpression'; }>;
+type RemovablePendingCallee = Extract<CallExpression['callee'], { type: 'Identifier'; }> | PendingMemberCallee;
+type RemovablePendingCallExpression = CallExpression & { callee: RemovablePendingCallee; };
 
 const defaultOption: ResolvedOption = {
     allowSkippedWithComment: false
@@ -92,7 +95,7 @@ function fixPendingMemberExpression(
     fixer: Rule.RuleFixer,
     sourceCode: Readonly<SourceCode>,
     callee: Readonly<PendingMemberCallee>
-): Readonly<Rule.Fix | null> {
+): Readonly<Rule.Fix> {
     const { object } = callee;
     const range = expectNodeRange(callee);
 
@@ -102,17 +105,13 @@ function fixPendingMemberExpression(
 function fixPendingTest(
     fixer: Rule.RuleFixer,
     sourceCode: Readonly<SourceCode>,
-    node: Readonly<CallExpression>
-): Readonly<Rule.Fix | null> {
+    node: Readonly<RemovablePendingCallExpression>
+): Readonly<Rule.Fix> {
     if (isIdentifier(node.callee)) {
         return fixer.replaceText(node.callee, node.callee.name.slice(1));
     }
 
-    if (isPendingMemberExpression(node.callee)) {
-        return fixPendingMemberExpression(fixer, sourceCode, node.callee);
-    }
-
-    return null;
+    return fixPendingMemberExpression(fixer, sourceCode, expectMemberExpression(asRuleNode(node.callee)));
 }
 
 function hasKnownLocation(
@@ -156,7 +155,7 @@ function shouldAllowSkippedWithComment(
         hasAdjacentLeadingComment(context.sourceCode, asRuleNode(node));
 }
 
-function canRemovePendingModifier(node: Readonly<CallExpression>): boolean {
+function canRemovePendingModifier(node: Readonly<CallExpression>): node is Readonly<RemovablePendingCallExpression> {
     return isIdentifier(node.callee) ||
         (isPendingMemberExpression(node.callee) && !isThisSkipMemberExpression(node.callee));
 }

@@ -116,6 +116,7 @@ ruleTester.run('no-async-in-sync-tests', noAsyncInSyncTestsRule, {
         'it("", function () { load(function () {}); });',
         'it("", async function () { await load(); });',
         'it("", function () { return load().then(function () {}); });',
+        'it("", function () { return; });',
         'it("", () => load().then(function () {}));',
         'it("", function () { promise[method](cleanup); });',
         'it("", function () { return 42; });',
@@ -182,6 +183,16 @@ ruleTester.run('no-async-in-sync-tests', noAsyncInSyncTestsRule, {
             errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
         },
         {
+            code: 'it("", function () { promise.then?.(cleanup); });',
+            languageOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
+        },
+        {
+            code: 'it("", function () { (promise?.then)(cleanup); });',
+            languageOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
+        },
+        {
             code: 'it("", () => load(function (error) {}));',
             languageOptions: { ecmaVersion: 6 },
             errors: [{ messageId: 'unexpectedCallbackAsyncOperation' }]
@@ -230,6 +241,10 @@ describe('no-async-in-sync-tests metadata', function () {
 describe('no-async-in-sync-tests parser services', function () {
     it('ignores missing parser services', function () {
         assert.deepStrictEqual(verifyWithParserServices(null), []);
+    });
+
+    it('ignores parser services that are not records', function () {
+        assert.deepStrictEqual(verifyWithParserServices([]), []);
     });
 
     it('ignores parser services without type access', function () {

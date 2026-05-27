@@ -48,9 +48,11 @@ describe('config call helpers', function () {
     it('isSuiteConfigCall() detects this-bound config calls', function () {
         const timeoutExpression = readExpression('this.timeout(5000);').expression;
         const chainedExpression = readExpression('it("works", function () {}).timeout(5000);').expression;
+        const computedNonConfigExpression = readExpression('this["custom"](5000);').expression;
 
         assert.strictEqual(isSuiteConfigCall(asTraversableNode(timeoutExpression)), true);
         assert.strictEqual(isSuiteConfigCall(asTraversableNode(chainedExpression)), false);
+        assert.strictEqual(isSuiteConfigCall(asTraversableNode(computedNonConfigExpression)), false);
     });
 
     it('getStaticNumericConfigValue() resolves static numeric arguments', function () {
