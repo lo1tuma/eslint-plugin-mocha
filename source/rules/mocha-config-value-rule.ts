@@ -86,7 +86,7 @@ type RuleDefinition<MessageId extends string> = {
     name: string;
 };
 
-function hasMemberCallee(node: Readonly<CallExpression>): node is MochaConfigCallExpression {
+export function hasMemberCallee(node: Readonly<CallExpression>): node is MochaConfigCallExpression {
     return node.callee.type === 'MemberExpression';
 }
 
@@ -103,8 +103,12 @@ function reportMochaConfigCall(
     });
 }
 
-function validateNumericMochaConfigLimitOption(option: Readonly<NumericMochaConfigLimitOption>): void {
-    if (option.mode === 'range' && option.min > option.max) {
+export function validateNumericMochaConfigLimitOption(option: Readonly<NumericMochaConfigLimitOption>): void {
+    if (option.mode !== 'range') {
+        return;
+    }
+
+    if (option.min > option.max) {
         throw new TypeError('`min` must be less than or equal to `max`.');
     }
 }

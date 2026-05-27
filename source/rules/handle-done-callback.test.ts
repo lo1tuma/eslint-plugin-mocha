@@ -195,6 +195,10 @@ ruleTester.run('handle-done-callback', handleDoneCallbackRule, {
 });
 
 describe('handle-done-callback helpers', function () {
+    it('exposes the expected default options', function () {
+        assert.deepStrictEqual(handleDoneCallbackRule.meta?.defaultOptions, [{ ignorePending: false }]);
+    });
+
     it('findParamInScope() returns parameter variables', function () {
         const variable = { defs: [{ type: 'Parameter' }] };
         const result = findParamInScope('done', {
@@ -210,6 +214,24 @@ describe('handle-done-callback helpers', function () {
         const result = findParamInScope('done', {
             set: new Map([
                 ['done', { defs: [{ type: 'Variable' }] }]
+            ])
+        } as unknown as Scope.Scope);
+
+        assert.strictEqual(result, undefined);
+    });
+
+    it('findParamInScope() returns undefined when the parameter is missing', function () {
+        const result = findParamInScope('done', {
+            set: new Map()
+        } as unknown as Scope.Scope);
+
+        assert.strictEqual(result, undefined);
+    });
+
+    it('findParamInScope() returns undefined when the variable has no definitions', function () {
+        const result = findParamInScope('done', {
+            set: new Map([
+                ['done', { defs: [] }]
             ])
         } as unknown as Scope.Scope);
 

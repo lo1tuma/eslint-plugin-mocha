@@ -152,43 +152,41 @@ const rules = {
     'no-empty-title': noEmptyTitleRule
 };
 
+export type MochaPlugin = ESLint.Plugin & {
+    meta: typeof pluginMeta;
+    rules: typeof rules;
+    configs: {
+        all: MochaConfig;
+        recommended: MochaConfig;
+    };
+};
+
 type MochaConfig = Linter.Config & {
     plugins: {
         mocha: ESLint.Plugin;
     };
 };
 
-const configs: {
-    all: MochaConfig;
-    recommended: MochaConfig;
-} = {
+const pluginBase = {
+    meta: pluginMeta,
+    rules
+};
+
+const configs: MochaPlugin['configs'] = {
     all: {
         name: 'mocha/all',
-        plugins: { mocha: {} },
+        plugins: { mocha: pluginBase },
         languageOptions: { globals: globals.mocha },
         rules: allRules
     },
     recommended: {
         name: 'mocha/recommended',
-        plugins: { mocha: {} },
+        plugins: { mocha: pluginBase },
         languageOptions: { globals: globals.mocha },
         rules: recommendedRules
     }
 };
 
-export type MochaPlugin = ESLint.Plugin & {
-    meta: typeof pluginMeta;
-    rules: typeof rules;
-    configs: typeof configs;
-};
-
-const plugin: MochaPlugin = {
-    meta: pluginMeta,
-    rules,
-    configs
-};
-
-plugin.configs.all.plugins.mocha = plugin;
-plugin.configs.recommended.plugins.mocha = plugin;
+const plugin = Object.assign(pluginBase, { configs }) satisfies MochaPlugin;
 
 export default plugin;

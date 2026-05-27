@@ -7,18 +7,30 @@ import {
     getCodeAfterCallbackHandlingNode
 } from './callback-handling-state.js';
 
-function getRepeatedCallbackHandlingNode(
+export function getRepeatedCallbackHandlingNode(
     context: Readonly<CallbackHandlingContext>,
     pathState: Readonly<CallbackPathState>,
     operation: Readonly<CallbackHandlingOperation>
 ): Rule.Node | undefined {
-    if (operation.type !== 'call' || !pathState.callbackHandled) {
-        return undefined;
-    }
+    const repeatedNodeByOperationType = {
+        bindingAssignment() {
+            return undefined;
+        },
+        containerPropertyAssignment() {
+            return undefined;
+        },
+        call() {
+            if (!pathState.callbackHandled) {
+                return undefined;
+            }
 
-    return getCodeAfterCallbackHandlingNode(context.sourceCode, pathState, operation) === undefined
-        ? operation.node
-        : undefined;
+            return getCodeAfterCallbackHandlingNode(context.sourceCode, pathState, operation) === undefined
+                ? operation.node
+                : undefined;
+        }
+    } as const;
+
+    return repeatedNodeByOperationType[operation.type]();
 }
 
 export function collectRepeatedCallbackHandlingNodes(

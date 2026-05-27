@@ -58,7 +58,7 @@ function recordReportedNodes(
     }
 }
 
-function shouldRevisitSegment(
+export function shouldRevisitSegment(
     collection: Readonly<PendingSegmentCollection>,
     nextState: PathState,
     segment: Readonly<Rule.CodePathSegment>,
@@ -92,18 +92,23 @@ function processPendingSegment(
     }
 }
 
-export function collectCallbackHandlingNodes(
-    context: Readonly<CallbackHandlingContext>,
-    selectReportedNode: ReportedNodeSelector
-): readonly Rule.Node[] {
-    const collection: PendingSegmentCollection = {
+export function createPendingSegmentCollection(
+    context: Readonly<CallbackHandlingContext>
+): PendingSegmentCollection {
+    return {
         exitStatesBySegmentId: new Map(),
         pendingSegments: [context.codePath.initialSegment],
         queuedSegmentIds: new Set([context.codePath.initialSegment.id]),
         reportedNodeSet: new WeakSet(),
         reportedNodes: []
     };
+}
 
+export function processPendingSegments(
+    context: Readonly<CallbackHandlingContext>,
+    collection: PendingSegmentCollection,
+    selectReportedNode: ReportedNodeSelector
+): void {
     while (collection.pendingSegments.length > 0) {
         const segment = collection.pendingSegments.shift();
 
@@ -111,6 +116,15 @@ export function collectCallbackHandlingNodes(
             processPendingSegment(context, collection, segment, selectReportedNode);
         }
     }
+}
+
+export function collectCallbackHandlingNodes(
+    context: Readonly<CallbackHandlingContext>,
+    selectReportedNode: ReportedNodeSelector
+): readonly Rule.Node[] {
+    const collection = createPendingSegmentCollection(context);
+
+    processPendingSegments(context, collection, selectReportedNode);
 
     return collection.reportedNodes;
 }

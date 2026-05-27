@@ -274,6 +274,13 @@ describe('callback handling state helpers', function () {
             arePathStatesSame(state, createPathState({ callbackHandled: true, handledAliases: ['done', 'finish'] })),
             false
         );
+        assert.strictEqual(
+            arePathStatesSame(
+                createPathState({ handledAliases: ['done'] }),
+                createPathState({ handledAliases: ['done'], unhandledAliases: ['finish'] })
+            ),
+            false
+        );
     });
 
     it('updatePathState() tracks aliased callback calls', function () {
@@ -341,6 +348,32 @@ describe('callback handling state helpers', function () {
         );
     });
 
+    it('updatePathState() skips identifier sources without tracked container properties', function () {
+        const sourceCode = createSourceCode();
+        const nextState = updatePathState(
+            sourceCode,
+            createPathState(),
+            bindingAssignment(identifier('trackMissingContainer'), 'callbacks', identifier('missingCallbacks'))
+        );
+
+        assert.strictEqual(nextState.unhandledReferences.containerPropertiesByBinding.has('callbacks'), false);
+    });
+
+    it('updatePathState() skips object containers without tracked callback properties', function () {
+        const sourceCode = createSourceCode();
+        const nextState = updatePathState(
+            sourceCode,
+            createPathState(),
+            bindingAssignment(
+                identifier('trackEmptyContainer'),
+                'callbacks',
+                objectExpression([property(literal('complete'), literal(0), true)])
+            )
+        );
+
+        assert.strictEqual(nextState.unhandledReferences.containerPropertiesByBinding.has('callbacks'), false);
+    });
+
     it('updatePathState() clears callback container properties on reassignment', function () {
         const sourceCode = createSourceCode();
         const nextState = updatePathState(
@@ -381,6 +414,60 @@ describe('callback handling state helpers', function () {
 
         assert.strictEqual(nextState.callbackHandled, true);
         assert.deepStrictEqual(readStrings(nextState.handledReferences.aliasBindings), ['done']);
+    });
+
+    it('updatePathState() treats global delegate calls as callback handling', function () {
+        const nextState = updatePathState(
+            createSourceCode(),
+            createPathState(),
+            callOperation(memberExpression(identifier('globalThis'), identifier('setTimeout')), [
+                identifier('done'),
+                literal(0)
+            ])
+        );
+
+        assert.strictEqual(nextState.callbackHandled, true);
+        assert.deepStrictEqual(readStrings(nextState.handledReferences.aliasBindings), ['done']);
+    });
+
+    it('updatePathState() treats global aliases as callback handling delegates', function () {
+        const nextState = updatePathState(
+            createSourceCode(),
+            createPathState(),
+            callOperation(memberExpression(identifier('global'), identifier('setTimeout')), [
+                identifier('done'),
+                literal(0)
+            ])
+        );
+
+        assert.strictEqual(nextState.callbackHandled, true);
+        assert.deepStrictEqual(readStrings(nextState.handledReferences.aliasBindings), ['done']);
+    });
+
+    it('updatePathState() treats window delegates as callback handling', function () {
+        const nextState = updatePathState(
+            createSourceCode(),
+            createPathState(),
+            callOperation(memberExpression(identifier('window'), identifier('queueMicrotask')), [
+                identifier('done')
+            ])
+        );
+
+        assert.strictEqual(nextState.callbackHandled, true);
+        assert.deepStrictEqual(readStrings(nextState.handledReferences.aliasBindings), ['done']);
+    });
+
+    it('updatePathState() ignores dynamic delegate calls', function () {
+        const nextState = updatePathState(
+            createSourceCode(),
+            createPathState(),
+            callOperation(memberExpression(identifier('globalThis'), identifier('delegateName'), true), [
+                identifier('done')
+            ])
+        );
+
+        assert.strictEqual(nextState.callbackHandled, false);
+        assert.deepStrictEqual(readStrings(nextState.handledReferences.aliasBindings), []);
     });
 
     it('getCodeAfterCallbackHandlingNode() reports non-callback operations after the callback', function () {
@@ -431,6 +518,31 @@ describe('callback handling state helpers', function () {
 
         assert.deepStrictEqual(readStrings(initialState.unhandledReferences.aliasBindings), ['done']);
         assert.deepStrictEqual(readStrings(orphanState.unhandledReferences.aliasBindings), ['done']);
+    });
+
+    it('createEntryState() ignores predecessor states for the initial segment', function () {
+        const start = createSegment('start');
+        const previous = createSegment('previous');
+        start.prevSegments.push(previous);
+
+        const initialState = createEntryState(
+            createContext(createCodePath(start, [start])),
+            asCodePathSegment(start),
+            new Map([
+                [
+                    'previous',
+                    createPathState({
+                        callbackHandled: true,
+                        handledAliases: ['done'],
+                        unhandledAliases: ['done', 'finish']
+                    })
+                ]
+            ])
+        );
+
+        assert.strictEqual(initialState.callbackHandled, false);
+        assert.deepStrictEqual(readStrings(initialState.handledReferences.aliasBindings), []);
+        assert.deepStrictEqual(readStrings(initialState.unhandledReferences.aliasBindings), ['done']);
     });
 
     it('createEntryState() merges previous states and missing predecessor fallbacks', function () {

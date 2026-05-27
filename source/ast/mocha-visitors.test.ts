@@ -1,6 +1,11 @@
 import { type Rule, RuleTester } from 'eslint';
 import assert from 'node:assert';
-import { callExpressionVisitor, createMochaVisitors, dispatchCallback } from './mocha-visitors.js';
+import {
+    callExpressionVisitor,
+    createMochaVisitors,
+    dispatchCallback,
+    dispatchSpecificCallExpressionContext
+} from './mocha-visitors.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 type ProgramNode = Parameters<Exclude<Rule.RuleListener['Program'], undefined>>[0];
@@ -97,5 +102,30 @@ describe('mocha visitor helpers', function () {
         });
 
         assert.strictEqual(genericCallCount, 1);
+    });
+
+    it('dispatchSpecificCallExpressionContext() ignores missing suite-or-test dispatchers', function () {
+        assert.doesNotThrow(() => {
+            dispatchSpecificCallExpressionContext(
+                {
+                    callbackVisitor: undefined,
+                    includeSuiteOrTestCase: true,
+                    visitor: undefined
+                },
+                {},
+                {
+                    config: null,
+                    interface: 'BDD',
+                    modifier: null,
+                    name: 'it()',
+                    node: asNode({
+                        arguments: [],
+                        callee: asNode({ type: 'Identifier', name: 'it' }),
+                        type: 'CallExpression'
+                    }),
+                    type: 'testCase'
+                }
+            );
+        });
     });
 });

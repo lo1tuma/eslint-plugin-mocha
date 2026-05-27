@@ -1,6 +1,7 @@
 import type { Rule } from 'eslint';
 import type { Except } from 'type-fest';
 import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
+import { getLastOrThrow } from '../list.js';
 import { getRuleOption } from '../rule-options.js';
 import {
     allowMochaCallOptionSchema,
@@ -94,8 +95,9 @@ export const noHooksForSingleChildRule: Readonly<Rule.RuleModule> = {
             'Program:exit': popLayer,
 
             hook(visitorContext) {
-                const currentLayer = layers.at(-1);
-                currentLayer?.hookNodes.push(visitorContext);
+                const currentLayer = getLastOrThrow(layers);
+
+                currentLayer.hookNodes.push(visitorContext);
             }
         });
     }

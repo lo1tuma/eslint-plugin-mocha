@@ -40,6 +40,12 @@ describe('all-name-details', function () {
         assert.ok(names.some((nameDetails) => {
             return nameDetails.path.join('.') === 'setup';
         }));
+        assert.ok(names.some((nameDetails) => {
+            return nameDetails.path.join('.') === 'suiteSetup' && nameDetails.type === 'hook';
+        }));
+        assert.ok(names.some((nameDetails) => {
+            return nameDetails.path.join('.') === 'suiteTeardown' && nameDetails.type === 'hook';
+        }));
     });
 
     it('includes custom names when all interfaces are enabled', function () {

@@ -4,8 +4,6 @@ import { withInterface } from '../mocha-interface-test-cases.js';
 import {
     checkPendingSuite,
     checkPendingTestCase,
-    fixPendingMemberExpression,
-    isPendingMemberExpression,
     noPendingTestsRule
 } from './no-pending-tests.js';
 
@@ -26,14 +24,6 @@ function asSourceCode(sourceCode: Record<string, unknown>): SourceCode {
     return sourceCode as unknown as SourceCode;
 }
 
-function asRuleFixer(fixer: Record<string, unknown>): Rule.RuleFixer {
-    return fixer as unknown as Rule.RuleFixer;
-}
-
-function asRuleFix(fix: Record<string, unknown>): Rule.Fix {
-    return fix as unknown as Rule.Fix;
-}
-
 ruleTester.run('no-pending-tests', noPendingTestsRule, {
     valid: [
         'it()',
@@ -44,6 +34,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
         'specify("should be false", function() { assert(something, false); })',
         'something.it()',
         'something.it("test")',
+        'it(title)',
         'describe()',
         'describe.only()',
         'it.only()',
@@ -477,35 +468,5 @@ describe('no-pending-tests helpers', function () {
         );
 
         assert.deepStrictEqual(reports, ['reported']);
-    });
-
-    it('isPendingMemberExpression() returns false for non-member-expression callees', function () {
-        const result = isPendingMemberExpression({ type: 'Identifier', name: 'xdescribe' } as never);
-
-        assert.strictEqual(result, false);
-    });
-
-    it('fixPendingMemberExpression() returns null when the member-expression range is missing', function () {
-        const result = fixPendingMemberExpression(
-            asRuleFixer({
-                replaceTextRange() {
-                    return asRuleFix({});
-                }
-            }),
-            asSourceCode({
-                getText() {
-                    return 'describe';
-                }
-            }),
-            {
-                type: 'MemberExpression',
-                computed: false,
-                object: { type: 'Identifier', name: 'describe' },
-                property: { type: 'Identifier', name: 'skip' },
-                range: undefined
-            } as never
-        );
-
-        assert.strictEqual(result, null);
     });
 });

@@ -5,7 +5,9 @@ import { withInterface } from '../mocha-interface-test-cases.js';
 import { isRecord } from '../record.js';
 import {
     collectCandidateExpressions,
+    getComputedStringPropertyName,
     getParserServicesWithTypeInformation,
+    hasErrorFirstCallback,
     hasPromiseLikeType,
     noAsyncInSyncTestsRule,
     unwrapChainExpression
@@ -16,6 +18,24 @@ const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } })
 const { pathname: projectRoot } = new URL('../../', import.meta.url);
 const { pathname: typescriptFilename } = new URL('./no-async-in-sync-tests.fixture.ts', import.meta.url);
 const allowSetTimeoutOption = { allowedAsyncMethods: ['setTimeout'] };
+const defaultAllowedAsyncMethods = [
+    'setImmediate',
+    'setInterval',
+    'setTimeout',
+    'queueMicrotask',
+    'process.nextTick',
+    'global.setImmediate',
+    'global.setInterval',
+    'global.setTimeout',
+    'global.queueMicrotask',
+    'globalThis.setImmediate',
+    'globalThis.setInterval',
+    'globalThis.setTimeout',
+    'globalThis.queueMicrotask',
+    'window.setInterval',
+    'window.setTimeout',
+    'window.queueMicrotask'
+] as const;
 const typescriptLanguageOptions = {
     parser: typescriptParser,
     parserOptions: {
@@ -61,6 +81,7 @@ ruleTester.run('no-async-in-sync-tests', noAsyncInSyncTestsRule, {
     valid: [
         'it("", function () {});',
         'it("", function (done) { load(function (error) { done(error); }); });',
+        'it("", function () { load(function () {}); });',
         'it("", async function () { await load(); });',
         'it("", function () { return load().then(function () {}); });',
         'it("", () => load().then(function () {}));',
@@ -113,18 +134,16 @@ ruleTester.run('no-async-in-sync-tests', noAsyncInSyncTestsRule, {
             code: 'it("", function () { promise["then"](cleanup); });',
             errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
         },
-        {
-            code: 'it("", function () { setTimeout(work, 0); });',
-            errors: [{ messageId: 'unexpectedScheduledAsyncOperation' }]
-        },
-        {
-            code: 'it("", function () { process.nextTick(work); });',
-            errors: [{ messageId: 'unexpectedScheduledAsyncOperation' }]
-        },
-        {
-            code: 'it("", function () { globalThis.queueMicrotask(work); });',
-            errors: [{ messageId: 'unexpectedScheduledAsyncOperation' }]
-        },
+        ...defaultAllowedAsyncMethods.map((methodCall) => {
+            const expression = methodCall === 'setInterval' || methodCall.endsWith('.setInterval')
+                ? `${methodCall}(work, 0);`
+                : `${methodCall}(work);`;
+
+            return {
+                code: `it("", function () { ${expression} });`,
+                errors: [{ messageId: 'unexpectedScheduledAsyncOperation' }]
+            };
+        }),
         {
             code: 'it("", function () { promise?.then(cleanup); });',
             languageOptions: { ecmaVersion: 2020 },
@@ -171,6 +190,17 @@ RuleTester.it = defaultIt;
 RuleTester.itOnly = defaultItOnly;
 
 describe('no-async-in-sync-tests helpers', function () {
+    it('hasErrorFirstCallback() ignores non-Identifier first parameters', function () {
+        const result = hasErrorFirstCallback({
+            params: [{
+                type: 'AssignmentPattern',
+                name: 'error'
+            }]
+        } as never);
+
+        assert.strictEqual(result, false);
+    });
+
     it('getParserServicesWithTypeInformation() ignores non-object parser services', function () {
         const result = getParserServicesWithTypeInformation({
             parserServices: null
@@ -182,6 +212,54 @@ describe('no-async-in-sync-tests helpers', function () {
     it('getParserServicesWithTypeInformation() ignores parser services without typed accessors', function () {
         const result = getParserServicesWithTypeInformation({
             parserServices: {}
+        } as unknown as SourceCode);
+
+        assert.strictEqual(result, undefined);
+    });
+
+    it('getParserServicesWithTypeInformation() ignores parser services without getTypeAtLocation()', function () {
+        const result = getParserServicesWithTypeInformation({
+            parserServices: {
+                program: {
+                    getTypeChecker() {
+                        return {
+                            getPromisedTypeOfPromise() {
+                                return undefined;
+                            }
+                        };
+                    }
+                }
+            }
+        } as unknown as SourceCode);
+
+        assert.strictEqual(result, undefined);
+    });
+
+    it('getParserServicesWithTypeInformation() ignores parser services without getTypeChecker()', function () {
+        const result = getParserServicesWithTypeInformation({
+            parserServices: {
+                getTypeAtLocation() {
+                    return undefined;
+                },
+                program: {}
+            }
+        } as unknown as SourceCode);
+
+        assert.strictEqual(result, undefined);
+    });
+
+    it('getParserServicesWithTypeInformation() ignores parser services without getPromisedTypeOfPromise()', function () {
+        const result = getParserServicesWithTypeInformation({
+            parserServices: {
+                getTypeAtLocation() {
+                    return undefined;
+                },
+                program: {
+                    getTypeChecker() {
+                        return {};
+                    }
+                }
+            }
         } as unknown as SourceCode);
 
         assert.strictEqual(result, undefined);
@@ -217,6 +295,39 @@ describe('no-async-in-sync-tests helpers', function () {
         assert.deepStrictEqual(result, []);
     });
 
+    it('collectCandidateExpressions() ignores return statements without arguments', function () {
+        const result = collectCandidateExpressions({
+            visitorKeys: {}
+        } as unknown as SourceCode, {
+            type: 'BlockStatement',
+            body: [{ type: 'ReturnStatement', argument: null }]
+        } as never);
+
+        assert.deepStrictEqual(result, []);
+    });
+
+    it('collectCandidateExpressions() ignores return statements with an absent argument', function () {
+        const result = collectCandidateExpressions({
+            visitorKeys: {}
+        } as unknown as SourceCode, {
+            type: 'BlockStatement',
+            body: [{ type: 'ReturnStatement' }]
+        } as never);
+
+        assert.deepStrictEqual(result, []);
+    });
+
+    it('collectCandidateExpressions() ignores non-return statements with argument properties', function () {
+        const result = collectCandidateExpressions({
+            visitorKeys: {}
+        } as unknown as SourceCode, {
+            type: 'BlockStatement',
+            body: [{ type: 'ThrowStatement', argument: { type: 'Identifier', name: 'error' } }]
+        } as never);
+
+        assert.deepStrictEqual(result, []);
+    });
+
     it('unwrapChainExpression() returns the inner expression for optional chains', function () {
         const result = unwrapChainExpression({
             type: 'ChainExpression',
@@ -224,5 +335,27 @@ describe('no-async-in-sync-tests helpers', function () {
         } as never);
 
         assert.deepStrictEqual(result, { type: 'Identifier', name: 'promise' });
+    });
+
+    it('getComputedStringPropertyName() ignores computed properties without string literals', function () {
+        const result = getComputedStringPropertyName({
+            computed: true,
+            property: { type: 'Literal', value: 0 }
+        } as never);
+
+        assert.strictEqual(result, undefined);
+    });
+
+    it('getComputedStringPropertyName() ignores non-computed literal properties', function () {
+        const result = getComputedStringPropertyName({
+            computed: false,
+            property: { type: 'Literal', value: 'then' }
+        } as never);
+
+        assert.strictEqual(result, undefined);
+    });
+
+    it('should declare an empty default allow-list', function () {
+        assert.deepStrictEqual(noAsyncInSyncTestsRule.meta?.defaultOptions, [{ allowedAsyncMethods: [] }]);
     });
 });

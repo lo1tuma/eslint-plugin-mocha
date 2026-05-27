@@ -89,11 +89,10 @@ export function clonePathState(state: Readonly<CallbackPathState>): CallbackPath
 }
 
 function areReferenceStatesSame(
-    left: Readonly<CallbackReferenceState> | undefined,
+    left: Readonly<CallbackReferenceState>,
     right: Readonly<CallbackReferenceState>
 ): boolean {
-    return left !== undefined &&
-        haveSameTrackedBindings(left.aliasBindings, right.aliasBindings) &&
+    return haveSameTrackedBindings(left.aliasBindings, right.aliasBindings) &&
         haveSameTrackedContainerProperties(
             left.containerPropertiesByBinding,
             right.containerPropertiesByBinding
@@ -242,9 +241,9 @@ function isKnownSingleCallbackDelegateCall(
     node: Readonly<CallExpressionNode>,
     state: Readonly<CallbackReferenceState>
 ): boolean {
-    const normalizedCallPath = getNormalizedCallPath(sourceCode, asRuleNode(node.callee));
+    const normalizedCallPath = String(getNormalizedCallPath(sourceCode, asRuleNode(node.callee)));
 
-    if (normalizedCallPath === undefined || !knownSingleCallbackDelegates.has(normalizedCallPath)) {
+    if (!knownSingleCallbackDelegates.has(normalizedCallPath)) {
         return false;
     }
 

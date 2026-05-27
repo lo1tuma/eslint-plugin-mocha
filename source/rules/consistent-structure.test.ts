@@ -102,6 +102,7 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
         'describe(function() { after(function() {}); });',
         'describe(function() { describe(function() {}); describe(function() {}); });',
         'describe(function() { it(function() {}); it(function() {}); });',
+        'describe(function() { before(function() {}); before(function() {}); });',
         {
             code:
                 'describe(function() { before(function() {}); beforeEach(function() {}); afterEach(function() {}); after(function() {}); });',
@@ -122,6 +123,10 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
         },
         {
             code: 'describe(function() { it(function() {}); describe(function() {}); });',
+            options: [{ order: 'hooks-tests-suites' }]
+        },
+        {
+            code: 'describe(function() { before(function() {}); it(function() {}); });',
             options: [{ order: 'hooks-tests-suites' }]
         },
         {
@@ -310,6 +315,15 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
 });
 
 describe('consistent-structure helpers', function () {
+    it('exposes the expected default options', function () {
+        assert.deepStrictEqual(consistentStructureRule.meta?.defaultOptions, [{
+            disallowDuplicateHooks: false,
+            hookOrder: 'off',
+            order: 'off',
+            disallowMixedTestsAndSuites: false
+        }]);
+    });
+
     it('getTopLevelMochaExpression() walks up member expressions', function () {
         const { expression } = readExpression('foo.bar.baz();');
 

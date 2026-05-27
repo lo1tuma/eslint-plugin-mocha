@@ -20,14 +20,9 @@ export function mapWithArgs<ListItem, MappedReturnValue, Args extends readonly u
     callback: (item: ListItem, ...args: Args) => MappedReturnValue,
     ...args: Args
 ): readonly MappedReturnValue[] {
-    const result: MappedReturnValue[] = Array.from({ length: list.length });
-
-    for (const [index, item] of list.entries()) {
-        const itemResults = callback(item, ...args);
-        result[index] = itemResults;
-    }
-
-    return result;
+    return list.map((item) => {
+        return callback(item, ...args);
+    });
 }
 
 export function filterWithArgs<ListItem, Args extends readonly unknown[]>(

@@ -125,12 +125,10 @@ function reportUnexpectedOrder(
         return;
     }
 
-    if (currentKind === 'testCase' && highestSeenKind === 'suite') {
-        context.report({
-            node: visitorContext.node,
-            messageId: 'unexpectedTestAfterSuite'
-        });
-    }
+    context.report({
+        node: visitorContext.node,
+        messageId: 'unexpectedTestAfterSuite'
+    });
 }
 
 function getHighestSeenKind(
@@ -176,9 +174,7 @@ type OrderedHook = {
 };
 
 function getTerminalName(name: string): string {
-    const lastSeparatorIndex = name.lastIndexOf('.');
-
-    return lastSeparatorIndex === -1 ? name : name.slice(lastSeparatorIndex + 1);
+    return name.slice(name.lastIndexOf('.') + 1);
 }
 
 function getOrderedHook(name: string): Readonly<OrderedHook> | null {

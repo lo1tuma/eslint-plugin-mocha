@@ -4,7 +4,6 @@ import { isFunction } from '../ast/node-types.js';
 import type { CallbackHandlingOperation } from '../callback-handling-state.js';
 import {
     asRuleNode,
-    asRuleNodeOrNull,
     getMemberExpressionBindingAndProperty,
     getTrackedBinding,
     type TrackedBinding
@@ -53,7 +52,7 @@ function pushOperation(
     operations.push(operation);
 }
 
-function createTrackedCallbackFunction(
+export function createTrackedCallbackFunction(
     trackedCallbackFunctionContext: Readonly<TrackedCallbackFunctionContext>
 ): TrackedCallbackFunction | undefined {
     const {
@@ -196,7 +195,7 @@ export function createTrackedCallbackVisitors(
 
             recordOperation({
                 node,
-                source: asRuleNodeOrNull(node.init),
+                source: node.init === null ? null : asRuleNode(node.init),
                 target: getTrackedBinding(context.sourceCode, node.id),
                 type: 'bindingAssignment'
             });
