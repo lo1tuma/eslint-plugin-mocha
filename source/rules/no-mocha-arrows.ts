@@ -57,7 +57,7 @@ function formatFunctionHead(
     return `${functionKeyword}${paramsFullText} `;
 }
 
-function fixArrowFunction(
+export function fixArrowFunction(
     fixer: Rule.RuleFixer,
     sourceCode: Readonly<SourceCode>,
     fn: Readonly<ArrowFunctionExpression>

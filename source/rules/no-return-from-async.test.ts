@@ -167,4 +167,19 @@ describe('no-return-from-async helpers', function () {
 
         assert.deepStrictEqual(reports, []);
     });
+
+    it('checkNodeForReturnFromAsync() ignores non-function nodes with async flags', function () {
+        const reports: string[] = [];
+
+        checkNodeForReturnFromAsync({
+            report() {
+                reports.push('reported');
+            }
+        } as unknown as Rule.RuleContext, {
+            type: 'Identifier',
+            async: true
+        } as unknown as Rule.Node);
+
+        assert.deepStrictEqual(reports, []);
+    });
 });

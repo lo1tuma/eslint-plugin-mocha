@@ -22,6 +22,7 @@ describe('list helpers', function () {
         }, 2);
 
         assert.deepStrictEqual(result, [2, 4, 6]);
+        assert.strictEqual(result.length, 3);
     });
 
     it('filterWithArgs() filters with additional args', function () {

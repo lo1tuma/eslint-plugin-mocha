@@ -1,12 +1,11 @@
 import type { Rule } from 'eslint';
-import { createTitlePatternRule } from '../title-pattern-rule.js';
+import { createSuiteTitlePatternRule } from '../title-pattern-rule.js';
 
 export const validSuiteTitleRule: Readonly<Rule.RuleModule> = {
-    ...createTitlePatternRule({
+    ...createSuiteTitlePatternRule({
         defaultPattern: '',
         description: 'Require suite descriptions to match a pre-configured regular expression',
         documentationFile: 'valid-suite-title',
-        messageId: 'invalidSuiteTitle',
-        target: 'suite'
+        messageId: 'invalidSuiteTitle'
     })
 };

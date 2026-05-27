@@ -1,7 +1,6 @@
 import type { AST, Rule, Scope, SourceCode } from 'eslint';
 import type * as ESTree from 'estree';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { builtinNames } from '../mocha/descriptors.js';
 import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 import { getInterface } from '../settings.js';
 
@@ -40,15 +39,22 @@ type UnexpectedImportDescriptor = {
 };
 
 const defaultOption: ResolvedOption = { interface: 'BDD' };
-const interfaceMethodNames = new Set<string>();
-
-for (const nameDetails of builtinNames) {
-    const [name] = nameDetails.path;
-
-    if (name !== undefined) {
-        interfaceMethodNames.add(name);
-    }
-}
+const interfaceMethodNames = new Set([
+    'describe',
+    'context',
+    'suite',
+    'it',
+    'specify',
+    'test',
+    'before',
+    'after',
+    'beforeEach',
+    'afterEach',
+    'suiteSetup',
+    'suiteTeardown',
+    'setup',
+    'teardown'
+]);
 
 function reportUnexpectedInterface(
     context: Readonly<Rule.RuleContext>,
@@ -68,7 +74,7 @@ function reportUnexpectedInterface(
 
 export function getMochaModuleScope(sourceCode: Readonly<SourceCode>): Readonly<Scope.Scope> | null {
     const { globalScope } = sourceCode.scopeManager;
-    const [maybeModuleScope] = globalScope?.childScopes ?? [];
+    const maybeModuleScope = globalScope?.childScopes?.[0];
 
     return maybeModuleScope?.type === 'module' ? maybeModuleScope : null;
 }
@@ -114,14 +120,17 @@ export function getImportedName(specifier: Readonly<ImportSpecifierNode>): strin
 function isInterfaceMethodImport(
     specifier: Readonly<ImportSpecifierNode>
 ): boolean {
-    const importedName = getImportedName(specifier);
-
-    return importedName !== null && interfaceMethodNames.has(importedName);
+    return specifier.imported.type === 'Identifier'
+        ? interfaceMethodNames.has(specifier.imported.name)
+        : interfaceMethodNames.has(String(specifier.imported.value));
 }
 
 function isCanonicalNamedImportSpecifier(specifier: Readonly<ImportSpecifierNode>): boolean {
-    return specifier.imported.type === 'Identifier' &&
-        specifier.local.name === specifier.imported.name;
+    if (specifier.imported.type !== 'Identifier') {
+        return false;
+    }
+
+    return specifier.local.name === specifier.imported.name;
 }
 
 function isFixableImportSpecifier(specifier: Readonly<ImportSpecifierNode>): boolean {

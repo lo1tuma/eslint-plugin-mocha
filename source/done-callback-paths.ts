@@ -1,13 +1,11 @@
 import { findVariable, getStringIfConstant } from '@eslint-community/eslint-utils';
 import type { Rule, Scope, SourceCode } from 'eslint';
-import type { Except } from 'type-fest';
 
 type CallExpressionNode = Parameters<Exclude<Rule.RuleListener['CallExpression'], undefined>>[0];
 type MemberExpressionNode = Parameters<Exclude<Rule.RuleListener['MemberExpression'], undefined>>[0];
 type PropertyNode = Parameters<Exclude<Rule.RuleListener['Property'], undefined>>[0];
 type IdentifierNode = Parameters<Exclude<Rule.RuleListener['Identifier'], undefined>>[0];
 type ObjectExpressionNode = Parameters<Exclude<Rule.RuleListener['ObjectExpression'], undefined>>[0];
-type NodeWithoutParent = Except<Rule.Node, 'parent'>;
 type IdentifierLike = Readonly<Pick<IdentifierNode, 'name' | 'type'>>;
 type MemberExpressionLike = Readonly<Pick<MemberExpressionNode, 'computed' | 'object' | 'property' | 'type'>>;
 type PropertyLike = Readonly<Pick<PropertyNode, 'computed' | 'key' | 'type'>>;
@@ -53,10 +51,6 @@ type AnalysisContext = {
 export function asRuleNode(node: unknown): Rule.Node {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- eslint core nodes have parent at runtime
     return node as Rule.Node;
-}
-
-export function asRuleNodeOrNull(node: Readonly<NodeWithoutParent> | null | undefined): Rule.Node | null {
-    return node === null || node === undefined ? null : asRuleNode(node);
 }
 
 export function getTrackedBinding(sourceCode: Readonly<SourceCode>, node: IdentifierLike): TrackedBinding {
@@ -188,9 +182,11 @@ export function haveSameTrackedContainerProperties(
     });
 }
 
-function sameState(left: Readonly<PendingPathState> | undefined, right: Readonly<PendingPathState>): boolean {
-    return left !== undefined &&
-        left.hasUnhandledPath === right.hasUnhandledPath &&
+export function arePendingPathStatesSame(
+    left: Readonly<PendingPathState>,
+    right: Readonly<PendingPathState>
+): boolean {
+    return left.hasUnhandledPath === right.hasUnhandledPath &&
         haveSameTrackedBindings(left.aliasBindings, right.aliasBindings) &&
         haveSameTrackedContainerProperties(
             left.containerPropertiesByBinding,
@@ -200,7 +196,7 @@ function sameState(left: Readonly<PendingPathState> | undefined, right: Readonly
 
 function intersectBindingSets(states: NonEmptyPendingPathStates): Set<TrackedBinding> {
     const [firstState, ...otherStates] = states;
-    const bindings = new Set(firstState?.aliasBindings);
+    const bindings = new Set(firstState.aliasBindings);
 
     for (const binding of Array.from(bindings)) {
         const isSharedBinding = otherStates.every((state) => {
@@ -235,7 +231,9 @@ function sharedPropertiesForBinding(
     return sharedProperties;
 }
 
-function intersectPropertyMaps(states: NonEmptyPendingPathStates): Map<TrackedBinding, Set<string>> {
+export function intersectTrackedContainerPropertiesByBinding(
+    states: NonEmptyPendingPathStates
+): Map<TrackedBinding, Set<string>> {
     const [firstState, ...otherStates] = states;
     const sharedPropertiesByBinding = new Map<TrackedBinding, Set<string>>();
 
@@ -261,7 +259,7 @@ function mergeIncomingStates(previousStates: readonly Readonly<PendingPathState>
 
     return {
         aliasBindings: intersectBindingSets(unhandledStates),
-        containerPropertiesByBinding: intersectPropertyMaps(unhandledStates),
+        containerPropertiesByBinding: intersectTrackedContainerPropertiesByBinding(unhandledStates),
         hasUnhandledPath: true
     };
 }
@@ -331,7 +329,7 @@ export function collectTrackedCallbackObjectProperties(
     return trackedProperties;
 }
 
-function getContainerPropertiesFromExpression(
+export function getTrackedContainerPropertiesFromExpression(
     sourceCode: Readonly<SourceCode>,
     node: Readonly<Rule.Node>,
     state: Readonly<PendingPathState>
@@ -360,7 +358,7 @@ function isHandledHandoffExpression(
         return true;
     }
 
-    return (getContainerPropertiesFromExpression(sourceCode, node, state)?.size ?? 0) > 0;
+    return (getTrackedContainerPropertiesFromExpression(sourceCode, node, state)?.size ?? 0) > 0;
 }
 
 function callFinishesPendingPaths(
@@ -392,7 +390,7 @@ function applyBindingSourceValue(
         return state;
     }
 
-    const containerProperties = getContainerPropertiesFromExpression(sourceCode, operation.source, state);
+    const containerProperties = getTrackedContainerPropertiesFromExpression(sourceCode, operation.source, state);
 
     if (containerProperties !== undefined) {
         state.containerPropertiesByBinding.set(operation.target, containerProperties);
@@ -401,7 +399,7 @@ function applyBindingSourceValue(
     return state;
 }
 
-function applyBindingAssignment(
+export function applyBindingAssignment(
     sourceCode: Readonly<SourceCode>,
     state: Readonly<PendingPathState>,
     operation: Extract<Operation, { type: 'bindingAssignment'; }>
@@ -429,7 +427,7 @@ function nextPropertiesForAssignment(
     return nextProperties;
 }
 
-function applyContainerPropertyAssignment(
+export function applyContainerPropertyAssignment(
     sourceCode: Readonly<SourceCode>,
     state: Readonly<PendingPathState>,
     operation: Extract<Operation, { type: 'containerPropertyAssignment'; }>
@@ -446,9 +444,9 @@ function applyContainerPropertyAssignment(
         nextProperties.add(operation.propertyName ?? dynamicPropertyName);
     }
 
-    if (nextProperties.size === 0) {
-        nextState.containerPropertiesByBinding.delete(operation.target);
-    } else {
+    nextState.containerPropertiesByBinding.delete(operation.target);
+
+    if (nextProperties.size > 0) {
         nextState.containerPropertiesByBinding.set(operation.target, nextProperties);
     }
 
@@ -570,8 +568,9 @@ function processAllPendingSegments(
             queue.queuedSegmentIds.delete(segment.id);
 
             const nextState = processPendingSegment(context, segment, queue.exitStatesBySegmentId);
+            const previousState = queue.exitStatesBySegmentId.get(segment.id);
 
-            if (!sameState(queue.exitStatesBySegmentId.get(segment.id), nextState)) {
+            if (previousState === undefined || !arePendingPathStatesSame(previousState, nextState)) {
                 queue.exitStatesBySegmentId.set(segment.id, nextState);
                 enqueueNextSegments(segment.nextSegments, queue.pendingSegments, queue.queuedSegmentIds);
             }

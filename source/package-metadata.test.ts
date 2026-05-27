@@ -171,5 +171,52 @@ describe('package metadata', function () {
                 }
             );
         });
+
+        it('throws when the package module default export is not a record', async function () {
+            const packageJsonPath = '/virtual/project/package.json';
+            const { readClosestPackageMetadata } = createPackageMetadataReaderDependencies(
+                [packageJsonPath],
+                {
+                    [pathToFileURL(packageJsonPath).href]: {
+                        default: ['eslint-plugin-mocha']
+                    }
+                }
+            );
+
+            await assert.rejects(
+                async function () {
+                    await readClosestPackageMetadata('file:///virtual/project/plugin.js');
+                },
+                function (error: unknown) {
+                    return error instanceof Error &&
+                        error.message === `Missing package name or version in ${packageJsonPath}`;
+                }
+            );
+        });
+
+        it('throws when the package name is not a string', async function () {
+            const packageJsonPath = '/virtual/project/package.json';
+            const { readClosestPackageMetadata } = createPackageMetadataReaderDependencies(
+                [packageJsonPath],
+                {
+                    [pathToFileURL(packageJsonPath).href]: {
+                        default: {
+                            name: 1,
+                            version: '11.3.0'
+                        }
+                    }
+                }
+            );
+
+            await assert.rejects(
+                async function () {
+                    await readClosestPackageMetadata('file:///virtual/project/plugin.js');
+                },
+                function (error: unknown) {
+                    return error instanceof Error &&
+                        error.message === `Missing package name or version in ${packageJsonPath}`;
+                }
+            );
+        });
     });
 });

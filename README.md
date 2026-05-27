@@ -119,7 +119,7 @@ For wrapper APIs that still expose suite, test, or hook call functions, use `add
 
 ## Rules
 
-For maintainers: the rules table below is generated, and the headers in `documentation/rules/*.md` are partly generated. Refresh them with `npx just update-eslint-docs`.
+For maintainers: the rules table below is generated, and the headers in `documentation/rules/*.md` are partly generated. Refresh them with `npx just update-eslint-docs`. Run mutation testing with `npx just test-mutation`.
 
 <!-- begin auto-generated rules list -->
 

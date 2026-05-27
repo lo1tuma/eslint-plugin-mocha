@@ -21,6 +21,10 @@ function isMochaConfigCallName(value: string): value is MochaConfigCall {
     return suiteConfig.has(value);
 }
 
+function isFiniteNumber(value: unknown): value is number {
+    return Number.isFinite(value);
+}
+
 function getNamedConfigPropertyName(property: Readonly<CallExpression['callee']>): MochaConfigCall | null {
     if (!isMemberExpression(property) || !isIdentifier(property.property) || property.computed) {
         return null;
@@ -36,8 +40,10 @@ function getComputedConfigPropertyName(property: Readonly<CallExpression['callee
         return null;
     }
 
-    return typeof property.property.value === 'string' && isMochaConfigCallName(property.property.value)
-        ? property.property.value
+    const name = String(property.property.value);
+
+    return isMochaConfigCallName(name)
+        ? name
         : null;
 }
 
@@ -59,7 +65,7 @@ function getMochaContextConfigExpression(
         : callee;
 }
 
-function getFirstArgument(
+export function getFirstArgument(
     node: Readonly<CallExpression>
 ): Readonly<CallExpression['arguments'][number]> | undefined {
     const [firstArgument] = node.arguments;
@@ -101,9 +107,10 @@ export function getStaticNumericConfigValue(
     }
 
     const staticValue = getStaticValue(firstArgument, sourceCode.getScope(firstArgument));
+    const value = staticValue?.value;
 
-    return staticValue !== null && typeof staticValue.value === 'number' && Number.isFinite(staticValue.value)
-        ? staticValue.value
+    return isFiniteNumber(value)
+        ? value
         : null;
 }
 

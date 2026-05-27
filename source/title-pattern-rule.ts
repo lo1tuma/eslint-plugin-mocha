@@ -24,24 +24,27 @@ const optionSchema = {
 
 type Option = InferSchemaOption<typeof optionSchema>;
 type ResolvedOption = Option & { pattern: string; };
-type TitleTarget = 'suite' | 'testCase';
 
 type TitlePatternRuleDefinition = {
     defaultPattern: string;
     description: string;
     documentationFile: string;
     messageId: string;
-    target: TitleTarget;
 };
 
-function normalizeOptions(options: Readonly<ResolvedOption>): Readonly<NormalizedOptions> {
+type CreateVisitors = (
+    context: Readonly<Rule.RuleContext>,
+    checkTitle: (visitorContext: Readonly<VisitorContext>) => void
+) => Rule.RuleListener;
+
+export function normalizeOptions(options: Readonly<ResolvedOption>): Readonly<NormalizedOptions> {
     const { pattern: stringPattern, message } = options;
     const pattern = new RegExp(stringPattern, 'u');
 
     return { pattern, message: typeof message === 'string' ? message : undefined };
 }
 
-function hasValidOrNoDescription(
+export function hasValidOrNoDescription(
     context: Readonly<Rule.RuleContext>,
     mochaCallExpression: Readonly<CallExpression>,
     pattern: Readonly<RegExp>
@@ -60,8 +63,9 @@ function hasValidOrNoDescription(
     return description === null || pattern.test(description);
 }
 
-export function createTitlePatternRule(
-    definition: Readonly<TitlePatternRuleDefinition>
+function createTitlePatternRule(
+    definition: Readonly<TitlePatternRuleDefinition>,
+    createVisitors: CreateVisitors
 ): Readonly<Rule.RuleModule> {
     const defaultOptions: [ResolvedOption] = [{ pattern: definition.defaultPattern }];
     const messages = {
@@ -98,9 +102,23 @@ export function createTitlePatternRule(
                 );
             }
 
-            return definition.target === 'suite'
-                ? createMochaVisitors(context, { suite: checkTitle })
-                : createMochaVisitors(context, { testCase: checkTitle });
+            return createVisitors(context, checkTitle);
         }
     };
+}
+
+export function createSuiteTitlePatternRule(
+    definition: Readonly<TitlePatternRuleDefinition>
+): Readonly<Rule.RuleModule> {
+    return createTitlePatternRule(definition, (context, checkTitle) => {
+        return createMochaVisitors(context, { suite: checkTitle });
+    });
+}
+
+export function createTestCaseTitlePatternRule(
+    definition: Readonly<TitlePatternRuleDefinition>
+): Readonly<Rule.RuleModule> {
+    return createTitlePatternRule(definition, (context, checkTitle) => {
+        return createMochaVisitors(context, { testCase: checkTitle });
+    });
 }
