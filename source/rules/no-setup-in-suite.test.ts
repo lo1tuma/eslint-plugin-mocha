@@ -1,7 +1,7 @@
 import { type Rule, RuleTester } from 'eslint';
 import assert from 'node:assert';
 import { withInterface } from '../mocha-interface-test-cases.js';
-import { noSetupInSuiteRule } from './no-setup-in-suite.js';
+import { enterNestedFunction, noSetupInSuiteRule } from './no-setup-in-suite.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const memberExpressionError = 'Unexpected member expression in suite block. ' +
@@ -165,6 +165,37 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
                     message: 'Unexpected function call in suite block.',
                     line: 1,
                     column: 22
+                }
+            ]
+        },
+        {
+            code: 'describe("", function () { const later = () => {}; a(); });',
+            languageOptions: { ecmaVersion: 2015 },
+            errors: [
+                {
+                    message: 'Unexpected function call in suite block.',
+                    line: 1,
+                    column: 52
+                }
+            ]
+        },
+        {
+            code: 'describe("", function () { function later() {} a(); });',
+            errors: [
+                {
+                    message: 'Unexpected function call in suite block.',
+                    line: 1,
+                    column: 48
+                }
+            ]
+        },
+        {
+            code: 'describe("", function () { var later = function () {}; a(); });',
+            errors: [
+                {
+                    message: 'Unexpected function call in suite block.',
+                    line: 1,
+                    column: 56
                 }
             ]
         },
@@ -351,5 +382,13 @@ describe('no-setup-in-suite create()', function () {
         } as unknown as Rule.RuleContext);
 
         assert.ok(true);
+    });
+
+    it('enterNestedFunction() ignores top-level declarations', function () {
+        const nesting: number[] = [];
+
+        enterNestedFunction(nesting);
+
+        assert.deepStrictEqual(nesting, []);
     });
 });

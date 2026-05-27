@@ -2,7 +2,12 @@ import { Linter, type Rule } from 'eslint';
 import assert from 'node:assert';
 import type { Except } from 'type-fest';
 import type { NameDetails } from '../mocha/name-details.js';
-import { findImportReferencesByName } from './find-import-references.js';
+import {
+    findImportReferencesByName,
+    isExclusiveNamedImportBindingWithMatchingSource,
+    isImportSpecifierNode,
+    replaceFirstSegment
+} from './find-import-references.js';
 import type { ResolvedReference } from './resolved-reference.js';
 
 function findReferenceNames(
@@ -166,6 +171,19 @@ describe('findImportReferencesByName()', function () {
         assert.deepStrictEqual(foundResolvedReferences, []);
     });
 
+    it('returns references used on the right-hand side of assignments', function () {
+        const foundResolvedReferences = findReferenceNames(
+            'import { foo } from "bar"; let other; other = foo;',
+            [{ path: ['foo'] }],
+            'bar'
+        );
+
+        assert.deepStrictEqual(foundResolvedReferences, [{
+            path: ['foo'],
+            resolvedPath: ['foo']
+        }]);
+    });
+
     it('returns an empty array when a reference is used to a shadowed variable', function () {
         const foundResolvedReferences = findReferenceNames(
             'import { foo } from "bar"; function baz() { const foo = 42; foo; }',
@@ -221,5 +239,126 @@ describe('findImportReferencesByName()', function () {
         assert.strictEqual(typeof foundResolvedReferences[0]?.path[1], 'symbol');
         assert.strictEqual(foundResolvedReferences[0]?.resolvedPath[0], 'foo');
         assert.strictEqual(typeof foundResolvedReferences[0]?.resolvedPath[1], 'symbol');
+    });
+
+    it('preserves aliased dynamic paths when the imported binding is used with dynamic member access', function () {
+        const foundResolvedReferences = findReferenceNames('import { foo as baz } from "bar"; baz[bar];', [
+            { path: ['foo'] }
+        ], 'bar');
+
+        assert.strictEqual(foundResolvedReferences.length, 1);
+        assert.strictEqual(foundResolvedReferences[0]?.path[0], 'baz');
+        assert.strictEqual(typeof foundResolvedReferences[0]?.path[1], 'symbol');
+        assert.strictEqual(foundResolvedReferences[0]?.resolvedPath[0], 'baz');
+        assert.strictEqual(typeof foundResolvedReferences[0]?.resolvedPath[1], 'symbol');
+    });
+
+    it('returns an empty array when the global scope has no child scopes', function () {
+        const foundResolvedReferences = findImportReferencesByName(
+            {
+                sourceCode: {
+                    scopeManager: {
+                        globalScope: {}
+                    }
+                }
+            } as unknown as Rule.RuleContext,
+            [{ path: ['foo'] }] as unknown as readonly NameDetails[],
+            'bar'
+        );
+
+        assert.deepStrictEqual(foundResolvedReferences, []);
+    });
+
+    it('replaceFirstSegment() handles empty constant paths without throwing', function () {
+        assert.deepStrictEqual(replaceFirstSegment([], 'foo'), ['foo']);
+    });
+
+    it('isImportSpecifierNode() rejects specifiers without imported names', function () {
+        const result = isImportSpecifierNode({
+            type: 'ImportSpecifier',
+            imported: {}
+        });
+
+        assert.strictEqual(result, false);
+    });
+
+    it('isImportSpecifierNode() rejects nodes with the wrong type', function () {
+        const result = isImportSpecifierNode({
+            type: 'Identifier',
+            imported: {
+                name: 'foo'
+            }
+        });
+
+        assert.strictEqual(result, false);
+    });
+
+    it('isImportSpecifierNode() rejects nodes with non-record imported bindings', function () {
+        const result = isImportSpecifierNode({
+            type: 'ImportSpecifier',
+            imported: 'foo'
+        });
+
+        assert.strictEqual(result, false);
+    });
+
+    it('isExclusiveNamedImportBindingWithMatchingSource() rejects non-literal import sources', function () {
+        const result = isExclusiveNamedImportBindingWithMatchingSource(
+            {
+                defs: [{
+                    type: 'ImportBinding',
+                    node: {
+                        type: 'ImportSpecifier',
+                        imported: { name: 'foo' }
+                    },
+                    parent: {
+                        source: {
+                            type: 'Identifier',
+                            value: 'bar'
+                        }
+                    }
+                }],
+                references: []
+            } as unknown as Parameters<typeof isExclusiveNamedImportBindingWithMatchingSource>[0],
+            'bar'
+        );
+
+        assert.strictEqual(result, false);
+    });
+
+    it('isExclusiveNamedImportBindingWithMatchingSource() rejects variables without definitions', function () {
+        const result = isExclusiveNamedImportBindingWithMatchingSource(
+            {
+                defs: [],
+                references: []
+            } as unknown as Parameters<typeof isExclusiveNamedImportBindingWithMatchingSource>[0],
+            'bar'
+        );
+
+        assert.strictEqual(result, false);
+    });
+
+    it('isExclusiveNamedImportBindingWithMatchingSource() rejects non-import definitions', function () {
+        const result = isExclusiveNamedImportBindingWithMatchingSource(
+            {
+                defs: [{
+                    type: 'Variable',
+                    node: {
+                        type: 'ImportSpecifier',
+                        imported: { name: 'foo' }
+                    },
+                    parent: {
+                        source: {
+                            type: 'Literal',
+                            value: 'bar'
+                        }
+                    }
+                }],
+                references: []
+            } as unknown as Parameters<typeof isExclusiveNamedImportBindingWithMatchingSource>[0],
+            'bar'
+        );
+
+        assert.strictEqual(result, false);
     });
 });

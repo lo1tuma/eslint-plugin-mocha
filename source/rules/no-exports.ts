@@ -29,7 +29,7 @@ function isNamedDefaultExportDeclaration(
         node.declaration.id !== null;
 }
 
-function isLocalNamedExportList(node: Readonly<ExportNode>): node is Readonly<ExportNamedDeclarationNode> {
+export function isLocalNamedExportList(node: Readonly<ExportNode>): node is Readonly<ExportNamedDeclarationNode> {
     return node.type === 'ExportNamedDeclaration' &&
         node.declaration === null &&
         node.source === null;

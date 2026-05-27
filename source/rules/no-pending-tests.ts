@@ -58,7 +58,7 @@ function isCallbackMissing(node: CallExpression): boolean {
     return firstArgument !== undefined && firstArgument.type === 'Literal' && node.arguments.length === 1;
 }
 
-function fixPendingIdentifier(
+export function fixPendingIdentifier(
     fixer: Rule.RuleFixer,
     callee: Readonly<CallExpression['callee']>
 ): Readonly<Rule.Fix | null> {

@@ -3,7 +3,9 @@ import assert from 'node:assert';
 import type { TraversableNode } from '../ast/visit-child-nodes.js';
 import {
     getConfigPropertyName,
+    getFirstArgument,
     getStaticNumericConfigValue,
+    isDisabledTimeoutValue,
     isMochaContextConfigCall,
     isSuiteConfigCall,
     visitMochaContextConfigCalls
@@ -60,6 +62,61 @@ describe('config call helpers', function () {
         assert.strictEqual(getConfigPropertyName(otherExpression), null);
     });
 
+    it('getConfigPropertyName() ignores computed properties on non-member expressions', function () {
+        const result = getConfigPropertyName({
+            type: 'CallExpression',
+            arguments: [],
+            callee: {
+                type: 'Identifier',
+                name: 'timeout'
+            }
+        } as never);
+
+        assert.strictEqual(result, null);
+    });
+
+    it('getConfigPropertyName() ignores non-computed literal member properties', function () {
+        const result = getConfigPropertyName({
+            type: 'CallExpression',
+            arguments: [],
+            callee: {
+                type: 'MemberExpression',
+                computed: false,
+                object: {
+                    type: 'Identifier',
+                    name: 'it'
+                },
+                property: {
+                    type: 'Literal',
+                    value: 'timeout'
+                }
+            }
+        } as never);
+
+        assert.strictEqual(result, null);
+    });
+
+    it('getConfigPropertyName() ignores computed non-string literal member properties', function () {
+        const result = getConfigPropertyName({
+            type: 'CallExpression',
+            arguments: [],
+            callee: {
+                type: 'MemberExpression',
+                computed: true,
+                object: {
+                    type: 'Identifier',
+                    name: 'it'
+                },
+                property: {
+                    type: 'Literal',
+                    value: 42
+                }
+            }
+        } as never);
+
+        assert.strictEqual(result, null);
+    });
+
     it('isMochaContextConfigCall() and isSuiteConfigCall() detect this-bound config calls', function () {
         const timeoutExpression = readExpression('this.timeout(5000);').expression;
         const chainedExpression = readExpression('it("works", function () {}).timeout(5000);').expression;
@@ -89,12 +146,41 @@ describe('config call helpers', function () {
     it('getStaticNumericConfigValue() returns null for spread and non-numeric values', function () {
         const spreadExpression = readExpression('it("works", function () {}).timeout(...values);');
         const stringExpression = readExpression('it("works", function () {}).timeout("2s");');
+        const infiniteExpression = readExpression('it("works", function () {}).timeout(1 / 0);');
 
         assert.strictEqual(spreadExpression.expression.type, 'CallExpression');
         assert.strictEqual(stringExpression.expression.type, 'CallExpression');
+        assert.strictEqual(infiniteExpression.expression.type, 'CallExpression');
 
         assert.strictEqual(getStaticNumericConfigValue(spreadExpression.expression, spreadExpression.sourceCode), null);
         assert.strictEqual(getStaticNumericConfigValue(stringExpression.expression, stringExpression.sourceCode), null);
+        assert.strictEqual(
+            getStaticNumericConfigValue(infiniteExpression.expression, infiniteExpression.sourceCode),
+            null
+        );
+    });
+
+    it('getStaticNumericConfigValue() returns null for non-static identifiers', function () {
+        const identifierExpression = readExpression('it("works", function () {}).timeout(value);');
+
+        assert.strictEqual(identifierExpression.expression.type, 'CallExpression');
+        assert.strictEqual(
+            getStaticNumericConfigValue(identifierExpression.expression, identifierExpression.sourceCode),
+            null
+        );
+    });
+
+    it('getFirstArgument() ignores spread arguments', function () {
+        const spreadExpression = readExpression('it("works", function () {}).timeout(...values);');
+
+        assert.strictEqual(spreadExpression.expression.type, 'CallExpression');
+        assert.strictEqual(getFirstArgument(spreadExpression.expression), undefined);
+    });
+
+    it('isDisabledTimeoutValue() only matches disabled timeout values', function () {
+        assert.strictEqual(isDisabledTimeoutValue(1), false);
+        assert.strictEqual(isDisabledTimeoutValue(0), true);
+        assert.strictEqual(isDisabledTimeoutValue(2_147_483_647), true);
     });
 
     it('visitMochaContextConfigCalls() skips nested non-arrow functions', function () {

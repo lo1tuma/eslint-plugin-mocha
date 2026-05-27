@@ -24,7 +24,7 @@ function isLiteral(node: Readonly<Rule.Node>): boolean {
     return node.type === 'Literal';
 }
 
-function isStaticallyAnalyzableDescription(node: Readonly<Rule.Node>, extractedText: string | null): boolean {
+export function isStaticallyAnalyzableDescription(node: Readonly<Rule.Node>, extractedText: string | null): boolean {
     if (extractedText === null) {
         return isLiteral(node);
     }

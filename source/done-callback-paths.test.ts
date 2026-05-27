@@ -1,7 +1,6 @@
 import type { Rule, Scope, SourceCode } from 'eslint';
 import assert from 'node:assert';
 import {
-    asRuleNodeOrNull,
     getMemberExpressionBindingAndProperty,
     hasUnhandledReturnPath,
     haveSameTrackedBindings,
@@ -80,7 +79,9 @@ function property(
     } as unknown as PropertyNode;
 }
 
-function objectExpression(properties: readonly Readonly<PropertyNode>[]): ObjectExpressionNode {
+function objectExpression(
+    properties: readonly Readonly<PropertyNode | SpreadElementNode>[]
+): ObjectExpressionNode {
     return { properties, type: 'ObjectExpression' } as unknown as ObjectExpressionNode;
 }
 
@@ -159,11 +160,6 @@ function analyzeOperations(
 }
 
 describe('done callback path helpers', function () {
-    it('asRuleNodeOrNull() preserves nullish values', function () {
-        assert.strictEqual(asRuleNodeOrNull(null), null);
-        assert.strictEqual(asRuleNodeOrNull(undefined), null);
-    });
-
     it('getMemberExpressionBindingAndProperty() resolves static and computed properties', function () {
         const sourceCode = createSourceCode();
 
@@ -292,6 +288,32 @@ describe('done callback path helpers', function () {
         assert.strictEqual(result, true);
     });
 
+    it('hasUnhandledReturnPath() drops container properties missing from any branch', function () {
+        const start = createSegment('start');
+        const left = createSegment('left');
+        const middle = createSegment('middle');
+        const right = createSegment('right');
+        const end = createSegment('end');
+
+        linkSegments(start, left);
+        linkSegments(start, middle);
+        linkSegments(start, right);
+        linkSegments(left, end);
+        linkSegments(middle, end);
+        linkSegments(right, end);
+
+        const result = analyzeOperations(
+            new Map([
+                ['left', [containerPropertyAssignment('obj', 'someFunc', identifier('done'))]],
+                ['middle', [containerPropertyAssignment('obj', 'someFunc', identifier('done'))]],
+                ['end', [callOperation(identifier('foo'), [identifier('obj')])]]
+            ]),
+            createCodePath(start, [end])
+        );
+
+        assert.strictEqual(result, true);
+    });
+
     it('hasUnhandledReturnPath() handles inline callback containers with static keys', function () {
         const start = createSegment('start');
 
@@ -302,6 +324,29 @@ describe('done callback path helpers', function () {
                     [
                         callOperation(identifier('foo'), [
                             objectExpression([property(literal('someFunc'), identifier('done'))])
+                        ])
+                    ]
+                ]
+            ]),
+            createCodePath(start, [start])
+        );
+
+        assert.strictEqual(result, false);
+    });
+
+    it('hasUnhandledReturnPath() ignores spread elements in callback containers', function () {
+        const start = createSegment('start');
+
+        const result = analyzeOperations(
+            new Map([
+                [
+                    'start',
+                    [
+                        callOperation(identifier('foo'), [
+                            objectExpression([
+                                property(literal('someFunc'), identifier('done')),
+                                spreadElement(identifier('rest'))
+                            ])
                         ])
                     ]
                 ]
@@ -363,6 +408,27 @@ describe('done callback path helpers', function () {
 
         assert.strictEqual(trackedResult, false);
         assert.strictEqual(clearedResult, true);
+    });
+
+    it('hasUnhandledReturnPath() preserves remaining container properties on targeted reassignment', function () {
+        const start = createSegment('start');
+
+        const result = analyzeOperations(
+            new Map([
+                [
+                    'start',
+                    [
+                        containerPropertyAssignment('obj', 'someFunc', identifier('done')),
+                        containerPropertyAssignment('obj', 'otherFunc', identifier('done')),
+                        containerPropertyAssignment('obj', 'someFunc', null),
+                        callOperation(identifier('foo'), [identifier('obj')])
+                    ]
+                ]
+            ]),
+            createCodePath(start, [start])
+        );
+
+        assert.strictEqual(result, false);
     });
 
     it('hasUnhandledReturnPath() treats spread callback handoffs as handled', function () {
@@ -444,6 +510,8 @@ describe('done callback path helpers', function () {
 
     it('haveSameTrackedBindings() detects different binding counts', function () {
         assert.strictEqual(haveSameTrackedBindings(new Set(['done']), new Set()), false);
+        assert.strictEqual(haveSameTrackedBindings(new Set(['done']), new Set(['done', 'finish'])), false);
+        assert.strictEqual(haveSameTrackedBindings(new Set(['done', 'finish']), new Set(['done', 'other'])), false);
     });
 
     it('haveSameTrackedContainerProperties() detects different tracked properties', function () {
@@ -474,7 +542,29 @@ describe('done callback path helpers', function () {
                     ['obj', new Set(['someFunc'])]
                 ]),
                 new Map([
+                    ['other', new Set(['someFunc'])]
+                ])
+            ),
+            false
+        );
+        assert.strictEqual(
+            haveSameTrackedContainerProperties(
+                new Map([
+                    ['obj', new Set(['someFunc'])]
+                ]),
+                new Map([
                     ['obj', new Set(['someFunc', 'otherFunc'])]
+                ])
+            ),
+            false
+        );
+        assert.strictEqual(
+            haveSameTrackedContainerProperties(
+                new Map([
+                    ['obj', new Set(['someFunc', 'otherFunc'])]
+                ]),
+                new Map([
+                    ['obj', new Set(['someFunc', 'thirdFunc'])]
                 ])
             ),
             false
