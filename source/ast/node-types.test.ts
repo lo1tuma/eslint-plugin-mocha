@@ -1,6 +1,6 @@
 import type { Rule } from 'eslint';
 import assert from 'node:assert';
-import { getParentNode } from './node-types.js';
+import { getParentNode, isLiteral } from './node-types.js';
 
 function asNode(node: Record<string, unknown>): Rule.Node {
     return node as unknown as Rule.Node;
@@ -22,5 +22,9 @@ describe('node type helpers', function () {
         }, function (error: unknown) {
             return error instanceof Error && error.message === 'Expected node to have a parent.';
         });
+    });
+
+    it('isLiteral() rejects non-literal nodes', function () {
+        assert.strictEqual(isLiteral(asNode({ type: 'Identifier' })), false);
     });
 });

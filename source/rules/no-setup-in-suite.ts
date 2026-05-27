@@ -17,10 +17,15 @@ const FUNCTION = 1;
 const SUITE = 2;
 
 function isNestedInSuiteBlock(nesting: readonly number[]): boolean {
-    return (
-        nesting.length > 0 &&
-        nesting.lastIndexOf(FUNCTION) < nesting.lastIndexOf(SUITE)
-    );
+    return nesting.at(-1) === SUITE;
+}
+
+export function enterNestedFunction(nesting: number[]): void {
+    if (nesting.length === 0) {
+        return;
+    }
+
+    nesting.push(FUNCTION);
 }
 
 function reportCallExpression(context: Readonly<Rule.RuleContext>, callExpression: Readonly<CallExpression>): void {
@@ -103,9 +108,6 @@ export const noSetupInSuiteRule: Readonly<Rule.RuleModule> = {
             },
 
             nonMochaCallExpression(node) {
-                if (nesting.length === 0) {
-                    return;
-                }
                 handleCallExpressionInSuite(node);
             },
 
@@ -121,9 +123,7 @@ export const noSetupInSuiteRule: Readonly<Rule.RuleModule> = {
             },
 
             FunctionDeclaration() {
-                if (nesting.length > 0) {
-                    nesting.push(FUNCTION);
-                }
+                enterNestedFunction(nesting);
             },
             'FunctionDeclaration:exit'() {
                 if (nesting.length > 0) {

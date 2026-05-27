@@ -1,4 +1,5 @@
 import { RuleTester } from 'eslint';
+import assert from 'node:assert';
 import { withInterface } from '../mocha-interface-test-cases.js';
 import { validTestTitleRule } from './valid-test-title.js';
 
@@ -142,4 +143,10 @@ ruleTester.run('valid-test-title', validTestTitleRule, {
             ]
         }
     ]
+});
+
+describe('valid-test-title metadata', function () {
+    it('should default to the should-pattern', function () {
+        assert.deepStrictEqual(validTestTitleRule.meta?.defaultOptions, [{ pattern: '^should' }]);
+    });
 });

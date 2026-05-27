@@ -41,6 +41,42 @@ describe('no-pending-tests leading comment helpers', function () {
         assert.strictEqual(result, true);
     });
 
+    it('hasAdjacentLeadingComment() returns true when the previous token is on an earlier line', function () {
+        const comment = {
+            type: 'Line',
+            loc: {
+                start: { line: 2, column: 0 },
+                end: { line: 2, column: 19 }
+            }
+        };
+
+        const result = hasAdjacentLeadingComment(
+            asSourceCode({
+                getCommentsBefore() {
+                    return [comment];
+                },
+                getTokenBefore() {
+                    return {
+                        type: 'Identifier',
+                        loc: {
+                            start: { line: 1, column: 0 },
+                            end: { line: 1, column: 9 }
+                        }
+                    };
+                }
+            }),
+            asRuleNode({
+                type: 'CallExpression',
+                loc: {
+                    start: { line: 3, column: 0 },
+                    end: { line: 3, column: 10 }
+                }
+            })
+        );
+
+        assert.strictEqual(result, true);
+    });
+
     it('hasAdjacentLeadingComment() returns false when there is no leading comment', function () {
         const result = hasAdjacentLeadingComment(
             asSourceCode({
@@ -130,6 +166,42 @@ describe('no-pending-tests leading comment helpers', function () {
                 loc: {
                     start: { line: 2, column: 0 },
                     end: { line: 2, column: 10 }
+                }
+            })
+        );
+
+        assert.strictEqual(result, false);
+    });
+
+    it('hasAdjacentLeadingComment() returns false when a previous token shares the comment line', function () {
+        const comment = {
+            type: 'Line',
+            loc: {
+                start: { line: 2, column: 13 },
+                end: { line: 2, column: 32 }
+            }
+        };
+
+        const result = hasAdjacentLeadingComment(
+            asSourceCode({
+                getCommentsBefore() {
+                    return [comment];
+                },
+                getTokenBefore() {
+                    return {
+                        type: 'Punctuator',
+                        loc: {
+                            start: { line: 2, column: 11 },
+                            end: { line: 2, column: 12 }
+                        }
+                    };
+                }
+            }),
+            asRuleNode({
+                type: 'CallExpression',
+                loc: {
+                    start: { line: 3, column: 0 },
+                    end: { line: 3, column: 10 }
                 }
             })
         );

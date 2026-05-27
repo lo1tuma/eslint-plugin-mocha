@@ -209,7 +209,7 @@ export function dispatchCallback(
     }
 }
 
-function dispatchSpecificCallExpressionContext(
+export function dispatchSpecificCallExpressionContext(
     group: Readonly<CallExpressionDispatchGroup> | undefined,
     dispatchers: Readonly<CallExpressionDispatchers>,
     context: Readonly<VisitorContext>

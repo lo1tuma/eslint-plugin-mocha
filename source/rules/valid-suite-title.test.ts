@@ -1,4 +1,5 @@
 import { RuleTester } from 'eslint';
+import assert from 'node:assert';
 import { withInterface } from '../mocha-interface-test-cases.js';
 import { validSuiteTitleRule } from './valid-suite-title.js';
 
@@ -120,4 +121,10 @@ ruleTester.run('valid-suite-title', validSuiteTitleRule, {
             ]
         }
     ]
+});
+
+describe('valid-suite-title metadata', function () {
+    it('should default to an empty title pattern', function () {
+        assert.deepStrictEqual(validSuiteTitleRule.meta?.defaultOptions, [{ pattern: '' }]);
+    });
 });

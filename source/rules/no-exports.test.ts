@@ -4,6 +4,7 @@ import {
     createExportSuggestions,
     fixRemoveExportKeyword,
     fixRemoveExportStatement,
+    isLocalNamedExportList,
     noExportsRule
 } from './no-exports.js';
 
@@ -281,7 +282,10 @@ describe('no-exports helpers', function () {
                     return null;
                 }
             }),
-            asFixKeywordNode({ type: 'ExportDefaultDeclaration' })
+            asFixKeywordNode({
+                type: 'ExportDefaultDeclaration',
+                range: [0, 7]
+            })
         );
 
         assert.strictEqual(result, null);
@@ -300,6 +304,52 @@ describe('no-exports helpers', function () {
                     type: 'VariableDeclaration',
                     declarations: [],
                     kind: 'const'
+                },
+                specifiers: [],
+                source: null
+            })
+        );
+
+        assert.strictEqual(result, null);
+    });
+
+    it('fixRemoveExportKeyword() returns null when the declaration range is missing', function () {
+        const result = fixRemoveExportKeyword(
+            asRuleFixer({
+                removeRange() {
+                    return null;
+                }
+            }),
+            asFixKeywordNode({
+                type: 'ExportNamedDeclaration',
+                range: [0, 7],
+                declaration: {
+                    type: 'VariableDeclaration',
+                    declarations: [],
+                    kind: 'const'
+                },
+                specifiers: [],
+                source: null
+            })
+        );
+
+        assert.strictEqual(result, null);
+    });
+
+    it('fixRemoveExportKeyword() returns null when the export range is missing', function () {
+        const result = fixRemoveExportKeyword(
+            asRuleFixer({
+                removeRange() {
+                    return null;
+                }
+            }),
+            asFixKeywordNode({
+                type: 'ExportNamedDeclaration',
+                declaration: {
+                    type: 'VariableDeclaration',
+                    declarations: [],
+                    kind: 'const',
+                    range: [7, 20]
                 },
                 specifiers: [],
                 source: null
@@ -339,6 +389,18 @@ describe('no-exports helpers', function () {
         assert.deepStrictEqual(result, []);
     });
 
+    it('createExportSuggestions() ignores anonymous default export declarations', function () {
+        const result = createExportSuggestions(asSuggestionNode({
+            type: 'ExportDefaultDeclaration',
+            declaration: {
+                type: 'FunctionDeclaration',
+                id: null
+            }
+        }));
+
+        assert.deepStrictEqual(result, []);
+    });
+
     it('createExportSuggestions() ignores re-export declarations', function () {
         const result = createExportSuggestions(asSuggestionNode({
             type: 'ExportNamedDeclaration',
@@ -351,5 +413,19 @@ describe('no-exports helpers', function () {
         }));
 
         assert.deepStrictEqual(result, []);
+    });
+
+    it('isLocalNamedExportList() rejects named exports with declarations', function () {
+        const result = isLocalNamedExportList(asSuggestionNode({
+            type: 'ExportNamedDeclaration',
+            declaration: {
+                type: 'VariableDeclaration',
+                declarations: [],
+                kind: 'const'
+            },
+            source: null
+        }));
+
+        assert.strictEqual(result, false);
     });
 });

@@ -1,6 +1,7 @@
 import { RuleTester } from 'eslint';
+import assert from 'node:assert';
 import { withInterface } from '../mocha-interface-test-cases.js';
-import { noEmptyTitleRule } from './no-empty-title.js';
+import { isStaticallyAnalyzableDescription, noEmptyTitleRule } from './no-empty-title.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
@@ -143,4 +144,10 @@ ruleTester.run('no-empty-title', noEmptyTitleRule, {
             errors: [{ message: defaultErrorMessage, line: 1, column: 1 }]
         }
     ]
+});
+
+describe('no-empty-title helpers', function () {
+    it('isStaticallyAnalyzableDescription() treats literals without extracted text as analyzable', function () {
+        assert.strictEqual(isStaticallyAnalyzableDescription({ type: 'Literal' } as never, null), true);
+    });
 });

@@ -28,14 +28,14 @@ type NamedImportBindingVariable = Readonly<Scope.Variable> & {
     readonly defs: readonly [ImportBindingDefinition, ...(readonly Scope.Definition[])];
 };
 
-function isImportSpecifierNode(node: unknown): node is Readonly<ImportSpecifierNode> {
+export function isImportSpecifierNode(node: unknown): node is Readonly<ImportSpecifierNode> {
     return isRecord(node) &&
         node.type === 'ImportSpecifier' &&
         isRecord(node.imported) &&
         typeof node.imported.name === 'string';
 }
 
-function isExclusiveNamedImportBindingWithMatchingSource(
+export function isExclusiveNamedImportBindingWithMatchingSource(
     variable: Readonly<Scope.Variable>,
     expectedSource: string | null
 ): variable is NamedImportBindingVariable {
@@ -74,7 +74,7 @@ function isBindingConstant(variable: Readonly<Scope.Variable>): boolean {
     return variable.references.every(isNonAssignmentReference);
 }
 
-function replaceFirstSegment(path: DynamicPath, replacement: string): DynamicPath {
+export function replaceFirstSegment(path: DynamicPath, replacement: string): DynamicPath {
     if (isConstantPath(path)) {
         const [firstSegment, ...remainingPath] = path;
         const suffix = firstSegment?.endsWith('()') === true ? '()' : '';
@@ -130,7 +130,7 @@ export function findImportReferencesByName(
 ): readonly ResolvedReference[] {
     const { sourceCode } = context;
     const { globalScope } = sourceCode.scopeManager;
-    const [maybeModuleScope] = globalScope?.childScopes ?? [];
+    const maybeModuleScope = globalScope?.childScopes?.[0];
 
     if (maybeModuleScope?.type !== 'module') {
         return [];

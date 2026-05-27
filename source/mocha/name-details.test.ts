@@ -293,6 +293,23 @@ describe('mocha names', function () {
                 }
             ]);
         });
+
+        it('does not add x-variants for TDD names', function () {
+            const nameDetailsList = buildAllNameDetailsWithVariants([{
+                path: ['test'],
+                interface: 'TDD',
+                type: 'testCase',
+                modifier: null,
+                config: null
+            }]);
+
+            assert.strictEqual(
+                nameDetailsList.some((nameDetails) => {
+                    return nameDetails.path.join('.') === prefixPending('test');
+                }),
+                false
+            );
+        });
     });
 
     describe('reformatLastPathSegmentWithCallExpressions()', function () {

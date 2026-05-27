@@ -1,7 +1,10 @@
 import type { Rule, Scope, SourceCode } from 'eslint';
 import assert from 'node:assert';
 import type { CallbackHandlingOperation } from './callback-handling-state.js';
-import { collectRepeatedCallbackHandlingNodes } from './repeated-callback-handling-paths.js';
+import {
+    collectRepeatedCallbackHandlingNodes,
+    getRepeatedCallbackHandlingNode
+} from './repeated-callback-handling-paths.js';
 
 type MutableSegment = {
     id: string;
@@ -188,7 +191,46 @@ function analyzeOperations(
     });
 }
 
+function createPathState(callbackHandled: boolean): {
+    callbackHandled: boolean;
+    handledReferences: {
+        aliasBindings: Set<string>;
+        containerPropertiesByBinding: Map<string, Set<string>>;
+    };
+    unhandledReferences: {
+        aliasBindings: Set<string>;
+        containerPropertiesByBinding: Map<string, Set<string>>;
+    };
+} {
+    return {
+        callbackHandled,
+        handledReferences: {
+            aliasBindings: new Set(),
+            containerPropertiesByBinding: new Map()
+        },
+        unhandledReferences: {
+            aliasBindings: new Set(),
+            containerPropertiesByBinding: new Map()
+        }
+    };
+}
+
 describe('repeated callback handling path helpers', function () {
+    it('getRepeatedCallbackHandlingNode() ignores non-call operations after callback handling', function () {
+        const result = getRepeatedCallbackHandlingNode(
+            {
+                callbackBinding: 'done',
+                codePath: createCodePath(createSegment('start'), []),
+                operationsBySegmentId: new Map(),
+                sourceCode: createSourceCode()
+            },
+            createPathState(true),
+            bindingAssignment('finish', null)
+        );
+
+        assert.strictEqual(result, undefined);
+    });
+
     it('collectRepeatedCallbackHandlingNodes() reports repeated aliased calls', function () {
         const start = createSegment('start');
         const firstCall = callOperation(identifier('finish'), []);

@@ -81,6 +81,43 @@ describe('prefer-arrow-callback rule wrapper', function () {
         }
     });
 
+    it('falls back to default metadata when the core rule metadata is missing', async function () {
+        try {
+            builtinRules.get = function (name) {
+                if (name === builtinRuleName) {
+                    return {
+                        create() {
+                            return {};
+                        }
+                    };
+                }
+
+                return originalGet(name);
+            };
+
+            const { preferArrowCallbackRule } = await importPreferArrowCallbackRule('missing-metadata');
+
+            assert.deepStrictEqual(preferArrowCallbackRule.meta, {
+                type: 'suggestion',
+                languages: ['js/js'],
+                docs: {
+                    description: 'Require using arrow functions for callbacks',
+                    recommended: false,
+                    url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/prefer-arrow-callback.md'
+                },
+                defaultOptions: [],
+                schema: [],
+                fixable: undefined,
+                hasSuggestions: undefined,
+                messages: {
+                    preferArrowCallback: 'Unexpected function expression.'
+                }
+            });
+        } finally {
+            builtinRules.get = originalGet;
+        }
+    });
+
     it('forwards the wrapped core rule report through the filtered context', async function () {
         const observedContextValues: Record<string, string> = {};
         const reportedMessages: string[] = [];
@@ -157,5 +194,100 @@ describe('prefer-arrow-callback rule wrapper', function () {
             sourceText: 'foo();'
         });
         assert.deepStrictEqual(reportedMessages, ['wrapped report']);
+    });
+
+    it('forwards wrapped core rule reports without nodes', async function () {
+        const reportedMessages: string[] = [];
+
+        try {
+            builtinRules.get = function (name) {
+                if (name === builtinRuleName) {
+                    return {
+                        meta: {
+                            type: 'problem',
+                            docs: {
+                                description: 'stub rule'
+                            },
+                            defaultOptions: [],
+                            schema: [],
+                            messages: {
+                                preferArrowCallback: 'stub message'
+                            }
+                        },
+                        create(ruleContext: Rule.RuleContext) {
+                            ruleContext.report({
+                                message: 'wrapped report without node'
+                            } as unknown as Rule.ReportDescriptor);
+
+                            return {};
+                        }
+                    };
+                }
+
+                return originalGet(name);
+            };
+
+            const { preferArrowCallbackRule } = await importPreferArrowCallbackRule('report-without-node');
+            const linter = new Linter({ configType: 'flat' });
+            linter.verify('foo();', [{
+                languageOptions: { ecmaVersion: 2022, sourceType: 'script' },
+                rules: {}
+            }]);
+            const sourceCode = linter.getSourceCode();
+            const ruleContext: Rule.RuleContext = {
+                id: 'prefer-arrow-callback',
+                options: [],
+                settings: {},
+                languageOptions: { ecmaVersion: 2022, sourceType: 'script' },
+                cwd: process.cwd(),
+                filename: '<text>',
+                physicalFilename: '<text>',
+                sourceCode,
+                report(descriptor) {
+                    if ('message' in descriptor) {
+                        reportedMessages.push(descriptor.message);
+                    }
+                }
+            };
+
+            preferArrowCallbackRule.create(ruleContext);
+        } finally {
+            builtinRules.get = originalGet;
+        }
+
+        assert.deepStrictEqual(reportedMessages, ['wrapped report without node']);
+    });
+
+    it('shouldSkipReport() ignores reports without nodes', async function () {
+        const { shouldSkipReport } = await importPreferArrowCallbackRule('skip-report-without-node');
+        const result = shouldSkipReport(new WeakSet(), {
+            message: 'wrapped report without node'
+        } as unknown as Rule.ReportDescriptor);
+
+        assert.strictEqual(result, false);
+    });
+
+    it('shouldSkipReport() filters mocha callback function-expression reports', async function () {
+        const { shouldSkipReport } = await importPreferArrowCallbackRule('skip-report-mocha-callback');
+        const mochaCallback = { type: 'FunctionExpression' } as unknown as Rule.Node;
+        const mochaCallbacks = new WeakSet<Rule.Node>([mochaCallback]);
+        const result = shouldSkipReport(mochaCallbacks, {
+            node: mochaCallback,
+            message: 'wrapped report'
+        });
+
+        assert.strictEqual(result, true);
+    });
+
+    it('shouldSkipReport() keeps reports for non-function-expression nodes', async function () {
+        const { shouldSkipReport } = await importPreferArrowCallbackRule('keep-report-non-function-expression');
+        const mochaCallback = { type: 'ArrowFunctionExpression' } as unknown as Rule.Node;
+        const mochaCallbacks = new WeakSet<Rule.Node>([mochaCallback]);
+        const result = shouldSkipReport(mochaCallbacks, {
+            node: mochaCallback,
+            message: 'wrapped report'
+        });
+
+        assert.strictEqual(result, false);
     });
 });

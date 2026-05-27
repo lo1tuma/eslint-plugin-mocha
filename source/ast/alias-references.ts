@@ -18,11 +18,14 @@ import {
 } from './node-types.js';
 import { findParentNodeAndPathForIdentifier, type ResolvedReference } from './resolved-reference.js';
 
+function isConstVariableDeclarationParent(
+    parent: Rule.Node | null
+): parent is Extract<Rule.Node, { type: 'VariableDeclaration'; }> {
+    return parent?.type === 'VariableDeclaration' && parent.kind === 'const';
+}
+
 function isAliasConstAssignment(node: Rule.Node): node is VariableDeclarator {
-    if (isVariableDeclarator(node) && node.parent.type === 'VariableDeclaration') {
-        return node.parent.kind === 'const';
-    }
-    return false;
+    return isVariableDeclarator(node) && isConstVariableDeclarationParent(node.parent);
 }
 
 type IdentifierWithPath = { identifier: IdentifierPattern; path: DynamicPath; };
@@ -51,7 +54,6 @@ function extractIdentifiersFromObjectPattern(
 
 type IdentifierWithAssignmentPaths = {
     identifier: IdentifierPattern;
-    fullPath: DynamicPath;
     leftHandSidePath: DynamicPath;
     rightHandSidePath: DynamicPath;
 };
@@ -64,7 +66,7 @@ function getDeclaredIdentifiers(
     const path = extractMemberExpressionPath(sourceCode, node.init as Rule.Node);
 
     if (isIdentifierPattern(node.id)) {
-        return [{ identifier: node.id, fullPath: path, leftHandSidePath: [], rightHandSidePath: path }];
+        return [{ identifier: node.id, leftHandSidePath: [], rightHandSidePath: path }];
     }
 
     if (isObjectPattern(node.id)) {
@@ -72,7 +74,6 @@ function getDeclaredIdentifiers(
         return allPatternIdentifiers.map((patternIdentifiers) => {
             return {
                 identifier: patternIdentifiers.identifier,
-                fullPath: [...path, ...patternIdentifiers.path],
                 leftHandSidePath: patternIdentifiers.path,
                 rightHandSidePath: path
             };
@@ -117,7 +118,12 @@ function isNonInitReference(reference: Readonly<Scope.Reference>): boolean {
     return reference.init !== true;
 }
 
-// eslint-disable-next-line max-statements -- no good idea how to split this function
+export function getNonInitAliasReferences(
+    variable: Readonly<Scope.Variable> | null
+): readonly Scope.Reference[] {
+    return variable?.references.filter(isNonInitReference) ?? [];
+}
+
 function resolveAliasReferencesRecursively(
     reference: Readonly<ResolvedReference>,
     sourceCode: Readonly<SourceCode>
@@ -130,21 +136,17 @@ function resolveAliasReferencesRecursively(
 
         for (const { identifier, leftHandSidePath: identifierPath } of declaratedIdentifiers) {
             const aliasedVariable = findVariable(sourceCode.getScope(node), identifier.name);
+            const aliasedResolvedReferences = mapWithArgs(
+                getNonInitAliasReferences(aliasedVariable),
+                aliasReferenceToResolvedReference,
+                sourceCode,
+                reference,
+                identifierPath
+            );
 
-            if (aliasedVariable !== null) {
-                const aliasReferencesWithoutInit = aliasedVariable.references.filter(isNonInitReference);
-                const aliasedResolvedReferences = mapWithArgs(
-                    aliasReferencesWithoutInit,
-                    aliasReferenceToResolvedReference,
-                    sourceCode,
-                    reference,
-                    identifierPath
-                );
-
-                result.push(
-                    ...flatMapWithArgs(aliasedResolvedReferences, resolveAliasReferencesRecursively, sourceCode)
-                );
-            }
+            result.push(
+                ...flatMapWithArgs(aliasedResolvedReferences, resolveAliasReferencesRecursively, sourceCode)
+            );
         }
     }
 

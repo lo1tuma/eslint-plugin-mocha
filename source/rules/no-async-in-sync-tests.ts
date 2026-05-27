@@ -93,6 +93,14 @@ function collectExpressions(
     return expressions;
 }
 
+function getReturnedExpression(node: Readonly<TraversableNode>): ExtractedExpression {
+    if (node.type !== 'ReturnStatement') {
+        return undefined;
+    }
+
+    return node.argument ?? undefined;
+}
+
 export function collectCandidateExpressions(
     sourceCode: Readonly<SourceCode>,
     body: Readonly<AnyFunction['body']>
@@ -102,9 +110,7 @@ export function collectCandidateExpressions(
             return node.expression;
         }
 
-        return node.type === 'ReturnStatement' && node.argument !== null && node.argument !== undefined
-            ? node.argument
-            : undefined;
+        return getReturnedExpression(node);
     });
 }
 
@@ -112,11 +118,7 @@ function collectReturnedExpressions(
     sourceCode: Readonly<SourceCode>,
     body: Readonly<AnyFunction['body']>
 ): readonly TraversableNode[] {
-    return collectExpressions(sourceCode, body, (node) => {
-        return node.type === 'ReturnStatement' && node.argument !== null && node.argument !== undefined
-            ? node.argument
-            : undefined;
-    });
+    return collectExpressions(sourceCode, body, getReturnedExpression);
 }
 
 function isGetPromisedTypeOfPromise(value: unknown): value is TypeCheckerLike['getPromisedTypeOfPromise'] {
@@ -182,7 +184,7 @@ function getNamedPropertyName(
     return !node.computed && node.property.type === 'Identifier' ? node.property.name : undefined;
 }
 
-function getComputedStringPropertyName(
+export function getComputedStringPropertyName(
     node: Readonly<Extract<TraversableNode, { type: 'MemberExpression'; }>>
 ): string | undefined {
     return node.computed && node.property.type === 'Literal' && typeof node.property.value === 'string'
@@ -226,7 +228,7 @@ function findPromiseMethodCall(
     return collectCallExpressions(sourceCode, expression).find(isPromiseMethodCall);
 }
 
-function hasErrorFirstCallback(node: Readonly<AnyFunction>): boolean {
+export function hasErrorFirstCallback(node: Readonly<AnyFunction>): boolean {
     const firstParam = getFirstMeaningfulParameter(node);
 
     return firstParam !== undefined &&

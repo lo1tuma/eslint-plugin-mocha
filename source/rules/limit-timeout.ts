@@ -75,12 +75,16 @@ type ReportMessageDetails = {
     readonly data?: Record<string, string>;
 };
 
-function hasMemberCallee(node: Readonly<CallExpression>): node is MochaConfigCallExpression {
+export function hasMemberCallee(node: Readonly<CallExpression>): node is MochaConfigCallExpression {
     return node.callee.type === 'MemberExpression';
 }
 
 function validateOption(option: Readonly<Option>): void {
-    if (option.mode === 'range' && option.min > option.max) {
+    if (option.mode !== 'range') {
+        return;
+    }
+
+    if (option.min > option.max) {
         throw new TypeError('`min` must be less than or equal to `max`.');
     }
 }

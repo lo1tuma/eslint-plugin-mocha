@@ -20,7 +20,7 @@ function hasReportNode(
     return 'node' in descriptor;
 }
 
-function shouldSkipReport(
+export function shouldSkipReport(
     mochaCallbacks: WeakSet<Rule.Node>,
     descriptor: Rule.ReportDescriptor
 ): boolean {
