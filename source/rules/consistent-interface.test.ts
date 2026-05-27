@@ -41,6 +41,14 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
             settings: { mocha: { interface: 'require' } }
         },
         {
+            code: `import {"describe" as describe, "it" as it} from 'mocha'; describe('foo', () => {
+                it('bar', () => {});
+            });`,
+            languageOptions: { ecmaVersion: 2022, sourceType: 'module' },
+            options: [{ interface: 'BDD' }],
+            settings: { mocha: { interface: 'require' } }
+        },
+        {
             code: 'import {run} from "mocha"; run();',
             options: [{ interface: 'BDD' }],
             settings: { mocha: { interface: 'BDD' } }
@@ -143,6 +151,19 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
             code: `import {describe as foo, it as bar} from 'mocha'; foo('foo', () => {
                 bar('bar', () => {});
             });`,
+            output: null,
+            options: [{ interface: 'BDD' }],
+            settings: { mocha: { interface: 'TDD' } },
+            errors: [
+                { message: 'Unexpected use of require interface instead of global TDD' },
+                { message: 'Unexpected use of require interface instead of global TDD' }
+            ]
+        },
+        {
+            code: `import {"describe" as describe, "it" as it} from 'mocha'; describe('foo', () => {
+                it('bar', () => {});
+            });`,
+            languageOptions: { ecmaVersion: 2022, sourceType: 'module' },
             output: null,
             options: [{ interface: 'BDD' }],
             settings: { mocha: { interface: 'TDD' } },

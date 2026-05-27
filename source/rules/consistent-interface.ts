@@ -2,6 +2,7 @@ import type { AST, Rule, Scope, SourceCode } from 'eslint';
 import type * as ESTree from 'estree';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { expectNodeLocation, expectNodeRange } from '../ast/node-location.js';
+import { getLastOrThrow } from '../list.js';
 import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 import { getInterface } from '../settings.js';
 
@@ -144,12 +145,12 @@ function removeFullImportDeclaration(
     sourceCode: Readonly<SourceCode>,
     importDeclaration: Readonly<ImportDeclarationNode>
 ): Readonly<Rule.Fix | null> {
-    const nextToken = sourceCode.getTokenAfter(importDeclaration);
     const range = expectNodeRange(importDeclaration);
+    const trailingSource = sourceCode.text.slice(range[1]);
+    const nextTokenOffset = trailingSource.search(/\S/u);
+    const nextRangeStart = range[1] + Math.max(nextTokenOffset, 0);
 
-    return nextToken === null
-        ? fixer.removeRange(range)
-        : fixer.removeRange([range[0], nextToken.range[0]]);
+    return fixer.removeRange([range[0], nextRangeStart]);
 }
 
 function shouldRemoveFullImportDeclaration(importDeclaration: Readonly<ImportDeclarationNode>): boolean {
@@ -182,16 +183,14 @@ function getRangeAfterPreviousSpecifier(
 function getImportSpecifierRemovalRange(
     specifier: Readonly<ImportSpecifierNode>,
     specifiers: readonly ImportSpecifierNode[]
-): AST.Range | null {
+): AST.Range {
     const index = specifiers.indexOf(specifier);
-    const nextSpecifier = specifiers[index + 1];
-    const previousSpecifier = specifiers[index - 1] ?? specifier;
 
     if (index === 0) {
-        return nextSpecifier === undefined ? null : getRangeBeforeNextSpecifier(specifier, nextSpecifier);
+        return getRangeBeforeNextSpecifier(specifier, getLastOrThrow(specifiers.slice(1)));
     }
 
-    return getRangeAfterPreviousSpecifier(previousSpecifier, specifier);
+    return getRangeAfterPreviousSpecifier(getLastOrThrow(specifiers.slice(index - 1, index)), specifier);
 }
 
 function fixImportSpecifier(
@@ -204,9 +203,7 @@ function fixImportSpecifier(
         return removeFullImportDeclaration(fixer, sourceCode, importDeclaration);
     }
 
-    const removalRange = getImportSpecifierRemovalRange(specifier, importDeclaration.specifiers);
-
-    return removalRange === null ? null : fixer.removeRange(removalRange);
+    return fixer.removeRange(getImportSpecifierRemovalRange(specifier, importDeclaration.specifiers));
 }
 
 function createUnexpectedImportDescriptor(
@@ -214,7 +211,7 @@ function createUnexpectedImportDescriptor(
     configuredMochaInterface: InterfaceName
 ): UnexpectedImportDescriptor {
     const { specifier } = binding;
-    const loc = specifier.local.loc ?? expectNodeLocation(specifier);
+    const loc = expectNodeLocation(specifier.local);
 
     return {
         loc,

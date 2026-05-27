@@ -230,6 +230,9 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
                 });
             });`
         },
+        {
+            code: "describe('foo', () => it('bar', () => {}));"
+        },
         ...nestedStatementWrappers.map(createValidNestedStatementCase)
     ],
 
