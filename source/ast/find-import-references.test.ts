@@ -2,13 +2,22 @@ import { Linter, type Rule } from 'eslint';
 import assert from 'node:assert';
 import type { Except } from 'type-fest';
 import type { NameDetails } from '../mocha/name-details.js';
-import {
-    findImportReferencesByName,
-    isExclusiveNamedImportBindingWithMatchingSource,
-    isImportSpecifierNode,
-    replaceFirstSegment
-} from './find-import-references.js';
+import { findImportReferencesByName } from './find-import-references.js';
 import type { ResolvedReference } from './resolved-reference.js';
+
+type MockImportDefinition = {
+    node: unknown;
+    parent: {
+        source: Rule.Node;
+    };
+    type: 'ImportBinding';
+};
+type MockScopeVariable = {
+    defs: readonly MockImportDefinition[];
+    references: readonly [{
+        identifier: Rule.Node;
+    }];
+};
 
 function findReferenceNames(
     code: string,
@@ -51,6 +60,70 @@ function findReferenceNames(
     return foundResolvedReferences;
 }
 
+function findReferenceNamesFromMockVariable(
+    variable: MockScopeVariable,
+    importSource: string | null,
+    names: readonly NameDetails[] = [{ path: ['foo'] }] as unknown as readonly NameDetails[]
+): readonly Except<ResolvedReference, 'node'>[] {
+    const identifierNode = variable.references[0]?.identifier;
+    const ruleContext = {
+        sourceCode: {
+            getScope() {
+                return {
+                    childScopes: [],
+                    set: new Map(),
+                    upper: null
+                };
+            },
+            scopeManager: {
+                globalScope: {
+                    childScopes: [{
+                        type: 'module',
+                        variables: [variable]
+                    }]
+                }
+            }
+        }
+    } as unknown as Rule.RuleContext;
+
+    const references = findImportReferencesByName(
+        ruleContext,
+        names,
+        importSource
+    );
+
+    return references.map((reference) => {
+        assert.strictEqual(reference.node, identifierNode.parent);
+
+        return {
+            path: reference.path,
+            resolvedPath: reference.resolvedPath
+        };
+    });
+}
+
+function createMockImportReferenceVariable(
+    definitionNode: unknown,
+    source: Rule.Node
+): MockScopeVariable {
+    const identifierNode = {
+        name: 'foo',
+        parent: {
+            type: 'ExpressionStatement'
+        },
+        type: 'Identifier'
+    } as unknown as Rule.Node;
+
+    return {
+        defs: [{
+            node: definitionNode,
+            parent: { source },
+            type: 'ImportBinding'
+        }],
+        references: [{ identifier: identifierNode }]
+    };
+}
+
 describe('findImportReferencesByName()', function () {
     it('returns an empty array if the scope manager has no global scope', function () {
         const foundResolvedReferences = findImportReferencesByName(
@@ -72,6 +145,155 @@ describe('findImportReferencesByName()', function () {
         const foundResolvedReferences = findReferenceNames('', [{ path: ['foo'] }], 'bar');
 
         assert.deepStrictEqual(foundResolvedReferences, []);
+    });
+
+    it('ignores named imports whose source node is not a literal', function () {
+        const foundResolvedReferences = findReferenceNamesFromMockVariable(
+            createMockImportReferenceVariable(
+                {
+                    imported: { name: 'foo' },
+                    type: 'ImportSpecifier'
+                },
+                {
+                    name: 'bar',
+                    type: 'Identifier'
+                } as unknown as Rule.Node
+            ),
+            null
+        );
+
+        assert.deepStrictEqual(foundResolvedReferences, []);
+    });
+
+    it('ignores import bindings whose definition node is not an import specifier', function () {
+        const foundResolvedReferences = findReferenceNamesFromMockVariable(
+            createMockImportReferenceVariable(
+                {
+                    imported: { name: 'foo' },
+                    type: 'ImportDefaultSpecifier'
+                },
+                {
+                    type: 'Literal',
+                    value: 'bar'
+                } as unknown as Rule.Node
+            ),
+            'bar'
+        );
+
+        assert.deepStrictEqual(foundResolvedReferences, []);
+    });
+
+    it('ignores import specifiers whose imported name is not a string', function () {
+        const foundResolvedReferences = findReferenceNamesFromMockVariable(
+            createMockImportReferenceVariable(
+                {
+                    imported: { name: 42 },
+                    type: 'ImportSpecifier'
+                },
+                {
+                    type: 'Literal',
+                    value: 'bar'
+                } as unknown as Rule.Node
+            ),
+            'bar',
+            [{ path: [42] }] as unknown as readonly NameDetails[]
+        );
+
+        assert.deepStrictEqual(foundResolvedReferences, []);
+    });
+
+    it('ignores variables without an import definition', function () {
+        const identifierNode = {
+            name: 'foo',
+            parent: {
+                type: 'ExpressionStatement'
+            },
+            type: 'Identifier'
+        } as unknown as Rule.Node;
+        const foundResolvedReferences = findReferenceNamesFromMockVariable({
+            defs: [],
+            references: [{ identifier: identifierNode }]
+        }, 'bar');
+
+        assert.deepStrictEqual(foundResolvedReferences, []);
+    });
+
+    it('ignores import bindings whose definition is not an import binding', function () {
+        const identifierNode = {
+            name: 'foo',
+            parent: {
+                type: 'ExpressionStatement'
+            },
+            type: 'Identifier'
+        } as unknown as Rule.Node;
+        const foundResolvedReferences = findReferenceNamesFromMockVariable({
+            defs: [{
+                node: {
+                    imported: { name: 'foo' },
+                    type: 'ImportSpecifier'
+                },
+                parent: {
+                    source: {
+                        type: 'Literal',
+                        value: 'bar'
+                    } as unknown as Rule.Node
+                },
+                type: 'Variable'
+            } as unknown as MockImportDefinition],
+            references: [{ identifier: identifierNode }]
+        }, 'bar');
+
+        assert.deepStrictEqual(foundResolvedReferences, []);
+    });
+
+    it('replaces empty reference paths with the imported name', function () {
+        const foundResolvedReferences = findReferenceNamesFromMockVariable(
+            createMockImportReferenceVariable(
+                {
+                    imported: { name: 'foo' },
+                    type: 'ImportSpecifier'
+                },
+                {
+                    type: 'Literal',
+                    value: 'bar'
+                } as unknown as Rule.Node
+            ),
+            'bar',
+            [{ path: ['foo'] }] as unknown as readonly NameDetails[]
+        );
+
+        const literalReference = {
+            parent: {
+                type: 'ExpressionStatement'
+            },
+            type: 'Literal',
+            value: 'foo'
+        } as unknown as Rule.Node;
+        const emptyPathReferences = findReferenceNamesFromMockVariable({
+            defs: [{
+                node: {
+                    imported: { name: 'foo' },
+                    type: 'ImportSpecifier'
+                },
+                parent: {
+                    source: {
+                        type: 'Literal',
+                        value: 'bar'
+                    } as unknown as Rule.Node
+                },
+                type: 'ImportBinding'
+            }],
+            references: [{ identifier: literalReference }]
+        }, 'bar');
+
+        assert.deepStrictEqual(foundResolvedReferences, [{
+            path: ['foo'],
+            resolvedPath: ['foo']
+        }]);
+        assert.deepStrictEqual(emptyPathReferences, [{
+            path: [],
+            resolvedPath: ['foo']
+        }]);
     });
 
     it('returns an empty array if the sourceType is not an module', function () {
@@ -267,98 +489,5 @@ describe('findImportReferencesByName()', function () {
         );
 
         assert.deepStrictEqual(foundResolvedReferences, []);
-    });
-
-    it('replaceFirstSegment() handles empty constant paths without throwing', function () {
-        assert.deepStrictEqual(replaceFirstSegment([], 'foo'), ['foo']);
-    });
-
-    it('isImportSpecifierNode() rejects specifiers without imported names', function () {
-        const result = isImportSpecifierNode({
-            type: 'ImportSpecifier',
-            imported: {}
-        });
-
-        assert.strictEqual(result, false);
-    });
-
-    it('isImportSpecifierNode() rejects nodes with the wrong type', function () {
-        const result = isImportSpecifierNode({
-            type: 'Identifier',
-            imported: {
-                name: 'foo'
-            }
-        });
-
-        assert.strictEqual(result, false);
-    });
-
-    it('isImportSpecifierNode() rejects nodes with non-record imported bindings', function () {
-        const result = isImportSpecifierNode({
-            type: 'ImportSpecifier',
-            imported: 'foo'
-        });
-
-        assert.strictEqual(result, false);
-    });
-
-    it('isExclusiveNamedImportBindingWithMatchingSource() rejects non-literal import sources', function () {
-        const result = isExclusiveNamedImportBindingWithMatchingSource(
-            {
-                defs: [{
-                    type: 'ImportBinding',
-                    node: {
-                        type: 'ImportSpecifier',
-                        imported: { name: 'foo' }
-                    },
-                    parent: {
-                        source: {
-                            type: 'Identifier',
-                            value: 'bar'
-                        }
-                    }
-                }],
-                references: []
-            } as unknown as Parameters<typeof isExclusiveNamedImportBindingWithMatchingSource>[0],
-            'bar'
-        );
-
-        assert.strictEqual(result, false);
-    });
-
-    it('isExclusiveNamedImportBindingWithMatchingSource() rejects variables without definitions', function () {
-        const result = isExclusiveNamedImportBindingWithMatchingSource(
-            {
-                defs: [],
-                references: []
-            } as unknown as Parameters<typeof isExclusiveNamedImportBindingWithMatchingSource>[0],
-            'bar'
-        );
-
-        assert.strictEqual(result, false);
-    });
-
-    it('isExclusiveNamedImportBindingWithMatchingSource() rejects non-import definitions', function () {
-        const result = isExclusiveNamedImportBindingWithMatchingSource(
-            {
-                defs: [{
-                    type: 'Variable',
-                    node: {
-                        type: 'ImportSpecifier',
-                        imported: { name: 'foo' }
-                    },
-                    parent: {
-                        source: {
-                            type: 'Literal',
-                            value: 'bar'
-                        }
-                    }
-                }],
-                references: []
-            } as unknown as Parameters<typeof isExclusiveNamedImportBindingWithMatchingSource>[0],
-            'bar'
-        );
-
-        assert.strictEqual(result, false);
     });
 });

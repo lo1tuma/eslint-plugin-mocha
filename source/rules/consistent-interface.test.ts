@@ -46,6 +46,25 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
             settings: { mocha: { interface: 'BDD' } }
         },
         {
+            code: 'import mocha from "mocha"; mocha.describe("foo", () => {});',
+            settings: { mocha: { interface: 'BDD' } }
+        },
+        {
+            code: 'import * as mocha from "mocha"; mocha.describe("foo", () => {});',
+            settings: { mocha: { interface: 'BDD' } }
+        },
+        {
+            code: 'describe("foo", function () {});',
+            languageOptions: { ecmaVersion: 2020, sourceType: 'script' },
+            options: [{ interface: 'BDD' }],
+            settings: { mocha: { interface: 'BDD' } }
+        },
+        {
+            code: 'import {setup, teardown} from "mocha"; setup(() => {}); teardown(() => {});',
+            options: [{ interface: 'TDD' }],
+            settings: { mocha: { interface: 'require' } }
+        },
+        {
             code: `describe('foo', () => {
                 it('bar', () => {});
             });`,
@@ -157,6 +176,59 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
             settings: { mocha: { interface: 'BDD' } },
             errors: [
                 { message: 'Unexpected use of require interface instead of global BDD' }
+            ]
+        },
+        {
+            code: "import {run, describe} from 'mocha'; describe('foo', () => {});",
+            output: "import {run} from 'mocha'; describe('foo', () => {});",
+            options: [{ interface: 'BDD' }],
+            settings: { mocha: { interface: 'BDD' } },
+            errors: [
+                { message: 'Unexpected use of require interface instead of global BDD' }
+            ]
+        },
+        {
+            code: `import {context, specify, before, after, beforeEach, afterEach} from 'mocha';
+                context('foo', () => {});
+                specify('bar', () => {});
+                before(() => {});
+                after(() => {});
+                beforeEach(() => {});
+                afterEach(() => {});`,
+            output: `context('foo', () => {});
+                specify('bar', () => {});
+                before(() => {});
+                after(() => {});
+                beforeEach(() => {});
+                afterEach(() => {});`,
+            options: [{ interface: 'BDD' }],
+            settings: { mocha: { interface: 'BDD' } },
+            errors: [
+                { message: 'Unexpected use of require interface instead of global BDD' },
+                { message: 'Unexpected use of require interface instead of global BDD' },
+                { message: 'Unexpected use of require interface instead of global BDD' },
+                { message: 'Unexpected use of require interface instead of global BDD' },
+                { message: 'Unexpected use of require interface instead of global BDD' },
+                { message: 'Unexpected use of require interface instead of global BDD' }
+            ]
+        },
+        {
+            code: `import {suiteSetup, suiteTeardown, setup, teardown} from 'mocha';
+                suiteSetup(() => {});
+                suiteTeardown(() => {});
+                setup(() => {});
+                teardown(() => {});`,
+            output: `suiteSetup(() => {});
+                suiteTeardown(() => {});
+                setup(() => {});
+                teardown(() => {});`,
+            options: [{ interface: 'TDD' }],
+            settings: { mocha: { interface: 'TDD' } },
+            errors: [
+                { message: 'Unexpected use of require interface instead of global TDD' },
+                { message: 'Unexpected use of require interface instead of global TDD' },
+                { message: 'Unexpected use of require interface instead of global TDD' },
+                { message: 'Unexpected use of require interface instead of global TDD' }
             ]
         },
         {

@@ -1,9 +1,10 @@
 import type { Rule, SourceCode } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
+import { expectNodeRange } from '../ast/node-location.js';
 import { type AnyFunction, isFunction } from '../ast/node-types.js';
 import { type TraversableNode, visitChildNodes } from '../ast/visit-child-nodes.js';
 
-export function containsDirectAwait(
+function containsDirectAwait(
     sourceCode: Readonly<SourceCode>,
     node: AnyFunction['body'] | TraversableNode
 ): boolean {
@@ -32,19 +33,16 @@ function isAsyncFunction(node: Rule.Node): node is AnyFunction {
         node.async === true;
 }
 
-export function fixAsyncFunction(
+function fixAsyncFunction(
     sourceCode: Readonly<SourceCode>,
     fixer: Rule.RuleFixer,
     fn: Readonly<AnyFunction>
 ): Readonly<Rule.Fix | null> {
     if (!containsDirectAwait(sourceCode, fn.body)) {
-        // Remove the "async" token and all the whitespace before "function":
-        const amountOfTokens = 2;
-        const [asyncToken, functionToken] = sourceCode.getFirstTokens(fn, amountOfTokens);
-        if (asyncToken === undefined || functionToken === undefined) {
-            return null;
-        }
-        return fixer.removeRange([asyncToken.range[0], functionToken.range[0]]);
+        const asyncPrefixLength = 'async '.length;
+        const [start] = expectNodeRange(fn);
+
+        return fixer.removeRange([start, start + asyncPrefixLength]);
     }
     return null;
 }

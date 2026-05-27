@@ -1,7 +1,7 @@
 import { Linter, RuleTester } from 'eslint';
 import assert from 'node:assert';
 import { withInterface } from '../mocha-interface-test-cases.js';
-import { hasMemberCallee, limitTimeoutRule } from './limit-timeout.js';
+import { limitTimeoutRule } from './limit-timeout.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const unexpectedTimeout = 'Unexpected use of Mocha timeout configuration.';
@@ -10,6 +10,7 @@ const unexpectedDisabledTimeout = 'Unexpected disabled Mocha timeout.';
 ruleTester.run('limit-timeout', limitTimeoutRule, {
     valid: [
         'it("works", function () {});',
+        'timeout(5000);',
         'it("works", function () {}).slow(5000);',
         {
             code: 'it("works", function () {}).timeout();',
@@ -146,17 +147,6 @@ ruleTester.run('limit-timeout', limitTimeoutRule, {
 });
 
 describe('limit-timeout', function () {
-    it('hasMemberCallee() rejects non-member callees', function () {
-        assert.strictEqual(
-            hasMemberCallee({
-                callee: {
-                    type: 'Identifier'
-                }
-            } as never),
-            false
-        );
-    });
-
     it('accepts ranges where min and max are equal', function () {
         const linter = new Linter();
         const messages = linter.verify('it("works", function () {}).timeout(5);', {

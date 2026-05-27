@@ -1,10 +1,5 @@
-import type { Rule } from 'eslint';
 import assert from 'node:assert';
-import {
-    isLiteralOrUndefinedReturn,
-    reportIfImplicitReturn,
-    reportUnexpectedReturnInBlock
-} from './mocha-return-rule.js';
+import { isLiteralOrUndefinedReturn } from './mocha-return-rule.js';
 
 describe('mocha-return-rule helpers', function () {
     it('treats bare returns as allowed', function () {
@@ -34,68 +29,5 @@ describe('mocha-return-rule helpers', function () {
             } as never),
             false
         );
-    });
-
-    it('reports implicit returns from non-block bodies', function () {
-        const reports: string[] = [];
-        const result = reportIfImplicitReturn(
-            {
-                report() {
-                    reports.push('reported');
-                }
-            } as unknown as Rule.RuleContext,
-            {
-                body: { type: 'Identifier', name: 'value' }
-            } as never,
-            'unexpectedReturn'
-        );
-
-        assert.strictEqual(result, true);
-        assert.deepStrictEqual(reports, ['reported']);
-    });
-
-    it('ignores explicit block bodies for implicit return checks', function () {
-        const reports: string[] = [];
-        const result = reportIfImplicitReturn(
-            {
-                report() {
-                    reports.push('reported');
-                }
-            } as unknown as Rule.RuleContext,
-            {
-                body: { type: 'BlockStatement', body: [] }
-            } as never,
-            'unexpectedReturn'
-        );
-
-        assert.strictEqual(result, false);
-        assert.deepStrictEqual(reports, []);
-    });
-
-    it('reports unexpected block returns when the predicate rejects them', function () {
-        const reports: string[] = [];
-
-        reportUnexpectedReturnInBlock(
-            {
-                report() {
-                    reports.push('reported');
-                }
-            } as unknown as Rule.RuleContext,
-            {
-                body: {
-                    type: 'BlockStatement',
-                    body: [{
-                        type: 'ReturnStatement',
-                        argument: { type: 'Identifier', name: 'value' }
-                    }]
-                }
-            } as never,
-            'unexpectedReturn',
-            function () {
-                return false;
-            }
-        );
-
-        assert.deepStrictEqual(reports, ['reported']);
     });
 });

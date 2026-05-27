@@ -1,12 +1,8 @@
 import { Linter, type Rule, RuleTester, type SourceCode } from 'eslint';
 import assert from 'node:assert';
 import { withInterface } from '../mocha-interface-test-cases.js';
-import {
-    consistentStructureRule,
-    getDirectStructureContext,
-    getStructureEntityKind
-} from './consistent-structure.js';
-import { getTopLevelMochaExpression, isNestedStatementBoundary } from './direct-mocha-statement.js';
+import { consistentStructureRule } from './consistent-structure.js';
+import { getTopLevelMochaExpression } from './direct-mocha-statement.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
@@ -42,57 +38,6 @@ function readExpression(code: string): { sourceCode: Readonly<SourceCode>; expre
     assert.notStrictEqual(result, null);
 
     return result as unknown as { sourceCode: Readonly<SourceCode>; expression: Readonly<Rule.Node>; };
-}
-
-function readSuiteBodyNodes(
-    code: string
-): { nestedMochaCall: Readonly<Rule.Node>; suiteBody: Readonly<Rule.Node>; } {
-    const linter = new Linter();
-    let result: { nestedMochaCall: Readonly<Rule.Node>; suiteBody: Readonly<Rule.Node>; } | null = null;
-
-    const testRule: Rule.RuleModule = {
-        create(ruleContext) {
-            return {
-                Program() {
-                    const [firstStatement] = ruleContext.sourceCode.ast.body;
-
-                    assert.notStrictEqual(firstStatement, undefined);
-                    assert.strictEqual(firstStatement?.type, 'ExpressionStatement');
-                    assert.strictEqual(firstStatement.expression.type, 'CallExpression');
-
-                    const suiteCallback = firstStatement.expression.arguments[0];
-
-                    assert.notStrictEqual(suiteCallback, undefined);
-                    assert.strictEqual(suiteCallback?.type, 'FunctionExpression');
-
-                    const [nestedStatement] = suiteCallback.body.body;
-
-                    assert.notStrictEqual(nestedStatement, undefined);
-                    assert.strictEqual(nestedStatement?.type, 'IfStatement');
-                    assert.strictEqual(nestedStatement.consequent.type, 'BlockStatement');
-                    assert.strictEqual(nestedStatement.consequent.body[0]?.type, 'ExpressionStatement');
-
-                    result = {
-                        nestedMochaCall: nestedStatement.consequent.body[0].expression as unknown as Readonly<
-                            Rule.Node
-                        >,
-                        suiteBody: suiteCallback.body as unknown as Readonly<Rule.Node>
-                    };
-                }
-            };
-        }
-    };
-
-    const messages = linter.verify(code, {
-        plugins: { 'test-plugin': { rules: { 'test-rule': testRule } } },
-        languageOptions: { ecmaVersion: 2020, sourceType: 'script' },
-        rules: { 'test-plugin/test-rule': 'error' }
-    });
-
-    assert.deepStrictEqual(messages, []);
-    assert.notStrictEqual(result, null);
-
-    return result as unknown as { nestedMochaCall: Readonly<Rule.Node>; suiteBody: Readonly<Rule.Node>; };
 }
 
 ruleTester.run('consistent-structure', consistentStructureRule, {
@@ -335,69 +280,5 @@ describe('consistent-structure helpers', function () {
 
         assert.strictEqual(result.type, 'MemberExpression');
         assert.strictEqual(result, expression.callee);
-    });
-
-    it('getStructureEntityKind() throws for unsupported mocha entities', function () {
-        const { expression: node } = readExpression('foo;');
-
-        assert.throws(
-            function () {
-                getStructureEntityKind({
-                    config: 'timeout',
-                    interface: 'BDD',
-                    modifier: null,
-                    name: 'timeout',
-                    node,
-                    type: 'config'
-                });
-            },
-            /Unexpected mocha entity type: config/u
-        );
-    });
-
-    it('getDirectStructureContext() returns null when no structure layer exists', function () {
-        const { expression: node } = readExpression('foo;');
-        const result = getDirectStructureContext([], {
-            config: null,
-            interface: 'BDD',
-            modifier: null,
-            name: 'describe',
-            node,
-            type: 'suite'
-        });
-
-        assert.strictEqual(result, null);
-    });
-
-    it('isNestedStatementBoundary() handles declarations, functions, and unrelated nodes', function () {
-        assert.strictEqual(isNestedStatementBoundary({ type: 'ImportDeclaration' } as Rule.Node), true);
-        assert.strictEqual(isNestedStatementBoundary({ type: 'FunctionExpression' } as Rule.Node), true);
-        assert.strictEqual(isNestedStatementBoundary({ type: 'Identifier' } as Rule.Node), false);
-    });
-
-    it('getDirectStructureContext() returns null for nested statements inside a suite body', function () {
-        const { nestedMochaCall, suiteBody } = readSuiteBodyNodes('describe(function () { if (foo) { it(); } });');
-        const result = getDirectStructureContext(
-            [{
-                hasReportedMixedStructure: false,
-                hasSeenSuite: false,
-                hasSeenTestCase: false,
-                highestSeenHookOrderName: null,
-                highestSeenHookOrderRank: null,
-                highestSeenKind: null,
-                scopeNode: suiteBody as never,
-                usedHookNames: new Set()
-            }],
-            {
-                config: null,
-                interface: 'BDD',
-                modifier: null,
-                name: 'it',
-                node: nestedMochaCall,
-                type: 'testCase'
-            }
-        );
-
-        assert.strictEqual(result, null);
     });
 });

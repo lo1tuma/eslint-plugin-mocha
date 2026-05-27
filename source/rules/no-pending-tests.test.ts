@@ -1,28 +1,12 @@
-import { type Rule, RuleTester, type SourceCode } from 'eslint';
+import { RuleTester } from 'eslint';
 import assert from 'node:assert';
 import { withInterface } from '../mocha-interface-test-cases.js';
-import {
-    checkPendingSuite,
-    checkPendingTestCase,
-    noPendingTestsRule
-} from './no-pending-tests.js';
+import { noPendingTestsRule } from './no-pending-tests.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const expectedErrorMessage = 'Unexpected pending mocha test.';
 const expectedMissingCommentMessage = 'Unexpected skipped mocha test without a preceding comment.';
 const allowSkippedWithCommentOption = { allowSkippedWithComment: true };
-
-function asRuleContext(ruleContext: Record<string, unknown>): Rule.RuleContext {
-    return ruleContext as unknown as Rule.RuleContext;
-}
-
-function asRuleNode(node: Record<string, unknown>): Rule.Node {
-    return node as unknown as Rule.Node;
-}
-
-function asSourceCode(sourceCode: Record<string, unknown>): SourceCode {
-    return sourceCode as unknown as SourceCode;
-}
 
 ruleTester.run('no-pending-tests', noPendingTestsRule, {
     valid: [
@@ -37,6 +21,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
         'it(title)',
         'describe()',
         'describe.only()',
+        'it["only"]()',
         'it.only()',
         withInterface('TDD', 'suite()'),
         withInterface('TDD', 'suite.only()'),
@@ -48,6 +33,10 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
         withInterface('TDD', 'var dynamicOnly = "ski"; dynamicOnly += String.fromCharCode(112); suite[dynamicOnly]()'),
         {
             code: '// SKIP pending #201\nit.skip("works", function() {})',
+            options: [allowSkippedWithCommentOption]
+        },
+        {
+            code: 'something();\n// SKIP pending #201\nit.skip("works", function() {})',
             options: [allowSkippedWithCommentOption]
         },
         {
@@ -66,6 +55,8 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
             code: '// SKIP pending #201\nbefore(function() { this.skip(); })',
             options: [allowSkippedWithCommentOption]
         },
+        'it("works", function() { this.only(); })',
+        'it("works", function() { this["only"](); })',
         'it("works", function() { function later() { this.skip(); } later.call(this); })',
         {
             code: 'xcustom()',
@@ -398,75 +389,8 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
     ]
 });
 
-describe('no-pending-tests helpers', function () {
-    it('checkPendingTestCase() ignores non-call-expression nodes', function () {
-        const reports: string[] = [];
-
-        checkPendingTestCase(
-            asRuleContext({
-                report() {
-                    reports.push('reported');
-                }
-            }),
-            {
-                modifier: null,
-                node: asRuleNode({ type: 'Identifier' })
-            },
-            { allowSkippedWithComment: false }
-        );
-
-        assert.deepStrictEqual(reports, []);
-    });
-
-    it('checkPendingSuite() ignores non-call-expression nodes', function () {
-        const reports: string[] = [];
-
-        checkPendingSuite(
-            asRuleContext({
-                report() {
-                    reports.push('reported');
-                }
-            }),
-            {
-                modifier: 'pending',
-                node: asRuleNode({ type: 'Identifier' })
-            },
-            { allowSkippedWithComment: false }
-        );
-
-        assert.deepStrictEqual(reports, []);
-    });
-
-    it('checkPendingSuite() handles this.skip() calls when skipped comments are allowed', function () {
-        const reports: string[] = [];
-
-        checkPendingSuite(
-            asRuleContext({
-                report() {
-                    reports.push('reported');
-                },
-                sourceCode: asSourceCode({
-                    getCommentsBefore() {
-                        return [];
-                    }
-                })
-            }),
-            {
-                modifier: 'pending',
-                node: asRuleNode({
-                    arguments: [],
-                    callee: {
-                        computed: false,
-                        object: { type: 'ThisExpression' },
-                        property: { name: 'skip', type: 'Identifier' },
-                        type: 'MemberExpression'
-                    },
-                    type: 'CallExpression'
-                })
-            },
-            { allowSkippedWithComment: true }
-        );
-
-        assert.deepStrictEqual(reports, ['reported']);
+describe('no-pending-tests metadata', function () {
+    it('defaults to disallowing skipped tests with comments', function () {
+        assert.deepStrictEqual(noPendingTestsRule.meta?.defaultOptions, [{ allowSkippedWithComment: false }]);
     });
 });

@@ -1,17 +1,18 @@
 import type { Rule, SourceCode } from 'eslint';
 import type { Comment as EstreeComment } from 'estree';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
+import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
+import { expectNodeRange } from '../ast/node-location.js';
 import {
     type AnyFunction,
-    type CallExpression,
+    expectCallExpression,
     getParentNode,
-    isCallExpression,
     isFunction,
     isIdentifier,
     isLiteral,
     isMemberExpression,
     type MemberExpression
 } from '../ast/node-types.js';
+import { asRuleNode } from '../ast/rule-node.js';
 import { type TraversableNode, visitChildNodes } from '../ast/visit-child-nodes.js';
 import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 
@@ -30,15 +31,13 @@ type ResolvedOption = Option & { allowSkippedWithComment: boolean; };
 type PendingRuleConfiguration = {
     readonly allowSkippedWithComment: boolean;
 };
+type CallExpression = Extract<TraversableNode, { type: 'CallExpression'; }>;
 
 const defaultOption: ResolvedOption = {
     allowSkippedWithComment: false
 };
 
-type PendingVisitorContext = {
-    readonly node: Rule.Node;
-    readonly modifier: string | null;
-};
+type PendingMemberCallee = Extract<CallExpression['callee'], { type: 'MemberExpression'; }>;
 type Locatable = {
     readonly loc?:
         | {
@@ -58,17 +57,6 @@ function isCallbackMissing(node: CallExpression): boolean {
     return firstArgument !== undefined && firstArgument.type === 'Literal' && node.arguments.length === 1;
 }
 
-export function fixPendingIdentifier(
-    fixer: Rule.RuleFixer,
-    callee: Readonly<CallExpression['callee']>
-): Readonly<Rule.Fix | null> {
-    if (!isIdentifier(callee) || !callee.name.startsWith('x')) {
-        return null;
-    }
-
-    return fixer.replaceText(callee, callee.name.slice(1));
-}
-
 function isNamedSkipProperty(property: Readonly<MemberExpression['property']>): boolean {
     return isIdentifier(property) && property.name === 'skip';
 }
@@ -77,7 +65,7 @@ function isLiteralSkipProperty(property: Readonly<MemberExpression['property']>)
     return isLiteral(property) && property.value === 'skip';
 }
 
-export function isPendingMemberExpression(
+function isPendingMemberExpression(
     callee: Readonly<CallExpression['callee']>
 ): callee is Extract<CallExpression['callee'], { type: 'MemberExpression'; }> {
     if (!isMemberExpression(callee)) {
@@ -100,16 +88,13 @@ function isThisSkipCall(node: Readonly<CallExpression>): boolean {
     return isThisSkipMemberExpression(node.callee);
 }
 
-export function fixPendingMemberExpression(
+function fixPendingMemberExpression(
     fixer: Rule.RuleFixer,
     sourceCode: Readonly<SourceCode>,
-    callee: Readonly<CallExpression['callee']>
+    callee: Readonly<PendingMemberCallee>
 ): Readonly<Rule.Fix | null> {
-    if (!isPendingMemberExpression(callee) || callee.range === undefined) {
-        return null;
-    }
-
-    const { object, range } = callee;
+    const { object } = callee;
+    const range = expectNodeRange(callee);
 
     return fixer.replaceTextRange(range, sourceCode.getText(object));
 }
@@ -119,16 +104,15 @@ function fixPendingTest(
     sourceCode: Readonly<SourceCode>,
     node: Readonly<CallExpression>
 ): Readonly<Rule.Fix | null> {
-    return fixPendingIdentifier(fixer, node.callee) ?? fixPendingMemberExpression(fixer, sourceCode, node.callee);
-}
+    if (isIdentifier(node.callee)) {
+        return fixer.replaceText(node.callee, node.callee.name.slice(1));
+    }
 
-function canSuggestPendingTest(node: Readonly<CallExpression>): boolean {
-    return (isIdentifier(node.callee) && node.callee.name.startsWith('x')) ||
-        (isPendingMemberExpression(node.callee) && !isThisSkipMemberExpression(node.callee));
-}
+    if (isPendingMemberExpression(node.callee)) {
+        return fixPendingMemberExpression(fixer, sourceCode, node.callee);
+    }
 
-function isSkippedCall(node: Readonly<CallExpression>): boolean {
-    return canSuggestPendingTest(node) || isThisSkipCall(node);
+    return null;
 }
 
 function hasKnownLocation(
@@ -151,7 +135,7 @@ function isStandaloneLeadingComment(sourceCode: Readonly<SourceCode>, comment: K
         tokenBeforeComment.loc.end.line < comment.loc.start.line;
 }
 
-export function hasAdjacentLeadingComment(
+function hasAdjacentLeadingComment(
     sourceCode: Readonly<SourceCode>,
     node: Readonly<Rule.Node>
 ): boolean {
@@ -169,8 +153,12 @@ function shouldAllowSkippedWithComment(
     configuration: Readonly<PendingRuleConfiguration>
 ): boolean {
     return configuration.allowSkippedWithComment &&
-        isSkippedCall(node) &&
-        hasAdjacentLeadingComment(context.sourceCode, node);
+        hasAdjacentLeadingComment(context.sourceCode, asRuleNode(node));
+}
+
+function canRemovePendingModifier(node: Readonly<CallExpression>): boolean {
+    return isIdentifier(node.callee) ||
+        (isPendingMemberExpression(node.callee) && !isThisSkipMemberExpression(node.callee));
 }
 
 function visitThisSkipCalls(
@@ -178,7 +166,7 @@ function visitThisSkipCalls(
     node: TraversableNode,
     visitor: (callExpression: Readonly<CallExpression>) => void
 ): void {
-    if (isCallExpression(node) && isThisSkipCall(node)) {
+    if (node.type === 'CallExpression' && isThisSkipCall(node)) {
         visitor(node);
     }
 
@@ -201,7 +189,7 @@ function reportSkipped(
     context.report({
         node: nodeToReport,
         messageId,
-        ...(canSuggestPendingTest(node)
+        ...(canRemovePendingModifier(node)
             ? {
                 suggest: [{
                     messageId: 'removePendingModifier' as const,
@@ -214,50 +202,46 @@ function reportSkipped(
     });
 }
 
-export function checkPendingTestCase(
+function checkPendingTestCase(
     context: Readonly<Rule.RuleContext>,
-    visitorContext: PendingVisitorContext,
+    visitorContext: Readonly<VisitorContext>,
     configuration: Readonly<PendingRuleConfiguration>
 ): void {
-    if (!isCallExpression(visitorContext.node)) {
-        return;
-    }
+    const node = expectCallExpression(visitorContext.node);
 
-    if (isCallbackMissing(visitorContext.node)) {
+    if (isCallbackMissing(node)) {
         context.report({
-            node: visitorContext.node,
+            node,
             messageId: 'unexpectedPendingTest'
         });
     } else if (visitorContext.modifier === 'pending') {
-        if (shouldAllowSkippedWithComment(context, visitorContext.node, configuration)) {
+        if (shouldAllowSkippedWithComment(context, node, configuration)) {
             return;
         }
 
         reportSkipped(
             context,
-            visitorContext.node,
+            node,
             configuration.allowSkippedWithComment ? 'unexpectedSkippedTestWithoutComment' : 'unexpectedPendingTest'
         );
     }
 }
 
-export function checkPendingSuite(
+function checkPendingSuite(
     context: Readonly<Rule.RuleContext>,
-    visitorContext: PendingVisitorContext,
+    visitorContext: Readonly<VisitorContext>,
     configuration: Readonly<PendingRuleConfiguration>
 ): void {
-    if (!isCallExpression(visitorContext.node)) {
-        return;
-    }
+    const node = expectCallExpression(visitorContext.node);
 
     if (visitorContext.modifier === 'pending') {
-        if (shouldAllowSkippedWithComment(context, visitorContext.node, configuration)) {
+        if (shouldAllowSkippedWithComment(context, node, configuration)) {
             return;
         }
 
         reportSkipped(
             context,
-            visitorContext.node,
+            node,
             configuration.allowSkippedWithComment ? 'unexpectedSkippedTestWithoutComment' : 'unexpectedPendingTest'
         );
     }
@@ -273,7 +257,7 @@ function checkPendingCallback(
     visitThisSkipCalls(context.sourceCode, callbackNode.body, (thisSkipCall) => {
         if (
             configuration.allowSkippedWithComment &&
-            (hasAdjacentLeadingComment(context.sourceCode, thisSkipCall) ||
+            (hasAdjacentLeadingComment(context.sourceCode, asRuleNode(thisSkipCall)) ||
                 hasAdjacentLeadingComment(context.sourceCode, callbackParent))
         ) {
             return;

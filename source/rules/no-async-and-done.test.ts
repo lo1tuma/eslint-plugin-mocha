@@ -1,7 +1,6 @@
 import * as typescriptParser from '@typescript-eslint/parser';
-import { type Rule, RuleTester } from 'eslint';
-import assert from 'node:assert';
-import { checkNodeForAsyncAndDone, noAsyncAndDoneRule } from './no-async-and-done.js';
+import { RuleTester } from 'eslint';
+import { noAsyncAndDoneRule } from './no-async-and-done.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const message = 'Do not use an async function together with a Mocha callback parameter';
@@ -75,18 +74,4 @@ ruleTester.run('no-async-and-done', noAsyncAndDoneRule, {
             languageOptions: es6LanguageOptions
         }
     ]
-});
-
-describe('no-async-and-done helpers', function () {
-    it('checkNodeForAsyncAndDone() ignores non-function nodes', function () {
-        const reports: string[] = [];
-
-        checkNodeForAsyncAndDone({
-            report() {
-                reports.push('reported');
-            }
-        } as unknown as Rule.RuleContext, { type: 'Identifier' } as Rule.Node);
-
-        assert.deepStrictEqual(reports, []);
-    });
 });

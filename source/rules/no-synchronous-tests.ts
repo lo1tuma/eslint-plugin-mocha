@@ -1,7 +1,7 @@
 import type { Rule } from 'eslint';
 import type { Except } from 'type-fest';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { type BlockStatement, isBlockStatement, isFunction, type ReturnStatement } from '../ast/node-types.js';
+import { type AnyFunction, type BlockStatement, isBlockStatement, type ReturnStatement } from '../ast/node-types.js';
 import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 
 const asyncMethods = ['async', 'callback', 'promise'] as const;
@@ -25,14 +25,14 @@ type Option = InferSchemaOption<typeof optionSchema>;
 type AsyncMethod = (typeof asyncMethods)[number];
 type ResolvedOption = Option & { allowedAsyncMethods: AsyncMethod[]; };
 const defaultOption: ResolvedOption = { allowedAsyncMethods: Array.from(asyncMethods) };
-type AsyncCheck = (functionExpression: Readonly<Rule.Node>) => boolean;
+type AsyncCheck = (functionExpression: Readonly<AnyFunction>) => boolean;
 
-function hasAsyncCallback(functionExpression: Readonly<Rule.Node>): boolean {
-    return isFunction(functionExpression) && functionExpression.params.length === 1;
+function hasAsyncCallback(functionExpression: Readonly<AnyFunction>): boolean {
+    return functionExpression.params.length === 1;
 }
 
-function isAsyncFunction(functionExpression: Readonly<Rule.Node>): boolean {
-    return isFunction(functionExpression) && functionExpression.async === true;
+function isAsyncFunction(functionExpression: Readonly<AnyFunction>): boolean {
+    return functionExpression.async === true;
 }
 
 function findPromiseReturnStatement(nodes: Readonly<BlockStatement['body']>): Readonly<ReturnStatement | undefined> {
@@ -45,10 +45,7 @@ function findPromiseReturnStatement(nodes: Readonly<BlockStatement['body']>): Re
     });
 }
 
-export function doesReturnPromise(functionExpression: Readonly<Rule.Node>): boolean {
-    if (!isFunction(functionExpression)) {
-        return false;
-    }
+function doesReturnPromise(functionExpression: Readonly<AnyFunction>): boolean {
     const bodyStatement = functionExpression.body;
     let returnStatement: Except<Rule.Node, 'parent'> | null | undefined = null;
 

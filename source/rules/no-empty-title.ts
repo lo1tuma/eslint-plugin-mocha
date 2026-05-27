@@ -17,20 +17,7 @@ const optionSchema = {
 } as const satisfies RuleSchema;
 
 type Option = InferSchemaOption<typeof optionSchema>;
-type ResolvedOption = Option & { message: string; };
-const defaultOption: ResolvedOption = { message: ERROR_MESSAGE };
-
-function isLiteral(node: Readonly<Rule.Node>): boolean {
-    return node.type === 'Literal';
-}
-
-export function isStaticallyAnalyzableDescription(node: Readonly<Rule.Node>, extractedText: string | null): boolean {
-    if (extractedText === null) {
-        return isLiteral(node);
-    }
-
-    return true;
-}
+const defaultOption: Option = {};
 
 function isValidDescriptionArgumentNode(node: Except<Rule.Node, 'parent'> | undefined): node is Rule.Node {
     if (node === undefined) {
@@ -71,7 +58,7 @@ export const noEmptyTitleRule: Readonly<Rule.RuleModule> = {
         schema: [optionSchema]
     },
     create(context) {
-        const { message } = getRuleOption<ResolvedOption>(context);
+        const { message: customMessage } = getRuleOption<Option>(context);
 
         function isNonEmptyDescription(mochaCallExpression: CallExpression): boolean {
             const description = mochaCallExpression.arguments[0];
@@ -85,20 +72,16 @@ export const noEmptyTitleRule: Readonly<Rule.RuleModule> = {
                 context.sourceCode.getScope(mochaCallExpression)
             );
 
-            if (!isStaticallyAnalyzableDescription(description, text)) {
-                return true;
-            }
-
-            return text !== null && text.trim().length > 0;
+            return text === null || text.trim().length > 0;
         }
 
         return createMochaVisitors(context, {
             suiteOrTestCase(visitorContext) {
                 if (isCallExpression(visitorContext.node) && !isNonEmptyDescription(visitorContext.node)) {
                     context.report(
-                        message === ERROR_MESSAGE
+                        customMessage === undefined
                             ? { node: visitorContext.node, messageId: 'emptyTitle' }
-                            : { node: visitorContext.node, message }
+                            : { node: visitorContext.node, message: customMessage }
                     );
                 }
             }

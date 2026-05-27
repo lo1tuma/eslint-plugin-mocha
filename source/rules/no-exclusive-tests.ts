@@ -1,36 +1,33 @@
 import type { Rule, SourceCode } from 'eslint';
 import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
-import { isCallExpression, isMemberExpression, type MemberExpression } from '../ast/node-types.js';
+import { expectNodeRange } from '../ast/node-location.js';
+import { expectCallExpression, expectMemberExpression, type MemberExpression } from '../ast/node-types.js';
+import { asRuleNode } from '../ast/rule-node.js';
 
-export function fixExclusiveTest(
+type ExclusiveCallNode = Extract<Rule.Node, { type: 'CallExpression'; }> & {
+    callee: MemberExpression;
+};
+
+function fixExclusiveTest(
     fixer: Rule.RuleFixer,
     sourceCode: Readonly<SourceCode>,
-    node: Readonly<Rule.Node>
+    node: Readonly<ExclusiveCallNode>
 ): Readonly<Rule.Fix | null> {
-    if (!isCallExpression(node) || !isMemberExpression(node.callee)) {
-        return null;
-    }
+    const range = expectNodeRange(node.callee);
 
-    return node.callee.range === undefined
-        ? null
-        : fixer.replaceTextRange(node.callee.range, sourceCode.getText(node.callee.object));
+    return fixer.replaceTextRange(range, sourceCode.getText(node.callee.object));
 }
 
-export function getExclusivePropertyNode(node: Readonly<Rule.Node>): Readonly<MemberExpression['property']> | null {
-    if (!isCallExpression(node) || !isMemberExpression(node.callee)) {
-        return null;
-    }
-
+function getExclusivePropertyNode(
+    node: Readonly<ExclusiveCallNode>
+): Readonly<MemberExpression['property']> {
     return node.callee.property;
 }
 
-export function createExclusiveTestReportDescriptor(
-    node: Readonly<Rule.Node>,
+function createExclusiveTestReportDescriptor(
     exclusivePropertyNode: Readonly<MemberExpression['property']>
 ): Rule.ReportDescriptor & { messageId: 'unexpectedExclusiveTest'; } {
-    return exclusivePropertyNode.loc === null || exclusivePropertyNode.loc === undefined
-        ? { node, messageId: 'unexpectedExclusiveTest' }
-        : { node, loc: exclusivePropertyNode.loc, messageId: 'unexpectedExclusiveTest' };
+    return { node: exclusivePropertyNode, messageId: 'unexpectedExclusiveTest' };
 }
 
 export const noExclusiveTestsRule: Readonly<Rule.RuleModule> = {
@@ -52,19 +49,25 @@ export const noExclusiveTestsRule: Readonly<Rule.RuleModule> = {
         const { sourceCode } = context;
 
         function checkPresenceOfExclusiveModifier(visitorContext: Readonly<VisitorContext>): void {
-            const exclusivePropertyNode = getExclusivePropertyNode(visitorContext.node);
-
-            if (visitorContext.modifier === 'exclusive' && exclusivePropertyNode !== null) {
-                context.report({
-                    ...createExclusiveTestReportDescriptor(visitorContext.node, exclusivePropertyNode),
-                    suggest: [{
-                        messageId: 'removeExclusiveModifier',
-                        fix(fixer) {
-                            return fixExclusiveTest(fixer, sourceCode, visitorContext.node);
-                        }
-                    }]
-                });
+            if (visitorContext.modifier !== 'exclusive') {
+                return;
             }
+
+            const exclusiveCall = expectCallExpression(visitorContext.node);
+            const exclusiveNode: Readonly<ExclusiveCallNode> = {
+                ...exclusiveCall,
+                callee: expectMemberExpression(asRuleNode(exclusiveCall.callee))
+            };
+            const exclusivePropertyNode = getExclusivePropertyNode(exclusiveNode);
+            context.report({
+                ...createExclusiveTestReportDescriptor(exclusivePropertyNode),
+                suggest: [{
+                    messageId: 'removeExclusiveModifier',
+                    fix(fixer) {
+                        return fixExclusiveTest(fixer, sourceCode, exclusiveNode);
+                    }
+                }]
+            });
         }
 
         return createMochaVisitors(context, {

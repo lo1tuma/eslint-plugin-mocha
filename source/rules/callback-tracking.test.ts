@@ -1,10 +1,6 @@
 import { Linter, type Rule } from 'eslint';
 import assert from 'node:assert';
-import { createTrackedCallbackFunction, createTrackedCallbackVisitors } from './callback-tracking.js';
-
-function asNode(node: Record<string, unknown>): Rule.Node {
-    return node as unknown as Rule.Node;
-}
+import { createTrackedCallbackVisitors } from './callback-tracking.js';
 
 function createSourceCode(): Rule.RuleContext['sourceCode'] {
     const linter = new Linter();
@@ -66,19 +62,6 @@ function collectOperationTypes(code: string): readonly string[] {
 }
 
 describe('callback tracking', function () {
-    it('createTrackedCallbackFunction() ignores inherited bindings for non-function nodes', function () {
-        const trackedFunction = createTrackedCallbackFunction({
-            codePath: createCodePath(),
-            includeInheritedCallbackBinding: true,
-            inheritedCallbackBinding: 'done',
-            node: asNode({ type: 'Program' }),
-            sourceCode: createSourceCode(),
-            trackedCallbackNodes: new WeakSet()
-        });
-
-        assert.strictEqual(trackedFunction, undefined);
-    });
-
     it('ignores non-mocha functions without inherited callback bindings', function () {
         const trackedFunctions: unknown[] = [];
         const visitors = createTrackedCallbackVisitors(
@@ -106,6 +89,15 @@ describe('callback tracking', function () {
     it('ignores delete expressions without member access inside tracked callbacks', function () {
         const operationTypes = collectOperationTypes(
             'it("title", function(done) { const callbackAlias = done; delete callbackAlias; });'
+        );
+
+        assert.strictEqual(operationTypes.includes('bindingAssignment'), true);
+        assert.strictEqual(operationTypes.includes('containerPropertyAssignment'), false);
+    });
+
+    it('ignores non-delete unary member access inside tracked callbacks', function () {
+        const operationTypes = collectOperationTypes(
+            'it("title", function(done) { const callbacks = { complete: done }; typeof callbacks.complete; });'
         );
 
         assert.strictEqual(operationTypes.includes('bindingAssignment'), true);
