@@ -18,7 +18,7 @@
     "devDependencies": {
         "@ben_12/eslint-plugin-dprint": "1.19.0",
         "@dprint/json": "0.21.3",
-        "@dprint/markdown": "0.22.0",
+        "@dprint/markdown": "0.22.1",
         "@dprint/typescript": "0.96.0",
         "@enormora/eslint-config-base": "0.0.32",
         "@enormora/eslint-config-mocha": "0.0.27",
