@@ -39,7 +39,7 @@
         "dprint-plugin-yaml": "0.6.0",
         "eslint": "10.4.0",
         "eslint-doc-generator": "2.0.2",
-        "eslint-plugin-eslint-plugin": "6.4.0",
+        "eslint-plugin-eslint-plugin": "6.5.0",
         "jscpd": "4.2.3",
         "knip": "6.14.2",
         "markdownlint-cli": "0.43.0",
