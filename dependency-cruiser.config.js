@@ -1,4 +1,9 @@
-const configFiles = ['^dependency-cruiser\\.config\\.js$', '^eslint\\.config\\.js$', '^packtory\\.config\\.js$'];
+const configFiles = [
+    '^dependency-cruiser\\.config\\.js$',
+    '^eslint\\.config\\.js$',
+    '^packtory\\.config\\.js$',
+    '^stryker\\.config\\.js$'
+];
 const entryPointFiles = ['^source/plugin\\.ts$'];
 const benchmarkFiles = ['^benchmarks/', '\\.bench\\.ts$'];
 const testFiles = ['\\.test\\.ts$'];

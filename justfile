@@ -60,6 +60,12 @@ coveralls:
 changelog:
     pr-log
 
+pack-preview:
+    packtory preview
+
+pack-publish:
+    packtory publish --no-dry-run
+
 update-eslint-docs *options:
     tsc --build source/tsconfig.sources.json
     eslint-doc-generator --ignore-config all --path-rule-doc 'documentation/rules/{name}.md' --url-configs 'https://github.com/lo1tuma/eslint-plugin-mocha#configs' {{options}}
