@@ -9,6 +9,7 @@
     "exports": "./target/build/source/plugin.js",
     "scripts": {},
     "dependencies": {
+        "@eslint/core": "^1.2.0",
         "@eslint-community/eslint-utils": "4.4.1",
         "globals": "15.14.0",
         "json-schema-to-ts": "3.1.1",
