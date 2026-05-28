@@ -1,4 +1,6 @@
 // @ts-check
+/** @typedef {import('@packtory/cli/package.json')} PacktoryCliPackage */
+
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
