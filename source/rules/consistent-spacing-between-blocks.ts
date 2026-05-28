@@ -1,36 +1,29 @@
 import type { AST, Rule } from 'eslint';
 import type { Except } from 'type-fest';
 import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
-import { type AnyFunction, isBlockStatement, isFunction, isProgram, type Program } from '../ast/node-types.js';
+import { expectNodeRange } from '../ast/node-location.js';
+import { type BlockStatement, isBlockStatement, type Program } from '../ast/node-types.js';
 import { getLastOrThrow } from '../list.js';
 import { getTopLevelMochaExpression, isDirectStatementInScope } from './direct-mocha-statement.js';
 
 const minimumAmountOfLinesBetweenNeeded = 2;
 
-export function containsNode(nodeA: Except<Rule.Node, 'parent'>, nodeB: Except<Rule.Node, 'parent'>): boolean {
-    const { range: rangeA } = nodeA;
-    const { range: rangeB } = nodeB;
-    if (rangeA === undefined || rangeB === undefined) {
-        return false;
-    }
+function containsNode(nodeA: Except<Rule.Node, 'parent'>, nodeB: Except<Rule.Node, 'parent'>): boolean {
+    const rangeA = expectNodeRange(nodeA);
+    const rangeB = expectNodeRange(nodeB);
 
     return rangeB[1] <= rangeA[1] && rangeB[0] >= rangeA[0];
 }
 
-export function isFirstStatementInScope(scopeNode: Layer['scopeNode'], node: Rule.Node): boolean {
-    if (isBlockStatement(scopeNode) || isProgram(scopeNode)) {
-        const [firstNode] = scopeNode.body;
-        if (firstNode !== undefined) {
-            return containsNode(firstNode, node);
-        }
-    }
+function isFirstStatementInScope(scopeNode: Layer['scopeNode'], node: Rule.Node): boolean {
+    const [firstNode] = scopeNode.body;
 
-    return containsNode(scopeNode, node);
+    return firstNode === undefined || containsNode(firstNode, node);
 }
 
 type Layer = {
     entities: EntityLocation[];
-    scopeNode: AnyFunction['body'] | Program;
+    scopeNode: BlockStatement | Program;
 };
 
 type EntityLocation = {
@@ -131,14 +124,16 @@ export const consistentSpacingBetweenBlocksRule: Readonly<Rule.RuleModule> = {
 
             suiteCallback(visitorContext) {
                 const { node } = visitorContext;
-                if (isFunction(node)) {
+                if (isBlockStatement(node.body)) {
                     layers.push({ entities: [], scopeNode: node.body });
                 }
             },
 
-            'suiteCallback:exit'() {
-                checkCurrentLayer();
-                layers.pop();
+            'suiteCallback:exit'(visitorContext) {
+                if (isBlockStatement(visitorContext.node.body)) {
+                    checkCurrentLayer();
+                    layers.pop();
+                }
             },
 
             Program(node) {

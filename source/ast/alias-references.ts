@@ -17,6 +17,7 @@ import {
     type VariableDeclarator
 } from './node-types.js';
 import { findParentNodeAndPathForIdentifier, type ResolvedReference } from './resolved-reference.js';
+import { asRuleNode } from './rule-node.js';
 
 function isConstVariableDeclarationParent(
     parent: Rule.Node | null
@@ -62,8 +63,7 @@ function getDeclaredIdentifiers(
     sourceCode: Readonly<SourceCode>,
     node: Readonly<VariableDeclarator>
 ): readonly IdentifierWithAssignmentPaths[] {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- bad typing in eslint core
-    const path = extractMemberExpressionPath(sourceCode, node.init as Rule.Node);
+    const path = extractMemberExpressionPath(sourceCode, asRuleNode(node.init));
 
     if (isIdentifierPattern(node.id)) {
         return [{ identifier: node.id, leftHandSidePath: [], rightHandSidePath: path }];
@@ -83,21 +83,20 @@ function getDeclaredIdentifiers(
     return [];
 }
 
-// eslint-disable-next-line complexity -- no good idea how to refactor
-export function extendPath(
+function extendPath(
     parentReference: Readonly<ResolvedReference>,
     originalPath: DynamicPath,
     identifierPath: DynamicPath
 ): DynamicPath {
     const extendedPath = [...parentReference.resolvedPath, ...originalPath, ...identifierPath.slice(1)];
-    if (
-        isConstantPath(identifierPath) && identifierPath.length === 1 && identifierPath.at(0)?.endsWith('()') === true
-    ) {
-        const lastElement = extendedPath.at(-1);
-        if (lastElement !== undefined) {
-            extendedPath[extendedPath.length - 1] = typeof lastElement === 'string'
-                ? `${lastElement}()`
-                : lastElement;
+    const [callAlias] = identifierPath;
+
+    if (identifierPath.length === 1 && String(callAlias).endsWith('()')) {
+        const lastIndex = extendedPath.length - 1;
+        const lastElement = extendedPath[lastIndex];
+
+        if (typeof lastElement === 'string') {
+            extendedPath[lastIndex] = `${lastElement}()`;
         }
     }
     return extendedPath;
@@ -109,8 +108,7 @@ function aliasReferenceToResolvedReference(
     parentReference: Readonly<ResolvedReference>,
     originalPath: DynamicPath
 ): Readonly<ResolvedReference> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- bad typings in eslint core
-    const { node, path } = findParentNodeAndPathForIdentifier(sourceCode, reference.identifier as Rule.Node);
+    const { node, path } = findParentNodeAndPathForIdentifier(sourceCode, asRuleNode(reference.identifier));
     return { node, path, resolvedPath: extendPath(parentReference, originalPath, path) };
 }
 
@@ -118,10 +116,10 @@ function isNonInitReference(reference: Readonly<Scope.Reference>): boolean {
     return reference.init !== true;
 }
 
-export function getNonInitAliasReferences(
-    variable: Readonly<Scope.Variable> | null
+function getNonInitAliasReferences(
+    variable: Readonly<Scope.Variable>
 ): readonly Scope.Reference[] {
-    return variable?.references.filter(isNonInitReference) ?? [];
+    return variable.references.filter(isNonInitReference);
 }
 
 function resolveAliasReferencesRecursively(
@@ -131,22 +129,32 @@ function resolveAliasReferencesRecursively(
     const { node } = reference;
     const result = [reference];
 
+    function resolveAliasedReferencesForIdentifier(
+        identifierPath: DynamicPath,
+        identifierName: string
+    ): readonly ResolvedReference[] {
+        const aliasedVariable = findVariable(sourceCode.getScope(reference.node), identifierName);
+
+        if (aliasedVariable === null) {
+            return [];
+        }
+
+        const aliasedResolvedReferences = mapWithArgs(
+            getNonInitAliasReferences(aliasedVariable),
+            aliasReferenceToResolvedReference,
+            sourceCode,
+            reference,
+            identifierPath
+        );
+
+        return flatMapWithArgs(aliasedResolvedReferences, resolveAliasReferencesRecursively, sourceCode);
+    }
+
     if (isAliasConstAssignment(node)) {
         const declaratedIdentifiers = getDeclaredIdentifiers(sourceCode, node);
 
         for (const { identifier, leftHandSidePath: identifierPath } of declaratedIdentifiers) {
-            const aliasedVariable = findVariable(sourceCode.getScope(node), identifier.name);
-            const aliasedResolvedReferences = mapWithArgs(
-                getNonInitAliasReferences(aliasedVariable),
-                aliasReferenceToResolvedReference,
-                sourceCode,
-                reference,
-                identifierPath
-            );
-
-            result.push(
-                ...flatMapWithArgs(aliasedResolvedReferences, resolveAliasReferencesRecursively, sourceCode)
-            );
+            result.push(...resolveAliasedReferencesForIdentifier(identifierPath, identifier.name));
         }
     }
 

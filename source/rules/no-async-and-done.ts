@@ -3,7 +3,7 @@ import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { isFunction } from '../ast/node-types.js';
 import { hasCallbackParameter } from '../mocha/callback-parameter.js';
 
-export function checkNodeForAsyncAndDone(context: Readonly<Rule.RuleContext>, node: Readonly<Rule.Node>): void {
+function checkNodeForAsyncAndDone(context: Readonly<Rule.RuleContext>, node: Readonly<Rule.Node>): void {
     if (!isFunction(node) || node.async !== true || !hasCallbackParameter(node)) {
         return;
     }

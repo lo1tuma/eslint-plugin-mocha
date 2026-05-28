@@ -1,6 +1,8 @@
 import type { AST, Rule, Scope, SourceCode } from 'eslint';
 import type * as ESTree from 'estree';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
+import { expectNodeLocation, expectNodeRange } from '../ast/node-location.js';
+import { getLastOrThrow } from '../list.js';
 import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
 import { getInterface } from '../settings.js';
 
@@ -21,6 +23,10 @@ type Option = InferSchemaOption<typeof optionSchema>;
 type ResolvedOption = Option & { interface: InterfaceName; };
 type ImportSpecifierNode = ESTree.ImportSpecifier;
 type ImportDeclarationNode = ESTree.ImportDeclaration;
+type ImportDeclarationSpecifier = ImportDeclarationNode['specifiers'][number];
+type NamedImportDeclarationNode = ImportDeclarationNode & {
+    specifiers: readonly ImportSpecifierNode[];
+};
 type MochaImportBinding = {
     importDeclaration: Readonly<ImportDeclarationNode>;
     specifier: Readonly<ImportSpecifierNode>;
@@ -56,6 +62,12 @@ const interfaceMethodNames = new Set([
     'teardown'
 ]);
 
+function isImportedIdentifier(specifier: Readonly<ImportSpecifierNode>): specifier is Readonly<ImportSpecifierNode> & {
+    imported: ESTree.Identifier;
+} {
+    return specifier.imported.type === 'Identifier';
+}
+
 function reportUnexpectedInterface(
     context: Readonly<Rule.RuleContext>,
     node: Readonly<Rule.Node>,
@@ -72,49 +84,32 @@ function reportUnexpectedInterface(
     });
 }
 
-export function getMochaModuleScope(sourceCode: Readonly<SourceCode>): Readonly<Scope.Scope> | null {
+function getMochaModuleScope(sourceCode: Readonly<SourceCode>): Readonly<Scope.Scope> | null {
     const { globalScope } = sourceCode.scopeManager;
     const maybeModuleScope = globalScope?.childScopes?.[0];
 
     return maybeModuleScope?.type === 'module' ? maybeModuleScope : null;
 }
 
-function isMochaImportDefinition(importDef: Readonly<Scope.Definition>): importDef is Readonly<MochaImportDefinition> {
-    return importDef.type === 'ImportBinding' &&
+function isMochaImportDefinition(
+    importDef: Readonly<Scope.Definition> | undefined
+): importDef is Readonly<MochaImportDefinition> {
+    return importDef?.type === 'ImportBinding' &&
         importDef.parent.source.value === 'mocha' &&
         importDef.node.type === 'ImportSpecifier';
 }
 
-export function getMochaImportBinding(variable: Readonly<Scope.Variable>): Readonly<MochaImportBinding> | null {
+function getMochaImportBinding(variable: Readonly<Scope.Variable>): Readonly<MochaImportBinding> | null {
     const importDef = variable.defs[0];
 
-    if (importDef === undefined || !isMochaImportDefinition(importDef)) {
-        return null;
-    }
-
-    const specifier = importDef.parent.specifiers.find((currentSpecifier): currentSpecifier is ImportSpecifierNode => {
-        return currentSpecifier.type === 'ImportSpecifier' &&
-            currentSpecifier.local.name === variable.name;
-    });
-
-    if (specifier === undefined) {
+    if (!isMochaImportDefinition(importDef)) {
         return null;
     }
 
     return {
         importDeclaration: importDef.parent,
-        specifier
+        specifier: importDef.node
     };
-}
-
-export function getImportedName(specifier: Readonly<ImportSpecifierNode>): string | null {
-    if (specifier.imported.type === 'Identifier') {
-        return specifier.imported.name;
-    }
-
-    return typeof specifier.imported.value === 'string'
-        ? specifier.imported.value
-        : null;
 }
 
 function isInterfaceMethodImport(
@@ -126,128 +121,109 @@ function isInterfaceMethodImport(
 }
 
 function isCanonicalNamedImportSpecifier(specifier: Readonly<ImportSpecifierNode>): boolean {
-    if (specifier.imported.type !== 'Identifier') {
-        return false;
-    }
+    return isImportedIdentifier(specifier) && specifier.local.name === specifier.imported.name;
+}
 
-    return specifier.local.name === specifier.imported.name;
+function isImportSpecifier(
+    specifier: Readonly<ImportDeclarationSpecifier>
+): specifier is Readonly<ImportSpecifierNode> {
+    return specifier.type === 'ImportSpecifier';
 }
 
 function isFixableImportSpecifier(specifier: Readonly<ImportSpecifierNode>): boolean {
     return isCanonicalNamedImportSpecifier(specifier) && isInterfaceMethodImport(specifier);
 }
 
-function isAutoFixableImportSpecifier(
-    specifier: Readonly<ImportSpecifierNode>,
+function hasOnlyNamedImportSpecifiers(
     importDeclaration: Readonly<ImportDeclarationNode>
-): boolean {
-    return isCanonicalNamedImportSpecifier(specifier) &&
-        importDeclaration.specifiers.every((currentSpecifier) => {
-            return currentSpecifier.type === 'ImportSpecifier';
-        });
+): importDeclaration is Readonly<NamedImportDeclarationNode> {
+    return importDeclaration.specifiers.every(isImportSpecifier);
 }
 
-function getNamedImportSpecifiers(
-    importDeclaration: Readonly<ImportDeclarationNode>
-): readonly ImportSpecifierNode[] {
-    return importDeclaration.specifiers.filter((currentSpecifier): currentSpecifier is ImportSpecifierNode => {
-        return currentSpecifier.type === 'ImportSpecifier';
-    });
-}
-
-export function removeFullImportDeclaration(
+function removeFullImportDeclaration(
     fixer: Rule.RuleFixer,
     sourceCode: Readonly<SourceCode>,
     importDeclaration: Readonly<ImportDeclarationNode>
 ): Readonly<Rule.Fix | null> {
-    if (importDeclaration.range === undefined) {
-        return null;
-    }
+    const range = expectNodeRange(importDeclaration);
+    const trailingSource = sourceCode.text.slice(range[1]);
+    const nextTokenOffset = trailingSource.search(/\S/u);
+    const nextRangeStart = range[1] + Math.max(nextTokenOffset, 0);
 
-    const nextToken = sourceCode.getTokenAfter(importDeclaration);
-
-    return nextToken === null
-        ? fixer.removeRange(importDeclaration.range)
-        : fixer.removeRange([importDeclaration.range[0], nextToken.range[0]]);
+    return fixer.removeRange([range[0], nextRangeStart]);
 }
 
 function shouldRemoveFullImportDeclaration(importDeclaration: Readonly<ImportDeclarationNode>): boolean {
     return importDeclaration.specifiers.length > 0 &&
-        importDeclaration.specifiers.every((currentSpecifier): currentSpecifier is ImportSpecifierNode => {
-            return currentSpecifier.type === 'ImportSpecifier' && isFixableImportSpecifier(currentSpecifier);
+        importDeclaration.specifiers.every((currentSpecifier): currentSpecifier is Readonly<ImportSpecifierNode> => {
+            return isImportSpecifier(currentSpecifier) && isFixableImportSpecifier(currentSpecifier);
         });
 }
 
 function getRangeBeforeNextSpecifier(
     specifier: Readonly<ImportSpecifierNode>,
-    nextSpecifier: Readonly<ImportSpecifierNode | undefined>
-): AST.Range | null {
-    return nextSpecifier?.range === undefined || specifier.range === undefined
-        ? null
-        : [specifier.range[0], nextSpecifier.range[0]];
+    nextSpecifier: Readonly<ImportSpecifierNode>
+): AST.Range {
+    const specifierRange = expectNodeRange(specifier);
+    const nextSpecifierRange = expectNodeRange(nextSpecifier);
+
+    return [specifierRange[0], nextSpecifierRange[0]];
 }
 
 function getRangeAfterPreviousSpecifier(
-    previousSpecifier: Readonly<ImportSpecifierNode | undefined>,
+    previousSpecifier: Readonly<ImportSpecifierNode>,
     specifier: Readonly<ImportSpecifierNode>
-): AST.Range | null {
-    return previousSpecifier?.range === undefined || specifier.range === undefined
-        ? null
-        : [previousSpecifier.range[1], specifier.range[1]];
+): AST.Range {
+    const previousSpecifierRange = expectNodeRange(previousSpecifier);
+    const specifierRange = expectNodeRange(specifier);
+
+    return [previousSpecifierRange[1], specifierRange[1]];
 }
 
-export function getImportSpecifierRemovalRange(
+function getImportSpecifierRemovalRange(
     specifier: Readonly<ImportSpecifierNode>,
     specifiers: readonly ImportSpecifierNode[]
-): AST.Range | null {
+): AST.Range {
     const index = specifiers.indexOf(specifier);
-    if (index === -1) {
-        return null;
-    }
 
     if (index === 0) {
-        return getRangeBeforeNextSpecifier(specifier, specifiers[1]);
+        return getRangeBeforeNextSpecifier(specifier, getLastOrThrow(specifiers.slice(1)));
     }
 
-    return getRangeAfterPreviousSpecifier(specifiers[index - 1], specifier);
+    return getRangeAfterPreviousSpecifier(getLastOrThrow(specifiers.slice(index - 1, index)), specifier);
 }
 
-export function fixImportSpecifier(
+function fixImportSpecifier(
     fixer: Rule.RuleFixer,
     sourceCode: Readonly<SourceCode>,
     specifier: Readonly<ImportSpecifierNode>,
-    importDeclaration: Readonly<ImportDeclarationNode>
+    importDeclaration: Readonly<NamedImportDeclarationNode>
 ): Readonly<Rule.Fix | null> {
     if (shouldRemoveFullImportDeclaration(importDeclaration)) {
         return removeFullImportDeclaration(fixer, sourceCode, importDeclaration);
     }
 
-    const specifiers = getNamedImportSpecifiers(importDeclaration);
-    const removalRange = getImportSpecifierRemovalRange(specifier, specifiers);
-
-    return removalRange === null ? null : fixer.removeRange(removalRange);
+    return fixer.removeRange(getImportSpecifierRemovalRange(specifier, importDeclaration.specifiers));
 }
 
-export function createUnexpectedImportDescriptor(
+function createUnexpectedImportDescriptor(
     binding: Readonly<MochaImportBinding>,
     configuredMochaInterface: InterfaceName
-): UnexpectedImportDescriptor | null {
-    const { importDeclaration, specifier } = binding;
-    const loc = specifier.local.loc ?? specifier.loc ?? importDeclaration.loc;
+): UnexpectedImportDescriptor {
+    const { specifier } = binding;
+    const loc = expectNodeLocation(specifier.local);
 
-    return loc === null || loc === undefined
-        ? null
-        : {
-            loc,
-            messageId: 'unexpectedInterface',
-            data: {
-                actualInterface: 'require',
-                expectedInterface: `global ${configuredMochaInterface}`
-            }
-        };
+    return {
+        loc,
+        messageId: 'unexpectedInterface',
+        data: {
+            actualInterface: 'require',
+            expectedInterface: `global ${configuredMochaInterface}`
+        }
+    };
 }
 
-export function reportUnexpectedImportBinding(
+function reportUnexpectedImportBinding(
     context: Readonly<Rule.RuleContext>,
     binding: Readonly<MochaImportBinding>,
     configuredMochaInterface: InterfaceName
@@ -257,13 +233,9 @@ export function reportUnexpectedImportBinding(
     }
 
     const descriptor = createUnexpectedImportDescriptor(binding, configuredMochaInterface);
-    if (descriptor === null) {
-        return;
-    }
-
     const { importDeclaration, specifier } = binding;
 
-    if (isAutoFixableImportSpecifier(specifier, importDeclaration)) {
+    if (hasOnlyNamedImportSpecifiers(importDeclaration) && isCanonicalNamedImportSpecifier(specifier)) {
         context.report({
             ...descriptor,
             fix(fixer) {
@@ -276,7 +248,7 @@ export function reportUnexpectedImportBinding(
     context.report(descriptor);
 }
 
-export function reportUnexpectedImportBindingsInModule(
+function reportUnexpectedImportBindingsInModule(
     context: Readonly<Rule.RuleContext>,
     configuredMochaInterface: InterfaceName
 ): void {

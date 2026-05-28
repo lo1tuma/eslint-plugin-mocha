@@ -1,12 +1,7 @@
-import { Linter, type Rule } from 'eslint';
+import { Linter, type Rule, type Scope, type SourceCode } from 'eslint';
 import assert from 'node:assert';
-import { extendPath, getNonInitAliasReferences, resolveAliasedReferences } from './alias-references.js';
-import type { CallExpression } from './node-types.js';
+import { resolveAliasedReferences } from './alias-references.js';
 import { initialReferenceToResolvedReference, type ResolvedReference } from './resolved-reference.js';
-
-function asCallExpression(node: Record<string, unknown>): CallExpression {
-    return node as unknown as CallExpression;
-}
 
 function findResolvedAliasesOfGlobalVariables(code: string): readonly ResolvedReference[] {
     const linter = new Linter();
@@ -39,76 +34,54 @@ function findResolvedAliasesOfGlobalVariables(code: string): readonly ResolvedRe
     return resolvedAliases;
 }
 
+function createEmptyScope(): Scope.Scope {
+    return {
+        set: new Map(),
+        childScopes: [],
+        upper: null
+    } as unknown as Scope.Scope;
+}
+
+function createSourceCodeWithScope(scope: Readonly<Scope.Scope>): SourceCode {
+    return {
+        getScope() {
+            return scope;
+        }
+    } as unknown as SourceCode;
+}
+
+function asNode(node: Record<string, unknown>): Rule.Node {
+    return node as unknown as Rule.Node;
+}
+
+function createConstAliasReference(aliasName: string, originalName: string): ResolvedReference {
+    const variableDeclaration = asNode({ type: 'VariableDeclaration', kind: 'const' });
+    const identifier = asNode({
+        type: 'Identifier',
+        name: originalName
+    });
+    const aliasIdentifier = asNode({
+        type: 'Identifier',
+        name: aliasName
+    });
+    const variableDeclarator = asNode({
+        type: 'VariableDeclarator',
+        id: aliasIdentifier,
+        init: identifier,
+        parent: variableDeclaration
+    });
+
+    identifier.parent = variableDeclarator;
+    aliasIdentifier.parent = variableDeclarator;
+
+    return {
+        node: variableDeclarator as unknown as ResolvedReference['node'],
+        path: [originalName],
+        resolvedPath: [originalName]
+    };
+}
+
 describe('resolveAliasedReferences()', function () {
-    it('preserves symbol path segments when extending function-call aliases', function () {
-        const dynamicSegment = Symbol('dynamic');
-        const parentReference: ResolvedReference = {
-            node: asCallExpression({ type: 'CallExpression' }),
-            path: [],
-            resolvedPath: ['foo']
-        };
-        const result = extendPath(
-            parentReference,
-            [dynamicSegment],
-            ['bar()']
-        );
-
-        assert.strictEqual(result[0], 'foo');
-        assert.strictEqual(result[1], dynamicSegment);
-    });
-
-    it('appends call markers only for single constant call paths', function () {
-        const parentReference: ResolvedReference = {
-            node: asCallExpression({ type: 'CallExpression' }),
-            path: [],
-            resolvedPath: ['foo']
-        };
-
-        assert.deepStrictEqual(extendPath(parentReference, [], ['bar()']), ['foo()']);
-        assert.deepStrictEqual(extendPath(parentReference, [], ['bar', 'baz()']), ['foo', 'baz()']);
-        assert.deepStrictEqual(extendPath(parentReference, [], ['bar()', 'baz']), ['foo', 'baz']);
-    });
-
-    it('returns the existing path unchanged for empty identifier paths', function () {
-        const parentReference: ResolvedReference = {
-            node: asCallExpression({ type: 'CallExpression' }),
-            path: [],
-            resolvedPath: ['foo']
-        };
-
-        assert.deepStrictEqual(extendPath(parentReference, [], []), ['foo']);
-    });
-
-    it('ignores sparse single-segment call paths', function () {
-        const parentReference: ResolvedReference = {
-            node: asCallExpression({ type: 'CallExpression' }),
-            path: [],
-            resolvedPath: ['foo']
-        };
-        const sparsePath: string[] = [];
-        sparsePath.length = 1;
-
-        assert.deepStrictEqual(extendPath(parentReference, [], sparsePath), ['foo']);
-    });
-
-    it('does not create sparse indexes when no path element exists to rewrite', function () {
-        const result = extendPath(
-            {
-                node: asCallExpression({ type: 'CallExpression' }),
-                path: [],
-                resolvedPath: []
-            },
-            [],
-            ['bar()']
-        );
-
-        assert.strictEqual(Reflect.has(result, '-1'), false);
-    });
-
-    it('getNonInitAliasReferences() returns an empty list for missing variables', function () {
-        assert.deepStrictEqual(getNonInitAliasReferences(null), []);
-    });
-
     it('returns an empty array if no initial references exist', function () {
         const aliases = findResolvedAliasesOfGlobalVariables('');
 
@@ -252,6 +225,42 @@ describe('resolveAliasedReferences()', function () {
         assert.deepStrictEqual(aliases[1]?.resolvedPath, ['foo', 'bar']);
     });
 
+    it('traces call aliases of renames const declaration const x = foo; x()', function () {
+        const aliases = findResolvedAliasesOfGlobalVariables('const x = foo; x();');
+
+        assert.strictEqual(aliases.length, 2);
+        assert.deepStrictEqual(aliases[0]?.path, ['foo']);
+        assert.deepStrictEqual(aliases[0]?.resolvedPath, ['foo']);
+        assert.deepStrictEqual(aliases[1]?.path, ['x()']);
+        assert.deepStrictEqual(aliases[1]?.resolvedPath, ['foo()']);
+    });
+
+    it('traces member call aliases of renames const declaration const x = foo; x.bar()', function () {
+        const aliases = findResolvedAliasesOfGlobalVariables('const x = foo; x.bar();');
+
+        assert.strictEqual(aliases.length, 2);
+        assert.deepStrictEqual(aliases[0]?.path, ['foo']);
+        assert.deepStrictEqual(aliases[0]?.resolvedPath, ['foo']);
+        assert.deepStrictEqual(aliases[1]?.path, ['x', 'bar()']);
+        assert.deepStrictEqual(aliases[1]?.resolvedPath, ['foo', 'bar()']);
+    });
+
+    it('does not treat member access after aliased calls as direct call aliases', function () {
+        const aliases = findResolvedAliasesOfGlobalVariables('const x = foo; x().bar;');
+
+        assert.strictEqual(aliases.length, 2);
+        assert.deepStrictEqual(aliases[0]?.path, ['foo']);
+        assert.deepStrictEqual(aliases[0]?.resolvedPath, ['foo']);
+        assert.deepStrictEqual(aliases[1]?.path, ['x()', 'bar']);
+        assert.deepStrictEqual(aliases[1]?.resolvedPath, ['foo', 'bar']);
+    });
+
+    it('ignores aliased calls backed by dynamic member access', function () {
+        const aliases = findResolvedAliasesOfGlobalVariables('const x = foo[bar]; x();');
+
+        assert.deepStrictEqual(aliases, []);
+    });
+
     it('traces renames via const destructuring const { bar } = foo; bar', function () {
         const aliases = findResolvedAliasesOfGlobalVariables('const { bar } = foo; bar;');
 
@@ -294,6 +303,16 @@ describe('resolveAliasedReferences()', function () {
             }),
             [['x'], ['x', 'foo', 'bar'], ['x', 'foo', 'baz']]
         );
+    });
+
+    it('keeps the original reference when alias scope lookup cannot resolve the declared binding', function () {
+        const originalReference = createConstAliasReference('alias', 'foo');
+        const aliases = resolveAliasedReferences(
+            createSourceCodeWithScope(createEmptyScope()),
+            [originalReference]
+        );
+
+        assert.deepStrictEqual(aliases, [originalReference]);
     });
 
     it('traces renames via nested const destructuring const { foo: { bar: baz} } = x; baz', function () {

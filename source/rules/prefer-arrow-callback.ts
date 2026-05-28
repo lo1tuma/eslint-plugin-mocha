@@ -20,13 +20,11 @@ function hasReportNode(
     return 'node' in descriptor;
 }
 
-export function shouldSkipReport(
+function shouldSkipReport(
     mochaCallbacks: WeakSet<Rule.Node>,
     descriptor: Rule.ReportDescriptor
 ): boolean {
-    return hasReportNode(descriptor) &&
-        descriptor.node.type === 'FunctionExpression' &&
-        mochaCallbacks.has(descriptor.node);
+    return hasReportNode(descriptor) ? mochaCallbacks.has(descriptor.node) : false;
 }
 
 function createCoreContext(

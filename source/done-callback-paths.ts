@@ -1,20 +1,22 @@
-import { findVariable, getStringIfConstant } from '@eslint-community/eslint-utils';
-import type { Rule, Scope, SourceCode } from 'eslint';
+import type { Rule, SourceCode } from 'eslint';
+import { asRuleNode } from './ast/rule-node.js';
+import {
+    applyBindingSourceValue,
+    applyContainerPropertyAssignment as applyTrackedContainerPropertyAssignment,
+    clonePendingPathState,
+    createHandledPendingPathState,
+    createInitialPendingPathState,
+    getTrackedContainerPropertiesFromExpression,
+    haveSamePendingPathStates,
+    isTrackedCallbackExpression,
+    mergeIncomingPendingPathStates,
+    type PendingPathState,
+    type TrackedBinding
+} from './tracked-callback-reference-state.js';
 
 type CallExpressionNode = Parameters<Exclude<Rule.RuleListener['CallExpression'], undefined>>[0];
-type MemberExpressionNode = Parameters<Exclude<Rule.RuleListener['MemberExpression'], undefined>>[0];
-type PropertyNode = Parameters<Exclude<Rule.RuleListener['Property'], undefined>>[0];
-type IdentifierNode = Parameters<Exclude<Rule.RuleListener['Identifier'], undefined>>[0];
-type ObjectExpressionNode = Parameters<Exclude<Rule.RuleListener['ObjectExpression'], undefined>>[0];
-type IdentifierLike = Readonly<Pick<IdentifierNode, 'name' | 'type'>>;
-type MemberExpressionLike = Readonly<Pick<MemberExpressionNode, 'computed' | 'object' | 'property' | 'type'>>;
-type PropertyLike = Readonly<Pick<PropertyNode, 'computed' | 'key' | 'type'>>;
 
-const dynamicPropertyName = '<dynamic>';
-
-export type TrackedBinding = Scope.Variable | string;
-
-export type Operation =
+type Operation =
     | {
         node: Readonly<CallExpressionNode>;
         type: 'call';
@@ -30,16 +32,6 @@ export type Operation =
         target: TrackedBinding;
         type: 'bindingAssignment';
     };
-export type TrackedReferenceState = {
-    aliasBindings: ReadonlySet<TrackedBinding>;
-    containerPropertiesByBinding: ReadonlyMap<TrackedBinding, ReadonlySet<string>>;
-};
-
-type PendingPathState = {
-    aliasBindings: Set<TrackedBinding>;
-    containerPropertiesByBinding: Map<TrackedBinding, Set<string>>;
-    hasUnhandledPath: boolean;
-};
 
 type AnalysisContext = {
     callbackBinding: TrackedBinding;
@@ -47,307 +39,6 @@ type AnalysisContext = {
     operationsBySegmentId: ReadonlyMap<string, readonly Operation[]>;
     sourceCode: Readonly<SourceCode>;
 };
-
-export function asRuleNode(node: unknown): Rule.Node {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- eslint core nodes have parent at runtime
-    return node as Rule.Node;
-}
-
-export function getTrackedBinding(sourceCode: Readonly<SourceCode>, node: IdentifierLike): TrackedBinding {
-    return findVariable(sourceCode.getScope(asRuleNode(node)), node.name) ?? node.name;
-}
-
-type BindingAndProperty = {
-    binding: TrackedBinding;
-    propertyName: string | undefined;
-};
-type NonEmptyPendingPathStates = readonly [Readonly<PendingPathState>, ...Readonly<PendingPathState>[]];
-
-function hasPendingPathStates(
-    states: readonly Readonly<PendingPathState>[]
-): states is NonEmptyPendingPathStates {
-    return states.length > 0;
-}
-
-function getComputedPropertyName(
-    sourceCode: Readonly<SourceCode>,
-    node: MemberExpressionLike | PropertyLike
-): string | undefined {
-    const keyNode = node.type === 'MemberExpression' ? node.property : node.key;
-
-    return getStringIfConstant(keyNode, sourceCode.getScope(asRuleNode(node))) ?? undefined;
-}
-
-function getNamedPropertyName(node: MemberExpressionLike | PropertyLike): string | undefined {
-    const keyNode = node.type === 'MemberExpression' ? node.property : node.key;
-
-    if (keyNode.type === 'Identifier') {
-        return keyNode.name;
-    }
-    if (keyNode.type === 'Literal' && keyNode.value !== null) {
-        return String(keyNode.value);
-    }
-
-    return undefined;
-}
-
-function getStaticPropertyName(
-    sourceCode: Readonly<SourceCode>,
-    node: MemberExpressionLike | PropertyLike
-): string | undefined {
-    return node.computed
-        ? getComputedPropertyName(sourceCode, node)
-        : getNamedPropertyName(node);
-}
-
-export function getMemberExpressionBindingAndProperty(
-    sourceCode: Readonly<SourceCode>,
-    node: MemberExpressionLike
-): Readonly<BindingAndProperty> | undefined {
-    if (node.object.type !== 'Identifier') {
-        return undefined;
-    }
-
-    return {
-        binding: getTrackedBinding(sourceCode, node.object),
-        propertyName: getStaticPropertyName(sourceCode, node)
-    };
-}
-
-function createHandledState(): PendingPathState {
-    return {
-        aliasBindings: new Set(),
-        containerPropertiesByBinding: new Map(),
-        hasUnhandledPath: false
-    };
-}
-
-function createInitialState(callbackBinding: TrackedBinding): PendingPathState {
-    return {
-        aliasBindings: new Set([callbackBinding]),
-        containerPropertiesByBinding: new Map(),
-        hasUnhandledPath: true
-    };
-}
-
-export function cloneTrackedContainerProperties(
-    containerPropertiesByBinding: TrackedReferenceState['containerPropertiesByBinding']
-): Map<TrackedBinding, Set<string>> {
-    return new Map(
-        Array.from(containerPropertiesByBinding, ([binding, properties]) => {
-            return [binding, new Set(properties)] as const;
-        })
-    );
-}
-
-function copyState(state: Readonly<PendingPathState>): PendingPathState {
-    return {
-        aliasBindings: new Set(state.aliasBindings),
-        containerPropertiesByBinding: cloneTrackedContainerProperties(state.containerPropertiesByBinding),
-        hasUnhandledPath: state.hasUnhandledPath
-    };
-}
-
-export function haveSameTrackedBindings(
-    left: ReadonlySet<TrackedBinding>,
-    right: ReadonlySet<TrackedBinding>
-): boolean {
-    if (left.size !== right.size) {
-        return false;
-    }
-
-    return Array.from(left).every((binding) => {
-        return right.has(binding);
-    });
-}
-
-export function haveSameTrackedContainerProperties(
-    left: ReadonlyMap<TrackedBinding, ReadonlySet<string>>,
-    right: ReadonlyMap<TrackedBinding, ReadonlySet<string>>
-): boolean {
-    if (left.size !== right.size) {
-        return false;
-    }
-
-    return Array.from(left).every(([binding, properties]) => {
-        const otherProperties = right.get(binding);
-
-        if (otherProperties === undefined || properties.size !== otherProperties.size) {
-            return false;
-        }
-
-        return Array.from(properties).every((property) => {
-            return otherProperties.has(property);
-        });
-    });
-}
-
-export function arePendingPathStatesSame(
-    left: Readonly<PendingPathState>,
-    right: Readonly<PendingPathState>
-): boolean {
-    return left.hasUnhandledPath === right.hasUnhandledPath &&
-        haveSameTrackedBindings(left.aliasBindings, right.aliasBindings) &&
-        haveSameTrackedContainerProperties(
-            left.containerPropertiesByBinding,
-            right.containerPropertiesByBinding
-        );
-}
-
-function intersectBindingSets(states: NonEmptyPendingPathStates): Set<TrackedBinding> {
-    const [firstState, ...otherStates] = states;
-    const bindings = new Set(firstState.aliasBindings);
-
-    for (const binding of Array.from(bindings)) {
-        const isSharedBinding = otherStates.every((state) => {
-            return state.aliasBindings.has(binding);
-        });
-
-        if (!isSharedBinding) {
-            bindings.delete(binding);
-        }
-    }
-
-    return bindings;
-}
-
-function sharedPropertiesForBinding(
-    binding: TrackedBinding,
-    firstProperties: ReadonlySet<string>,
-    otherStates: readonly Readonly<PendingPathState>[]
-): Set<string> {
-    const sharedProperties = new Set(firstProperties);
-
-    for (const property of Array.from(sharedProperties)) {
-        const isSharedProperty = otherStates.every((state) => {
-            return state.containerPropertiesByBinding.get(binding)?.has(property) === true;
-        });
-
-        if (!isSharedProperty) {
-            sharedProperties.delete(property);
-        }
-    }
-
-    return sharedProperties;
-}
-
-export function intersectTrackedContainerPropertiesByBinding(
-    states: NonEmptyPendingPathStates
-): Map<TrackedBinding, Set<string>> {
-    const [firstState, ...otherStates] = states;
-    const sharedPropertiesByBinding = new Map<TrackedBinding, Set<string>>();
-
-    for (const [binding, properties] of firstState.containerPropertiesByBinding) {
-        const sharedProperties = sharedPropertiesForBinding(binding, properties, otherStates);
-
-        if (sharedProperties.size > 0) {
-            sharedPropertiesByBinding.set(binding, sharedProperties);
-        }
-    }
-
-    return sharedPropertiesByBinding;
-}
-
-function mergeIncomingStates(previousStates: readonly Readonly<PendingPathState>[]): PendingPathState {
-    const unhandledStates = previousStates.filter((state) => {
-        return state.hasUnhandledPath;
-    });
-
-    if (!hasPendingPathStates(unhandledStates)) {
-        return createHandledState();
-    }
-
-    return {
-        aliasBindings: intersectBindingSets(unhandledStates),
-        containerPropertiesByBinding: intersectTrackedContainerPropertiesByBinding(unhandledStates),
-        hasUnhandledPath: true
-    };
-}
-
-function getContainerProperties(
-    state: Readonly<TrackedReferenceState>,
-    binding: TrackedBinding
-): ReadonlySet<string> | undefined {
-    return state.containerPropertiesByBinding.get(binding);
-}
-
-function isTrackedPropertyAccess(
-    sourceCode: Readonly<SourceCode>,
-    node: MemberExpressionLike,
-    state: Readonly<TrackedReferenceState>
-): boolean {
-    const bindingAndProperty = getMemberExpressionBindingAndProperty(sourceCode, node);
-
-    if (bindingAndProperty === undefined) {
-        return false;
-    }
-
-    const properties = getContainerProperties(state, bindingAndProperty.binding);
-
-    if (properties === undefined) {
-        return false;
-    }
-
-    if (bindingAndProperty.propertyName === undefined) {
-        return properties.has(dynamicPropertyName);
-    }
-
-    return properties.has(bindingAndProperty.propertyName);
-}
-
-export function isTrackedCallbackExpression(
-    sourceCode: Readonly<SourceCode>,
-    node: Readonly<Rule.Node>,
-    state: Readonly<TrackedReferenceState>
-): boolean {
-    if (node.type === 'Identifier') {
-        return state.aliasBindings.has(getTrackedBinding(sourceCode, node));
-    }
-
-    return node.type === 'MemberExpression' && isTrackedPropertyAccess(sourceCode, node, state);
-}
-
-export function collectTrackedCallbackObjectProperties(
-    sourceCode: Readonly<SourceCode>,
-    node: Readonly<ObjectExpressionNode>,
-    state: Readonly<TrackedReferenceState>
-): Set<string> {
-    const trackedProperties = new Set<string>();
-
-    for (const property of node.properties) {
-        if (property.type === 'Property' && property.kind === 'init') {
-            const propertyName = getStaticPropertyName(sourceCode, property);
-            const isTrackedCallback = propertyName !== undefined &&
-                isTrackedCallbackExpression(sourceCode, asRuleNode(property.value), state);
-
-            if (isTrackedCallback) {
-                trackedProperties.add(propertyName);
-            }
-        }
-    }
-
-    return trackedProperties;
-}
-
-export function getTrackedContainerPropertiesFromExpression(
-    sourceCode: Readonly<SourceCode>,
-    node: Readonly<Rule.Node>,
-    state: Readonly<PendingPathState>
-): Set<string> | undefined {
-    if (node.type === 'Identifier') {
-        const properties = getContainerProperties(state, getTrackedBinding(sourceCode, node));
-
-        return properties === undefined ? undefined : new Set(properties);
-    }
-
-    if (node.type === 'ObjectExpression') {
-        const trackedProperties = collectTrackedCallbackObjectProperties(sourceCode, node, state);
-
-        return trackedProperties.size > 0 ? trackedProperties : undefined;
-    }
-
-    return undefined;
-}
 
 function isHandledHandoffExpression(
     sourceCode: Readonly<SourceCode>,
@@ -376,81 +67,17 @@ function callFinishesPendingPaths(
     });
 }
 
-function applyBindingSourceValue(
-    sourceCode: Readonly<SourceCode>,
-    state: PendingPathState,
-    operation: Extract<Operation, { type: 'bindingAssignment'; }>
-): PendingPathState {
-    if (operation.source === null) {
-        return state;
-    }
-
-    if (isTrackedCallbackExpression(sourceCode, operation.source, state)) {
-        state.aliasBindings.add(operation.target);
-        return state;
-    }
-
-    const containerProperties = getTrackedContainerPropertiesFromExpression(sourceCode, operation.source, state);
-
-    if (containerProperties !== undefined) {
-        state.containerPropertiesByBinding.set(operation.target, containerProperties);
-    }
-
-    return state;
-}
-
-export function applyBindingAssignment(
+function applyBindingAssignment(
     sourceCode: Readonly<SourceCode>,
     state: Readonly<PendingPathState>,
     operation: Extract<Operation, { type: 'bindingAssignment'; }>
 ): PendingPathState {
-    const nextState = copyState(state);
+    const nextState = clonePendingPathState(state);
 
     nextState.aliasBindings.delete(operation.target);
     nextState.containerPropertiesByBinding.delete(operation.target);
 
-    return applyBindingSourceValue(sourceCode, nextState, operation);
-}
-
-function nextPropertiesForAssignment(
-    currentProperties: ReadonlySet<string> | undefined,
-    propertyName: string | undefined
-): Set<string> {
-    const nextProperties = new Set(currentProperties);
-
-    if (propertyName === undefined) {
-        nextProperties.clear();
-    } else {
-        nextProperties.delete(propertyName);
-    }
-
-    return nextProperties;
-}
-
-export function applyContainerPropertyAssignment(
-    sourceCode: Readonly<SourceCode>,
-    state: Readonly<PendingPathState>,
-    operation: Extract<Operation, { type: 'containerPropertyAssignment'; }>
-): PendingPathState {
-    const nextState = copyState(state);
-    const nextProperties = nextPropertiesForAssignment(
-        nextState.containerPropertiesByBinding.get(operation.target),
-        operation.propertyName
-    );
-    const shouldTrackProperty = operation.source !== null &&
-        isTrackedCallbackExpression(sourceCode, operation.source, nextState);
-
-    if (shouldTrackProperty) {
-        nextProperties.add(operation.propertyName ?? dynamicPropertyName);
-    }
-
-    nextState.containerPropertiesByBinding.delete(operation.target);
-
-    if (nextProperties.size > 0) {
-        nextState.containerPropertiesByBinding.set(operation.target, nextProperties);
-    }
-
-    return nextState;
+    return applyBindingSourceValue(sourceCode, nextState, operation.source, operation.target);
 }
 
 function applyOperation(
@@ -463,10 +90,12 @@ function applyOperation(
     }
 
     if (operation.type === 'call') {
-        return callFinishesPendingPaths(sourceCode, operation.node, state) ? createHandledState() : copyState(state);
+        return callFinishesPendingPaths(sourceCode, operation.node, state)
+            ? createHandledPendingPathState()
+            : clonePendingPathState(state);
     }
 
-    return applyContainerPropertyAssignment(sourceCode, state, operation);
+    return applyTrackedContainerPropertyAssignment(sourceCode, state, operation);
 }
 
 function runOperations(
@@ -474,12 +103,10 @@ function runOperations(
     entryState: Readonly<PendingPathState>,
     operations: readonly Operation[]
 ): PendingPathState {
-    let nextState = copyState(entryState);
+    let nextState = clonePendingPathState(entryState);
 
     for (const operation of operations) {
-        if (nextState.hasUnhandledPath) {
-            nextState = applyOperation(sourceCode, nextState, operation);
-        }
+        nextState = applyOperation(sourceCode, nextState, operation);
     }
 
     return nextState;
@@ -492,11 +119,11 @@ function computeEntryState(
     exitStatesBySegmentId: ReadonlyMap<string, Readonly<PendingPathState>>
 ): PendingPathState {
     if (segment.id === initialSegmentId) {
-        return createInitialState(callbackBinding);
+        return createInitialPendingPathState(callbackBinding);
     }
 
-    return mergeIncomingStates(segment.prevSegments.map((previousSegment) => {
-        return exitStatesBySegmentId.get(previousSegment.id) ?? createHandledState();
+    return mergeIncomingPendingPathStates(segment.prevSegments.map((previousSegment) => {
+        return exitStatesBySegmentId.get(previousSegment.id) ?? createHandledPendingPathState();
     }));
 }
 
@@ -517,7 +144,7 @@ function segmentHasUnhandledReturnPath(
     exitStatesBySegmentId: ReadonlyMap<string, Readonly<PendingPathState>>,
     segment: Readonly<Rule.CodePathSegment>
 ): boolean {
-    return (exitStatesBySegmentId.get(segment.id) ?? createHandledState()).hasUnhandledPath;
+    return (exitStatesBySegmentId.get(segment.id) ?? createHandledPendingPathState()).hasUnhandledPath;
 }
 
 type PendingSegmentQueue = {
@@ -570,7 +197,7 @@ function processAllPendingSegments(
             const nextState = processPendingSegment(context, segment, queue.exitStatesBySegmentId);
             const previousState = queue.exitStatesBySegmentId.get(segment.id);
 
-            if (previousState === undefined || !arePendingPathStatesSame(previousState, nextState)) {
+            if (previousState === undefined || !haveSamePendingPathStates(previousState, nextState)) {
                 queue.exitStatesBySegmentId.set(segment.id, nextState);
                 enqueueNextSegments(segment.nextSegments, queue.pendingSegments, queue.queuedSegmentIds);
             }

@@ -2,8 +2,8 @@ import type { Rule, SourceCode } from 'eslint';
 import { extractMemberExpressionPath, isConstantPath } from '../ast/member-expression.js';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { type AnyFunction, isFunction } from '../ast/node-types.js';
+import { asRuleNode } from '../ast/rule-node.js';
 import { type TraversableNode, visitWithoutNestedFunctions } from '../ast/visit-child-nodes.js';
-import { asRuleNode } from '../done-callback-paths.js';
 import { getFirstMeaningfulParameter, hasCallbackParameter } from '../mocha/callback-parameter.js';
 import { stripCallExpressions } from '../mocha/name-details.js';
 import { isRecord } from '../record.js';
@@ -22,13 +22,9 @@ type TypeCheckerLike = {
     getPromisedTypeOfPromise: (type: unknown) => unknown;
 };
 
-type ProgramLike = {
-    getTypeChecker: () => Readonly<TypeCheckerLike>;
-};
-
 type ParserServicesWithTypeInformation = {
-    program: Readonly<ProgramLike>;
     getTypeAtLocation: (node: Readonly<Rule.Node>) => unknown;
+    getPromisedTypeOfPromise: TypeCheckerLike['getPromisedTypeOfPromise'];
 };
 
 const errorCallbackNames = new Set(['err', 'error']);
@@ -68,6 +64,7 @@ type ResolvedOption = Option & { allowedAsyncMethods: string[]; };
 const defaultOption: ResolvedOption = { allowedAsyncMethods: [] };
 
 type ExtractedExpression = Readonly<TraversableNode> | undefined;
+const failedTypeLookup = Symbol('failed type lookup');
 
 function collectExpressions(
     sourceCode: Readonly<SourceCode>,
@@ -101,7 +98,7 @@ function getReturnedExpression(node: Readonly<TraversableNode>): ExtractedExpres
     return node.argument ?? undefined;
 }
 
-export function collectCandidateExpressions(
+function collectCandidateExpressions(
     sourceCode: Readonly<SourceCode>,
     body: Readonly<AnyFunction['body']>
 ): TraversableNode[] {
@@ -121,60 +118,86 @@ function collectReturnedExpressions(
     return collectExpressions(sourceCode, body, getReturnedExpression);
 }
 
-function isGetPromisedTypeOfPromise(value: unknown): value is TypeCheckerLike['getPromisedTypeOfPromise'] {
+function isGetTypeAtLocation(
+    value: unknown
+): value is ParserServicesWithTypeInformation['getTypeAtLocation'] {
     return typeof value === 'function';
 }
 
-function isTypeCheckerLike(value: unknown): value is TypeCheckerLike {
-    return isRecord(value) && isGetPromisedTypeOfPromise(value.getPromisedTypeOfPromise);
-}
-
-function isGetTypeChecker(value: unknown): value is ProgramLike['getTypeChecker'] {
+function isTypeCheckerFactory(value: unknown): value is () => unknown {
     return typeof value === 'function';
 }
 
-function isProgramLike(value: unknown): value is ProgramLike {
-    return isRecord(value) &&
-        isGetTypeChecker(value.getTypeChecker) &&
-        isTypeCheckerLike(value.getTypeChecker());
-}
-
-function isGetTypeAtLocation(value: unknown): value is ParserServicesWithTypeInformation['getTypeAtLocation'] {
+function isPromisedTypeReader(value: unknown): value is TypeCheckerLike['getPromisedTypeOfPromise'] {
     return typeof value === 'function';
 }
 
-export function getParserServicesWithTypeInformation(
-    sourceCode: Readonly<SourceCode>
-): Readonly<ParserServicesWithTypeInformation> | undefined {
-    const services: unknown = sourceCode.parserServices;
+function getParserServicesRecord(sourceCode: Readonly<SourceCode>): Record<string, unknown> | undefined {
+    const parserServices: unknown = sourceCode.parserServices;
 
-    if (!isRecord(services)) {
+    return isRecord(parserServices) ? parserServices : undefined;
+}
+
+function getPromisedTypeReader(
+    services: Readonly<Record<string, unknown>>
+): TypeCheckerLike['getPromisedTypeOfPromise'] | undefined {
+    const program = isRecord(services.program) ? services.program : undefined;
+
+    if (!isTypeCheckerFactory(program?.getTypeChecker)) {
         return undefined;
     }
 
-    if (!isGetTypeAtLocation(services.getTypeAtLocation) || !isProgramLike(services.program)) {
+    const typeChecker = program.getTypeChecker();
+
+    if (!isRecord(typeChecker) || !isPromisedTypeReader(typeChecker.getPromisedTypeOfPromise)) {
+        return undefined;
+    }
+
+    return typeChecker.getPromisedTypeOfPromise;
+}
+
+function getParserServicesWithTypeInformation(
+    sourceCode: Readonly<SourceCode>
+): Readonly<ParserServicesWithTypeInformation> | undefined {
+    const services = getParserServicesRecord(sourceCode);
+
+    if (services === undefined || !isGetTypeAtLocation(services.getTypeAtLocation)) {
+        return undefined;
+    }
+
+    const promisedTypeReader = getPromisedTypeReader(services);
+
+    if (promisedTypeReader === undefined) {
         return undefined;
     }
 
     return {
-        program: services.program,
-        getTypeAtLocation: services.getTypeAtLocation
+        getTypeAtLocation: services.getTypeAtLocation,
+        getPromisedTypeOfPromise: promisedTypeReader
     };
 }
 
-export function hasPromiseLikeType(
+function getExpressionType(
     parserServices: Readonly<ParserServicesWithTypeInformation>,
     expression: Readonly<TraversableNode>
-): boolean {
+): unknown {
     try {
-        const type = parserServices.getTypeAtLocation(asRuleNode(expression));
-        return parserServices.program.getTypeChecker().getPromisedTypeOfPromise(type) !== undefined;
+        return parserServices.getTypeAtLocation(asRuleNode(expression));
     } catch {
-        return false;
+        return failedTypeLookup;
     }
 }
 
-export function unwrapChainExpression(node: Readonly<TraversableNode>): Readonly<TraversableNode> {
+function hasPromiseLikeType(
+    parserServices: Readonly<ParserServicesWithTypeInformation>,
+    expression: Readonly<TraversableNode>
+): boolean {
+    const type = getExpressionType(parserServices, expression);
+
+    return type !== failedTypeLookup && parserServices.getPromisedTypeOfPromise(type) !== undefined;
+}
+
+function unwrapChainExpression(node: Readonly<TraversableNode>): Readonly<TraversableNode> {
     return node.type === 'ChainExpression' ? node.expression : node;
 }
 
@@ -184,20 +207,16 @@ function getNamedPropertyName(
     return !node.computed && node.property.type === 'Identifier' ? node.property.name : undefined;
 }
 
-export function getComputedStringPropertyName(
-    node: Readonly<Extract<TraversableNode, { type: 'MemberExpression'; }>>
-): string | undefined {
-    return node.computed && node.property.type === 'Literal' && typeof node.property.value === 'string'
-        ? node.property.value
-        : undefined;
-}
-
 function getStaticPropertyName(node: Readonly<TraversableNode>): string | undefined {
     if (node.type !== 'MemberExpression') {
         return undefined;
     }
 
-    return getNamedPropertyName(node) ?? getComputedStringPropertyName(node);
+    if (node.property.type === 'Literal') {
+        return String(node.property.value);
+    }
+
+    return getNamedPropertyName(node);
 }
 
 function isPromiseMethodCall(node: Readonly<CallExpression>): boolean {
@@ -228,12 +247,11 @@ function findPromiseMethodCall(
     return collectCallExpressions(sourceCode, expression).find(isPromiseMethodCall);
 }
 
-export function hasErrorFirstCallback(node: Readonly<AnyFunction>): boolean {
+function hasErrorFirstCallback(node: Readonly<AnyFunction>): boolean {
     const firstParam = getFirstMeaningfulParameter(node);
+    const errorCallbackName = firstParam?.type === 'Identifier' ? firstParam.name : '';
 
-    return firstParam !== undefined &&
-        firstParam.type === 'Identifier' &&
-        errorCallbackNames.has(firstParam.name);
+    return errorCallbackNames.has(errorCallbackName);
 }
 
 function hasInlineErrorFirstCallback(node: Readonly<CallExpression>): boolean {

@@ -9,6 +9,7 @@ const unexpectedSlow = 'Unexpected use of Mocha slow threshold configuration.';
 ruleTester.run('limit-slow', limitSlowRule, {
     valid: [
         'it("works", function () {});',
+        'slow(500);',
         'it("works", function () {}).timeout(5000);',
         {
             code: 'it("works", function () {}).slow();',

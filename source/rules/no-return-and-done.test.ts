@@ -1,10 +1,5 @@
-import { type Rule, RuleTester } from 'eslint';
-import assert from 'node:assert';
-import {
-    checkNodeForReturnAndDone,
-    noReturnAndDoneRule,
-    reportIfFunctionWithBlock
-} from './no-return-and-done.js';
+import { RuleTester } from 'eslint';
+import { noReturnAndDoneRule } from './no-return-and-done.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const message = 'Unexpected use of `return` in a test with callback';
@@ -123,48 +118,4 @@ ruleTester.run('no-return-and-done', noReturnAndDoneRule, {
             errors: [{ message, column: 36, line: 1 }]
         }
     ]
-});
-
-describe('no-return-and-done helpers', function () {
-    it('reportIfFunctionWithBlock() ignores non-block bodies', function () {
-        const reports: string[] = [];
-
-        reportIfFunctionWithBlock({
-            report() {
-                reports.push('reported');
-            }
-        } as unknown as Rule.RuleContext, {
-            body: { type: 'Identifier' }
-        } as never, 'done');
-
-        assert.deepStrictEqual(reports, []);
-    });
-
-    it('checkNodeForReturnAndDone() ignores non-function nodes', function () {
-        const reports: string[] = [];
-
-        checkNodeForReturnAndDone({
-            report() {
-                reports.push('reported');
-            }
-        } as unknown as Rule.RuleContext, { type: 'Identifier' } as Rule.Node);
-
-        assert.deepStrictEqual(reports, []);
-    });
-
-    it('checkNodeForReturnAndDone() ignores functions without an identifier callback parameter', function () {
-        const reports: string[] = [];
-
-        checkNodeForReturnAndDone({
-            report() {
-                reports.push('reported');
-            }
-        } as unknown as Rule.RuleContext, {
-            type: 'FunctionExpression',
-            body: { type: 'BlockStatement', body: [] },
-            params: [{ type: 'AssignmentPattern' }]
-        } as never);
-
-        assert.deepStrictEqual(reports, []);
-    });
 });

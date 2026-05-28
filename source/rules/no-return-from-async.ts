@@ -1,29 +1,28 @@
 import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { type AnyFunction, isFunction } from '../ast/node-types.js';
-import {
-    isLiteralOrUndefinedReturn,
-    reportIfImplicitReturn,
-    reportUnexpectedReturnInBlock
-} from './mocha-return-rule.js';
+import type { AnyFunction } from '../ast/node-types.js';
+import { findReturnStatement } from '../ast/return-statement.js';
+import { isLiteralOrUndefinedReturn } from './mocha-return-rule.js';
 
-export function reportIfFunctionWithBlock(
-    context: Readonly<Rule.RuleContext>,
-    node: Readonly<AnyFunction>
-): void {
-    reportUnexpectedReturnInBlock(context, node, 'unexpectedReturnWithAsync', isLiteralOrUndefinedReturn);
-}
-
-export function checkNodeForReturnFromAsync(context: Readonly<Rule.RuleContext>, node: Readonly<Rule.Node>): void {
-    if (!isFunction(node)) {
-        return;
-    }
+function checkNodeForReturnFromAsync(context: Readonly<Rule.RuleContext>, node: Readonly<AnyFunction>): void {
     if (node.async !== true) {
         return;
     }
 
-    if (!reportIfImplicitReturn(context, node, 'implicitReturnWithAsync')) {
-        reportIfFunctionWithBlock(context, node);
+    if (node.body.type !== 'BlockStatement') {
+        context.report({
+            node: node.body,
+            messageId: 'implicitReturnWithAsync'
+        });
+        return;
+    }
+    const returnStatement = findReturnStatement(node.body.body);
+
+    if (returnStatement !== undefined && !isLiteralOrUndefinedReturn(returnStatement)) {
+        context.report({
+            node: returnStatement,
+            messageId: 'unexpectedReturnWithAsync'
+        });
     }
 }
 

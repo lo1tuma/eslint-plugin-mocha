@@ -28,14 +28,14 @@ type NamedImportBindingVariable = Readonly<Scope.Variable> & {
     readonly defs: readonly [ImportBindingDefinition, ...(readonly Scope.Definition[])];
 };
 
-export function isImportSpecifierNode(node: unknown): node is Readonly<ImportSpecifierNode> {
+function isImportSpecifierNode(node: unknown): node is Readonly<ImportSpecifierNode> {
     return isRecord(node) &&
         node.type === 'ImportSpecifier' &&
         isRecord(node.imported) &&
         typeof node.imported.name === 'string';
 }
 
-export function isExclusiveNamedImportBindingWithMatchingSource(
+function isExclusiveNamedImportBindingWithMatchingSource(
     variable: Readonly<Scope.Variable>,
     expectedSource: string | null
 ): variable is NamedImportBindingVariable {
@@ -74,10 +74,15 @@ function isBindingConstant(variable: Readonly<Scope.Variable>): boolean {
     return variable.references.every(isNonAssignmentReference);
 }
 
-export function replaceFirstSegment(path: DynamicPath, replacement: string): DynamicPath {
+function replaceFirstSegment(path: DynamicPath, replacement: string): DynamicPath {
     if (isConstantPath(path)) {
         const [firstSegment, ...remainingPath] = path;
-        const suffix = firstSegment?.endsWith('()') === true ? '()' : '';
+
+        if (firstSegment === undefined) {
+            return [replacement];
+        }
+
+        const suffix = firstSegment.endsWith('()') ? '()' : '';
         return [`${replacement}${suffix}`, ...remainingPath];
     }
     return path;

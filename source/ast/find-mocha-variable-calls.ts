@@ -117,7 +117,7 @@ type SplitCustomNames = {
     readonly globals: readonly NameDetails[];
 };
 
-export function splitCustomNamesByInterface(customNames: readonly NameDetails[]): Readonly<SplitCustomNames> {
+function splitCustomNamesByInterface(customNames: readonly NameDetails[]): Readonly<SplitCustomNames> {
     return {
         require: customNames.filter((nameDetails) => {
             return nameDetails.interface === 'require';
