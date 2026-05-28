@@ -1,12 +1,9 @@
 import type { Rule, Scope, SourceCode } from 'eslint';
 import assert from 'node:assert';
+import { hasUnhandledReturnPath } from './done-callback-paths.js';
 import {
-    getMemberExpressionBindingAndProperty,
-    hasUnhandledReturnPath,
-    haveSameTrackedBindings,
-    haveSameTrackedContainerProperties,
-    type Operation
-} from './done-callback-paths.js';
+    getMemberExpressionBindingAndProperty
+} from './tracked-callback-reference-state.js';
 
 type MutableSegment = {
     id: string;
@@ -14,13 +11,18 @@ type MutableSegment = {
     prevSegments: MutableSegment[];
 };
 
-type CallOperationNode = Extract<Operation, { type: 'call'; }>['node'];
 type MemberExpressionNode = Parameters<Exclude<Rule.RuleListener['MemberExpression'], undefined>>[0];
 type PropertyNode = Parameters<Exclude<Rule.RuleListener['Property'], undefined>>[0];
 type ObjectExpressionNode = Parameters<Exclude<Rule.RuleListener['ObjectExpression'], undefined>>[0];
 type CallExpressionNode = Parameters<Exclude<Rule.RuleListener['CallExpression'], undefined>>[0];
 type IdentifierNode = Parameters<Exclude<Rule.RuleListener['Identifier'], undefined>>[0];
 type SpreadElementNode = Extract<Readonly<CallExpressionNode['arguments'][number]>, { type: 'SpreadElement'; }>;
+type Operation = Parameters<typeof hasUnhandledReturnPath>[0]['operationsBySegmentId'] extends ReadonlyMap<
+    string,
+    readonly (infer CurrentOperation)[]
+> ? CurrentOperation
+    : never;
+type CallOperationNode = Extract<Operation, { type: 'call'; }>['node'];
 
 function asSourceCode(sourceCode: Record<string, unknown>): SourceCode {
     return sourceCode as unknown as SourceCode;
@@ -240,6 +242,26 @@ describe('done callback path helpers', function () {
         );
 
         assert.strictEqual(result, true);
+    });
+
+    it('hasUnhandledReturnPath() stops processing later operations after a callback has been handled', function () {
+        const start = createSegment('start');
+        const end = createSegment('end');
+
+        linkSegments(start, end);
+
+        const result = analyzeOperations(
+            new Map([[
+                'end',
+                [
+                    callOperation(identifier('foo'), [identifier('done')]),
+                    bindingAssignment('next', identifier('done'))
+                ]
+            ]]),
+            createCodePath(start, [end])
+        );
+
+        assert.strictEqual(result, false);
     });
 
     it('hasUnhandledReturnPath() keeps shared container properties across branches', function () {
@@ -508,66 +530,57 @@ describe('done callback path helpers', function () {
         assert.strictEqual(result, true);
     });
 
-    it('haveSameTrackedBindings() detects different binding counts', function () {
-        assert.strictEqual(haveSameTrackedBindings(new Set(['done']), new Set()), false);
-        assert.strictEqual(haveSameTrackedBindings(new Set(['done']), new Set(['done', 'finish'])), false);
-        assert.strictEqual(haveSameTrackedBindings(new Set(['done', 'finish']), new Set(['done', 'other'])), false);
+    it('hasUnhandledReturnPath() revisits loops until aliased callback state stabilizes', function () {
+        const start = createSegment('start');
+        const loop = createSegment('loop');
+        const end = createSegment('end');
+
+        linkSegments(start, loop);
+        linkSegments(loop, loop);
+        linkSegments(loop, end);
+
+        const result = analyzeOperations(
+            new Map([
+                ['start', [bindingAssignment('next', identifier('done'))]],
+                [
+                    'loop',
+                    [
+                        bindingAssignment('later', identifier('next')),
+                        bindingAssignment('next', null)
+                    ]
+                ],
+                ['end', [callOperation(identifier('foo'), [identifier('later')])]]
+            ]),
+            createCodePath(start, [end])
+        );
+
+        assert.strictEqual(result, true);
     });
 
-    it('haveSameTrackedContainerProperties() detects different tracked properties', function () {
-        assert.strictEqual(
-            haveSameTrackedContainerProperties(
-                new Map([
-                    ['obj', new Set(['someFunc'])]
-                ]),
-                new Map()
-            ),
-            false
+    it('hasUnhandledReturnPath() ignores getter-based callback container properties', function () {
+        const start = createSegment('start');
+
+        const result = analyzeOperations(
+            new Map([
+                [
+                    'start',
+                    [
+                        callOperation(identifier('foo'), [{
+                            properties: [{
+                                computed: false,
+                                key: identifier('someFunc'),
+                                kind: 'get',
+                                type: 'Property',
+                                value: identifier('done')
+                            }],
+                            type: 'ObjectExpression'
+                        } as unknown as ObjectExpressionNode])
+                    ]
+                ]
+            ]),
+            createCodePath(start, [start])
         );
-        assert.strictEqual(
-            haveSameTrackedContainerProperties(
-                new Map([
-                    ['obj', new Set(['someFunc'])]
-                ]),
-                new Map([
-                    ['other', new Set(['someFunc'])],
-                    ['obj', new Set(['someFunc'])]
-                ])
-            ),
-            false
-        );
-        assert.strictEqual(
-            haveSameTrackedContainerProperties(
-                new Map([
-                    ['obj', new Set(['someFunc'])]
-                ]),
-                new Map([
-                    ['other', new Set(['someFunc'])]
-                ])
-            ),
-            false
-        );
-        assert.strictEqual(
-            haveSameTrackedContainerProperties(
-                new Map([
-                    ['obj', new Set(['someFunc'])]
-                ]),
-                new Map([
-                    ['obj', new Set(['someFunc', 'otherFunc'])]
-                ])
-            ),
-            false
-        );
-        assert.strictEqual(
-            haveSameTrackedContainerProperties(
-                new Map([
-                    ['obj', new Set(['someFunc', 'otherFunc'])]
-                ]),
-                new Map([
-                    ['obj', new Set(['someFunc', 'thirdFunc'])]
-                ])
-            ),
-            false
-        );
+
+        assert.strictEqual(result, true);
     });
 });

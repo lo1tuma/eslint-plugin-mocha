@@ -1,6 +1,5 @@
-import { type Rule, RuleTester } from 'eslint';
-import assert from 'node:assert';
-import { extractTitleArgument, noIdenticalTitleRule } from './no-identical-title.js';
+import { RuleTester } from 'eslint';
+import { noIdenticalTitleRule } from './no-identical-title.js';
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
 ruleTester.run('no-identical-title', noIdenticalTitleRule, {
@@ -242,15 +241,4 @@ ruleTester.run('no-identical-title', noIdenticalTitleRule, {
             errors: [{ message: 'Test suite title is used multiple times.', column: 1, line: 2 }]
         }
     ]
-});
-
-describe('no-identical-title helpers', function () {
-    it('extractTitleArgument() returns null for non-call-expression nodes', function () {
-        const result = extractTitleArgument({
-            type: 'Identifier',
-            name: 'describe'
-        } as unknown as Rule.Node);
-
-        assert.strictEqual(result, null);
-    });
 });

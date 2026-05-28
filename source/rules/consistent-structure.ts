@@ -100,21 +100,12 @@ function createStructureLayer(scopeNode: StructureLayer['scopeNode']): Readonly<
     };
 }
 
-export function getStructureEntityKind(visitorContext: Readonly<VisitorContext>): StructureEntityKind {
-    if (visitorContext.type === 'suite' || visitorContext.type === 'testCase' || visitorContext.type === 'hook') {
-        return visitorContext.type;
-    }
-
-    throw new Error(`Unexpected mocha entity type: ${visitorContext.type}`);
-}
-
 function reportUnexpectedOrder(
     context: Readonly<Rule.RuleContext>,
     visitorContext: Readonly<VisitorContext>,
-    highestSeenKind: StructureEntityKind
+    highestSeenKind: StructureEntityKind,
+    currentKind: StructureEntityKind
 ): void {
-    const currentKind = getStructureEntityKind(visitorContext);
-
     if (currentKind === 'hook') {
         context.report({
             node: visitorContext.node,
@@ -286,14 +277,11 @@ function replaceCurrentLayer(layers: StructureLayer[], nextLayer: Readonly<Struc
     layers.splice(-1, 1, nextLayer);
 }
 
-export function getDirectStructureContext(
+function getDirectStructureContext(
     layers: readonly StructureLayer[],
-    visitorContext: Readonly<VisitorContext>
+    visitorContext: Readonly<VisitorContext>,
+    currentKind: StructureEntityKind
 ): Readonly<DirectStructureContext> | null {
-    if (layers.length === 0) {
-        return null;
-    }
-
     const currentLayer = getLastOrThrow(layers);
 
     if (!isDirectStatementInScope(currentLayer.scopeNode, getDirectTopLevelMochaExpression(visitorContext.node))) {
@@ -301,7 +289,7 @@ export function getDirectStructureContext(
     }
 
     return {
-        currentKind: getStructureEntityKind(visitorContext),
+        currentKind,
         currentLayer
     };
 }
@@ -419,18 +407,18 @@ export const consistentStructureRule: Readonly<Rule.RuleModule> = {
         >(context);
         const layers: StructureLayer[] = [];
 
-        function registerStructure(visitorContext: Readonly<VisitorContext>): void {
-            const directStructureContext = getDirectStructureContext(layers, visitorContext);
+        function registerStructure(visitorContext: Readonly<VisitorContext>, currentKind: StructureEntityKind): void {
+            const directStructureContext = getDirectStructureContext(layers, visitorContext, currentKind);
 
             if (directStructureContext === null) {
                 return;
             }
 
-            const { currentKind, currentLayer } = directStructureContext;
+            const { currentKind: directKind, currentLayer } = directStructureContext;
             const { highestSeenKind } = currentLayer;
 
-            if (isSuiteBodyLayer(currentLayer) && hasUnexpectedOrder(order, highestSeenKind, currentKind)) {
-                reportUnexpectedOrder(context, visitorContext, highestSeenKind);
+            if (isSuiteBodyLayer(currentLayer) && hasUnexpectedOrder(order, highestSeenKind, directKind)) {
+                reportUnexpectedOrder(context, visitorContext, highestSeenKind, directKind);
             }
 
             trackStructureLayer(
@@ -451,7 +439,7 @@ export const consistentStructureRule: Readonly<Rule.RuleModule> = {
             },
 
             suite(visitorContext) {
-                registerStructure(visitorContext);
+                registerStructure(visitorContext, 'suite');
             },
 
             suiteCallback(visitorContext) {
@@ -471,11 +459,11 @@ export const consistentStructureRule: Readonly<Rule.RuleModule> = {
             },
 
             testCase(visitorContext) {
-                registerStructure(visitorContext);
+                registerStructure(visitorContext, 'testCase');
             },
 
             hook(visitorContext) {
-                registerStructure(visitorContext);
+                registerStructure(visitorContext, 'hook');
             }
         });
     }

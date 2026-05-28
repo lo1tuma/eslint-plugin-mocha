@@ -19,7 +19,7 @@ lint-dependencies:
 
 lint-unused-code:
     knip
-    knip --production --dependencies --files
+    knip --production
 
 lint-duplication *options:
     jscpd source --config jscpd.json {{options}}

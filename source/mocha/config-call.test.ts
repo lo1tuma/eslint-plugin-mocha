@@ -2,11 +2,8 @@ import { Linter, type Rule, type SourceCode } from 'eslint';
 import assert from 'node:assert';
 import type { TraversableNode } from '../ast/visit-child-nodes.js';
 import {
-    getConfigPropertyName,
-    getFirstArgument,
     getStaticNumericConfigValue,
     isDisabledTimeoutValue,
-    isMochaContextConfigCall,
     isSuiteConfigCall,
     visitMochaContextConfigCalls
 } from './config-call.js';
@@ -48,83 +45,14 @@ function asTraversableNode(node: Readonly<Rule.Node>): Readonly<TraversableNode>
 }
 
 describe('config call helpers', function () {
-    it('getConfigPropertyName() returns config names for direct and computed members', function () {
-        const timeoutExpression = readExpression('it("works", function () {}).timeout(5000);').expression;
-        const slowExpression = readExpression('it("works", function () {})["slow"](5000);').expression;
-        const otherExpression = readExpression('it("works", function () {})["only"]();').expression;
-
-        assert.strictEqual(timeoutExpression.type, 'CallExpression');
-        assert.strictEqual(slowExpression.type, 'CallExpression');
-        assert.strictEqual(otherExpression.type, 'CallExpression');
-
-        assert.strictEqual(getConfigPropertyName(timeoutExpression), 'timeout');
-        assert.strictEqual(getConfigPropertyName(slowExpression), 'slow');
-        assert.strictEqual(getConfigPropertyName(otherExpression), null);
-    });
-
-    it('getConfigPropertyName() ignores computed properties on non-member expressions', function () {
-        const result = getConfigPropertyName({
-            type: 'CallExpression',
-            arguments: [],
-            callee: {
-                type: 'Identifier',
-                name: 'timeout'
-            }
-        } as never);
-
-        assert.strictEqual(result, null);
-    });
-
-    it('getConfigPropertyName() ignores non-computed literal member properties', function () {
-        const result = getConfigPropertyName({
-            type: 'CallExpression',
-            arguments: [],
-            callee: {
-                type: 'MemberExpression',
-                computed: false,
-                object: {
-                    type: 'Identifier',
-                    name: 'it'
-                },
-                property: {
-                    type: 'Literal',
-                    value: 'timeout'
-                }
-            }
-        } as never);
-
-        assert.strictEqual(result, null);
-    });
-
-    it('getConfigPropertyName() ignores computed non-string literal member properties', function () {
-        const result = getConfigPropertyName({
-            type: 'CallExpression',
-            arguments: [],
-            callee: {
-                type: 'MemberExpression',
-                computed: true,
-                object: {
-                    type: 'Identifier',
-                    name: 'it'
-                },
-                property: {
-                    type: 'Literal',
-                    value: 42
-                }
-            }
-        } as never);
-
-        assert.strictEqual(result, null);
-    });
-
-    it('isMochaContextConfigCall() and isSuiteConfigCall() detect this-bound config calls', function () {
+    it('isSuiteConfigCall() detects this-bound config calls', function () {
         const timeoutExpression = readExpression('this.timeout(5000);').expression;
         const chainedExpression = readExpression('it("works", function () {}).timeout(5000);').expression;
+        const computedNonConfigExpression = readExpression('this["custom"](5000);').expression;
 
-        assert.strictEqual(isMochaContextConfigCall(asTraversableNode(timeoutExpression), 'timeout'), true);
-        assert.strictEqual(isMochaContextConfigCall(asTraversableNode(timeoutExpression), 'slow'), false);
         assert.strictEqual(isSuiteConfigCall(asTraversableNode(timeoutExpression)), true);
         assert.strictEqual(isSuiteConfigCall(asTraversableNode(chainedExpression)), false);
+        assert.strictEqual(isSuiteConfigCall(asTraversableNode(computedNonConfigExpression)), false);
     });
 
     it('getStaticNumericConfigValue() resolves static numeric arguments', function () {
@@ -168,13 +96,6 @@ describe('config call helpers', function () {
             getStaticNumericConfigValue(identifierExpression.expression, identifierExpression.sourceCode),
             null
         );
-    });
-
-    it('getFirstArgument() ignores spread arguments', function () {
-        const spreadExpression = readExpression('it("works", function () {}).timeout(...values);');
-
-        assert.strictEqual(spreadExpression.expression.type, 'CallExpression');
-        assert.strictEqual(getFirstArgument(spreadExpression.expression), undefined);
     });
 
     it('isDisabledTimeoutValue() only matches disabled timeout values', function () {

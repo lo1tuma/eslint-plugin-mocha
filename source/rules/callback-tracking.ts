@@ -1,29 +1,45 @@
 import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { isFunction } from '../ast/node-types.js';
+import { asRuleNode } from '../ast/rule-node.js';
 import type { CallbackHandlingOperation } from '../callback-handling-state.js';
+import { getIdentifierCallbackParameter } from '../mocha/callback-parameter.js';
 import {
-    asRuleNode,
     getMemberExpressionBindingAndProperty,
     getTrackedBinding,
     type TrackedBinding
-} from '../done-callback-paths.js';
-import { getIdentifierCallbackParameter } from '../mocha/callback-parameter.js';
+} from '../tracked-callback-reference-state.js';
 
-export type TrackedCallbackFunction = {
+type TrackedCallbackFunctionBase = {
     callbackBinding: TrackedBinding;
-    callbackName: string | undefined;
-    callbackNode: Rule.Node | undefined;
     codePath: Readonly<Rule.CodePath>;
     currentSegments: Set<Rule.CodePathSegment>;
     operationsBySegmentId: Map<string, CallbackHandlingOperation[]>;
 };
-
-type CallbackTrackingOptions = {
-    ignorePending: boolean;
-    includeInheritedCallbackBinding: boolean;
-    onTrackedFunctionEnd: (trackedFunction: Readonly<TrackedCallbackFunction>) => void;
+export type DirectTrackedCallbackFunction = TrackedCallbackFunctionBase & {
+    callbackName: string;
+    callbackNode: Rule.Node;
 };
+type InheritedTrackedCallbackFunction = TrackedCallbackFunctionBase & {
+    callbackName: undefined;
+    callbackNode: undefined;
+};
+export type TrackedCallbackFunction = DirectTrackedCallbackFunction | InheritedTrackedCallbackFunction;
+
+type SharedCallbackTrackingOptions = {
+    ignorePending: boolean;
+};
+type CallbackTrackingOptions =
+    | (SharedCallbackTrackingOptions & {
+        includeInheritedCallbackBinding: false;
+        onTrackedFunctionEnd: (trackedFunction: Readonly<DirectTrackedCallbackFunction>) => void;
+    })
+    | (SharedCallbackTrackingOptions & {
+        includeInheritedCallbackBinding: true;
+        onTrackedFunctionEnd: (
+            trackedFunction: Readonly<DirectTrackedCallbackFunction | InheritedTrackedCallbackFunction>
+        ) => void;
+    });
 type TrackedCallbackFunctionContext = {
     codePath: Readonly<Rule.CodePath>;
     includeInheritedCallbackBinding: boolean;
@@ -52,7 +68,7 @@ function pushOperation(
     operations.push(operation);
 }
 
-export function createTrackedCallbackFunction(
+function createTrackedCallbackFunction(
     trackedCallbackFunctionContext: Readonly<TrackedCallbackFunctionContext>
 ): TrackedCallbackFunction | undefined {
     const {
@@ -116,6 +132,30 @@ function recordMemberPropertyAssignment(
     });
 }
 
+function isDirectTrackedCallbackFunction(
+    trackedFunction: Readonly<TrackedCallbackFunction>
+): trackedFunction is Readonly<DirectTrackedCallbackFunction> {
+    return trackedFunction.callbackName !== undefined && trackedFunction.callbackNode !== undefined;
+}
+
+function reportTrackedFunction(
+    callbackTrackingOptions: Readonly<CallbackTrackingOptions>,
+    trackedFunction: Readonly<TrackedCallbackFunction>
+): void {
+    if (callbackTrackingOptions.includeInheritedCallbackBinding) {
+        const { onTrackedFunctionEnd } = callbackTrackingOptions;
+
+        onTrackedFunctionEnd(trackedFunction);
+        return;
+    }
+
+    if (isDirectTrackedCallbackFunction(trackedFunction)) {
+        const { onTrackedFunctionEnd } = callbackTrackingOptions;
+
+        onTrackedFunctionEnd(trackedFunction);
+    }
+}
+
 export function createTrackedCallbackVisitors(
     context: Readonly<Rule.RuleContext>,
     callbackTrackingOptions: Readonly<CallbackTrackingOptions>
@@ -170,7 +210,7 @@ export function createTrackedCallbackVisitors(
             const trackedFunction = currentFunction?.tracked;
 
             if (trackedFunction !== undefined) {
-                callbackTrackingOptions.onTrackedFunctionEnd(trackedFunction);
+                reportTrackedFunction(callbackTrackingOptions, trackedFunction);
             }
 
             currentFunction = currentFunction?.upper ?? null;

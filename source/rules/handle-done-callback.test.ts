@@ -1,12 +1,8 @@
 import * as typescriptParser from '@typescript-eslint/parser';
-import { type Rule, RuleTester, type Scope } from 'eslint';
+import { RuleTester } from 'eslint';
 import assert from 'node:assert';
 import { withInterface } from '../mocha-interface-test-cases.js';
-import {
-    findParamInScope,
-    handleDoneCallbackRule,
-    reportUnhandledDoneCallback
-} from './handle-done-callback.js';
+import { handleDoneCallbackRule } from './handle-done-callback.js';
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const typescriptLanguageOptions = { parser: typescriptParser };
 
@@ -197,82 +193,5 @@ ruleTester.run('handle-done-callback', handleDoneCallbackRule, {
 describe('handle-done-callback helpers', function () {
     it('exposes the expected default options', function () {
         assert.deepStrictEqual(handleDoneCallbackRule.meta?.defaultOptions, [{ ignorePending: false }]);
-    });
-
-    it('findParamInScope() returns parameter variables', function () {
-        const variable = { defs: [{ type: 'Parameter' }] };
-        const result = findParamInScope('done', {
-            set: new Map([
-                ['done', variable]
-            ])
-        } as unknown as Scope.Scope);
-
-        assert.strictEqual(result, variable);
-    });
-
-    it('findParamInScope() ignores non-parameter variables', function () {
-        const result = findParamInScope('done', {
-            set: new Map([
-                ['done', { defs: [{ type: 'Variable' }] }]
-            ])
-        } as unknown as Scope.Scope);
-
-        assert.strictEqual(result, undefined);
-    });
-
-    it('findParamInScope() returns undefined when the parameter is missing', function () {
-        const result = findParamInScope('done', {
-            set: new Map()
-        } as unknown as Scope.Scope);
-
-        assert.strictEqual(result, undefined);
-    });
-
-    it('findParamInScope() returns undefined when the variable has no definitions', function () {
-        const result = findParamInScope('done', {
-            set: new Map([
-                ['done', { defs: [] }]
-            ])
-        } as unknown as Scope.Scope);
-
-        assert.strictEqual(result, undefined);
-    });
-
-    it('reportUnhandledDoneCallback() ignores tracked functions without callback metadata', function () {
-        const segment: Rule.CodePathSegment = {
-            id: 'segment',
-            nextSegments: [],
-            prevSegments: [],
-            reachable: true
-        };
-        const codePath: Rule.CodePath = {
-            childCodePaths: [],
-            finalSegments: [segment],
-            id: 'codePath',
-            initialSegment: segment,
-            origin: 'program',
-            returnedSegments: [segment],
-            thrownSegments: [],
-            upper: null
-        };
-        const reports: Rule.ReportDescriptor[] = [];
-
-        reportUnhandledDoneCallback(
-            {
-                report(descriptor: Rule.ReportDescriptor) {
-                    reports.push(descriptor);
-                }
-            } as unknown as Rule.RuleContext,
-            {
-                callbackBinding: 'done',
-                callbackName: undefined,
-                callbackNode: undefined,
-                codePath,
-                currentSegments: new Set(),
-                operationsBySegmentId: new Map()
-            }
-        );
-
-        assert.deepStrictEqual(reports, []);
     });
 });

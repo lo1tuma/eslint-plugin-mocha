@@ -1,25 +1,7 @@
-import { type Rule, RuleTester, type SourceCode } from 'eslint';
-import assert from 'node:assert';
-import type { AnyFunction } from '../ast/node-types.js';
-import { containsDirectAwait, fixAsyncFunction, noAsyncSuiteRule } from './no-async-suite.js';
+import { RuleTester } from 'eslint';
+import { noAsyncSuiteRule } from './no-async-suite.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
-
-function asSourceCode(sourceCode: Record<string, unknown>): SourceCode {
-    return sourceCode as unknown as SourceCode;
-}
-
-function asRuleFixer(fixer: Record<string, unknown>): Rule.RuleFixer {
-    return fixer as unknown as Rule.RuleFixer;
-}
-
-function asRuleFix(fix: Record<string, unknown>): Rule.Fix {
-    return fix as unknown as Rule.Fix;
-}
-
-function asAnyFunction(node: Record<string, unknown>): AnyFunction {
-    return node as unknown as AnyFunction;
-}
 
 ruleTester.run('no-async-suite', noAsyncSuiteRule, {
     valid: [
@@ -159,35 +141,4 @@ ruleTester.run('no-async-suite', noAsyncSuiteRule, {
             }]
         }
     ]
-});
-
-describe('no-async-suite helpers', function () {
-    it('containsDirectAwait() returns false for non-await expressions', function () {
-        const sourceCode = asSourceCode({
-            visitorKeys: {}
-        });
-        const result = containsDirectAwait(sourceCode, { type: 'Identifier' } as never);
-
-        assert.strictEqual(result, false);
-    });
-
-    it('fixAsyncFunction() returns null when the async token cannot be resolved', function () {
-        const sourceCode = asSourceCode({
-            visitorKeys: {},
-            getFirstTokens() {
-                return [];
-            }
-        });
-        const fixer = asRuleFixer({
-            removeRange() {
-                return asRuleFix({});
-            }
-        });
-        const node = asAnyFunction({
-            body: { type: 'Identifier' }
-        });
-        const result = fixAsyncFunction(sourceCode, fixer, node);
-
-        assert.strictEqual(result, null);
-    });
 });

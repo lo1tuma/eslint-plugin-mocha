@@ -1,12 +1,13 @@
 import type { Rule } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
+import { expectNodeRange } from '../ast/node-location.js';
 
 type ExportNamedDeclarationNode = Parameters<NonNullable<Rule.RuleListener['ExportNamedDeclaration']>>[0];
 type ExportDefaultDeclarationNode = Parameters<NonNullable<Rule.RuleListener['ExportDefaultDeclaration']>>[0];
 type ExportAllDeclarationNode = Parameters<NonNullable<Rule.RuleListener['ExportAllDeclaration']>>[0];
 type ExportNode = ExportAllDeclarationNode | ExportDefaultDeclarationNode | ExportNamedDeclarationNode;
 type NamedExportWithDeclaration = ExportNamedDeclarationNode & {
-    declaration: Exclude<ExportNamedDeclarationNode['declaration'], null>;
+    declaration: Exclude<ExportNamedDeclarationNode['declaration'], null | undefined>;
 };
 type DefaultExportWithNamedDeclaration = ExportDefaultDeclarationNode & {
     declaration: {
@@ -29,42 +30,51 @@ function isNamedDefaultExportDeclaration(
         node.declaration.id !== null;
 }
 
-export function isLocalNamedExportList(node: Readonly<ExportNode>): node is Readonly<ExportNamedDeclarationNode> {
+function isLocalNamedExportList(node: Readonly<ExportNode>): node is Readonly<ExportNamedDeclarationNode> {
     return node.type === 'ExportNamedDeclaration' &&
-        node.declaration === null &&
         node.source === null;
 }
 
-export function fixRemoveExportKeyword(
+function fixRemoveExportKeyword(
     fixer: Rule.RuleFixer,
-    node: Readonly<DefaultExportWithNamedDeclaration | NamedExportWithDeclaration>
+    node: Readonly<ExportNode>,
+    declaration: { readonly range?: Readonly<[number, number]> | null | undefined; }
 ): Readonly<Rule.Fix | null> {
-    const { declaration } = node;
+    const range = expectNodeRange(node);
+    const declarationRange = expectNodeRange(declaration);
 
-    if (declaration === undefined) {
-        return null;
-    }
-
-    return node.range === undefined || declaration.range === undefined
-        ? null
-        : fixer.removeRange([node.range[0], declaration.range[0]]);
+    return fixer.removeRange([range[0], declarationRange[0]]);
 }
 
-export function fixRemoveExportStatement(
+function fixRemoveDefaultExportKeyword(
+    fixer: Rule.RuleFixer,
+    node: Readonly<DefaultExportWithNamedDeclaration>
+): Readonly<Rule.Fix | null> {
+    return fixRemoveExportKeyword(fixer, node, node.declaration);
+}
+
+function fixRemoveExportStatement(
     fixer: Rule.RuleFixer,
     node: Readonly<ExportNamedDeclarationNode>
 ): Readonly<Rule.Fix | null> {
-    return node.range === undefined
-        ? null
-        : fixer.removeRange(node.range);
+    return fixer.removeRange(expectNodeRange(node));
 }
 
-export function createExportSuggestions(node: Readonly<ExportNode>): ExportSuggestion[] {
-    if (isNamedExportWithDeclaration(node) || isNamedDefaultExportDeclaration(node)) {
+function createExportSuggestions(node: Readonly<ExportNode>): ExportSuggestion[] {
+    if (isNamedExportWithDeclaration(node)) {
         return [{
             messageId: 'removeExportKeyword',
             fix(fixer) {
-                return fixRemoveExportKeyword(fixer, node);
+                return fixRemoveExportKeyword(fixer, node, node.declaration);
+            }
+        }];
+    }
+
+    if (isNamedDefaultExportDeclaration(node)) {
+        return [{
+            messageId: 'removeExportKeyword',
+            fix(fixer) {
+                return fixRemoveDefaultExportKeyword(fixer, node);
             }
         }];
     }

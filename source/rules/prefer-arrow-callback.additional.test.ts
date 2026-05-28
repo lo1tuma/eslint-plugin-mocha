@@ -257,37 +257,4 @@ describe('prefer-arrow-callback rule wrapper', function () {
 
         assert.deepStrictEqual(reportedMessages, ['wrapped report without node']);
     });
-
-    it('shouldSkipReport() ignores reports without nodes', async function () {
-        const { shouldSkipReport } = await importPreferArrowCallbackRule('skip-report-without-node');
-        const result = shouldSkipReport(new WeakSet(), {
-            message: 'wrapped report without node'
-        } as unknown as Rule.ReportDescriptor);
-
-        assert.strictEqual(result, false);
-    });
-
-    it('shouldSkipReport() filters mocha callback function-expression reports', async function () {
-        const { shouldSkipReport } = await importPreferArrowCallbackRule('skip-report-mocha-callback');
-        const mochaCallback = { type: 'FunctionExpression' } as unknown as Rule.Node;
-        const mochaCallbacks = new WeakSet<Rule.Node>([mochaCallback]);
-        const result = shouldSkipReport(mochaCallbacks, {
-            node: mochaCallback,
-            message: 'wrapped report'
-        });
-
-        assert.strictEqual(result, true);
-    });
-
-    it('shouldSkipReport() keeps reports for non-function-expression nodes', async function () {
-        const { shouldSkipReport } = await importPreferArrowCallbackRule('keep-report-non-function-expression');
-        const mochaCallback = { type: 'ArrowFunctionExpression' } as unknown as Rule.Node;
-        const mochaCallbacks = new WeakSet<Rule.Node>([mochaCallback]);
-        const result = shouldSkipReport(mochaCallbacks, {
-            node: mochaCallback,
-            message: 'wrapped report'
-        });
-
-        assert.strictEqual(result, false);
-    });
 });

@@ -1,155 +1,128 @@
 import type { Rule } from 'eslint';
 import assert from 'node:assert';
-import {
-    createPendingSegmentCollection,
-    processPendingSegments,
-    shouldRevisitSegment
-} from './callback-handling-node-collector.js';
-import type {
-    CallbackHandlingContext,
-    CallbackPathState
-} from './callback-handling-state.js';
+import { collectCallbackHandlingNodes } from './callback-handling-node-collector.js';
+import type { CallbackHandlingOperation } from './callback-handling-state.js';
 
-function createPathState(): CallbackPathState {
-    return {
-        callbackHandled: false,
-        handledReferences: {
-            aliasBindings: new Set(),
-            containerPropertiesByBinding: new Map()
-        },
-        unhandledReferences: {
-            aliasBindings: new Set(['done']),
-            containerPropertiesByBinding: new Map()
-        }
-    };
+type MutableSegment = {
+    id: string;
+    nextSegments: MutableSegment[];
+    prevSegments: MutableSegment[];
+};
+type IdentifierNode = Parameters<Exclude<Rule.RuleListener['Identifier'], undefined>>[0];
+
+function identifier(name: string): IdentifierNode {
+    return { id: name, name, type: 'Identifier' } as unknown as IdentifierNode;
 }
 
-function createSegment(id: string): Rule.CodePathSegment {
-    return {
-        id,
-        nextSegments: [],
-        prevSegments: []
-    } as unknown as Rule.CodePathSegment;
+function createSegment(id: string): MutableSegment {
+    return { id, nextSegments: [], prevSegments: [] };
 }
 
-function createCodePath(initialSegment: Rule.CodePathSegment): Rule.CodePath {
+function linkSegments(previous: MutableSegment, next: MutableSegment): void {
+    previous.nextSegments.push(next);
+    next.prevSegments.push(previous);
+}
+
+function asCodePathSegment(segment: MutableSegment): Rule.CodePathSegment {
+    return segment as unknown as Rule.CodePathSegment;
+}
+
+function createCodePath(initialSegment: MutableSegment): Rule.CodePath {
     return {
-        initialSegment
+        initialSegment: asCodePathSegment(initialSegment)
     } as unknown as Rule.CodePath;
 }
 
 function createSourceCode(): Rule.RuleContext['sourceCode'] {
-    return {} as unknown as Rule.RuleContext['sourceCode'];
+    return Object.create(null) as Rule.RuleContext['sourceCode'];
 }
 
-function createReportedNode(): Rule.Node {
+function bindingAssignment(node: Readonly<Rule.Node>, target: string): CallbackHandlingOperation {
     return {
-        type: 'Identifier'
-    } as unknown as Rule.Node;
-}
-
-function createContext(initialSegment: Rule.CodePathSegment): CallbackHandlingContext {
-    return {
-        callbackBinding: 'done',
-        codePath: createCodePath(initialSegment),
-        operationsBySegmentId: new Map(),
-        sourceCode: createSourceCode()
+        node,
+        source: null,
+        target,
+        type: 'bindingAssignment'
     };
 }
 
-describe('callback handling node collector', function () {
-    it('shouldRevisitSegment() returns false for unchanged states without reports', function () {
-        const segment = createSegment('start');
-        const nextState = createPathState();
-        const result = shouldRevisitSegment(
+describe('collectCallbackHandlingNodes()', function () {
+    it('stops revisiting unchanged self-referential segments without reports', function () {
+        const loop = createSegment('loop');
+
+        linkSegments(loop, loop);
+
+        const result = collectCallbackHandlingNodes(
             {
-                exitStatesBySegmentId: new Map([[segment.id, nextState]]),
-                pendingSegments: [],
-                queuedSegmentIds: new Set(),
-                reportedNodeSet: new WeakSet(),
-                reportedNodes: []
+                callbackBinding: 'done',
+                codePath: createCodePath(loop),
+                operationsBySegmentId: new Map(),
+                sourceCode: createSourceCode()
             },
-            nextState,
-            segment,
-            []
-        );
-
-        assert.strictEqual(result, false);
-    });
-
-    it('shouldRevisitSegment() returns true when a segment reports a node', function () {
-        const segment = createSegment('start');
-        const nextState = createPathState();
-        const reportedNode = createReportedNode();
-        const result = shouldRevisitSegment(
-            {
-                exitStatesBySegmentId: new Map([[segment.id, nextState]]),
-                pendingSegments: [],
-                queuedSegmentIds: new Set(),
-                reportedNodeSet: new WeakSet(),
-                reportedNodes: []
-            },
-            nextState,
-            segment,
-            [reportedNode]
-        );
-
-        assert.strictEqual(result, true);
-    });
-
-    it('createPendingSegmentCollection() queues the initial segment', function () {
-        const initialSegment = createSegment('start');
-        const collection = createPendingSegmentCollection(createContext(initialSegment));
-
-        assert.deepStrictEqual(collection.pendingSegments, [initialSegment]);
-        assert.deepStrictEqual(Array.from(collection.queuedSegmentIds), ['start']);
-    });
-
-    it('processPendingSegments() does not revisit unchanged segments without reports', function () {
-        const initialSegment = createSegment('start');
-        const nextSegment = createSegment('next');
-        initialSegment.nextSegments.push(nextSegment);
-        nextSegment.prevSegments.push(initialSegment);
-        const callbackContext = createContext(initialSegment);
-        const collection = {
-            exitStatesBySegmentId: new Map([[initialSegment.id, createPathState()]]),
-            pendingSegments: [initialSegment],
-            queuedSegmentIds: new Set([initialSegment.id]),
-            reportedNodeSet: new WeakSet(),
-            reportedNodes: []
-        };
-
-        processPendingSegments(callbackContext, collection, () => {
-            return undefined;
-        });
-
-        assert.deepStrictEqual(Array.from(collection.exitStatesBySegmentId.keys()), ['start']);
-        assert.deepStrictEqual(collection.pendingSegments, []);
-        assert.deepStrictEqual(Array.from(collection.queuedSegmentIds), []);
-    });
-
-    it('processPendingSegments() ignores undefined queued segments', function () {
-        const collection = {
-            exitStatesBySegmentId: new Map(),
-            pendingSegments: [undefined as unknown as Rule.CodePathSegment],
-            queuedSegmentIds: new Set<string>(),
-            reportedNodeSet: new WeakSet(),
-            reportedNodes: []
-        };
-        let selectedNodeCount = 0;
-
-        processPendingSegments(
-            createContext(createSegment('start')),
-            collection,
-            () => {
-                selectedNodeCount += 1;
+            function () {
                 return undefined;
             }
         );
 
-        assert.strictEqual(selectedNodeCount, 0);
-        assert.deepStrictEqual(collection.pendingSegments, []);
-        assert.deepStrictEqual(collection.reportedNodes, []);
-        assert.deepStrictEqual(Array.from(collection.exitStatesBySegmentId.keys()), []);
+        assert.deepStrictEqual(result, []);
+    });
+
+    it('continues into following segments after reports with unchanged path state', function () {
+        const start = createSegment('start');
+        const end = createSegment('end');
+        const firstNode = identifier('first');
+        const secondNode = identifier('second');
+
+        linkSegments(start, end);
+
+        const result = collectCallbackHandlingNodes(
+            {
+                callbackBinding: 'done',
+                codePath: createCodePath(start),
+                operationsBySegmentId: new Map([
+                    ['start', [bindingAssignment(firstNode, 'first')]],
+                    ['end', [bindingAssignment(secondNode, 'second')]]
+                ]),
+                sourceCode: createSourceCode()
+            },
+            function (_context, _pathState, operation) {
+                return operation.node;
+            }
+        );
+
+        assert.deepStrictEqual(result, [firstNode, secondNode]);
+    });
+
+    it('re-enqueues following segments when later reports keep the path state unchanged', function () {
+        const loop = createSegment('loop');
+        const end = createSegment('end');
+        const loopNode = identifier('loop');
+        const endNode = identifier('end');
+        let loopVisits = 0;
+
+        linkSegments(loop, end);
+        linkSegments(loop, loop);
+
+        const result = collectCallbackHandlingNodes(
+            {
+                callbackBinding: 'done',
+                codePath: createCodePath(loop),
+                operationsBySegmentId: new Map([
+                    ['loop', [bindingAssignment(loopNode, 'loop')]],
+                    ['end', [bindingAssignment(endNode, 'end')]]
+                ]),
+                sourceCode: createSourceCode()
+            },
+            function (_context, _pathState, operation) {
+                if (operation.node === loopNode) {
+                    loopVisits += 1;
+                    return loopVisits === 2 ? loopNode : undefined;
+                }
+
+                return loopVisits >= 2 ? operation.node : undefined;
+            }
+        );
+
+        assert.deepStrictEqual(result, [loopNode, endNode]);
     });
 });

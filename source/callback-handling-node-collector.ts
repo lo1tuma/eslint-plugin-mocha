@@ -58,7 +58,7 @@ function recordReportedNodes(
     }
 }
 
-export function shouldRevisitSegment(
+function shouldRevisitSegment(
     collection: Readonly<PendingSegmentCollection>,
     nextState: PathState,
     segment: Readonly<Rule.CodePathSegment>,
@@ -92,29 +92,31 @@ function processPendingSegment(
     }
 }
 
-export function createPendingSegmentCollection(
+function createPendingSegmentCollection(
     context: Readonly<CallbackHandlingContext>
 ): PendingSegmentCollection {
+    const queuedSegmentIds = new Set<string>();
+
     return {
         exitStatesBySegmentId: new Map(),
         pendingSegments: [context.codePath.initialSegment],
-        queuedSegmentIds: new Set([context.codePath.initialSegment.id]),
+        queuedSegmentIds,
         reportedNodeSet: new WeakSet(),
         reportedNodes: []
     };
 }
 
-export function processPendingSegments(
+function processPendingSegments(
     context: Readonly<CallbackHandlingContext>,
     collection: PendingSegmentCollection,
     selectReportedNode: ReportedNodeSelector
 ): void {
-    while (collection.pendingSegments.length > 0) {
-        const segment = collection.pendingSegments.shift();
-
-        if (segment !== undefined) {
-            processPendingSegment(context, collection, segment, selectReportedNode);
-        }
+    for (
+        let segment = collection.pendingSegments.shift();
+        segment !== undefined;
+        segment = collection.pendingSegments.shift()
+    ) {
+        processPendingSegment(context, collection, segment, selectReportedNode);
     }
 }
 

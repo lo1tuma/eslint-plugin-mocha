@@ -3,10 +3,14 @@ import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { type CallExpression, isCallExpression } from '../ast/node-types.js';
 import {
     getStaticNumericConfigValue,
-    type MochaConfigCallExpression,
     visitMochaContextConfigCalls
 } from '../mocha/config-call.js';
 import { getRuleOption, type RuleSchema } from '../rule-options.js';
+import {
+    disallowModeOptionSchema,
+    maximumNumericMochaConfigOptionSchema,
+    rangeNumericMochaConfigOptionSchema
+} from './numeric-mocha-config-option-schemas.js';
 
 type MochaConfigName = Parameters<typeof visitMochaContextConfigCalls> extends [
     unknown,
@@ -30,45 +34,9 @@ type NumericMochaConfigLimitOption =
 
 const numericMochaConfigLimitOptionSchema = {
     oneOf: [
-        {
-            type: 'object',
-            properties: {
-                mode: {
-                    enum: ['disallow']
-                }
-            },
-            required: ['mode'],
-            additionalProperties: false
-        },
-        {
-            type: 'object',
-            properties: {
-                mode: {
-                    enum: ['max']
-                },
-                max: {
-                    type: 'integer'
-                }
-            },
-            required: ['mode', 'max'],
-            additionalProperties: false
-        },
-        {
-            type: 'object',
-            properties: {
-                mode: {
-                    enum: ['range']
-                },
-                min: {
-                    type: 'integer'
-                },
-                max: {
-                    type: 'integer'
-                }
-            },
-            required: ['mode', 'min', 'max'],
-            additionalProperties: false
-        }
+        disallowModeOptionSchema,
+        maximumNumericMochaConfigOptionSchema,
+        rangeNumericMochaConfigOptionSchema
     ]
 } as const satisfies RuleSchema;
 
@@ -86,24 +54,20 @@ type RuleDefinition<MessageId extends string> = {
     name: string;
 };
 
-export function hasMemberCallee(node: Readonly<CallExpression>): node is MochaConfigCallExpression {
-    return node.callee.type === 'MemberExpression';
-}
-
 function reportMochaConfigCall(
     context: Readonly<Rule.RuleContext>,
-    node: MochaConfigCallExpression,
+    node: Readonly<CallExpression>,
     messageId: string,
     data?: Readonly<Record<string, string>>
 ): void {
     context.report({
         data,
         messageId,
-        node: node.callee.property
+        node
     });
 }
 
-export function validateNumericMochaConfigLimitOption(option: Readonly<NumericMochaConfigLimitOption>): void {
+function validateNumericMochaConfigLimitOption(option: Readonly<NumericMochaConfigLimitOption>): void {
     if (option.mode !== 'range') {
         return;
     }
@@ -116,7 +80,7 @@ export function validateNumericMochaConfigLimitOption(option: Readonly<NumericMo
 type ConfiguredValueContext<MessageId extends string> = {
     context: Readonly<Rule.RuleContext>;
     messageIds: Readonly<RuleDefinition<MessageId>['messageIds']>;
-    node: MochaConfigCallExpression;
+    node: Readonly<CallExpression>;
     option: Exclude<NumericMochaConfigLimitOption, { mode: 'disallow'; }>;
     value: number;
 };
@@ -124,7 +88,7 @@ type ConfiguredValueContext<MessageId extends string> = {
 function reportConfiguredValue<MessageId extends string>(
     configuredValueContext: Readonly<ConfiguredValueContext<MessageId>>
 ): void {
-    const { context, node, messageIds, option, value } = configuredValueContext;
+    const { context, messageIds, node, option, value } = configuredValueContext;
 
     if (option.mode === 'max') {
         if (value > option.max) {
@@ -148,7 +112,7 @@ function reportConfiguredValue<MessageId extends string>(
 
 function readConfiguredValue(
     context: Readonly<Rule.RuleContext>,
-    node: MochaConfigCallExpression
+    node: Readonly<CallExpression>
 ): number | undefined {
     return getStaticNumericConfigValue(node, context.sourceCode) ?? undefined;
 }
@@ -172,7 +136,7 @@ export function createSimpleNumericMochaConfigLimitRule<MessageId extends string
             const option = getRuleOption<NumericMochaConfigLimitOption>(context);
             validateNumericMochaConfigLimitOption(option);
 
-            function checkConfigCall(node: MochaConfigCallExpression): void {
+            function checkConfigCall(node: Readonly<CallExpression>): void {
                 if (option.mode === 'disallow') {
                     reportMochaConfigCall(context, node, ruleDefinition.messageIds.disallow);
                     return;
@@ -197,11 +161,7 @@ export function createSimpleNumericMochaConfigLimitRule<MessageId extends string
                 config(visitorContext) {
                     const { node } = visitorContext;
 
-                    if (
-                        visitorContext.config === ruleDefinition.configName &&
-                        isCallExpression(node) &&
-                        hasMemberCallee(node)
-                    ) {
+                    if (visitorContext.config === ruleDefinition.configName && isCallExpression(node)) {
                         checkConfigCall(node);
                     }
                 },
