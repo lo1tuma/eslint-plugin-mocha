@@ -70,7 +70,7 @@ export default [
     },
     {
         ...nodeConfigFileConfig,
-        files: ['dependency-cruiser.config.js', 'eslint.config.js', 'packtory.config.js']
+        files: ['dependency-cruiser.config.js', 'eslint.config.js', 'packtory.config.js', 'stryker.config.js']
     },
     {
         ...mochaConfig,
@@ -107,7 +107,7 @@ export default [
     },
     {
         ...nodeEntryPointFileConfig,
-        files: ['source/plugin.ts']
+        files: ['source/plugin.ts', 'stryker.config.js']
     },
     {
         files: ['source/plugin.ts'],

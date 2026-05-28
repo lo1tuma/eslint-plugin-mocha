@@ -1,3 +1,4 @@
+import type { ConfigObject, LegacyConfigObject } from '@eslint/core';
 import type { ESLint, Linter } from 'eslint';
 import globals from 'globals';
 import { readClosestPackageMetadata } from './package-metadata.js';
@@ -155,11 +156,18 @@ const rules = {
 export type MochaPlugin = ESLint.Plugin & {
     meta: typeof pluginMeta;
     rules: typeof rules;
-    configs: {
-        all: MochaConfig;
-        recommended: MochaConfig;
-    };
+    configs: PublishedMochaConfigs;
 };
+
+type PublishedMochaConfigs = Record<string, PublishedMochaConfig> & {
+    all: MochaConfig;
+    recommended: MochaConfig;
+};
+
+type PublishedMochaConfig =
+    | ConfigObject
+    | ConfigObject[]
+    | LegacyConfigObject;
 
 type MochaConfig = Linter.Config & {
     plugins: {
