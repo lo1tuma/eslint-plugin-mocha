@@ -138,7 +138,7 @@ function createMockImportReferenceVariable(
 }
 
 suite('findImportReferencesByName()', function () {
-    suite('cases 1', function () {
+    suite('invalid import metadata', function () {
         test('returns an empty array if the scope manager has no global scope', function () {
             const foundResolvedReferences = findImportReferencesByName(
                 {
@@ -311,7 +311,7 @@ suite('findImportReferencesByName()', function () {
         });
     });
 
-    suite('cases 2', function () {
+    suite('source and binding matches', function () {
         test('returns an empty array if the sourceType is not an module', function () {
             const foundResolvedReferences = findReferenceNames('', [ { path: [ 'foo' ] } ], 'bar', 'script');
 
@@ -406,7 +406,7 @@ suite('findImportReferencesByName()', function () {
         });
     });
 
-    suite('cases 3', function () {
+    suite('assignments, scopes, and dynamic paths', function () {
         test('returns an empty array when the matching binding get re-assigned to a different value', function () {
             const foundResolvedReferences = findReferenceNames('import { foo } from "bar"; foo = 42; foo;', [ {
                 path: [ 'foo' ]
@@ -498,7 +498,7 @@ suite('findImportReferencesByName()', function () {
         });
     });
 
-    suite('cases 4', function () {
+    suite('missing module scopes', function () {
         test('returns an empty array when the global scope has no child scopes', function () {
             const foundResolvedReferences = findImportReferencesByName(
                 {

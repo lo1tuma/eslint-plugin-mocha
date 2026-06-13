@@ -63,7 +63,7 @@ function findCalls(
 }
 
 suite('findMochaVariableCalls()', function () {
-    suite('cases 1', function () {
+    suite('global and imported call matching', function () {
         test('returns an empty array if no match was found', function () {
             const calls = findCalls(
                 'bar()',
@@ -144,7 +144,7 @@ suite('findMochaVariableCalls()', function () {
         });
     });
 
-    suite('cases 2', function () {
+    suite('path matching and simple call aliases', function () {
         test('finds a matching call when there searching for a path', function () {
             const calls = findCalls(
                 'foo.bar()',
@@ -237,7 +237,7 @@ suite('findMochaVariableCalls()', function () {
         });
     });
 
-    suite('cases 3', function () {
+    suite('declaration aliases and property calls', function () {
         test('traces renames via const variable declaration const y = bar, x = foo; x()', function () {
             const calls = findCalls(
                 'const x = foo; x();',
@@ -319,7 +319,7 @@ suite('findMochaVariableCalls()', function () {
         });
     });
 
-    suite('cases 4', function () {
+    suite('destructuring and scoped aliases', function () {
         test('traces multiple renames via a single const destructuring const { bar,baz } = foo; bar();baz();', function () {
             const calls = findCalls(
                 'const { bar, baz } = foo; bar(); baz();',
@@ -406,7 +406,7 @@ suite('findMochaVariableCalls()', function () {
         });
     });
 
-    suite('cases 5', function () {
+    suite('nested paths and multiple aliases', function () {
         test('remains the correct resolved path when assigning a nested property', function () {
             const calls = findCalls(
                 'const x = foo.bar.baz; x();',
@@ -497,7 +497,7 @@ suite('findMochaVariableCalls()', function () {
         });
     });
 
-    suite('cases 6', function () {
+    suite('dynamic member calls', function () {
         test('doesn’t trace dynamic member expression calls when they can’t be resolved statically', function () {
             const calls = findCalls(
                 'foo[externalMember]();',
