@@ -121,6 +121,7 @@ For wrapper APIs that still expose suite, test, or hook call functions, use `add
 
 For maintainers: the rules table below is generated, and the headers in `documentation/rules/*.md` are partly generated. Refresh them with `npx just update-eslint-docs`. Run mutation testing with `npx just test-mutation`.
 
+<!-- dprint-ignore-start -->
 <!-- begin auto-generated rules list -->
 
 💼 [Configurations](https://github.com/lo1tuma/eslint-plugin-mocha#configs) enabled in.\
@@ -130,40 +131,41 @@ For maintainers: the rules table below is generated, and the headers in `documen
 🔧 Automatically fixable by the [`--fix` CLI option](https://eslint.org/docs/user-guide/command-line-interface#--fix).\
 💡 Manually fixable by [editor suggestions](https://eslint.org/docs/latest/use/core-concepts#rule-suggestions).
 
-| Name                                                                                          | Description                                                             | 💼 | ⚠️  | 🚫 | 🔧 | 💡 |
+| Name                                                                                          | Description                                                             | 💼 | ⚠️ | 🚫 | 🔧 | 💡 |
 | :-------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------- | :- | :- | :- | :- | :- |
-| [consistent-interface](documentation/rules/consistent-interface.md)                           | Enforces consistent use of mocha interfaces                             |    |    | ✅ | 🔧 |    |
-| [consistent-spacing-between-blocks](documentation/rules/consistent-spacing-between-blocks.md) | Require consistent spacing between blocks                               |    |    | ✅ | 🔧 |    |
-| [consistent-structure](documentation/rules/consistent-structure.md)                           | Require consistent structure for Mocha test entities                    | ✅ |    |    |    |    |
-| [handle-done-callback](documentation/rules/handle-done-callback.md)                           | Enforces handling of callbacks for async tests in every branch          | ✅ |    |    |    |    |
-| [limit-retries](documentation/rules/limit-retries.md)                                         | Enforce limits for Mocha retries                                        |    |    | ✅ |    |    |
-| [limit-slow](documentation/rules/limit-slow.md)                                               | Enforce limits for Mocha slow thresholds                                |    |    | ✅ |    |    |
-| [limit-timeout](documentation/rules/limit-timeout.md)                                         | Enforce limits for Mocha timeouts                                       |    |    | ✅ |    |    |
-| [max-top-level-suites](documentation/rules/max-top-level-suites.md)                           | Enforce the number of top-level suites in a single file                 |    |    | ✅ |    |    |
-| [no-async-and-done](documentation/rules/no-async-and-done.md)                                 | Disallow async functions that also use a Mocha callback                 | ✅ |    |    |    |    |
-| [no-async-in-sync-tests](documentation/rules/no-async-in-sync-tests.md)                       | Disallow async operations in synchronous tests or hooks                 | ✅ |    |    |    |    |
-| [no-async-suite](documentation/rules/no-async-suite.md)                                       | Disallow async functions passed to a suite                              | ✅ |    |    | 🔧 |    |
-| [no-code-after-done](documentation/rules/no-code-after-done.md)                               | Disallow executing code after calling a Mocha callback                  | ✅ |    |    |    |    |
-| [no-conditional-tests](documentation/rules/no-conditional-tests.md)                           | Disallow conditional suite and test declarations                        | ✅ |    |    |    |    |
-| [no-done-twice](documentation/rules/no-done-twice.md)                                         | Disallow calling a Mocha callback more than once                        | ✅ |    |    |    |    |
-| [no-empty-title](documentation/rules/no-empty-title.md)                                       | Disallow empty suite and test descriptions                              | ✅ |    |    |    |    |
-| [no-exclusive-tests](documentation/rules/no-exclusive-tests.md)                               | Disallow exclusive tests                                                |    | ✅ |    |    | 💡 |
-| [no-exports](documentation/rules/no-exports.md)                                               | Disallow exports from test files                                        | ✅ |    |    |    | 💡 |
-| [no-hooks](documentation/rules/no-hooks.md)                                                   | Disallow hooks                                                          |    |    | ✅ |    |    |
-| [no-hooks-for-single-child](documentation/rules/no-hooks-for-single-child.md)                 | Disallow hooks with a single direct child                               |    |    | ✅ |    |    |
-| [no-identical-title](documentation/rules/no-identical-title.md)                               | Disallow identical titles                                               | ✅ |    |    |    |    |
-| [no-mocha-arrows](documentation/rules/no-mocha-arrows.md)                                     | Disallow arrow functions as arguments to mocha functions                | ✅ |    |    | 🔧 |    |
-| [no-nested-suites](documentation/rules/no-nested-suites.md)                                   | Disallow suites to be nested within other suites                        |    |    | ✅ |    |    |
-| [no-nested-tests](documentation/rules/no-nested-tests.md)                                     | Disallow tests to be nested within other tests                          | ✅ |    |    |    |    |
-| [no-pending-tests](documentation/rules/no-pending-tests.md)                                   | Disallow pending tests                                                  |    | ✅ |    |    | 💡 |
-| [no-return-and-done](documentation/rules/no-return-and-done.md)                               | Disallow returning in a test or hook function that uses a callback      | ✅ |    |    |    |    |
-| [no-return-from-async](documentation/rules/no-return-from-async.md)                           | Disallow returning from an async test or hook                           |    |    | ✅ |    |    |
-| [no-root-hooks](documentation/rules/no-root-hooks.md)                                         | Disallow root hooks                                                     |    |    | ✅ |    |    |
-| [no-setup-in-suite](documentation/rules/no-setup-in-suite.md)                                 | Disallow setup in suite blocks                                          |    |    | ✅ |    |    |
-| [no-synchronous-tests](documentation/rules/no-synchronous-tests.md)                           | Disallow synchronous tests                                              |    |    | ✅ |    |    |
-| [no-top-level-tests](documentation/rules/no-top-level-tests.md)                               | Disallow top-level tests                                                | ✅ |    |    |    |    |
-| [prefer-arrow-callback](documentation/rules/prefer-arrow-callback.md)                         | Require using arrow functions for callbacks                             |    |    | ✅ | 🔧 |    |
-| [valid-suite-title](documentation/rules/valid-suite-title.md)                                 | Require suite descriptions to match a pre-configured regular expression |    |    | ✅ |    |    |
-| [valid-test-title](documentation/rules/valid-test-title.md)                                   | Require test descriptions to match a pre-configured regular expression  |    |    | ✅ |    |    |
+| [consistent-interface](documentation/rules/consistent-interface.md)                           | Enforces consistent use of mocha interfaces                             |    |    | ✅  | 🔧 |    |
+| [consistent-spacing-between-blocks](documentation/rules/consistent-spacing-between-blocks.md) | Require consistent spacing between blocks                               |    |    | ✅  | 🔧 |    |
+| [consistent-structure](documentation/rules/consistent-structure.md)                           | Require consistent structure for Mocha test entities                    | ✅  |    |    |    |    |
+| [handle-done-callback](documentation/rules/handle-done-callback.md)                           | Enforces handling of callbacks for async tests in every branch          | ✅  |    |    |    |    |
+| [limit-retries](documentation/rules/limit-retries.md)                                         | Enforce limits for Mocha retries                                        |    |    | ✅  |    |    |
+| [limit-slow](documentation/rules/limit-slow.md)                                               | Enforce limits for Mocha slow thresholds                                |    |    | ✅  |    |    |
+| [limit-timeout](documentation/rules/limit-timeout.md)                                         | Enforce limits for Mocha timeouts                                       |    |    | ✅  |    |    |
+| [max-top-level-suites](documentation/rules/max-top-level-suites.md)                           | Enforce the number of top-level suites in a single file                 |    |    | ✅  |    |    |
+| [no-async-and-done](documentation/rules/no-async-and-done.md)                                 | Disallow async functions that also use a Mocha callback                 | ✅  |    |    |    |    |
+| [no-async-in-sync-tests](documentation/rules/no-async-in-sync-tests.md)                       | Disallow async operations in synchronous tests or hooks                 | ✅  |    |    |    |    |
+| [no-async-suite](documentation/rules/no-async-suite.md)                                       | Disallow async functions passed to a suite                              | ✅  |    |    | 🔧 |    |
+| [no-code-after-done](documentation/rules/no-code-after-done.md)                               | Disallow executing code after calling a Mocha callback                  | ✅  |    |    |    |    |
+| [no-conditional-tests](documentation/rules/no-conditional-tests.md)                           | Disallow conditional suite and test declarations                        | ✅  |    |    |    |    |
+| [no-done-twice](documentation/rules/no-done-twice.md)                                         | Disallow calling a Mocha callback more than once                        | ✅  |    |    |    |    |
+| [no-empty-title](documentation/rules/no-empty-title.md)                                       | Disallow empty suite and test descriptions                              | ✅  |    |    |    |    |
+| [no-exclusive-tests](documentation/rules/no-exclusive-tests.md)                               | Disallow exclusive tests                                                |    | ✅  |    |    | 💡 |
+| [no-exports](documentation/rules/no-exports.md)                                               | Disallow exports from test files                                        | ✅  |    |    |    | 💡 |
+| [no-hooks](documentation/rules/no-hooks.md)                                                   | Disallow hooks                                                          |    |    | ✅  |    |    |
+| [no-hooks-for-single-child](documentation/rules/no-hooks-for-single-child.md)                 | Disallow hooks with a single direct child                               |    |    | ✅  |    |    |
+| [no-identical-title](documentation/rules/no-identical-title.md)                               | Disallow identical titles                                               | ✅  |    |    |    |    |
+| [no-mocha-arrows](documentation/rules/no-mocha-arrows.md)                                     | Disallow arrow functions as arguments to mocha functions                | ✅  |    |    | 🔧 |    |
+| [no-nested-suites](documentation/rules/no-nested-suites.md)                                   | Disallow suites to be nested within other suites                        |    |    | ✅  |    |    |
+| [no-nested-tests](documentation/rules/no-nested-tests.md)                                     | Disallow tests to be nested within other tests                          | ✅  |    |    |    |    |
+| [no-pending-tests](documentation/rules/no-pending-tests.md)                                   | Disallow pending tests                                                  |    | ✅  |    |    | 💡 |
+| [no-return-and-done](documentation/rules/no-return-and-done.md)                               | Disallow returning in a test or hook function that uses a callback      | ✅  |    |    |    |    |
+| [no-return-from-async](documentation/rules/no-return-from-async.md)                           | Disallow returning from an async test or hook                           |    |    | ✅  |    |    |
+| [no-root-hooks](documentation/rules/no-root-hooks.md)                                         | Disallow root hooks                                                     |    |    | ✅  |    |    |
+| [no-setup-in-suite](documentation/rules/no-setup-in-suite.md)                                 | Disallow setup in suite blocks                                          |    |    | ✅  |    |    |
+| [no-synchronous-tests](documentation/rules/no-synchronous-tests.md)                           | Disallow synchronous tests                                              |    |    | ✅  |    |    |
+| [no-top-level-tests](documentation/rules/no-top-level-tests.md)                               | Disallow top-level tests                                                | ✅  |    |    |    |    |
+| [prefer-arrow-callback](documentation/rules/prefer-arrow-callback.md)                         | Require using arrow functions for callbacks                             |    |    | ✅  | 🔧 |    |
+| [valid-suite-title](documentation/rules/valid-suite-title.md)                                 | Require suite descriptions to match a pre-configured regular expression |    |    | ✅  |    |    |
+| [valid-test-title](documentation/rules/valid-test-title.md)                                   | Require test descriptions to match a pre-configured regular expression  |    |    | ✅  |    |    |
 
 <!-- end auto-generated rules list -->
+<!-- dprint-ignore-end -->

@@ -7,7 +7,7 @@ const configFiles = [
 const entryPointFiles = [ '^source/plugin\\.ts$' ];
 const benchmarkFiles = [ '^benchmarks/', '\\.bench\\.ts$' ];
 const testFiles = [ '\\.test\\.ts$' ];
-const testSupportFiles = [ '^source/mocha-interface-test-cases\\.ts$' ];
+const testSupportFiles = [ '^source/mocha-interface-test-cases\\.ts$', '\\.test-support\\.ts$' ];
 const excludedFiles = [ '^(\\./)?target/' ];
 
 const ignoreFromOrphans = [ ...configFiles, ...entryPointFiles, ...benchmarkFiles, ...testFiles, ...testSupportFiles ];
