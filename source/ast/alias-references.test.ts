@@ -92,7 +92,7 @@ function createConstAliasReference(aliasName: string, originalName: string): Res
 }
 
 suite('resolveAliasedReferences()', function () {
-    suite('cases 1', function () {
+    suite('direct references and simple aliases', function () {
         test('returns an empty array if no initial references exist', function () {
             const aliases = findResolvedAliasesOfGlobalVariables('');
 
@@ -159,7 +159,7 @@ suite('resolveAliasedReferences()', function () {
         });
     });
 
-    suite('cases 2', function () {
+    suite('declaration and destructuring aliases', function () {
         test('traces renames via const variable declaration const y = bar, x = foo; x', function () {
             const aliases = findResolvedAliasesOfGlobalVariables('const x = foo; x;');
 
@@ -229,7 +229,7 @@ suite('resolveAliasedReferences()', function () {
         });
     });
 
-    suite('cases 3', function () {
+    suite('call, member, and object aliases', function () {
         test('traces property aliases of renames const declaration const x = foo; x.bar', function () {
             const aliases = findResolvedAliasesOfGlobalVariables('const x = foo; x.bar;');
 
@@ -309,7 +309,7 @@ suite('resolveAliasedReferences()', function () {
         });
     });
 
-    suite('cases 4', function () {
+    suite('nested patterns and scoped aliases', function () {
         test('traces multiple bindings from a nested object pattern', function () {
             const aliases = findResolvedAliasesOfGlobalVariables('const { foo: { bar, baz } } = x; bar; baz;');
 
@@ -390,7 +390,7 @@ suite('resolveAliasedReferences()', function () {
         });
     });
 
-    suite('cases 5', function () {
+    suite('multiple aliases and dynamic members', function () {
         test('traces multiple const renames in the same scope', function () {
             const aliases = findResolvedAliasesOfGlobalVariables('const { bar } = foo; const baz = bar; baz;');
 
@@ -486,7 +486,7 @@ suite('resolveAliasedReferences()', function () {
         });
     });
 
-    suite('cases 6', function () {
+    suite('unresolved dynamic members and rest patterns', function () {
         test('doesn’t trace unresolvable dynamic member expression aliases of aliases', function () {
             const aliases = findResolvedAliasesOfGlobalVariables(
                 'const { bar } = foo; bar[Math.random()];'
