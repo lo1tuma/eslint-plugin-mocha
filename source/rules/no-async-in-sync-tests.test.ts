@@ -1,6 +1,7 @@
+import assert from 'node:assert';
 import * as typescriptParser from '@typescript-eslint/parser';
 import { Linter, RuleTester } from 'eslint';
-import assert from 'node:assert';
+import { suite, test } from 'mocha';
 import { withInterface } from '../mocha-interface-test-cases.js';
 import { isRecord } from '../record.js';
 import { noAsyncInSyncTestsRule } from './no-async-in-sync-tests.js';
@@ -9,7 +10,7 @@ const slowTypedTestTimeout = 30_000;
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const { pathname: projectRoot } = new URL('../../', import.meta.url);
 const { pathname: typescriptFilename } = new URL('./no-async-in-sync-tests.fixture.ts', import.meta.url);
-const allowSetTimeoutOption = { allowedAsyncMethods: ['setTimeout'] };
+const allowSetTimeoutOption = { allowedAsyncMethods: [ 'setTimeout' ] };
 const defaultAllowedAsyncMethods = [
     'setImmediate',
     'setInterval',
@@ -31,7 +32,7 @@ const defaultAllowedAsyncMethods = [
 const typescriptLanguageOptions = {
     parser: typescriptParser,
     parserOptions: {
-        projectService: { allowDefaultProject: ['source/rules/*.fixture.ts'] },
+        projectService: { allowDefaultProject: [ 'source/rules/*.fixture.ts' ] },
         tsconfigRootDir: projectRoot
     },
     sourceType: 'module'
@@ -69,12 +70,12 @@ function withLongerTimeout(testFn: RuleTesterTestFunction): RuleTesterTestFuncti
 function verifyWithParserServices(parserServices: unknown): readonly Linter.LintMessage[] {
     const linter = new Linter({ configType: 'flat' });
 
-    return linter.verify('it("", function () { returnsPromise(); });', [{
+    return linter.verify('it("", function () { returnsPromise(); });', [ {
         languageOptions: {
             ecmaVersion: 2020,
             sourceType: 'script',
             parser: {
-                parseForESLint(code: string, options: Record<string, unknown>) {
+                parseForESLint(code: string, options: Readonly<Record<string, unknown>>) {
                     const parsed = typescriptParser.parseForESLint(code, {
                         ...options,
                         comment: true,
@@ -103,155 +104,27 @@ function verifyWithParserServices(parserServices: unknown): readonly Linter.Lint
         rules: {
             'mocha/no-async-in-sync-tests': 'error'
         }
-    }]);
+    } ]);
 }
 
-RuleTester.it = withLongerTimeout(defaultIt);
-RuleTester.itOnly = withLongerTimeout(defaultItOnly);
-
-ruleTester.run('no-async-in-sync-tests', noAsyncInSyncTestsRule, {
-    valid: [
-        'it("", function () {});',
-        'it("", function (done) { load(function (error) { done(error); }); });',
-        'it("", function () { load(function () {}); });',
-        'it("", async function () { await load(); });',
-        'it("", function () { return load().then(function () {}); });',
-        'it("", function () { return; });',
-        'it("", () => load().then(function () {}));',
-        'it("", function () { promise[method](cleanup); });',
-        'it("", function () { return 42; });',
-        'it("", function (done) { setTimeout(done, 0); });',
-        'before(function () { return task().finally(cleanup); });',
-        'describe("", function () { load().then(function () {}); });',
-        {
-            code: 'it("", function () { setTimeout(work, 0); });',
-            options: [allowSetTimeoutOption]
-        },
-        {
-            code: 'it("", function () { queryBuilder().catch(function (reason) {}); });\n' +
-                'declare function queryBuilder(): { catch(callback: (reason: unknown) => number): number; };',
-            filename: typescriptFilename,
-            languageOptions: typescriptLanguageOptions
-        },
-        {
-            code: 'it("", function () { return returnsPromise(); });\n' +
-                'declare function returnsPromise(): Promise<number>;',
-            filename: typescriptFilename,
-            languageOptions: typescriptLanguageOptions
-        },
-        withInterface('TDD', 'test("", function () { return task().then(function () {}); });')
-    ],
-
-    invalid: [
-        {
-            code: 'it("", function () { load(function (error) {}); });',
-            errors: [{ messageId: 'unexpectedCallbackAsyncOperation' }]
-        },
-        {
-            code: 'it("", function () { load(function (err, result) { use(result); }); });',
-            errors: [{ messageId: 'unexpectedCallbackAsyncOperation' }]
-        },
-        {
-            code: 'it("", function () { return load(function (error) {}); });',
-            errors: [{ messageId: 'unexpectedCallbackAsyncOperation' }]
-        },
-        {
-            code: 'it("", function () { load().then(function () {}); });',
-            errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
-        },
-        {
-            code: 'it("", function () { something(load().catch(function (reason) {})); });',
-            errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
-        },
-        {
-            code: 'it("", function () { promise["then"](cleanup); });',
-            errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
-        },
-        ...defaultAllowedAsyncMethods.map((methodCall) => {
-            const expression = methodCall === 'setInterval' || methodCall.endsWith('.setInterval')
-                ? `${methodCall}(work, 0);`
-                : `${methodCall}(work);`;
-
-            return {
-                code: `it("", function () { ${expression} });`,
-                errors: [{ messageId: 'unexpectedScheduledAsyncOperation' }]
-            };
-        }),
-        {
-            code: 'it("", function () { promise?.then(cleanup); });',
-            languageOptions: { ecmaVersion: 2020 },
-            errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
-        },
-        {
-            code: 'it("", function () { promise.then?.(cleanup); });',
-            languageOptions: { ecmaVersion: 2020 },
-            errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
-        },
-        {
-            code: 'it("", function () { (promise?.then)(cleanup); });',
-            languageOptions: { ecmaVersion: 2020 },
-            errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
-        },
-        {
-            code: 'it("", () => load(function (error) {}));',
-            languageOptions: { ecmaVersion: 6 },
-            errors: [{ messageId: 'unexpectedCallbackAsyncOperation' }]
-        },
-        {
-            code: 'before(function () { initialize(function (error) {}); });',
-            errors: [{ messageId: 'unexpectedCallbackAsyncOperation' }]
-        },
-        withInterface('TDD', {
-            code: 'test("", function () { task().finally(cleanup); });',
-            errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
-        }),
-        {
-            code: 'it("", function () { returnsPromise(); });\n' +
-                'declare function returnsPromise(): Promise<number>;',
-            filename: typescriptFilename,
-            languageOptions: typescriptLanguageOptions,
-            errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
-        },
-        {
-            code: 'it("", function () { load(function (error) {}); });\n' +
-                'declare function load(callback: (error: Error | null) => void): void;',
-            filename: typescriptFilename,
-            languageOptions: typescriptLanguageOptions,
-            errors: [{ messageId: 'unexpectedCallbackAsyncOperation' }]
-        },
-        {
-            code: 'it("", function (this: Mocha.Context) { returnsPromise(); });\n' +
-                'declare function returnsPromise(): Promise<number>;',
-            filename: typescriptFilename,
-            languageOptions: typescriptLanguageOptions,
-            errors: [{ messageId: 'unexpectedPromiseAsyncOperation' }]
-        }
-    ]
-});
-
-RuleTester.it = defaultIt;
-RuleTester.itOnly = defaultItOnly;
-
-describe('no-async-in-sync-tests metadata', function () {
-    it('defaults to allowing no additional async methods', function () {
-        assert.deepStrictEqual(noAsyncInSyncTestsRule.meta?.defaultOptions, [{ allowedAsyncMethods: [] }]);
+function registerAdditionalTests(): void {
+    test('no-async-in-sync-tests metadata defaults to allowing no additional async methods', function () {
+        assert.deepStrictEqual(noAsyncInSyncTestsRule.meta?.defaultOptions, [ { allowedAsyncMethods: [] } ]);
     });
-});
 
-describe('no-async-in-sync-tests parser services', function () {
-    it('ignores missing parser services', function () {
+    test('no-async-in-sync-tests parser services ignore missing parser services', function () {
         assert.deepStrictEqual(verifyWithParserServices(null), []);
     });
 
-    it('ignores parser services that are not records', function () {
+    test('ignores parser services that are not records', function () {
         assert.deepStrictEqual(verifyWithParserServices([]), []);
     });
 
-    it('ignores parser services without type access', function () {
+    test('ignores parser services without type access', function () {
         assert.deepStrictEqual(verifyWithParserServices({}), []);
     });
 
-    it('ignores parser services without a type checker', function () {
+    test('ignores parser services without a type checker', function () {
         assert.deepStrictEqual(
             verifyWithParserServices({
                 getTypeAtLocation() {
@@ -262,7 +135,7 @@ describe('no-async-in-sync-tests parser services', function () {
         );
     });
 
-    it('ignores parser services without promised type inspection', function () {
+    test('ignores parser services without promised type inspection', function () {
         assert.deepStrictEqual(
             verifyWithParserServices({
                 getTypeAtLocation() {
@@ -278,7 +151,7 @@ describe('no-async-in-sync-tests parser services', function () {
         );
     });
 
-    it('ignores parser services with a non-function promised type accessor', function () {
+    test('ignores parser services with a non-function promised type accessor', function () {
         assert.deepStrictEqual(
             verifyWithParserServices({
                 getTypeAtLocation() {
@@ -296,7 +169,7 @@ describe('no-async-in-sync-tests parser services', function () {
         );
     });
 
-    it('ignores type lookup failures', function () {
+    test('ignores type lookup failures', function () {
         assert.deepStrictEqual(
             verifyWithParserServices({
                 getTypeAtLocation() {
@@ -315,4 +188,219 @@ describe('no-async-in-sync-tests parser services', function () {
             []
         );
     });
+}
+
+suite('no-async-in-sync-tests', function () {
+    RuleTester.it = withLongerTimeout(defaultIt);
+    RuleTester.itOnly = withLongerTimeout(defaultItOnly);
+
+    ruleTester.run('no-async-in-sync-tests', noAsyncInSyncTestsRule, {
+        valid: [
+            'it("", function () {});',
+            'it("", function (done) { load(function (error) { done(error); }); });',
+            'it("", function () { load(function () {}); });',
+            'it("", async function () { await load(); });',
+            'it("", function () { return load().then(function () {}); });',
+            'it("", function () { return; });',
+            'it("", () => load().then(function () {}));',
+            'it("", function () { promise[method](cleanup); });',
+            'it("", function () { return 42; });',
+            'it("", function (done) { setTimeout(done, 0); });',
+            'before(function () { return task().finally(cleanup); });',
+            'describe("", function () { load().then(function () {}); });',
+            {
+                code: 'it("", function () { setTimeout(work, 0); });',
+                options: [ allowSetTimeoutOption ],
+                name: 'valid case 1'
+            },
+            {
+                filename: typescriptFilename,
+                code: 'it("", function () { queryBuilder().catch(function (reason) {}); });\n' +
+                    'declare function queryBuilder(): { catch(callback: (reason: unknown) => number): number; };',
+                languageOptions: typescriptLanguageOptions
+            },
+            {
+                filename: typescriptFilename,
+                code: 'it("", function () { return returnsPromise(); });\n' +
+                    'declare function returnsPromise(): Promise<number>;',
+                languageOptions: typescriptLanguageOptions
+            },
+            withInterface('TDD', 'test("", function () { return task().then(function () {}); });')
+        ],
+
+        invalid: [
+            {
+                code: 'it("", function () { load(function (error) {}); });',
+                errors: [ {
+                    messageId: 'unexpectedCallbackAsyncOperation',
+                    line: 1,
+                    column: 22,
+                    endLine: 1,
+                    endColumn: 47
+                } ]
+            },
+            {
+                code: 'it("", function () { load(function (err, result) { use(result); }); });',
+                errors: [ {
+                    messageId: 'unexpectedCallbackAsyncOperation',
+                    line: 1,
+                    column: 22,
+                    endLine: 1,
+                    endColumn: 67
+                } ]
+            },
+            {
+                code: 'it("", function () { return load(function (error) {}); });',
+                errors: [ {
+                    messageId: 'unexpectedCallbackAsyncOperation',
+                    line: 1,
+                    column: 29,
+                    endLine: 1,
+                    endColumn: 54
+                } ]
+            },
+            {
+                code: 'it("", function () { load().then(function () {}); });',
+                errors: [ {
+                    messageId: 'unexpectedPromiseAsyncOperation',
+                    line: 1,
+                    column: 22,
+                    endLine: 1,
+                    endColumn: 49
+                } ]
+            },
+            {
+                code: 'it("", function () { something(load().catch(function (reason) {})); });',
+                errors: [ {
+                    messageId: 'unexpectedPromiseAsyncOperation',
+                    line: 1,
+                    column: 32,
+                    endLine: 1,
+                    endColumn: 66
+                } ]
+            },
+            {
+                code: 'it("", function () { promise["then"](cleanup); });',
+                errors: [ {
+                    messageId: 'unexpectedPromiseAsyncOperation',
+                    line: 1,
+                    column: 22,
+                    endLine: 1,
+                    endColumn: 46
+                } ]
+            },
+            ...defaultAllowedAsyncMethods.map(function (methodCall) {
+                const expression = methodCall === 'setInterval' || methodCall.endsWith('.setInterval')
+                    ? `${methodCall}(work, 0);`
+                    : `${methodCall}(work);`;
+
+                return {
+                    code: `it("", function () { ${expression} });`,
+                    errors: [ { messageId: 'unexpectedScheduledAsyncOperation' } ]
+                };
+            }),
+            {
+                code: 'it("", function () { promise?.then(cleanup); });',
+                languageOptions: { ecmaVersion: 2020 },
+                errors: [ {
+                    messageId: 'unexpectedPromiseAsyncOperation',
+                    line: 1,
+                    column: 22,
+                    endLine: 1,
+                    endColumn: 44
+                } ]
+            },
+            {
+                code: 'it("", function () { promise.then?.(cleanup); });',
+                languageOptions: { ecmaVersion: 2020 },
+                errors: [ {
+                    messageId: 'unexpectedPromiseAsyncOperation',
+                    line: 1,
+                    column: 22,
+                    endLine: 1,
+                    endColumn: 45
+                } ]
+            },
+            {
+                code: 'it("", function () { (promise?.then)(cleanup); });',
+                languageOptions: { ecmaVersion: 2020 },
+                errors: [ {
+                    messageId: 'unexpectedPromiseAsyncOperation',
+                    line: 1,
+                    column: 22,
+                    endLine: 1,
+                    endColumn: 46
+                } ]
+            },
+            {
+                code: 'it("", () => load(function (error) {}));',
+                languageOptions: { ecmaVersion: 6 },
+                errors: [ {
+                    messageId: 'unexpectedCallbackAsyncOperation',
+                    line: 1,
+                    column: 14,
+                    endLine: 1,
+                    endColumn: 39
+                } ]
+            },
+            {
+                code: 'before(function () { initialize(function (error) {}); });',
+                errors: [ {
+                    messageId: 'unexpectedCallbackAsyncOperation',
+                    line: 1,
+                    column: 22,
+                    endLine: 1,
+                    endColumn: 53
+                } ]
+            },
+            withInterface('TDD', {
+                code: 'test("", function () { task().finally(cleanup); });',
+                errors: [ { messageId: 'unexpectedPromiseAsyncOperation' } ]
+            }),
+            {
+                filename: typescriptFilename,
+                code: 'it("", function () { returnsPromise(); });\n' +
+                    'declare function returnsPromise(): Promise<number>;',
+                languageOptions: typescriptLanguageOptions,
+                errors: [ {
+                    messageId: 'unexpectedPromiseAsyncOperation',
+                    line: 1,
+                    column: 22,
+                    endLine: 1,
+                    endColumn: 38
+                } ]
+            },
+            {
+                filename: typescriptFilename,
+                code: 'it("", function () { load(function (error) {}); });\n' +
+                    'declare function load(callback: (error: Error | null) => void): void;',
+                languageOptions: typescriptLanguageOptions,
+                errors: [ {
+                    messageId: 'unexpectedCallbackAsyncOperation',
+                    line: 1,
+                    column: 22,
+                    endLine: 1,
+                    endColumn: 47
+                } ]
+            },
+            {
+                filename: typescriptFilename,
+                code: 'it("", function (this: Mocha.Context) { returnsPromise(); });\n' +
+                    'declare function returnsPromise(): Promise<number>;',
+                languageOptions: typescriptLanguageOptions,
+                errors: [ {
+                    messageId: 'unexpectedPromiseAsyncOperation',
+                    line: 1,
+                    column: 41,
+                    endLine: 1,
+                    endColumn: 57
+                } ]
+            }
+        ]
+    });
+
+    RuleTester.it = defaultIt;
+    RuleTester.itOnly = defaultItOnly;
+
+    registerAdditionalTests();
 });

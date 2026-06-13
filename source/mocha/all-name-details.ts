@@ -8,8 +8,8 @@ import { buildAllNameDetailsWithVariants, type NameDetails } from './name-detail
 import { convertNameToPathArray } from './path.js';
 
 export type CustomNameConfig = Pick<NameDetailsConfig, 'interface'> & {
-    name: string;
-    type: CustomMochaEntityType;
+    readonly name: string;
+    readonly type: CustomMochaEntityType;
 };
 
 function nameConfigToNameDetails(nameConfig: Readonly<CustomNameConfig>): Readonly<NameDetailsConfig> {
@@ -37,7 +37,7 @@ function filterByInterface(
     nameDetailsList: readonly NameDetailsConfig[],
     interfaceToUse: MochaInterface
 ): readonly NameDetailsConfig[] {
-    return nameDetailsList.filter((nameDetails) => {
+    return nameDetailsList.filter(function (nameDetails) {
         return hasMatchingInterface(nameDetails, interfaceToUse);
     });
 }
@@ -46,7 +46,7 @@ function filterCustomNamesByInterface(
     nameDetailsList: readonly NameDetailsConfig[],
     interfaceToUse: MochaInterface
 ): readonly NameDetailsConfig[] {
-    return nameDetailsList.filter((nameDetails) => {
+    return nameDetailsList.filter(function (nameDetails) {
         return hasMatchingCustomInterface(nameDetails, interfaceToUse);
     });
 }
@@ -98,8 +98,8 @@ export function getAllNames(
 
     return [
         ...builtinNameDetails,
-        ...(includeAllInterfaces
+        ...includeAllInterfaces
             ? getAllCustomNameDetails(additionalNames)
-            : getCustomNameDetailsForInterface(additionalNames, interfaceToUse))
+            : getCustomNameDetailsForInterface(additionalNames, interfaceToUse)
     ];
 }

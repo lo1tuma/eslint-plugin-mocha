@@ -21,41 +21,41 @@ const knownSingleCallbackDelegates = new Set(
         .split(' ')
 );
 
-type CallExpressionNode = Parameters<Exclude<Rule.RuleListener['CallExpression'], undefined>>[0];
+type CallExpressionNode = Readonly<Parameters<Exclude<Rule.RuleListener['CallExpression'], undefined>>[0]>;
 type CallbackReferenceState = {
-    aliasBindings: Set<TrackedBinding>;
-    containerPropertiesByBinding: Map<TrackedBinding, Set<string>>;
+    readonly aliasBindings: ReadonlySet<TrackedBinding>;
+    readonly containerPropertiesByBinding: ReadonlyMap<TrackedBinding, ReadonlySet<string>>;
 };
 export type CallbackPathState = {
-    callbackHandled: boolean;
-    handledReferences: CallbackReferenceState;
-    unhandledReferences: CallbackReferenceState;
+    readonly callbackHandled: boolean;
+    readonly handledReferences: CallbackReferenceState;
+    readonly unhandledReferences: CallbackReferenceState;
 };
 
 export type CallbackHandlingOperation =
     | {
-        node: CallExpressionNode;
-        type: 'call';
+        readonly node: CallExpressionNode;
+        readonly type: 'call';
     }
     | {
-        node: Rule.Node;
-        propertyName: string | undefined;
-        source: Readonly<Rule.Node> | null;
-        target: TrackedBinding;
-        type: 'containerPropertyAssignment';
+        readonly node: Rule.Node;
+        readonly propertyName: string | undefined;
+        readonly source: Readonly<Rule.Node> | null;
+        readonly target: TrackedBinding;
+        readonly type: 'containerPropertyAssignment';
     }
     | {
-        node: Rule.Node;
-        source: Readonly<Rule.Node> | null;
-        target: TrackedBinding;
-        type: 'bindingAssignment';
+        readonly node: Rule.Node;
+        readonly source: Readonly<Rule.Node> | null;
+        readonly target: TrackedBinding;
+        readonly type: 'bindingAssignment';
     };
 
 export type CallbackHandlingContext = {
-    callbackBinding: TrackedBinding;
-    codePath: Readonly<Rule.CodePath>;
-    operationsBySegmentId: ReadonlyMap<string, readonly CallbackHandlingOperation[]>;
-    sourceCode: Readonly<Rule.RuleContext['sourceCode']>;
+    readonly callbackBinding: TrackedBinding;
+    readonly codePath: Readonly<Rule.CodePath>;
+    readonly operationsBySegmentId: ReadonlyMap<string, readonly CallbackHandlingOperation[]>;
+    readonly sourceCode: Readonly<Rule.RuleContext['sourceCode']>;
 };
 
 function createEmptyReferenceState(): CallbackReferenceState {
@@ -67,7 +67,7 @@ function createInitialPathState(callbackBinding: TrackedBinding): CallbackPathSt
         callbackHandled: false,
         handledReferences: createEmptyReferenceState(),
         unhandledReferences: {
-            aliasBindings: new Set([callbackBinding]),
+            aliasBindings: new Set([ callbackBinding ]),
             containerPropertiesByBinding: new Map()
         }
     };
@@ -103,8 +103,7 @@ export function arePathStatesSame(
     left: Readonly<CallbackPathState> | undefined,
     right: Readonly<CallbackPathState>
 ): boolean {
-    return left !== undefined &&
-        left.callbackHandled === right.callbackHandled &&
+    return left?.callbackHandled === right.callbackHandled &&
         areReferenceStatesSame(left.handledReferences, right.handledReferences) &&
         areReferenceStatesSame(left.unhandledReferences, right.unhandledReferences);
 }
@@ -132,23 +131,28 @@ function clearBindingReferenceState(
     state: Readonly<CallbackReferenceState>,
     target: TrackedBinding
 ): CallbackReferenceState {
-    const nextState = cloneReferenceState(state);
-
-    nextState.aliasBindings.delete(target);
-    nextState.containerPropertiesByBinding.delete(target);
-
-    return nextState;
+    return {
+        aliasBindings: new Set(
+            Array.from(state.aliasBindings).filter(function (binding) {
+                return binding !== target;
+            })
+        ),
+        containerPropertiesByBinding: new Map(
+            Array.from(state.containerPropertiesByBinding).filter(function ([ binding ]) {
+                return binding !== target;
+            })
+        )
+    };
 }
 
 function addAliasBindingReferenceState(
     state: Readonly<CallbackReferenceState>,
     target: TrackedBinding
 ): CallbackReferenceState {
-    const nextState = cloneReferenceState(state);
-
-    nextState.aliasBindings.add(target);
-
-    return nextState;
+    return {
+        ...state,
+        aliasBindings: new Set([ ...state.aliasBindings, target ])
+    };
 }
 
 function addContainerPropertyReferenceState(
@@ -156,11 +160,13 @@ function addContainerPropertyReferenceState(
     target: TrackedBinding,
     trackedProperties: ReadonlySet<string>
 ): CallbackReferenceState {
-    const nextState = cloneReferenceState(state);
-
-    nextState.containerPropertiesByBinding.set(target, new Set(trackedProperties));
-
-    return nextState;
+    return {
+        ...state,
+        containerPropertiesByBinding: new Map([
+            ...state.containerPropertiesByBinding,
+            [ target, new Set(trackedProperties) ]
+        ])
+    };
 }
 
 function assignBindingReferenceState(
@@ -187,7 +193,7 @@ function assignBindingReferenceState(
 function updateBindingReferenceState(
     sourceCode: Readonly<Rule.RuleContext['sourceCode']>,
     state: Readonly<CallbackReferenceState>,
-    operation: Readonly<Extract<CallbackHandlingOperation, { type: 'bindingAssignment'; }>>
+    operation: Readonly<Extract<CallbackHandlingOperation, { readonly type: 'bindingAssignment'; }>>
 ): CallbackReferenceState {
     const clearedState = clearBindingReferenceState(state, operation.target);
 
@@ -202,7 +208,7 @@ function updateBindingReferenceState(
 function updateContainerPropertyReferenceState(
     sourceCode: Readonly<Rule.RuleContext['sourceCode']>,
     state: Readonly<CallbackReferenceState>,
-    operation: Readonly<Extract<CallbackHandlingOperation, { type: 'containerPropertyAssignment'; }>>
+    operation: Readonly<Extract<CallbackHandlingOperation, { readonly type: 'containerPropertyAssignment'; }>>
 ): CallbackReferenceState {
     const nextState = cloneReferenceState(state);
     const trackedProperty = operation.propertyName ?? dynamicPropertyName;
@@ -214,13 +220,24 @@ function updateContainerPropertyReferenceState(
         nextProperties.add(trackedProperty);
     }
 
-    if (nextProperties.size === 0) {
-        nextState.containerPropertiesByBinding.delete(operation.target);
-    } else {
-        nextState.containerPropertiesByBinding.set(operation.target, nextProperties);
+    if (nextProperties.size > 0) {
+        return {
+            ...nextState,
+            containerPropertiesByBinding: new Map([
+                ...nextState.containerPropertiesByBinding,
+                [ operation.target, nextProperties ]
+            ])
+        };
     }
 
-    return nextState;
+    return {
+        ...nextState,
+        containerPropertiesByBinding: new Map(
+            Array.from(nextState.containerPropertiesByBinding).filter(function ([ binding ]) {
+                return binding !== operation.target;
+            })
+        )
+    };
 }
 
 function getNormalizedCallPath(
@@ -247,7 +264,7 @@ function isKnownSingleCallbackDelegateCall(
         return false;
     }
 
-    return node.arguments.some((argument) => {
+    return node.arguments.some(function (argument) {
         const candidate = argument.type === 'SpreadElement' ? argument.argument : argument;
         return isTrackedCallbackExpression(sourceCode, asRuleNode(candidate), state);
     });
@@ -255,7 +272,7 @@ function isKnownSingleCallbackDelegateCall(
 
 function isCallbackHandlingCall(
     sourceCode: Readonly<Rule.RuleContext['sourceCode']>,
-    operation: Readonly<Extract<CallbackHandlingOperation, { type: 'call'; }>>,
+    operation: Readonly<Extract<CallbackHandlingOperation, { readonly type: 'call'; }>>,
     state: Readonly<CallbackReferenceState>
 ): boolean {
     return isTrackedCallbackExpression(sourceCode, asRuleNode(operation.node.callee), state) ||
@@ -280,7 +297,7 @@ function mergeContainerProperties(
     const containerPropertiesByBinding = new Map<TrackedBinding, Set<string>>();
 
     for (const state of states) {
-        for (const [binding, properties] of state.containerPropertiesByBinding) {
+        for (const [ binding, properties ] of state.containerPropertiesByBinding) {
             const currentProperties = containerPropertiesByBinding.get(binding) ?? new Set<string>();
 
             for (const property of properties) {
@@ -368,13 +385,13 @@ function mergeIncomingPathStates(
     }
 
     return {
-        callbackHandled: previousStates.some((state) => {
+        callbackHandled: previousStates.some(function (state) {
             return state.callbackHandled;
         }),
-        handledReferences: mergeReferenceStates(previousStates.map((state) => {
+        handledReferences: mergeReferenceStates(previousStates.map(function (state) {
             return state.handledReferences;
         })),
-        unhandledReferences: mergeReferenceStates(previousStates.map((state) => {
+        unhandledReferences: mergeReferenceStates(previousStates.map(function (state) {
             return state.unhandledReferences;
         }))
     };
@@ -391,7 +408,7 @@ export function createEntryState(
 
     return mergeIncomingPathStates(
         context.callbackBinding,
-        segment.prevSegments.map((previousSegment) => {
+        segment.prevSegments.map(function (previousSegment) {
             return exitStatesBySegmentId.get(previousSegment.id) ?? createInitialPathState(context.callbackBinding);
         })
     );

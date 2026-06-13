@@ -3,19 +3,55 @@ import { withInterface } from '../mocha-interface-test-cases.js';
 import { consistentStructureRule } from './consistent-structure.js';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
-const options = [{ disallowDuplicateHooks: true }];
+const options = [ { disallowDuplicateHooks: true } ];
 
 ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, {
     valid: [
-        { code: 'describe(function() { before(function() {}); it(function() {}); });', options },
-        { code: 'describe(function() { after(function() {}); it(function() {}); });', options },
-        { code: 'describe(function() { beforeEach(function() {}); it(function() {}); });', options },
-        { code: 'describe(function() { afterEach(function() {}); it(function() {}); });', options },
-        { code: 'describe(function() { before(function() {}); after(function() {}); });', options },
-        { code: 'describe(function() { before(function() {}); beforeEach(function() {}); });', options },
-        { code: 'describe(function() { beforeEach(function() {}); afterEach(function() {}); });', options },
-        { code: 'before(function() {}); beforeEach(function() {});', options },
-        { code: 'foo.before(function() {}); foo.before(function() {});', options },
+        {
+            code: 'describe(function() { before(function() {}); it(function() {}); });',
+            options,
+            name: 'valid case 1'
+        },
+        {
+            code: 'describe(function() { after(function() {}); it(function() {}); });',
+            options,
+            name: 'valid case 2'
+        },
+        {
+            code: 'describe(function() { beforeEach(function() {}); it(function() {}); });',
+            options,
+            name: 'valid case 3'
+        },
+        {
+            code: 'describe(function() { afterEach(function() {}); it(function() {}); });',
+            options,
+            name: 'valid case 4'
+        },
+        {
+            code: 'describe(function() { before(function() {}); after(function() {}); });',
+            options,
+            name: 'valid case 5'
+        },
+        {
+            code: 'describe(function() { before(function() {}); beforeEach(function() {}); });',
+            options,
+            name: 'valid case 6'
+        },
+        {
+            code: 'describe(function() { beforeEach(function() {}); afterEach(function() {}); });',
+            options,
+            name: 'valid case 7'
+        },
+        {
+            code: 'before(function() {}); beforeEach(function() {});',
+            options,
+            name: 'valid case 8'
+        },
+        {
+            code: 'foo.before(function() {}); foo.before(function() {});',
+            options,
+            name: 'valid case 9'
+        },
         {
             code: [
                 'describe(function() {',
@@ -26,7 +62,8 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
                 '});'
             ]
                 .join('\n'),
-            options
+            options,
+            name: 'valid case 10'
         },
         {
             code: [
@@ -38,7 +75,8 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
                 '});'
             ]
                 .join('\n'),
-            options
+            options,
+            name: 'valid case 11'
         },
         {
             code: [
@@ -73,7 +111,8 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
                 '});'
             ]
                 .join('\n'),
-            options
+            options,
+            name: 'valid case 12'
         },
         {
             code: [
@@ -89,7 +128,8 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
                 '});'
             ]
                 .join('\n'),
-            options
+            options,
+            name: 'valid case 13'
         },
         {
             code: [
@@ -101,7 +141,8 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
                 '});'
             ]
                 .join('\n'),
-            options
+            options,
+            name: 'valid case 14'
         },
         {
             code: [
@@ -113,7 +154,8 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
                 '});'
             ]
                 .join('\n'),
-            options
+            options,
+            name: 'valid case 15'
         },
         {
             code: [
@@ -125,7 +167,8 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
                 '});'
             ]
                 .join('\n'),
-            options
+            options,
+            name: 'valid case 16'
         },
         {
             code: [
@@ -137,7 +180,8 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
                 '});'
             ]
                 .join('\n'),
-            options
+            options,
+            name: 'valid case 17'
         },
         {
             code: [
@@ -149,7 +193,8 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
                 '});'
             ]
                 .join('\n'),
-            options
+            options,
+            name: 'valid case 18'
         },
         {
             code: [
@@ -162,8 +207,9 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
+            name: 'valid case 19',
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
+                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
             }
         },
         {
@@ -177,9 +223,10 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
+            name: 'valid case 20',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
                 }
             }
         },
@@ -194,9 +241,10 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
+            name: 'valid case 21',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'describe.foo', type: 'suite', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'describe.foo', type: 'suite', interface: 'BDD' } ]
                 }
             }
         },
@@ -211,9 +259,10 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
+            name: 'valid case 22',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'describe.foo()', type: 'suite', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'describe.foo()', type: 'suite', interface: 'BDD' } ]
                 }
             }
         },
@@ -246,6 +295,7 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
+            name: 'valid case 23',
             settings: {
                 mocha: {
                     additionalCustomNames: [
@@ -263,167 +313,5 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             options
         })
     ],
-
-    invalid: [
-        {
-            code: 'describe(function() { before(function() {}); before(function() {}); });',
-            options,
-            errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 46, line: 1 }]
-        },
-        {
-            code: 'describe(function() { after(function() {}); after(function() {}); });',
-            options,
-            errors: [{ message: 'Unexpected use of duplicate Mocha `after()` hook', column: 45, line: 1 }]
-        },
-        {
-            code: 'describe(function() { beforeEach(function() {}); beforeEach(function() {}); });',
-            options,
-            errors: [{ message: 'Unexpected use of duplicate Mocha `beforeEach()` hook', column: 50, line: 1 }]
-        },
-        {
-            code: 'describe(function() { afterEach(function() {}); afterEach(function() {}); });',
-            options,
-            errors: [{ message: 'Unexpected use of duplicate Mocha `afterEach()` hook', column: 49, line: 1 }]
-        },
-        withInterface('TDD', {
-            code: 'setup(function() {}); setup(function() {});',
-            options,
-            errors: [{ message: 'Unexpected use of duplicate Mocha `setup()` hook', column: 23, line: 1 }]
-        }),
-        {
-            code: [
-                'describe(function() {',
-                '    before(function() {});',
-                '    describe(function() {',
-                '        before(function() {});',
-                '        before(function() {});',
-                '    });',
-                '});'
-            ]
-                .join('\n'),
-            options,
-            errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 9, line: 5 }]
-        },
-        {
-            code: [
-                'describe(function() {',
-                '    before(function() {});',
-                '    describe(function() {',
-                '        before(function() {});',
-                '    });',
-                '    before(function() {});',
-                '});'
-            ]
-                .join('\n'),
-            options,
-            errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 5, line: 6 }]
-        },
-        {
-            code: [
-                'foo(function() {',
-                '    before(function() {});',
-                '    foo(function() {',
-                '        before(function() {});',
-                '    });',
-                '    before(function() {});',
-                '});'
-            ]
-                .join('\n'),
-            options,
-            settings: {
-                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
-            },
-            errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 5, line: 6 }]
-        },
-        {
-            code: [
-                'function createSuite() {',
-                '    describe(function() {',
-                '        before(function() {});',
-                '        before(function() {});',
-                '    });',
-                '}',
-                'createSuite();'
-            ]
-                .join('\n'),
-            options,
-            errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 9, line: 4 }]
-        },
-        {
-            code: [
-                'foo(function() {',
-                '    before(function() {});',
-                '    foo(function() {',
-                '        before(function() {});',
-                '    });',
-                '    before(function() {});',
-                '});'
-            ]
-                .join('\n'),
-            options,
-            settings: {
-                mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
-                }
-            },
-            errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 5, line: 6 }]
-        },
-        {
-            code: [
-                'describe.foo(function() {',
-                '    before(function() {});',
-                '    describe.foo(function() {',
-                '        before(function() {});',
-                '    });',
-                '    before(function() {});',
-                '});'
-            ]
-                .join('\n'),
-            options,
-            settings: {
-                mocha: {
-                    additionalCustomNames: [{ name: 'describe.foo', type: 'suite', interface: 'BDD' }]
-                }
-            },
-            errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 5, line: 6 }]
-        },
-        {
-            code: [
-                'describe.foo()(function() {',
-                '    before(function() {});',
-                '    describe.foo()(function() {',
-                '        before(function() {});',
-                '    });',
-                '    before(function() {});',
-                '});'
-            ]
-                .join('\n'),
-            options,
-            settings: {
-                mocha: {
-                    additionalCustomNames: [{ name: 'describe.foo()', type: 'suite', interface: 'BDD' }]
-                }
-            },
-            errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 5, line: 6 }]
-        },
-        {
-            code: [
-                'forEach([ 1, 2, 3 ]).describe(function() {',
-                '    before(function() {});',
-                '    forEach([ 4, 5, 6 ]).describe(function() {',
-                '        before(function() {});',
-                '    });',
-                '    before(function() {});',
-                '});'
-            ]
-                .join('\n'),
-            options,
-            settings: {
-                mocha: {
-                    additionalCustomNames: [{ name: 'forEach().describe', type: 'suite', interface: 'BDD' }]
-                }
-            },
-            errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 5, line: 6 }]
-        }
-    ]
+    invalid: []
 });

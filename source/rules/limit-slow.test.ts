@@ -1,5 +1,6 @@
-import { Linter, RuleTester } from 'eslint';
 import assert from 'node:assert';
+import { Linter, RuleTester } from 'eslint';
+import { suite, test } from 'mocha';
 import { withInterface } from '../mocha-interface-test-cases.js';
 import { limitSlowRule } from './limit-slow.js';
 
@@ -13,96 +14,124 @@ ruleTester.run('limit-slow', limitSlowRule, {
         'it("works", function () {}).timeout(5000);',
         {
             code: 'it("works", function () {}).slow();',
-            options: [{ mode: 'max', max: 200 }]
+            options: [ { mode: 'max', max: 200 } ],
+            name: 'valid case 1'
         },
         {
             code: 'describe("suite", function () { this.slow(200); });',
-            options: [{ mode: 'max', max: 200 }]
+            options: [ { mode: 'max', max: 200 } ],
+            name: 'valid case 2'
         },
         {
             code: 'it("works", function () { this["slow"](200); });',
-            options: [{ mode: 'range', min: 50, max: 200 }]
+            options: [ { mode: 'range', min: 50, max: 200 } ],
+            name: 'valid case 3'
         },
         {
             code: 'it("works", function () { (() => this.slow(200))(); });',
+            options: [ { mode: 'range', min: 50, max: 200 } ],
             languageOptions: { ecmaVersion: 2015 },
-            options: [{ mode: 'range', min: 50, max: 200 }]
+            name: 'valid case 4'
         },
         {
             code: 'it("works", function () { function later() { this.slow(300); } });',
-            options: [{ mode: 'max', max: 200 }]
+            options: [ { mode: 'max', max: 200 } ],
+            name: 'valid case 5'
         },
         {
             code: 'const slowThreshold = 200; it("works", function () {}).slow(slowThreshold);',
+            options: [ { mode: 'max', max: 200 } ],
             languageOptions: { ecmaVersion: 2015 },
-            options: [{ mode: 'max', max: 200 }]
+            name: 'valid case 6'
         },
         {
             code: 'import { it } from "mocha"; it("works", function () {}).slow(200);',
+            options: [ { mode: 'max', max: 200 } ],
             languageOptions: {
                 ecmaVersion: 2018,
                 sourceType: 'module'
             },
-            options: [{ mode: 'max', max: 200 }],
+            name: 'valid case 7',
             settings: { mocha: { interface: 'require' } }
         },
         {
             code: 'custom("works", function () {}).slow(200);',
-            options: [{ mode: 'max', max: 200 }],
+            options: [ { mode: 'max', max: 200 } ],
+            name: 'valid case 8',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]
                 }
             }
         },
         withInterface('TDD', {
             code: 'test("works", function () {}).slow(200);',
-            options: [{ mode: 'range', min: 50, max: 200 }]
+            options: [ { mode: 'range', min: 50, max: 200 } ]
         })
     ],
 
     invalid: [
         {
             code: 'it("works", function () {}).slow(200);',
-            errors: [{ message: unexpectedSlow }]
+            errors: [ { message: unexpectedSlow, line: 1, column: 1, endLine: 1, endColumn: 38 } ]
         },
         {
             code: 'describe("suite", function () { this.slow(200); });',
-            errors: [{ message: unexpectedSlow }]
+            errors: [ { message: unexpectedSlow, line: 1, column: 33, endLine: 1, endColumn: 47 } ]
         },
         {
             code: 'it("works", function () { (() => this.slow(200))(); });',
             languageOptions: { ecmaVersion: 2015 },
-            errors: [{ message: unexpectedSlow }]
+            errors: [ { message: unexpectedSlow, line: 1, column: 34, endLine: 1, endColumn: 48 } ]
         },
         {
             code: 'it("works", function () {}).slow(300);',
-            options: [{ mode: 'max', max: 200 }],
-            errors: [{
-                message: 'Unexpected Mocha slow value 300. Maximum allowed is 200.'
-            }]
+            options: [ { mode: 'max', max: 200 } ],
+            errors: [ {
+                message: 'Unexpected Mocha slow value 300. Maximum allowed is 200.',
+                line: 1,
+                column: 1,
+                endLine: 1,
+                endColumn: 38
+            } ],
+            name: 'invalid case 1'
         },
         {
             code: 'const slowThreshold = 300; it("works", function () {}).slow(slowThreshold);',
+            options: [ { mode: 'max', max: 200 } ],
             languageOptions: { ecmaVersion: 2015 },
-            options: [{ mode: 'max', max: 200 }],
-            errors: [{
-                message: 'Unexpected Mocha slow value 300. Maximum allowed is 200.'
-            }]
+            errors: [ {
+                message: 'Unexpected Mocha slow value 300. Maximum allowed is 200.',
+                line: 1,
+                column: 28,
+                endLine: 1,
+                endColumn: 75
+            } ],
+            name: 'invalid case 2'
         },
         {
             code: 'it("works", function () {}).slow(25);',
-            options: [{ mode: 'range', min: 50, max: 200 }],
-            errors: [{
-                message: 'Unexpected Mocha slow value 25. Expected a value between 50 and 200.'
-            }]
+            options: [ { mode: 'range', min: 50, max: 200 } ],
+            errors: [ {
+                message: 'Unexpected Mocha slow value 25. Expected a value between 50 and 200.',
+                line: 1,
+                column: 1,
+                endLine: 1,
+                endColumn: 37
+            } ],
+            name: 'invalid case 3'
         },
         {
             code: 'describe("suite", function () { this["slow"](250); });',
-            options: [{ mode: 'range', min: 50, max: 200 }],
-            errors: [{
-                message: 'Unexpected Mocha slow value 250. Expected a value between 50 and 200.'
-            }]
+            options: [ { mode: 'range', min: 50, max: 200 } ],
+            errors: [ {
+                message: 'Unexpected Mocha slow value 250. Expected a value between 50 and 200.',
+                line: 1,
+                column: 33,
+                endLine: 1,
+                endColumn: 50
+            } ],
+            name: 'invalid case 4'
         },
         {
             code: 'import { it } from "mocha"; it("works", function () {}).slow(200);',
@@ -110,23 +139,25 @@ ruleTester.run('limit-slow', limitSlowRule, {
                 ecmaVersion: 2018,
                 sourceType: 'module'
             },
-            settings: { mocha: { interface: 'require' } },
-            errors: [{ message: unexpectedSlow }]
+            errors: [ { message: unexpectedSlow, line: 1, column: 29, endLine: 1, endColumn: 66 } ],
+            name: 'invalid case 5',
+            settings: { mocha: { interface: 'require' } }
         },
         {
             code: 'custom("works", function () {}).slow(200);',
+            errors: [ { message: unexpectedSlow, line: 1, column: 1, endLine: 1, endColumn: 42 } ],
+            name: 'invalid case 6',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]
                 }
-            },
-            errors: [{ message: unexpectedSlow }]
+            }
         }
     ]
 });
 
-describe('limit-slow', function () {
-    it('throws when the configured range is invalid', function () {
+suite('limit-slow', function () {
+    test('throws when the configured range is invalid', function () {
         const linter = new Linter();
 
         assert.throws(
@@ -135,7 +166,7 @@ describe('limit-slow', function () {
                     plugins: { 'test-plugin': { rules: { 'limit-slow': limitSlowRule } } },
                     languageOptions: { sourceType: 'script' },
                     rules: {
-                        'test-plugin/limit-slow': ['error', { mode: 'range', min: 200, max: 50 }]
+                        'test-plugin/limit-slow': [ 'error', { mode: 'range', min: 200, max: 50 } ]
                     }
                 });
             },

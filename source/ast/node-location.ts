@@ -2,7 +2,7 @@ import type { AST } from 'eslint';
 import type * as ESTree from 'estree';
 
 type RangedNode = {
-    readonly range?: Readonly<[number, number]> | null | undefined;
+    readonly range?: Readonly<readonly [number, number]> | null | undefined;
 };
 
 type LocatedNode = {
@@ -12,7 +12,7 @@ type LocatedNode = {
 function getNodeRange(node: Readonly<RangedNode>): AST.Range | null {
     const { range } = node;
 
-    return range === undefined || range === null ? null : [range[0], range[1]];
+    return range === undefined || range === null ? null : [ range[0], range[1] ];
 }
 
 export function expectNodeRange(node: Readonly<RangedNode>): AST.Range {

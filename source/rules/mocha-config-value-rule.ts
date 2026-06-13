@@ -5,7 +5,7 @@ import {
     getStaticNumericConfigValue,
     visitMochaContextConfigCalls
 } from '../mocha/config-call.js';
-import { getRuleOption, type RuleSchema } from '../rule-options.js';
+import { getRuleOption } from '../rule-options.js';
 import {
     disallowModeOptionSchema,
     maximumNumericMochaConfigOptionSchema,
@@ -21,15 +21,15 @@ type MochaConfigName = Parameters<typeof visitMochaContextConfigCalls> extends [
     : never;
 
 type NumericMochaConfigLimitOption =
-    | { mode: 'disallow'; }
+    | { readonly mode: 'disallow'; }
     | {
-        mode: 'max';
-        max: number;
+        readonly mode: 'max';
+        readonly max: number;
     }
     | {
-        mode: 'range';
-        min: number;
-        max: number;
+        readonly mode: 'range';
+        readonly min: number;
+        readonly max: number;
     };
 
 const numericMochaConfigLimitOptionSchema = {
@@ -38,20 +38,20 @@ const numericMochaConfigLimitOptionSchema = {
         maximumNumericMochaConfigOptionSchema,
         rangeNumericMochaConfigOptionSchema
     ]
-} as const satisfies RuleSchema;
+} as const;
 
 const defaultNumericMochaConfigLimitOption: NumericMochaConfigLimitOption = { mode: 'disallow' };
 
 type RuleDefinition<MessageId extends string> = {
-    configName: MochaConfigName;
-    description: string;
-    messageIds: {
-        aboveMax: MessageId;
-        disallow: MessageId;
-        outsideRange: MessageId;
+    readonly configName: MochaConfigName;
+    readonly description: string;
+    readonly messageIds: {
+        readonly aboveMax: MessageId;
+        readonly disallow: MessageId;
+        readonly outsideRange: MessageId;
     };
-    messages: Record<MessageId, string>;
-    name: string;
+    readonly messages: Readonly<Record<MessageId, string>>;
+    readonly name: string;
 };
 
 function reportMochaConfigCall(
@@ -78,11 +78,11 @@ function validateNumericMochaConfigLimitOption(option: Readonly<NumericMochaConf
 }
 
 type ConfiguredValueContext<MessageId extends string> = {
-    context: Readonly<Rule.RuleContext>;
-    messageIds: Readonly<RuleDefinition<MessageId>['messageIds']>;
-    node: Readonly<CallExpression>;
-    option: Exclude<NumericMochaConfigLimitOption, { mode: 'disallow'; }>;
-    value: number;
+    readonly context: Readonly<Rule.RuleContext>;
+    readonly messageIds: Readonly<RuleDefinition<MessageId>['messageIds']>;
+    readonly node: Readonly<CallExpression>;
+    readonly option: Exclude<NumericMochaConfigLimitOption, { readonly mode: 'disallow'; }>;
+    readonly value: number;
 };
 
 function reportConfiguredValue<MessageId extends string>(
@@ -123,14 +123,15 @@ export function createSimpleNumericMochaConfigLimitRule<MessageId extends string
     return {
         meta: {
             type: 'suggestion',
-            languages: ['js/js'],
+            languages: [ 'js/js' ],
             docs: {
                 description: ruleDefinition.description,
+                recommended: false,
                 url: `https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/${ruleDefinition.name}.md`
             },
-            defaultOptions: [defaultNumericMochaConfigLimitOption],
+            defaultOptions: [ defaultNumericMochaConfigLimitOption ],
             messages: ruleDefinition.messages,
-            schema: [numericMochaConfigLimitOptionSchema]
+            schema: [ numericMochaConfigLimitOptionSchema ]
         },
         create(context) {
             const option = getRuleOption<NumericMochaConfigLimitOption>(context);

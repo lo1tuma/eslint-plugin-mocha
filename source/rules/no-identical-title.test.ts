@@ -1,5 +1,6 @@
 import { RuleTester } from 'eslint';
 import { noIdenticalTitleRule } from './no-identical-title.js';
+
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
 ruleTester.run('no-identical-title', noIdenticalTitleRule, {
@@ -83,8 +84,8 @@ ruleTester.run('no-identical-title', noIdenticalTitleRule, {
             .join('\n'),
         {
             code: [
-                'it(`it${n}`, function() {});',
-                'it(`it${n}`, function() {});'
+                [ 'it(`it', '{n}`, function() {});' ].join('$'),
+                [ 'it(`it', '{n}`, function() {});' ].join('$')
             ]
                 .join('\n'),
             languageOptions: {
@@ -107,21 +108,20 @@ ruleTester.run('no-identical-title', noIdenticalTitleRule, {
             '});'
         ]
             .join('\n'),
-        {
-            code: [
-                'it(null, function() {});',
-                'it(null, function() {});'
-            ]
-                .join('\n')
-        },
+        [
+            'it(null, function() {});',
+            'it(null, function() {});'
+        ]
+            .join('\n'),
         {
             code: [
                 'foo("describe1", function() {});',
                 'foo("describe2", function() {});'
             ]
                 .join('\n'),
+            name: 'valid case 1',
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
+                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
             }
         },
         {
@@ -130,9 +130,10 @@ ruleTester.run('no-identical-title', noIdenticalTitleRule, {
                 'foo("describe2", function() {});'
             ]
                 .join('\n'),
+            name: 'valid case 2',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
                 }
             }
         },
@@ -156,7 +157,13 @@ ruleTester.run('no-identical-title', noIdenticalTitleRule, {
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Test title is used multiple times in the same test suite.', column: 4, line: 3 }]
+            errors: [ {
+                message: 'Test title is used multiple times in the same test suite.',
+                column: 4,
+                line: 3,
+                endLine: 3,
+                endColumn: 28
+            } ]
         },
         {
             code: [
@@ -164,7 +171,13 @@ ruleTester.run('no-identical-title', noIdenticalTitleRule, {
                 'it("it1", function() {});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Test title is used multiple times in the same test suite.', column: 1, line: 2 }]
+            errors: [ {
+                message: 'Test title is used multiple times in the same test suite.',
+                column: 1,
+                line: 2,
+                endLine: 2,
+                endColumn: 25
+            } ]
         },
         {
             code: [
@@ -172,7 +185,13 @@ ruleTester.run('no-identical-title', noIdenticalTitleRule, {
                 'it("it1", function() {});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Test title is used multiple times in the same test suite.', column: 1, line: 2 }]
+            errors: [ {
+                message: 'Test title is used multiple times in the same test suite.',
+                column: 1,
+                line: 2,
+                endLine: 2,
+                endColumn: 25
+            } ]
         },
         {
             code: [
@@ -180,7 +199,13 @@ ruleTester.run('no-identical-title', noIdenticalTitleRule, {
                 'it.only("it1", function() {});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Test title is used multiple times in the same test suite.', column: 1, line: 2 }]
+            errors: [ {
+                message: 'Test title is used multiple times in the same test suite.',
+                column: 1,
+                line: 2,
+                endLine: 2,
+                endColumn: 30
+            } ]
         },
         {
             code: [
@@ -188,7 +213,13 @@ ruleTester.run('no-identical-title', noIdenticalTitleRule, {
                 'specify("it1", function() {});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Test title is used multiple times in the same test suite.', column: 1, line: 2 }]
+            errors: [ {
+                message: 'Test title is used multiple times in the same test suite.',
+                column: 1,
+                line: 2,
+                endLine: 2,
+                endColumn: 30
+            } ]
         },
         {
             code: [
@@ -196,7 +227,13 @@ ruleTester.run('no-identical-title', noIdenticalTitleRule, {
                 'describe("describe1", function() {});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Test suite title is used multiple times.', column: 1, line: 2 }]
+            errors: [ {
+                message: 'Test suite title is used multiple times.',
+                column: 1,
+                line: 2,
+                endLine: 2,
+                endColumn: 37
+            } ]
         },
         {
             code: [
@@ -204,7 +241,13 @@ ruleTester.run('no-identical-title', noIdenticalTitleRule, {
                 'xdescribe("describe1", function() {});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Test suite title is used multiple times.', column: 1, line: 2 }]
+            errors: [ {
+                message: 'Test suite title is used multiple times.',
+                column: 1,
+                line: 2,
+                endLine: 2,
+                endColumn: 38
+            } ]
         },
         {
             code: [
@@ -214,7 +257,13 @@ ruleTester.run('no-identical-title', noIdenticalTitleRule, {
                 'describe("describe1", function() {});'
             ]
                 .join('\n'),
-            errors: [{ message: 'Test suite title is used multiple times.', column: 1, line: 4 }]
+            errors: [ {
+                message: 'Test suite title is used multiple times.',
+                column: 1,
+                line: 4,
+                endLine: 4,
+                endColumn: 37
+            } ]
         },
         {
             code: [
@@ -222,10 +271,17 @@ ruleTester.run('no-identical-title', noIdenticalTitleRule, {
                 'foo("describe1", function() {});'
             ]
                 .join('\n'),
+            errors: [ {
+                message: 'Test suite title is used multiple times.',
+                column: 1,
+                line: 2,
+                endLine: 2,
+                endColumn: 32
+            } ],
+            name: 'invalid case 1',
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
-            },
-            errors: [{ message: 'Test suite title is used multiple times.', column: 1, line: 2 }]
+                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
+            }
         },
         {
             code: [
@@ -233,12 +289,19 @@ ruleTester.run('no-identical-title', noIdenticalTitleRule, {
                 'foo("describe1", function() {});'
             ]
                 .join('\n'),
+            errors: [ {
+                message: 'Test suite title is used multiple times.',
+                column: 1,
+                line: 2,
+                endLine: 2,
+                endColumn: 32
+            } ],
+            name: 'invalid case 2',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
                 }
-            },
-            errors: [{ message: 'Test suite title is used multiple times.', column: 1, line: 2 }]
+            }
         }
     ]
 });

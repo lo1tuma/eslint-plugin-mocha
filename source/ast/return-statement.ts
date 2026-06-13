@@ -3,7 +3,7 @@ import type { Except } from 'type-fest';
 import { type BlockStatement, isIdentifier, isReturnStatement, type ReturnStatement } from './node-types.js';
 
 function isExplicitUndefined(
-    node: Except<Rule.Node, 'parent'> | undefined
+    node: Readonly<Except<Rule.Node, 'parent'>> | undefined
 ): boolean {
     return node !== undefined && isIdentifier(node) && node.name === 'undefined';
 }

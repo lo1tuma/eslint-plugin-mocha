@@ -20,10 +20,6 @@ function isNestedInSuiteBlock(nesting: readonly number[]): boolean {
     return nesting.at(-1) === SUITE;
 }
 
-function enterNestedFunction(nesting: number[]): void {
-    nesting.push(FUNCTION);
-}
-
 function reportCallExpression(context: Readonly<Rule.RuleContext>, callExpression: Readonly<CallExpression>): void {
     context.report({
         messageId: 'unexpectedFunctionCall',
@@ -43,31 +39,32 @@ function reportMemberExpression(
 
 function normalizeAllowedCall(value: unknown): readonly string[] {
     const path = convertNameToPathArray(normalizeMochaCallName(value));
-    const [lastPathSegment] = path.slice(-1);
+    const [ lastPathSegment ] = path.slice(-1);
 
-    return [...path.slice(0, -1), normalizeMochaCallName(lastPathSegment)];
+    return [ ...path.slice(0, -1), normalizeMochaCallName(lastPathSegment) ];
 }
 
 export const noSetupInSuiteRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
-        languages: ['js/js'],
         docs: {
             description: 'Disallow setup in suite blocks',
+            recommended: false,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-setup-in-suite.md'
         },
-        defaultOptions: [defaultAllowMochaCallOption],
+        schema: [ allowMochaCallOptionSchema ],
+        defaultOptions: [ defaultAllowMochaCallOption ],
         messages: {
             unexpectedFunctionCall: 'Unexpected function call in suite block.',
             unexpectedMemberExpression:
                 'Unexpected member expression in suite block. Member expressions may call functions via getters.'
         },
-        schema: [allowMochaCallOptionSchema]
+        languages: [ 'js/js' ]
     },
     create(context) {
         const { allow } = getRuleOption<ResolvedAllowMochaCallOption>(context);
         const allowedCalls = allow.map(normalizeAllowedCall);
-        const nesting: number[] = [];
+        let nesting: readonly number[] = [];
         const suiteNodes = new WeakSet();
 
         function isAllowedCall(node: Readonly<CallExpression>): boolean {
@@ -78,7 +75,7 @@ export const noSetupInSuiteRule: Readonly<Rule.RuleModule> = {
             );
 
             return isConstantPath(path) &&
-                allowedCalls.some((allowedCall) => {
+                allowedCalls.some(function (allowedCall) {
                     return isSamePath(path, allowedCall);
                 });
         }
@@ -95,12 +92,12 @@ export const noSetupInSuiteRule: Readonly<Rule.RuleModule> = {
 
         return createMochaVisitors(context, {
             suite(visitorContext) {
-                nesting.push(SUITE);
+                nesting = [ ...nesting, SUITE ];
                 suiteNodes.add(visitorContext.node);
             },
 
             'suite:exit'() {
-                nesting.pop();
+                nesting = nesting.slice(0, -1);
             },
 
             nonMochaCallExpression(node) {
@@ -119,31 +116,31 @@ export const noSetupInSuiteRule: Readonly<Rule.RuleModule> = {
             },
 
             FunctionDeclaration() {
-                enterNestedFunction(nesting);
+                nesting = [ ...nesting, FUNCTION ];
             },
             'FunctionDeclaration:exit'() {
-                nesting.pop();
+                nesting = nesting.slice(0, -1);
             },
 
             FunctionExpression(node) {
                 if (nesting.length > 0 && !suiteNodes.has(node.parent)) {
-                    nesting.push(FUNCTION);
+                    nesting = [ ...nesting, FUNCTION ];
                 }
             },
             'FunctionExpression:exit'(node) {
                 if (!suiteNodes.has(node.parent)) {
-                    nesting.pop();
+                    nesting = nesting.slice(0, -1);
                 }
             },
 
             ArrowFunctionExpression(node) {
                 if (nesting.length > 0 && !suiteNodes.has(node.parent)) {
-                    nesting.push(FUNCTION);
+                    nesting = [ ...nesting, FUNCTION ];
                 }
             },
             'ArrowFunctionExpression:exit'(node) {
                 if (!suiteNodes.has(node.parent)) {
-                    nesting.pop();
+                    nesting = nesting.slice(0, -1);
                 }
             }
         });

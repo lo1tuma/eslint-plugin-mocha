@@ -5,17 +5,17 @@ declare module '@eslint-community/eslint-utils' {
     type Node = Except<Rule.Node, 'parent'>;
 
     export function findVariable(
-        initialScope: Scope.Scope,
-        nameOrNode: Node | string
+        initialScope: Readonly<Scope.Scope>,
+        nameOrNode: Readonly<Node> | string
     ): Scope.Variable | null;
 
     export function getStringIfConstant(
-        node: Node,
-        initialScope?: Scope.Scope | null
+        node: Readonly<Node>,
+        initialScope?: Readonly<Scope.Scope> | null
     ): string | null;
 
     export function getStaticValue(
-        node: Node,
-        initialScope?: Scope.Scope | null
-    ): { value: unknown; optional?: true; } | null;
+        node: Readonly<Node>,
+        initialScope?: Readonly<Scope.Scope> | null
+    ): { readonly value: unknown; readonly optional?: true; } | null;
 }

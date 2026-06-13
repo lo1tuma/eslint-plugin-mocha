@@ -31,12 +31,12 @@ These patterns are considered correct:
 ```js
 /* eslint mocha/prefer-arrow-callback: "error" */
 
-describe("suite", function () {
+describe('suite', function () {
     beforeEach(function () {
         setup();
     });
 
-    it("works", function () {
+    it('works', function () {
         runAssertion();
     });
 });
@@ -47,7 +47,7 @@ Non-Mocha callbacks are still checked, even when they appear inside Mocha callba
 ```js
 /* eslint mocha/prefer-arrow-callback: "error" */
 
-it("works", function () {
+it('works', function () {
     foo(function () {
         bar();
     }); // ERROR

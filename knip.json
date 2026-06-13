@@ -18,10 +18,8 @@
     "ignoreDependencies": [
         "c8",
         "coveralls",
-        "dprint",
         "eslint-doc-generator",
         "jscpd",
-        "markdownlint-cli",
         "pr-log"
     ],
     "ignoreBinaries": []

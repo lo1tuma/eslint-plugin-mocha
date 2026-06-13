@@ -1,6 +1,6 @@
 import type { Rule, Scope } from 'eslint';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
+import { getRuleOption, type InferSchemaOption } from '../rule-options.js';
 
 const defaultSuiteLimit = 1;
 const optionSchema = {
@@ -11,10 +11,10 @@ const optionSchema = {
         }
     },
     additionalProperties: false
-} as const satisfies RuleSchema;
+} as const;
 
 type Option = InferSchemaOption<typeof optionSchema>;
-type ResolvedOption = Option & { limit: number; };
+type ResolvedOption = Option & { readonly limit: number; };
 const defaultOption: ResolvedOption = { limit: defaultSuiteLimit };
 
 function isTopLevelScope(scope: Readonly<Scope.Scope>): boolean {
@@ -24,16 +24,17 @@ function isTopLevelScope(scope: Readonly<Scope.Scope>): boolean {
 export const maxTopLevelSuitesRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
-        languages: ['js/js'],
         docs: {
             description: 'Enforce the number of top-level suites in a single file',
+            recommended: false,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/max-top-level-suites.md'
         },
-        defaultOptions: [defaultOption],
+        schema: [ optionSchema ],
+        defaultOptions: [ defaultOption ],
         messages: {
             tooManyTopLevelSuites: 'The number of top-level suites is more than {{limit}}.'
         },
-        schema: [optionSchema]
+        languages: [ 'js/js' ]
     },
     create(context) {
         const topLevelSuites: Rule.Node[] = [];

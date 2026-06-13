@@ -3,14 +3,8 @@ export PATH := './node_modules/.bin:' + env_var('PATH')
 default:
     @just --list
 
-format-check:
-    dprint check --list-different
-
-format-fix:
-    dprint fmt
-
 eslint *options:
-    eslint . --max-warnings 0 {{options}}
+    eslint . .github --max-warnings 0 {{options}}
 
 eslint-fix: (eslint '--fix')
 
@@ -24,14 +18,11 @@ lint-unused-code:
 lint-duplication *options:
     jscpd source --config jscpd.json {{options}}
 
-lint-docs:
-    markdownlint '**/*.md'
-
 lint-eslint-docs: (update-eslint-docs '--check')
 
-lint: lint-docs lint-eslint-docs eslint lint-dependencies lint-unused-code lint-duplication
+lint: lint-eslint-docs eslint lint-dependencies lint-unused-code lint-duplication
 
-lint-fix: eslint-fix format-fix
+lint-fix: eslint-fix
 
 compile:
     tsc --build

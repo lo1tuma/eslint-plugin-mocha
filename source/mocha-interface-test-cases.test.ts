@@ -1,8 +1,9 @@
 import assert from 'node:assert';
+import { suite, test } from 'mocha';
 import { withInterface } from './mocha-interface-test-cases.js';
 
-describe('mocha-interface-test-cases', function () {
-    it('adds interface settings to string test cases', function () {
+suite('mocha-interface-test-cases', function () {
+    test('adds interface settings to string test cases', function () {
         const result = withInterface('TDD', 'test()');
 
         assert.deepStrictEqual(result, {
@@ -16,12 +17,12 @@ describe('mocha-interface-test-cases', function () {
         });
     });
 
-    it('merges interface settings into object test cases', function () {
+    test('merges interface settings into object test cases', function () {
         const result = withInterface('BDD', {
             code: 'describe()',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'custom', type: 'suite', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'custom', type: 'suite', interface: 'BDD' } ]
                 },
                 foo: 'bar'
             }
@@ -32,7 +33,7 @@ describe('mocha-interface-test-cases', function () {
             settings: {
                 'mocha/interface': 'BDD',
                 mocha: {
-                    additionalCustomNames: [{ name: 'custom', type: 'suite', interface: 'BDD' }],
+                    additionalCustomNames: [ { name: 'custom', type: 'suite', interface: 'BDD' } ],
                     interface: 'BDD'
                 },
                 foo: 'bar'

@@ -14,30 +14,30 @@ import {
     type TrackedBinding
 } from './tracked-callback-reference-state.js';
 
-type CallExpressionNode = Parameters<Exclude<Rule.RuleListener['CallExpression'], undefined>>[0];
+type CallExpressionNode = Readonly<Parameters<Exclude<Rule.RuleListener['CallExpression'], undefined>>[0]>;
 
 type Operation =
     | {
-        node: Readonly<CallExpressionNode>;
-        type: 'call';
+        readonly node: Readonly<CallExpressionNode>;
+        readonly type: 'call';
     }
     | {
-        propertyName: string | undefined;
-        source: Readonly<Rule.Node> | null;
-        target: TrackedBinding;
-        type: 'containerPropertyAssignment';
+        readonly propertyName: string | undefined;
+        readonly source: Readonly<Rule.Node> | null;
+        readonly target: TrackedBinding;
+        readonly type: 'containerPropertyAssignment';
     }
     | {
-        source: Readonly<Rule.Node> | null;
-        target: TrackedBinding;
-        type: 'bindingAssignment';
+        readonly source: Readonly<Rule.Node> | null;
+        readonly target: TrackedBinding;
+        readonly type: 'bindingAssignment';
     };
 
 type AnalysisContext = {
-    callbackBinding: TrackedBinding;
-    codePath: Readonly<Rule.CodePath>;
-    operationsBySegmentId: ReadonlyMap<string, readonly Operation[]>;
-    sourceCode: Readonly<SourceCode>;
+    readonly callbackBinding: TrackedBinding;
+    readonly codePath: Readonly<Rule.CodePath>;
+    readonly operationsBySegmentId: ReadonlyMap<string, readonly Operation[]>;
+    readonly sourceCode: Readonly<SourceCode>;
 };
 
 function isHandledHandoffExpression(
@@ -61,7 +61,7 @@ function callFinishesPendingPaths(
         return true;
     }
 
-    return node.arguments.some((argument) => {
+    return node.arguments.some(function (argument) {
         const candidate = argument.type === 'SpreadElement' ? argument.argument : argument;
         return isHandledHandoffExpression(sourceCode, asRuleNode(candidate), state);
     });
@@ -70,12 +70,21 @@ function callFinishesPendingPaths(
 function applyBindingAssignment(
     sourceCode: Readonly<SourceCode>,
     state: Readonly<PendingPathState>,
-    operation: Extract<Operation, { type: 'bindingAssignment'; }>
+    operation: Extract<Operation, { readonly type: 'bindingAssignment'; }>
 ): PendingPathState {
-    const nextState = clonePendingPathState(state);
-
-    nextState.aliasBindings.delete(operation.target);
-    nextState.containerPropertiesByBinding.delete(operation.target);
+    const nextState = {
+        ...state,
+        aliasBindings: new Set(
+            Array.from(state.aliasBindings).filter(function (binding) {
+                return binding !== operation.target;
+            })
+        ),
+        containerPropertiesByBinding: new Map(
+            Array.from(state.containerPropertiesByBinding).filter(function ([ binding ]) {
+                return binding !== operation.target;
+            })
+        )
+    };
 
     return applyBindingSourceValue(sourceCode, nextState, operation.source, operation.target);
 }
@@ -122,22 +131,27 @@ function computeEntryState(
         return createInitialPendingPathState(callbackBinding);
     }
 
-    return mergeIncomingPendingPathStates(segment.prevSegments.map((previousSegment) => {
+    return mergeIncomingPendingPathStates(segment.prevSegments.map(function (previousSegment) {
         return exitStatesBySegmentId.get(previousSegment.id) ?? createHandledPendingPathState();
     }));
 }
 
 export function enqueueNextSegments(
     nextSegments: readonly Readonly<Rule.CodePathSegment>[],
-    pendingSegments: Rule.CodePathSegment[],
-    queuedSegmentIds: Set<string>
-): void {
+    pendingSegments: readonly Rule.CodePathSegment[],
+    queuedSegmentIds: ReadonlySet<string>
+): readonly [readonly Rule.CodePathSegment[], ReadonlySet<string>] {
+    let nextPendingSegments = pendingSegments;
+    let nextQueuedSegmentIds = queuedSegmentIds;
+
     for (const nextSegment of nextSegments) {
-        if (!queuedSegmentIds.has(nextSegment.id)) {
-            pendingSegments.push(nextSegment);
-            queuedSegmentIds.add(nextSegment.id);
+        if (!nextQueuedSegmentIds.has(nextSegment.id)) {
+            nextPendingSegments = [ ...nextPendingSegments, nextSegment ];
+            nextQueuedSegmentIds = new Set([ ...nextQueuedSegmentIds, nextSegment.id ]);
         }
     }
+
+    return [ nextPendingSegments, nextQueuedSegmentIds ];
 }
 
 function segmentHasUnhandledReturnPath(
@@ -148,15 +162,15 @@ function segmentHasUnhandledReturnPath(
 }
 
 type PendingSegmentQueue = {
-    exitStatesBySegmentId: Map<string, Readonly<PendingPathState>>;
-    pendingSegments: Rule.CodePathSegment[];
-    queuedSegmentIds: Set<string>;
+    readonly exitStatesBySegmentId: ReadonlyMap<string, Readonly<PendingPathState>>;
+    readonly pendingSegments: readonly Rule.CodePathSegment[];
+    readonly queuedSegmentIds: ReadonlySet<string>;
 };
 
 function processPendingSegment(
     context: Readonly<AnalysisContext>,
     segment: Readonly<Rule.CodePathSegment>,
-    exitStatesBySegmentId: Map<string, Readonly<PendingPathState>>
+    exitStatesBySegmentId: ReadonlyMap<string, Readonly<PendingPathState>>
 ): Readonly<PendingPathState> {
     const entryState = computeEntryState(
         context.callbackBinding,
@@ -179,38 +193,87 @@ function hasUnprocessedSegments(pendingSegments: readonly Rule.CodePathSegment[]
 function createPendingSegmentQueue(context: Readonly<AnalysisContext>): PendingSegmentQueue {
     return {
         exitStatesBySegmentId: new Map<string, Readonly<PendingPathState>>(),
-        pendingSegments: [context.codePath.initialSegment],
-        queuedSegmentIds: new Set([context.codePath.initialSegment.id])
+        pendingSegments: [ context.codePath.initialSegment ],
+        queuedSegmentIds: new Set([ context.codePath.initialSegment.id ])
+    };
+}
+
+function removeQueuedSegmentId(
+    queuedSegmentIds: ReadonlySet<string>,
+    segmentId: string | undefined
+): ReadonlySet<string> {
+    return new Set(
+        Array.from(queuedSegmentIds).filter(function (queuedSegmentId) {
+            return queuedSegmentId !== segmentId;
+        })
+    );
+}
+
+function dropPendingSegment(queue: Readonly<PendingSegmentQueue>): readonly [
+    Rule.CodePathSegment | undefined,
+    PendingSegmentQueue
+] {
+    const [ segment, ...pendingSegments ] = queue.pendingSegments;
+
+    return [
+        segment,
+        {
+            ...queue,
+            pendingSegments,
+            queuedSegmentIds: removeQueuedSegmentId(queue.queuedSegmentIds, segment?.id)
+        }
+    ];
+}
+
+function processKnownPendingSegment(
+    context: Readonly<AnalysisContext>,
+    queue: Readonly<PendingSegmentQueue>,
+    segment: Readonly<Rule.CodePathSegment>
+): PendingSegmentQueue {
+    const nextState = processPendingSegment(context, segment, queue.exitStatesBySegmentId);
+    const previousState = queue.exitStatesBySegmentId.get(segment.id);
+
+    if (previousState !== undefined && haveSamePendingPathStates(previousState, nextState)) {
+        return queue;
+    }
+
+    const [ pendingSegments, queuedSegmentIds ] = enqueueNextSegments(
+        segment.nextSegments,
+        queue.pendingSegments,
+        queue.queuedSegmentIds
+    );
+
+    return {
+        exitStatesBySegmentId: new Map([
+            ...queue.exitStatesBySegmentId,
+            [ segment.id, nextState ]
+        ]),
+        pendingSegments,
+        queuedSegmentIds
     };
 }
 
 function processAllPendingSegments(
     context: Readonly<AnalysisContext>,
-    queue: PendingSegmentQueue
-): void {
+    initialQueue: PendingSegmentQueue
+): PendingSegmentQueue {
+    let queue = initialQueue;
+
     while (hasUnprocessedSegments(queue.pendingSegments)) {
-        const segment = queue.pendingSegments.shift();
-
+        const [ segment, queueWithoutSegment ] = dropPendingSegment(queue);
+        queue = queueWithoutSegment;
         if (segment !== undefined) {
-            queue.queuedSegmentIds.delete(segment.id);
-
-            const nextState = processPendingSegment(context, segment, queue.exitStatesBySegmentId);
-            const previousState = queue.exitStatesBySegmentId.get(segment.id);
-
-            if (previousState === undefined || !haveSamePendingPathStates(previousState, nextState)) {
-                queue.exitStatesBySegmentId.set(segment.id, nextState);
-                enqueueNextSegments(segment.nextSegments, queue.pendingSegments, queue.queuedSegmentIds);
-            }
+            queue = processKnownPendingSegment(context, queue, segment);
         }
     }
+
+    return queue;
 }
 
 export function hasUnhandledReturnPath(context: Readonly<AnalysisContext>): boolean {
-    const queue = createPendingSegmentQueue(context);
+    const queue = processAllPendingSegments(context, createPendingSegmentQueue(context));
 
-    processAllPendingSegments(context, queue);
-
-    return context.codePath.returnedSegments.some((segment) => {
+    return context.codePath.returnedSegments.some(function (segment) {
         return segmentHasUnhandledReturnPath(queue.exitStatesBySegmentId, segment);
     });
 }

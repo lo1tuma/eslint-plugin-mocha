@@ -4,15 +4,16 @@ import { createMochaVisitors } from '../ast/mocha-visitors.js';
 export const noNestedSuitesRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
-        languages: ['js/js'],
         docs: {
             description: 'Disallow suites to be nested within other suites',
+            recommended: false,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-nested-suites.md'
         },
+        schema: [],
         messages: {
             nestedSuite: 'Unexpected suite nested within another suite.'
         },
-        schema: []
+        languages: [ 'js/js' ]
     },
     create(context) {
         let suiteNesting = 0;

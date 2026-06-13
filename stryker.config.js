@@ -12,7 +12,7 @@ const config = {
         'no-package': true,
         'no-opts': true,
         'no-config': true,
-        spec: ['target/build/source/**/*.test.js']
+        spec: [ 'target/build/source/**/*.test.js' ]
     },
     mutate: [
         'source/**/*.ts',
@@ -20,14 +20,14 @@ const config = {
         '!source/**/*.d.ts',
         '!source/mocha-interface-test-cases.ts'
     ],
-    ignorePatterns: ['node_modules', 'target', '.git'],
+    ignorePatterns: [ 'node_modules', 'target', '.git' ],
     disableTypeChecks: true,
     thresholds: {
         high: 100,
         low: 100,
         break: 100
     },
-    reporters: ['clear-text', 'html', 'json'],
+    reporters: [ 'clear-text', 'html', 'json' ],
     clearTextReporter: {
         reportMutants: true,
         reportScoreTable: false,

@@ -29,16 +29,17 @@ function checkNodeForReturnFromAsync(context: Readonly<Rule.RuleContext>, node: 
 export const noReturnFromAsyncRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
-        languages: ['js/js'],
         docs: {
             description: 'Disallow returning from an async test or hook',
+            recommended: false,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-return-from-async.md'
         },
+        schema: [],
         messages: {
             implicitReturnWithAsync: 'Confusing implicit return in a test with an async function',
             unexpectedReturnWithAsync: 'Unexpected use of `return` in a test with an async function'
         },
-        schema: []
+        languages: [ 'js/js' ]
     },
     create(context) {
         return createMochaVisitors(context, {

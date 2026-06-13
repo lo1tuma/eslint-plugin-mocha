@@ -1,5 +1,6 @@
-import { Linter, type Rule, type SourceCode } from 'eslint';
 import assert from 'node:assert';
+import { Linter, type Rule, type SourceCode } from 'eslint';
+import { suite, test } from 'mocha';
 import { extractMemberExpressionPath } from '../ast/member-expression.js';
 import { buildAllNameDetailsWithVariants, reformatLastPathSegmentWithCallExpressions } from './name-details.js';
 
@@ -9,15 +10,22 @@ function prefixPending(name: string): string {
 
 const prefixedFoo = prefixPending('foo');
 
-function readExpression(code: string): { sourceCode: Readonly<SourceCode>; expression: Readonly<Rule.Node>; } {
+type ReadExpressionResult = {
+    readonly sourceCode: Readonly<SourceCode>;
+    readonly expression: Readonly<Rule.Node>;
+};
+
+function readExpression(
+    code: string
+): ReadExpressionResult {
     const linter = new Linter();
-    let result: { sourceCode: Readonly<SourceCode>; expression: Readonly<Rule.Node>; } | null = null;
+    let result: ReadExpressionResult | null = null;
 
     const testRule: Rule.RuleModule = {
         create(ruleContext) {
             return {
                 Program() {
-                    const [firstStatement] = ruleContext.sourceCode.ast.body;
+                    const [ firstStatement ] = ruleContext.sourceCode.ast.body;
                     assert.notStrictEqual(firstStatement, undefined);
                     assert.strictEqual(firstStatement?.type, 'ExpressionStatement');
 
@@ -38,25 +46,28 @@ function readExpression(code: string): { sourceCode: Readonly<SourceCode>; expre
     assert.deepStrictEqual(messages, []);
     assert.notStrictEqual(result, null);
 
-    return result as unknown as { sourceCode: Readonly<SourceCode>; expression: Readonly<Rule.Node>; };
+    return result as unknown as {
+        readonly sourceCode: Readonly<SourceCode>;
+        readonly expression: Readonly<Rule.Node>;
+    };
 }
 
-describe('mocha names', function () {
-    describe('buildAllNameDetailsWithVariants()', function () {
-        it('returns an empty list if an empty list is given', function () {
+suite('mocha names', function () {
+    suite('buildAllNameDetailsWithVariants()', function () {
+        test('returns an empty list if an empty list is given', function () {
             const nameDetailsList = buildAllNameDetailsWithVariants([]);
 
             assert.deepStrictEqual(nameDetailsList, []);
         });
 
-        it('returns the name details for a suite itself and all its variants', function () {
-            const nameDetailsList = buildAllNameDetailsWithVariants([{
-                path: ['foo'],
+        test('returns the name details for a suite itself and all its variants', function () {
+            const nameDetailsList = buildAllNameDetailsWithVariants([ {
+                path: [ 'foo' ],
                 interface: 'BDD',
                 type: 'suite',
                 modifier: null,
                 config: null
-            }]);
+            } ]);
 
             assert.deepStrictEqual(nameDetailsList, [
                 {
@@ -294,17 +305,17 @@ describe('mocha names', function () {
             ]);
         });
 
-        it('does not add x-variants for TDD names', function () {
-            const nameDetailsList = buildAllNameDetailsWithVariants([{
-                path: ['test'],
+        test('does not add x-variants for TDD names', function () {
+            const nameDetailsList = buildAllNameDetailsWithVariants([ {
+                path: [ 'test' ],
                 interface: 'TDD',
                 type: 'testCase',
                 modifier: null,
                 config: null
-            }]);
+            } ]);
 
             assert.strictEqual(
-                nameDetailsList.some((nameDetails) => {
+                nameDetailsList.some(function (nameDetails) {
                     return nameDetails.path.join('.') === prefixPending('test');
                 }),
                 false
@@ -312,8 +323,8 @@ describe('mocha names', function () {
         });
     });
 
-    describe('reformatLastPathSegmentWithCallExpressions()', function () {
-        it('returns dynamic paths unchanged', function () {
+    suite('reformatLastPathSegmentWithCallExpressions()', function () {
+        test('returns dynamic paths unchanged', function () {
             const { sourceCode, expression } = readExpression('foo[bar];');
             const dynamicPath = extractMemberExpressionPath(sourceCode, expression);
 

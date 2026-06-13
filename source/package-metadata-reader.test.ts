@@ -1,8 +1,9 @@
 import assert from 'node:assert';
+import { suite, test } from 'mocha';
 import { createPackageMetadataReader } from './package-metadata-reader.js';
 
-describe('package metadata reader', function () {
-    it('skips missing package files when access throws an ENOENT-shaped record', async function () {
+suite('package metadata reader', function () {
+    test('skips missing package files when access throws an ENOENT-shaped record', async function () {
         const visitedPaths: string[] = [];
         const readClosestPackageMetadata = createPackageMetadataReader({
             async accessFile(packageJsonPath) {
@@ -34,7 +35,7 @@ describe('package metadata reader', function () {
         });
     });
 
-    it('rethrows access errors that are not ENOENT-shaped records', async function () {
+    test('rethrows access errors that are not ENOENT-shaped records', async function () {
         const readClosestPackageMetadata = createPackageMetadataReader({
             async accessFile() {
                 throw new Error('boom');
@@ -51,7 +52,7 @@ describe('package metadata reader', function () {
         });
     });
 
-    it('parses metadata from the imported package json module', async function () {
+    test('parses metadata from the imported package json module', async function () {
         const readClosestPackageMetadata = createPackageMetadataReader({
             async accessFile() {
                 return undefined;

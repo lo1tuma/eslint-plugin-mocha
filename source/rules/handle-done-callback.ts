@@ -1,6 +1,6 @@
 import type { Rule } from 'eslint';
 import { hasUnhandledReturnPath } from '../done-callback-paths.js';
-import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
+import { getRuleOption, type InferSchemaOption } from '../rule-options.js';
 import { createTrackedCallbackVisitors, type DirectTrackedCallbackFunction } from './callback-tracking.js';
 
 const optionSchema = {
@@ -11,10 +11,10 @@ const optionSchema = {
         }
     },
     additionalProperties: false
-} as const satisfies RuleSchema;
+} as const;
 
 type Option = InferSchemaOption<typeof optionSchema>;
-type ResolvedOption = Option & { ignorePending: boolean; };
+type ResolvedOption = Option & { readonly ignorePending: boolean; };
 const defaultOption: ResolvedOption = { ignorePending: false };
 
 function reportUnhandledDoneCallback(
@@ -44,16 +44,17 @@ function reportUnhandledDoneCallback(
 export const handleDoneCallbackRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'problem',
-        languages: ['js/js'],
         docs: {
             description: 'Enforces handling of callbacks for async tests in every branch',
+            recommended: true,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/handle-done-callback.md'
         },
-        defaultOptions: [defaultOption],
+        schema: [ optionSchema ],
+        defaultOptions: [ defaultOption ],
         messages: {
             expectedCallback: 'Expected "{{name}}" callback to be handled.'
         },
-        schema: [optionSchema]
+        languages: [ 'js/js' ]
     },
     create(context) {
         const { ignorePending } = getRuleOption<ResolvedOption>(context);

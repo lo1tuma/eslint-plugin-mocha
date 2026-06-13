@@ -11,7 +11,7 @@ function matchIdentifierName(reference: Readonly<Scope.Reference>, nameToMatch: 
 function findGlobalVariableReferences(globalScope: Readonly<Scope.Scope>, name: string): readonly Scope.Reference[] {
     const variable = globalScope.set.get(name);
 
-    if (variable !== undefined && variable.defs.length === 0) {
+    if (variable?.defs.length === 0) {
         return variable.references;
     }
 

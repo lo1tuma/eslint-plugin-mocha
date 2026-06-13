@@ -5,7 +5,7 @@ import { isRecord } from './record.js';
 type RuleTestCase = RuleTester.InvalidTestCase | RuleTester.ValidTestCase;
 
 function mergeMochaInterfaceIntoSettings(
-    settings: Record<string, unknown> | undefined,
+    settings: Readonly<Record<string, unknown>> | undefined,
     interfaceToUse: MochaInterface
 ): Record<string, unknown> {
     const mochaSettings = isRecord(settings?.mocha)
@@ -26,7 +26,7 @@ export function withInterface(interfaceToUse: MochaInterface, testCase: string):
 export function withInterface<T extends RuleTestCase>(interfaceToUse: MochaInterface, testCase: T): T;
 export function withInterface(
     interfaceToUse: MochaInterface,
-    testCase: RuleTestCase | string
+    testCase: Readonly<RuleTestCase> | string
 ): RuleTestCase {
     const normalizedTestCase = typeof testCase === 'string'
         ? { code: testCase }

@@ -11,16 +11,17 @@ import {
 export const noHooksRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
-        languages: ['js/js'],
         docs: {
             description: 'Disallow hooks',
+            recommended: false,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-hooks.md'
         },
-        defaultOptions: [defaultAllowMochaCallOption],
+        schema: [ allowMochaCallOptionSchema ],
+        defaultOptions: [ defaultAllowMochaCallOption ],
         messages: {
             unexpectedHook: 'Unexpected use of Mocha `{{name}}` hook'
         },
-        schema: [allowMochaCallOptionSchema]
+        languages: [ 'js/js' ]
     },
 
     create(context) {

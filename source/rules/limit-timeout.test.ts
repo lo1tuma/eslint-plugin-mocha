@@ -1,5 +1,6 @@
-import { Linter, RuleTester } from 'eslint';
 import assert from 'node:assert';
+import { Linter, RuleTester } from 'eslint';
+import { suite, test } from 'mocha';
 import { withInterface } from '../mocha-interface-test-cases.js';
 import { limitTimeoutRule } from './limit-timeout.js';
 
@@ -14,116 +15,148 @@ ruleTester.run('limit-timeout', limitTimeoutRule, {
         'it("works", function () {}).slow(5000);',
         {
             code: 'it("works", function () {}).timeout();',
-            options: [{ mode: 'max', max: 5000 }]
+            options: [ { mode: 'max', max: 5000 } ],
+            name: 'valid case 1'
         },
         {
             code: 'it("works", function () {}).timeout(5000);',
-            options: [{ mode: 'max', max: 5000 }]
+            options: [ { mode: 'max', max: 5000 } ],
+            name: 'valid case 2'
         },
         {
             code: 'describe("suite", function () { this.timeout(5000); });',
-            options: [{ mode: 'max', max: 5000 }]
+            options: [ { mode: 'max', max: 5000 } ],
+            name: 'valid case 3'
         },
         {
             code: 'it("works", function () { this["timeout"](5000); });',
-            options: [{ mode: 'range', min: 1, max: 5000 }]
+            options: [ { mode: 'range', min: 1, max: 5000 } ],
+            name: 'valid case 4'
         },
         {
             code: 'it("works", function () { (() => this.timeout(5000))(); });',
+            options: [ { mode: 'range', min: 1, max: 5000 } ],
             languageOptions: { ecmaVersion: 2015 },
-            options: [{ mode: 'range', min: 1, max: 5000 }]
+            name: 'valid case 5'
         },
         {
             code: 'it("works", function () { function later() { this.timeout(0); } });',
-            options: [{ mode: 'disallowDisabled' }]
+            options: [ { mode: 'disallowDisabled' } ],
+            name: 'valid case 6'
         },
         {
             code: 'const configuredTimeout = 5000; it("works", function () {}).timeout(configuredTimeout);',
+            options: [ { mode: 'max', max: 5000 } ],
             languageOptions: { ecmaVersion: 2015 },
-            options: [{ mode: 'max', max: 5000 }]
+            name: 'valid case 7'
         },
         {
             code: 'import { it } from "mocha"; it("works", function () {}).timeout(5000);',
+            options: [ { mode: 'max', max: 5000 } ],
             languageOptions: {
                 ecmaVersion: 2018,
                 sourceType: 'module'
             },
-            options: [{ mode: 'max', max: 5000 }],
+            name: 'valid case 8',
             settings: { mocha: { interface: 'require' } }
         },
         {
             code: 'custom("works", function () {}).timeout(5000);',
-            options: [{ mode: 'max', max: 5000 }],
+            options: [ { mode: 'max', max: 5000 } ],
+            name: 'valid case 9',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]
                 }
             }
         },
         withInterface('TDD', {
             code: 'test("works", function () {}).timeout(5000);',
-            options: [{ mode: 'range', min: 1, max: 5000 }]
+            options: [ { mode: 'range', min: 1, max: 5000 } ]
         })
     ],
 
     invalid: [
         {
             code: 'it("works", function () {}).timeout(5000);',
-            errors: [{ message: unexpectedTimeout }]
+            errors: [ { message: unexpectedTimeout, line: 1, column: 1, endLine: 1, endColumn: 42 } ]
         },
         {
             code: 'describe("suite", function () { this.timeout(5000); });',
-            errors: [{ message: unexpectedTimeout }]
+            errors: [ { message: unexpectedTimeout, line: 1, column: 33, endLine: 1, endColumn: 51 } ]
         },
         {
             code: 'it("works", function () { (() => this.timeout(5000))(); });',
             languageOptions: { ecmaVersion: 2015 },
-            errors: [{ message: unexpectedTimeout }]
+            errors: [ { message: unexpectedTimeout, line: 1, column: 34, endLine: 1, endColumn: 52 } ]
         },
         {
             code: 'it("works", function () {}).timeout(0);',
-            options: [{ mode: 'disallowDisabled' }],
-            errors: [{ message: unexpectedDisabledTimeout }]
+            options: [ { mode: 'disallowDisabled' } ],
+            errors: [ { message: unexpectedDisabledTimeout, line: 1, column: 1, endLine: 1, endColumn: 39 } ],
+            name: 'invalid case 1'
         },
         {
             code: 'it("works", function () { this.timeout(-1); });',
-            options: [{ mode: 'disallowDisabled' }],
-            errors: [{ message: unexpectedDisabledTimeout }]
+            options: [ { mode: 'disallowDisabled' } ],
+            errors: [ { message: unexpectedDisabledTimeout, line: 1, column: 27, endLine: 1, endColumn: 43 } ],
+            name: 'invalid case 2'
         },
         {
             code: 'const disabledTimeout = 2147483647; it("works", function () {}).timeout(disabledTimeout);',
+            options: [ { mode: 'disallowDisabled' } ],
             languageOptions: { ecmaVersion: 2015 },
-            options: [{ mode: 'disallowDisabled' }],
-            errors: [{ message: unexpectedDisabledTimeout }]
+            errors: [ { message: unexpectedDisabledTimeout, line: 1, column: 37, endLine: 1, endColumn: 89 } ],
+            name: 'invalid case 3'
         },
         {
             code: 'it("works", function () {}).timeout(5001);',
-            options: [{ mode: 'max', max: 5000 }],
-            errors: [{
-                message: 'Unexpected Mocha timeout value 5001. Maximum allowed is 5000.'
-            }]
+            options: [ { mode: 'max', max: 5000 } ],
+            errors: [ {
+                message: 'Unexpected Mocha timeout value 5001. Maximum allowed is 5000.',
+                line: 1,
+                column: 1,
+                endLine: 1,
+                endColumn: 42
+            } ],
+            name: 'invalid case 4'
         },
         {
             code: 'const configuredTimeout = 5001; it("works", function () {}).timeout(configuredTimeout);',
+            options: [ { mode: 'max', max: 5000 } ],
             languageOptions: { ecmaVersion: 2015 },
-            options: [{ mode: 'max', max: 5000 }],
-            errors: [{
-                message: 'Unexpected Mocha timeout value 5001. Maximum allowed is 5000.'
-            }]
+            errors: [ {
+                message: 'Unexpected Mocha timeout value 5001. Maximum allowed is 5000.',
+                line: 1,
+                column: 33,
+                endLine: 1,
+                endColumn: 87
+            } ],
+            name: 'invalid case 5'
         },
         {
             code: 'it("works", function () {}).timeout(0);',
-            options: [{ mode: 'range', min: 1, max: 5000 }],
-            errors: [{
-                message: 'Unexpected Mocha timeout value 0. Expected a value between 1 and 5000.'
-            }]
+            options: [ { mode: 'range', min: 1, max: 5000 } ],
+            errors: [ {
+                message: 'Unexpected Mocha timeout value 0. Expected a value between 1 and 5000.',
+                line: 1,
+                column: 1,
+                endLine: 1,
+                endColumn: 39
+            } ],
+            name: 'invalid case 6'
         },
         {
             code: 'describe("suite", function () { this["timeout"](6000); });',
-            options: [{ mode: 'range', min: 1, max: 5000 }],
-            errors: [{
-                message: 'Unexpected Mocha timeout value 6000. Expected a value between 1 and 5000.'
-            }]
+            options: [ { mode: 'range', min: 1, max: 5000 } ],
+            errors: [ {
+                message: 'Unexpected Mocha timeout value 6000. Expected a value between 1 and 5000.',
+                line: 1,
+                column: 33,
+                endLine: 1,
+                endColumn: 54
+            } ],
+            name: 'invalid case 7'
         },
         {
             code: 'import { it } from "mocha"; it("works", function () {}).timeout(5000);',
@@ -131,36 +164,38 @@ ruleTester.run('limit-timeout', limitTimeoutRule, {
                 ecmaVersion: 2018,
                 sourceType: 'module'
             },
-            settings: { mocha: { interface: 'require' } },
-            errors: [{ message: unexpectedTimeout }]
+            errors: [ { message: unexpectedTimeout, line: 1, column: 29, endLine: 1, endColumn: 70 } ],
+            name: 'invalid case 8',
+            settings: { mocha: { interface: 'require' } }
         },
         {
             code: 'custom("works", function () {}).timeout(5000);',
+            errors: [ { message: unexpectedTimeout, line: 1, column: 1, endLine: 1, endColumn: 46 } ],
+            name: 'invalid case 9',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'custom', type: 'testCase', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]
                 }
-            },
-            errors: [{ message: unexpectedTimeout }]
+            }
         }
     ]
 });
 
-describe('limit-timeout', function () {
-    it('accepts ranges where min and max are equal', function () {
+suite('limit-timeout', function () {
+    test('accepts ranges where min and max are equal', function () {
         const linter = new Linter();
         const messages = linter.verify('it("works", function () {}).timeout(5);', {
             plugins: { 'test-plugin': { rules: { 'limit-timeout': limitTimeoutRule } } },
             languageOptions: { sourceType: 'script' },
             rules: {
-                'test-plugin/limit-timeout': ['error', { mode: 'range', min: 5, max: 5 }]
+                'test-plugin/limit-timeout': [ 'error', { mode: 'range', min: 5, max: 5 } ]
             }
         });
 
         assert.deepStrictEqual(messages, []);
     });
 
-    it('throws when the configured range is invalid', function () {
+    test('throws when the configured range is invalid', function () {
         const linter = new Linter();
 
         assert.throws(
@@ -169,7 +204,7 @@ describe('limit-timeout', function () {
                     plugins: { 'test-plugin': { rules: { 'limit-timeout': limitTimeoutRule } } },
                     languageOptions: { sourceType: 'script' },
                     rules: {
-                        'test-plugin/limit-timeout': ['error', { mode: 'range', min: 10, max: 1 }]
+                        'test-plugin/limit-timeout': [ 'error', { mode: 'range', min: 10, max: 1 } ]
                     }
                 });
             },

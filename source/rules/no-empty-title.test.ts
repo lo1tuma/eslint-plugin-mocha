@@ -40,8 +40,8 @@ ruleTester.run('no-empty-title', noEmptyTitleRule, {
         'it(foo.bar, function() { })',
         'it("foo".toUpperCase(), function() { })',
         {
-            languageOptions: { ecmaVersion: 2020 },
-            code: 'it(foo ?? "bar", function() { })'
+            code: 'it(foo ?? "bar", function() { })',
+            languageOptions: { ecmaVersion: 2020 }
         },
         'it(foo || "bar", function() { })',
         'it(foo ? "bar" : "baz", function() { })',
@@ -50,97 +50,99 @@ ruleTester.run('no-empty-title', noEmptyTitleRule, {
         'it(foo + bar, function() { })',
         'it("foo" + "bar", function() { })',
         {
-            languageOptions: { ecmaVersion: 2019 },
-            code: 'it(...args)'
+            code: 'it(...args)',
+            languageOptions: { ecmaVersion: 2019 }
         },
         {
-            languageOptions: { ecmaVersion: 2019 },
-            code: 'async function a() { it(await foo, function () {}); }'
+            code: 'async function a() { it(await foo, function () {}); }',
+            languageOptions: { ecmaVersion: 2019 }
         },
         {
-            languageOptions: { ecmaVersion: 2019 },
-            code: 'function* g() { it(yield foo, function () {}); }'
+            code: 'function* g() { it(yield foo, function () {}); }',
+            languageOptions: { ecmaVersion: 2019 }
         },
 
         'notTest()',
 
         {
-            languageOptions: { ecmaVersion: 2019 },
-            code: 'it(string`template`, function () {});'
+            code: 'it(string`template`, function () {});',
+            languageOptions: { ecmaVersion: 2019 }
         },
         {
-            languageOptions: { ecmaVersion: 2019 },
-            code: 'it(`template strings`, function () {});'
+            code: 'it(`template strings`, function () {});',
+            languageOptions: { ecmaVersion: 2019 }
         },
         {
-            languageOptions: { ecmaVersion: 2019 },
-            code: 'it(`${foo} template strings`, function () {});'
+            code: [ 'it(`', '{foo} template strings`, function () {});' ].join('$'),
+            languageOptions: { ecmaVersion: 2019 }
         },
         {
+            code: 'someFunction("this is a test", function () { });',
+            name: 'valid case 1',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'someFunction', type: 'testCase', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'someFunction', type: 'testCase', interface: 'BDD' } ]
                 }
-            },
-            code: 'someFunction("this is a test", function () { });'
+            }
         },
         {
-            languageOptions: { ecmaVersion: 2019 },
-            code: 'const dynamicTitle = "foo"; it(dynamicTitle, function() {});'
+            code: 'const dynamicTitle = "foo"; it(dynamicTitle, function() {});',
+            languageOptions: { ecmaVersion: 2019 }
         },
         {
-            languageOptions: { ecmaVersion: 2019 },
-            code: 'const dynamicTitle = "foo"; it(dynamicTitle.replace("foo", ""), function() {});'
+            code: 'const dynamicTitle = "foo"; it(dynamicTitle.replace("foo", ""), function() {});',
+            languageOptions: { ecmaVersion: 2019 }
         }
     ],
 
     invalid: [
         withInterface('TDD', {
             code: 'test()',
-            errors: [{ message: defaultErrorMessage, ...firstLine }]
+            errors: [ { message: defaultErrorMessage, ...firstLine } ]
         }),
         withInterface('TDD', {
             code: 'test(function() { })',
-            errors: [{ message: defaultErrorMessage, ...firstLine }]
+            errors: [ { message: defaultErrorMessage, ...firstLine } ]
         }),
         withInterface('TDD', {
             code: 'test("", function() { })',
-            errors: [{ message: defaultErrorMessage, ...firstLine }]
+            errors: [ { message: defaultErrorMessage, ...firstLine } ]
         }),
         withInterface('TDD', {
             code: 'test("      ", function() { })',
-            errors: [{ message: defaultErrorMessage, ...firstLine }]
+            errors: [ { message: defaultErrorMessage, ...firstLine } ]
         }),
 
         {
-            options: [{ message: 'Custom Error' }],
+            code: 'someFunction(function() { })',
+            options: [ { message: 'Custom Error' } ],
+            errors: [ { message: 'Custom Error', ...firstLine, line: 1, column: 1, endLine: 1, endColumn: 29 } ],
+            name: 'invalid case 1',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'someFunction', type: 'testCase', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'someFunction', type: 'testCase', interface: 'BDD' } ]
                 }
-            },
-            code: 'someFunction(function() { })',
-            errors: [{ message: 'Custom Error', ...firstLine }]
+            }
         },
         {
-            languageOptions: { ecmaVersion: 2019 },
             code: 'it(` `, function () { });',
-            errors: [{ message: defaultErrorMessage, ...firstLine }]
+            languageOptions: { ecmaVersion: 2019 },
+            errors: [ { message: defaultErrorMessage, ...firstLine, line: 1, column: 1, endLine: 1, endColumn: 25 } ]
         },
         {
-            languageOptions: { ecmaVersion: 2019 },
             code: 'const foo = ""; it(foo);',
-            errors: [{ message: defaultErrorMessage, line: 1, column: 17 }]
-        },
-        {
             languageOptions: { ecmaVersion: 2019 },
-            code: 'const foo = { bar: "" }; it(foo.bar);',
-            errors: [{ message: defaultErrorMessage, line: 1, column: 26 }]
+            errors: [ { message: defaultErrorMessage, line: 1, column: 17, endLine: 1, endColumn: 24 } ]
         },
         {
-            languageOptions: { ecmaVersion: 2020 },
+            code: 'const foo = { bar: "" }; it(foo.bar);',
+            languageOptions: { ecmaVersion: 2019 },
+            errors: [ { message: defaultErrorMessage, line: 1, column: 26, endLine: 1, endColumn: 37 } ]
+        },
+        {
             code: 'it(foo?.bar);',
-            errors: [{ message: defaultErrorMessage, line: 1, column: 1 }]
+            languageOptions: { ecmaVersion: 2020 },
+            errors: [ { message: defaultErrorMessage, line: 1, column: 1, endLine: 1, endColumn: 13 } ]
         }
     ]
 });

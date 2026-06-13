@@ -3,19 +3,20 @@ import {
     arePathStatesSame,
     type CallbackHandlingContext,
     type CallbackHandlingOperation,
+    type CallbackPathState,
     clonePathState,
     createEntryState,
     updatePathState
 } from './callback-handling-state.js';
 import { enqueueNextSegments } from './done-callback-paths.js';
 
-type PathState = ReturnType<typeof clonePathState>;
+type PathState = CallbackPathState;
 type PendingSegmentCollection = {
-    exitStatesBySegmentId: Map<string, PathState>;
-    pendingSegments: Rule.CodePathSegment[];
-    queuedSegmentIds: Set<string>;
-    reportedNodeSet: WeakSet<Rule.Node>;
-    reportedNodes: Rule.Node[];
+    readonly exitStatesBySegmentId: ReadonlyMap<string, PathState>;
+    readonly pendingSegments: readonly Rule.CodePathSegment[];
+    readonly queuedSegmentIds: ReadonlySet<string>;
+    readonly reportedNodeSet: WeakSet<Rule.Node>;
+    readonly reportedNodes: readonly Rule.Node[];
 };
 type ReportedNodeSelector = (
     context: Readonly<CallbackHandlingContext>,
@@ -42,20 +43,24 @@ function collectSegmentReportedNodes(
         nextState = updatePathState(context.sourceCode, nextState, operation);
     }
 
-    return [reportedNodes, nextState];
+    return [ reportedNodes, nextState ];
 }
 
 function recordReportedNodes(
-    reportedNodes: Rule.Node[],
+    reportedNodes: readonly Rule.Node[],
     reportedNodeSet: WeakSet<Rule.Node>,
     segmentReportedNodes: readonly Rule.Node[]
-): void {
+): readonly Rule.Node[] {
+    let nextReportedNodes = reportedNodes;
+
     for (const reportedNode of segmentReportedNodes) {
         if (!reportedNodeSet.has(reportedNode)) {
             reportedNodeSet.add(reportedNode);
-            reportedNodes.push(reportedNode);
+            nextReportedNodes = [ ...nextReportedNodes, reportedNode ];
         }
     }
+
+    return nextReportedNodes;
 }
 
 function shouldRevisitSegment(
@@ -70,26 +75,43 @@ function shouldRevisitSegment(
 
 function processPendingSegment(
     context: Readonly<CallbackHandlingContext>,
-    collection: PendingSegmentCollection,
+    collection: Readonly<PendingSegmentCollection>,
     segment: Readonly<Rule.CodePathSegment>,
     selectReportedNode: ReportedNodeSelector
-): void {
-    collection.queuedSegmentIds.delete(segment.id);
-
+): PendingSegmentCollection {
     const entryState = createEntryState(context, segment, collection.exitStatesBySegmentId);
-    const [segmentReportedNodes, nextState] = collectSegmentReportedNodes(
+    const [ segmentReportedNodes, nextState ] = collectSegmentReportedNodes(
         context,
         entryState,
         segment,
         selectReportedNode
     );
-
-    recordReportedNodes(collection.reportedNodes, collection.reportedNodeSet, segmentReportedNodes);
+    const reportedNodes = recordReportedNodes(
+        collection.reportedNodes,
+        collection.reportedNodeSet,
+        segmentReportedNodes
+    );
 
     if (shouldRevisitSegment(collection, nextState, segment, segmentReportedNodes)) {
-        collection.exitStatesBySegmentId.set(segment.id, nextState);
-        enqueueNextSegments(segment.nextSegments, collection.pendingSegments, collection.queuedSegmentIds);
+        const [ pendingSegments, queuedSegmentIds ] = enqueueNextSegments(
+            segment.nextSegments,
+            collection.pendingSegments,
+            collection.queuedSegmentIds
+        );
+
+        return {
+            ...collection,
+            exitStatesBySegmentId: new Map([
+                ...collection.exitStatesBySegmentId,
+                [ segment.id, nextState ]
+            ]),
+            pendingSegments,
+            queuedSegmentIds,
+            reportedNodes
+        };
     }
+
+    return { ...collection, reportedNodes };
 }
 
 function createPendingSegmentCollection(
@@ -99,25 +121,50 @@ function createPendingSegmentCollection(
 
     return {
         exitStatesBySegmentId: new Map(),
-        pendingSegments: [context.codePath.initialSegment],
+        pendingSegments: [ context.codePath.initialSegment ],
         queuedSegmentIds,
         reportedNodeSet: new WeakSet(),
         reportedNodes: []
     };
 }
 
+function dropPendingSegment(collection: Readonly<PendingSegmentCollection>): readonly [
+    Rule.CodePathSegment | undefined,
+    PendingSegmentCollection
+] {
+    const [ segment, ...pendingSegments ] = collection.pendingSegments;
+
+    return [
+        segment,
+        {
+            ...collection,
+            pendingSegments,
+            queuedSegmentIds: new Set(
+                Array.from(collection.queuedSegmentIds).filter(function (segmentId) {
+                    return segmentId !== segment?.id;
+                })
+            )
+        }
+    ];
+}
+
 function processPendingSegments(
     context: Readonly<CallbackHandlingContext>,
-    collection: PendingSegmentCollection,
+    initialCollection: PendingSegmentCollection,
     selectReportedNode: ReportedNodeSelector
-): void {
-    for (
-        let segment = collection.pendingSegments.shift();
-        segment !== undefined;
-        segment = collection.pendingSegments.shift()
-    ) {
-        processPendingSegment(context, collection, segment, selectReportedNode);
+): PendingSegmentCollection {
+    let collection = initialCollection;
+
+    while (collection.pendingSegments.length > 0) {
+        const [ segment, nextCollection ] = dropPendingSegment(collection);
+        collection = nextCollection;
+
+        if (segment !== undefined) {
+            collection = processPendingSegment(context, collection, segment, selectReportedNode);
+        }
     }
+
+    return collection;
 }
 
 export function collectCallbackHandlingNodes(
@@ -125,8 +172,7 @@ export function collectCallbackHandlingNodes(
     selectReportedNode: ReportedNodeSelector
 ): readonly Rule.Node[] {
     const collection = createPendingSegmentCollection(context);
+    const processedCollection = processPendingSegments(context, collection, selectReportedNode);
 
-    processPendingSegments(context, collection, selectReportedNode);
-
-    return collection.reportedNodes;
+    return processedCollection.reportedNodes;
 }

@@ -6,7 +6,10 @@ import { findReturnStatement } from '../ast/return-statement.js';
 import { getIdentifierCallbackParameter } from '../mocha/callback-parameter.js';
 import { isLiteralOrUndefinedReturn } from './mocha-return-rule.js';
 
-function isFunctionCallWithName(node: Except<Rule.Node, 'parent'> | null | undefined, name: string): boolean {
+function isFunctionCallWithName(
+    node: Readonly<Except<Rule.Node, 'parent'>> | null | undefined,
+    name: string
+): boolean {
     return node?.type === 'CallExpression' &&
         node.callee.type === 'Identifier' &&
         node.callee.name === name;
@@ -47,16 +50,17 @@ function checkNodeForReturnAndDone(context: Readonly<Rule.RuleContext>, node: Re
 export const noReturnAndDoneRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'problem',
-        languages: ['js/js'],
         docs: {
             description: 'Disallow returning in a test or hook function that uses a callback',
+            recommended: true,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-return-and-done.md'
         },
+        schema: [],
         messages: {
             implicitReturnWithCallback: 'Confusing implicit return in a test with callback',
             unexpectedReturnWithCallback: 'Unexpected use of `return` in a test with callback'
         },
-        schema: []
+        languages: [ 'js/js' ]
     },
     create(context) {
         return createMochaVisitors(context, {

@@ -4,15 +4,16 @@ import { createMochaVisitors } from '../ast/mocha-visitors.js';
 export const noRootHooksRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'problem',
-        languages: ['js/js'],
         docs: {
             description: 'Disallow root hooks',
+            recommended: false,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-root-hooks.md'
         },
+        schema: [],
         messages: {
             unexpectedRootHook: 'Unexpected use of Mocha `{{name}}` hook outside of a test suite'
         },
-        schema: []
+        languages: [ 'js/js' ]
     },
     create(context) {
         let testSuites = 0;
