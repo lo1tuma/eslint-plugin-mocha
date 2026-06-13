@@ -17,15 +17,16 @@ function checkNodeForAsyncAndDone(context: Readonly<Rule.RuleContext>, node: Rea
 export const noAsyncAndDoneRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'problem',
-        languages: ['js/js'],
         docs: {
             description: 'Disallow async functions that also use a Mocha callback',
+            recommended: true,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-async-and-done.md'
         },
+        schema: [],
         messages: {
             unexpectedAsyncAndDone: 'Do not use an async function together with a Mocha callback parameter'
         },
-        schema: []
+        languages: [ 'js/js' ]
     },
     create(context) {
         return createMochaVisitors(context, {

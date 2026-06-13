@@ -1,5 +1,6 @@
-import { Linter, type Rule, type SourceCode } from 'eslint';
 import assert from 'node:assert';
+import { Linter, type Rule, type SourceCode } from 'eslint';
+import { suite, test } from 'mocha';
 import type { TraversableNode } from '../ast/visit-child-nodes.js';
 import {
     getStaticNumericConfigValue,
@@ -8,9 +9,16 @@ import {
     visitMochaContextConfigCalls
 } from './config-call.js';
 
-function readExpression(code: string): { sourceCode: Readonly<SourceCode>; expression: Readonly<Rule.Node>; } {
+type ReadExpressionResult = {
+    readonly sourceCode: Readonly<SourceCode>;
+    readonly expression: Readonly<Rule.Node>;
+};
+
+function readExpression(
+    code: string
+): ReadExpressionResult {
     const linter = new Linter();
-    let result: { sourceCode: Readonly<SourceCode>; expression: Readonly<Rule.Node>; } | null = null;
+    let result: ReadExpressionResult | null = null;
 
     const testRule: Rule.RuleModule = {
         create(ruleContext) {
@@ -37,15 +45,18 @@ function readExpression(code: string): { sourceCode: Readonly<SourceCode>; expre
     assert.deepStrictEqual(messages, []);
     assert.notStrictEqual(result, null);
 
-    return result as unknown as { sourceCode: Readonly<SourceCode>; expression: Readonly<Rule.Node>; };
+    return result as unknown as {
+        readonly sourceCode: Readonly<SourceCode>;
+        readonly expression: Readonly<Rule.Node>;
+    };
 }
 
 function asTraversableNode(node: Readonly<Rule.Node>): Readonly<TraversableNode> {
-    return node as unknown as Readonly<TraversableNode>;
+    return node;
 }
 
-describe('config call helpers', function () {
-    it('isSuiteConfigCall() detects this-bound config calls', function () {
+suite('config call helpers', function () {
+    test('isSuiteConfigCall() detects this-bound config calls', function () {
         const timeoutExpression = readExpression('this.timeout(5000);').expression;
         const chainedExpression = readExpression('it("works", function () {}).timeout(5000);').expression;
         const computedNonConfigExpression = readExpression('this["custom"](5000);').expression;
@@ -55,7 +66,7 @@ describe('config call helpers', function () {
         assert.strictEqual(isSuiteConfigCall(asTraversableNode(computedNonConfigExpression)), false);
     });
 
-    it('getStaticNumericConfigValue() resolves static numeric arguments', function () {
+    test('getStaticNumericConfigValue() resolves static numeric arguments', function () {
         const literalExpression = readExpression('it("works", function () {}).retries(2);');
         const constantExpression = readExpression(
             'const retryCount = 2; it("works", function () {}).retries(retryCount);'
@@ -71,7 +82,7 @@ describe('config call helpers', function () {
         );
     });
 
-    it('getStaticNumericConfigValue() returns null for spread and non-numeric values', function () {
+    test('getStaticNumericConfigValue() returns null for spread and non-numeric values', function () {
         const spreadExpression = readExpression('it("works", function () {}).timeout(...values);');
         const stringExpression = readExpression('it("works", function () {}).timeout("2s");');
         const infiniteExpression = readExpression('it("works", function () {}).timeout(1 / 0);');
@@ -88,7 +99,7 @@ describe('config call helpers', function () {
         );
     });
 
-    it('getStaticNumericConfigValue() returns null for non-static identifiers', function () {
+    test('getStaticNumericConfigValue() returns null for non-static identifiers', function () {
         const identifierExpression = readExpression('it("works", function () {}).timeout(value);');
 
         assert.strictEqual(identifierExpression.expression.type, 'CallExpression');
@@ -98,13 +109,13 @@ describe('config call helpers', function () {
         );
     });
 
-    it('isDisabledTimeoutValue() only matches disabled timeout values', function () {
+    test('isDisabledTimeoutValue() only matches disabled timeout values', function () {
         assert.strictEqual(isDisabledTimeoutValue(1), false);
         assert.strictEqual(isDisabledTimeoutValue(0), true);
         assert.strictEqual(isDisabledTimeoutValue(2_147_483_647), true);
     });
 
-    it('visitMochaContextConfigCalls() skips nested non-arrow functions', function () {
+    test('visitMochaContextConfigCalls() skips nested non-arrow functions', function () {
         const { sourceCode, expression } = readExpression(
             'it("works", function () { this.timeout(1000); (() => this.timeout(2000))(); function later() { this.timeout(3000); } });'
         );
@@ -116,7 +127,7 @@ describe('config call helpers', function () {
         assert.notStrictEqual(callbackBody?.type, 'SpreadElement');
         assert.strictEqual(callbackBody?.type, 'FunctionExpression');
 
-        visitMochaContextConfigCalls(sourceCode, callbackBody.body, 'timeout', (callExpression) => {
+        visitMochaContextConfigCalls(sourceCode, callbackBody.body, 'timeout', function (callExpression) {
             const timeoutValue = getStaticNumericConfigValue(callExpression, sourceCode);
             if (timeoutValue === null) {
                 throw new Error('Expected static timeout value');
@@ -125,6 +136,6 @@ describe('config call helpers', function () {
             visitedTimeouts.push(timeoutValue);
         });
 
-        assert.deepStrictEqual(visitedTimeouts, [1000, 2000]);
+        assert.deepStrictEqual(visitedTimeouts, [ 1000, 2000 ]);
     });
 });

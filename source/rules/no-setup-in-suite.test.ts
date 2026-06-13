@@ -1,5 +1,6 @@
-import { type Rule, RuleTester } from 'eslint';
 import assert from 'node:assert';
+import { type Rule, RuleTester } from 'eslint';
+import { suite, test } from 'mocha';
 import { withInterface } from '../mocha-interface-test-cases.js';
 import { noSetupInSuiteRule } from './no-setup-in-suite.js';
 
@@ -23,7 +24,7 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
         'describe.skip("", function () { it(); })',
         'describe.only("", function () { it(); })',
         'describe["only"]("", function () { it(); })',
-        { code: 'describe("", function () { this.slow(1); it(); })' },
+        'describe("", function () { this.slow(1); it(); })',
         'describe("", function () { this.timeout(1); it(); })',
         'describe("", function () { this.retries(1); it(); })',
         'describe("", function () { this["retries"](1); it(); })',
@@ -33,7 +34,7 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
         'describe("", function () { it("", function () { a["b"]; }); })',
         'describe("", function () { it("", function () { this.slow(1); }); })',
         'describe("", function () { it("", function () { this.timeout(1); }); })',
-        { code: 'describe("", function () { it("", function () {}).timeout(1); })' },
+        'describe("", function () { it("", function () {}).timeout(1); })',
         'describe("", function () { it("", function () {}).slow(1); })',
         'describe("", function () { it.only("", function () {}).timeout(1); })',
         'describe("", function () { it.skip("", function () {}).timeout(1); })',
@@ -66,6 +67,7 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
         'describe("", function () { describe("", function () { it(); }); it(); })',
         {
             code: 'foo("", function () { it(); })',
+            name: 'valid case 1',
             settings: {
                 'mocha/additionalCustomNames': [
                     { name: 'foo', type: 'suite', interface: 'BDD' }
@@ -74,6 +76,7 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
         },
         {
             code: 'foo("", function () { it(); })',
+            name: 'valid case 2',
             settings: {
                 mocha: {
                     additionalCustomNames: [
@@ -84,6 +87,7 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
         },
         {
             code: 'foo("", function () { it("", function () { b(); }); })',
+            name: 'valid case 3',
             settings: {
                 mocha: {
                     additionalCustomNames: [
@@ -110,19 +114,23 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
         'describe("", function () { var bar = function () { a.b = "c"; }; it(); })',
         {
             code: 'describe("", function () { const token = Symbol("bar"); it(); })',
-            options: [{ allow: ['Symbol'] }]
+            options: [ { allow: [ 'Symbol' ] } ],
+            name: 'valid case 4'
         },
         {
             code: 'describe("", function () { const token = Symbol("bar"); it(); })',
-            options: [{ allow: ['Symbol()'] }]
+            options: [ { allow: [ 'Symbol()' ] } ],
+            name: 'valid case 5'
         },
         {
             code: 'describe("", function () { Object.freeze({}); it(); })',
-            options: [{ allow: ['Object.freeze'] }]
+            options: [ { allow: [ 'Object.freeze' ] } ],
+            name: 'valid case 6'
         },
         {
             code: 'describe("", function () { Object.freeze({}); it(); })',
-            options: [{ allow: ['Object.freeze()'] }]
+            options: [ { allow: [ 'Object.freeze()' ] } ],
+            name: 'valid case 7'
         }
     ],
 
@@ -153,7 +161,9 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
                 {
                     message: 'Unexpected function call in suite block.',
                     line: 1,
-                    column: 28
+                    column: 28,
+                    endLine: 1,
+                    endColumn: 29
                 }
             ]
         },
@@ -164,7 +174,9 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
                 {
                     message: 'Unexpected function call in suite block.',
                     line: 1,
-                    column: 22
+                    column: 22,
+                    endLine: 1,
+                    endColumn: 23
                 }
             ]
         },
@@ -175,7 +187,9 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
                 {
                     message: 'Unexpected function call in suite block.',
                     line: 1,
-                    column: 52
+                    column: 52,
+                    endLine: 1,
+                    endColumn: 53
                 }
             ]
         },
@@ -185,7 +199,9 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
                 {
                     message: 'Unexpected function call in suite block.',
                     line: 1,
-                    column: 48
+                    column: 48,
+                    endLine: 1,
+                    endColumn: 49
                 }
             ]
         },
@@ -195,60 +211,71 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
                 {
                     message: 'Unexpected function call in suite block.',
                     line: 1,
-                    column: 56
+                    column: 56,
+                    endLine: 1,
+                    endColumn: 57
                 }
             ]
         },
         {
             code: 'foo("", function () { a(); });',
-            settings: {
-                mocha: {
-                    additionalCustomNames: [
-                        { name: 'foo', type: 'suite', interface: 'BDD' }
-                    ]
-                }
-            },
             errors: [
                 {
                     message: 'Unexpected function call in suite block.',
                     line: 1,
-                    column: 23
+                    column: 23,
+                    endLine: 1,
+                    endColumn: 24
                 }
-            ]
+            ],
+            name: 'invalid case 1',
+            settings: {
+                mocha: {
+                    additionalCustomNames: [
+                        { name: 'foo', type: 'suite', interface: 'BDD' }
+                    ]
+                }
+            }
         },
         {
             code: 'foo("", function () { a[b]; });',
+            errors: [
+                {
+                    message: memberExpressionError,
+                    line: 1,
+                    column: 23,
+                    endLine: 1,
+                    endColumn: 27
+                }
+            ],
+            name: 'invalid case 2',
             settings: {
                 mocha: {
                     additionalCustomNames: [
                         { name: 'foo', type: 'suite', interface: 'BDD' }
                     ]
                 }
-            },
-            errors: [
-                {
-                    message: memberExpressionError,
-                    line: 1,
-                    column: 23
-                }
-            ]
+            }
         },
         {
             code: 'foo("", function () { a["b"]; });',
+            errors: [
+                {
+                    message: memberExpressionError,
+                    line: 1,
+                    column: 23,
+                    endLine: 1,
+                    endColumn: 29
+                }
+            ],
+            name: 'invalid case 3',
             settings: {
                 mocha: {
                     additionalCustomNames: [
                         { name: 'foo', type: 'suite', interface: 'BDD' }
                     ]
                 }
-            },
-            errors: [
-                {
-                    message: memberExpressionError,
-                    line: 1,
-                    column: 23
-                }
-            ]
+            }
         },
         {
             code: 'describe("", function () { a.b; });',
@@ -256,7 +283,9 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
                 {
                     message: memberExpressionError,
                     line: 1,
-                    column: 28
+                    column: 28,
+                    endLine: 1,
+                    endColumn: 31
                 }
             ]
         },
@@ -266,31 +295,38 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
                 {
                     message: 'Unexpected function call in suite block.',
                     line: 1,
-                    column: 28
+                    column: 28,
+                    endLine: 1,
+                    endColumn: 34
                 },
                 {
                     message: memberExpressionError,
                     line: 1,
-                    column: 28
+                    column: 28,
+                    endLine: 1,
+                    endColumn: 34
                 }
             ]
         },
         {
             code: 'foo("", function () { a.b; });',
+            errors: [
+                {
+                    message: memberExpressionError,
+                    line: 1,
+                    column: 23,
+                    endLine: 1,
+                    endColumn: 26
+                }
+            ],
+            name: 'invalid case 4',
             settings: {
                 mocha: {
                     additionalCustomNames: [
                         { name: 'foo', type: 'suite', interface: 'BDD' }
                     ]
                 }
-            },
-            errors: [
-                {
-                    message: memberExpressionError,
-                    line: 1,
-                    column: 23
-                }
-            ]
+            }
         },
         {
             code: 'describe("", function () { it("", function () {}).a(); });',
@@ -298,17 +334,23 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
                 {
                     message: 'Unexpected function call in suite block.',
                     line: 1,
-                    column: 28
+                    column: 28,
+                    endLine: 1,
+                    endColumn: 52
                 },
                 {
                     message: memberExpressionError,
                     line: 1,
-                    column: 28
+                    column: 28,
+                    endLine: 1,
+                    endColumn: 52
                 },
                 {
                     message: 'Unexpected function call in suite block.',
                     line: 1,
-                    column: 28
+                    column: 28,
+                    endLine: 1,
+                    endColumn: 30
                 }
             ]
         },
@@ -318,17 +360,23 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
                 {
                     message: 'Unexpected function call in suite block.',
                     line: 1,
-                    column: 28
+                    column: 28,
+                    endLine: 1,
+                    endColumn: 65
                 },
                 {
                     message: memberExpressionError,
                     line: 1,
-                    column: 28
+                    column: 28,
+                    endLine: 1,
+                    endColumn: 65
                 },
                 {
                     message: 'Unexpected function call in suite block.',
                     line: 1,
-                    column: 28
+                    column: 28,
+                    endLine: 1,
+                    endColumn: 37
                 }
             ]
         },
@@ -338,40 +386,48 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
                 {
                     message: 'Unexpected function call in suite block.',
                     line: 1,
-                    column: 42
+                    column: 42,
+                    endLine: 1,
+                    endColumn: 48
                 }
             ]
         },
         {
             code: 'describe("", function () { const token = Symbol("bar"); helper(); it(); })',
-            options: [{ allow: ['Symbol'] }],
+            options: [ { allow: [ 'Symbol' ] } ],
             errors: [
                 {
                     message: 'Unexpected function call in suite block.',
                     line: 1,
-                    column: 57
+                    column: 57,
+                    endLine: 1,
+                    endColumn: 63
                 }
-            ]
+            ],
+            name: 'invalid case 5'
         },
         {
             code: 'describe("", function () { Object.freeze; it(); })',
-            options: [{ allow: ['Object.freeze'] }],
+            options: [ { allow: [ 'Object.freeze' ] } ],
             errors: [
                 {
                     message: memberExpressionError,
                     line: 1,
-                    column: 28
+                    column: 28,
+                    endLine: 1,
+                    endColumn: 41
                 }
-            ]
+            ],
+            name: 'invalid case 6'
         }
     ]
 });
 
-describe('no-setup-in-suite create()', function () {
-    it('normalizes non-string allow entries when invoked directly', function () {
+suite('no-setup-in-suite create()', function () {
+    test('normalizes non-string allow entries when invoked directly', function () {
         noSetupInSuiteRule.create({
             id: 'no-setup-in-suite',
-            options: [{ allow: [42] }],
+            options: [ { allow: [ 42 ] } ],
             settings: {},
             sourceCode: {
                 ast: { body: [] },

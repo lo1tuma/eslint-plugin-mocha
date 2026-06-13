@@ -1,8 +1,7 @@
 import type { Rule } from 'eslint';
 import type { FromSchema, JSONSchema } from 'json-schema-to-ts';
 
-export type RuleSchema = JSONSchema;
-export type InferSchemaOption<TSchema extends RuleSchema> = FromSchema<TSchema>;
+export type InferSchemaOption<TSchema extends JSONSchema> = FromSchema<TSchema>;
 
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- callers provide the schema-derived option type
 export type GetRuleOption = <TOption>(context: Readonly<Rule.RuleContext>) => TOption;

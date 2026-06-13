@@ -55,7 +55,7 @@ function getPropertyName(
 
 function getMochaContextConfigExpression(
     callee: Readonly<CallExpression['callee']>
-): Readonly<Extract<CallExpression['callee'], { type: 'MemberExpression'; }>> | null {
+): Readonly<Extract<CallExpression['callee'], { readonly type: 'MemberExpression'; }>> | null {
     if (!isMemberExpression(callee) || callee.object.type !== 'ThisExpression') {
         return null;
     }
@@ -68,7 +68,7 @@ function getMochaContextConfigExpression(
 function getFirstArgument(
     node: Readonly<CallExpression>
 ): Readonly<CallExpression['arguments'][number]> | undefined {
-    const [firstArgument] = node.arguments;
+    const [ firstArgument ] = node.arguments;
 
     return firstArgument?.type === 'SpreadElement' ? undefined : firstArgument;
 }
@@ -128,7 +128,7 @@ export function visitMochaContextConfigCalls(
         return;
     }
 
-    visitChildNodes(sourceCode, node, (childNode) => {
+    visitChildNodes(sourceCode, node, function (childNode) {
         visitMochaContextConfigCalls(sourceCode, childNode, configName, visitor);
     });
 }

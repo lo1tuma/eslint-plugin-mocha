@@ -8,28 +8,31 @@ import { getTopLevelMochaExpression, isDirectStatementInScope } from './direct-m
 
 const minimumAmountOfLinesBetweenNeeded = 2;
 
-function containsNode(nodeA: Except<Rule.Node, 'parent'>, nodeB: Except<Rule.Node, 'parent'>): boolean {
+function containsNode(
+    nodeA: Readonly<Except<Rule.Node, 'parent'>>,
+    nodeB: Readonly<Except<Rule.Node, 'parent'>>
+): boolean {
     const rangeA = expectNodeRange(nodeA);
     const rangeB = expectNodeRange(nodeB);
 
     return rangeB[1] <= rangeA[1] && rangeB[0] >= rangeA[0];
 }
 
-function isFirstStatementInScope(scopeNode: Layer['scopeNode'], node: Rule.Node): boolean {
-    const [firstNode] = scopeNode.body;
+function isFirstStatementInScope(scopeNode: Layer['scopeNode'], node: Readonly<Rule.Node>): boolean {
+    const [ firstNode ] = scopeNode.body;
 
     return firstNode === undefined || containsNode(firstNode, node);
 }
 
 type Layer = {
-    entities: EntityLocation[];
-    scopeNode: BlockStatement | Program;
+    readonly entities: readonly EntityLocation[];
+    readonly scopeNode: Readonly<BlockStatement | Program>;
 };
 
 type EntityLocation = {
-    reportNode: VisitorContext['node'];
-    statementNode: Rule.Node;
-    beforeToken: Readonly<AST.Token> | null;
+    readonly reportNode: VisitorContext['node'];
+    readonly statementNode: Rule.Node;
+    readonly beforeToken: Readonly<AST.Token> | null;
 };
 
 type SpacingCheck = {
@@ -63,17 +66,18 @@ function getSpacingCheck(
 export const consistentSpacingBetweenBlocksRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
-        languages: ['js/js'],
+        docs: {
+            description: 'Require consistent spacing between blocks',
+            recommended: false,
+            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/' +
+                'consistent-spacing-between-blocks.md'
+        },
         fixable: 'whitespace',
         schema: [],
         messages: {
             expectedLineBreak: 'Expected line break before this statement.'
         },
-        docs: {
-            description: 'Require consistent spacing between blocks',
-            url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/' +
-                'consistent-spacing-between-blocks.md'
-        }
+        languages: [ 'js/js' ]
     },
 
     create(context) {
@@ -84,12 +88,16 @@ export const consistentSpacingBetweenBlocksRule: Readonly<Rule.RuleModule> = {
             const currentLayer = getLastOrThrow(layers);
             if (isDirectStatementInScope(currentLayer.scopeNode, visitorContext.node)) {
                 const statementNode = getTopLevelMochaExpression(visitorContext.node);
-                currentLayer.entities.push({
-                    reportNode: visitorContext.node,
-                    statementNode,
-                    beforeToken: sourceCode.getTokenBefore(statementNode, { includeComments: false }) as (
-                        Readonly<AST.Token> | null
-                    )
+                layers.splice(-1, 1, {
+                    ...currentLayer,
+                    entities: [
+                        ...currentLayer.entities,
+                        {
+                            reportNode: visitorContext.node,
+                            statementNode,
+                            beforeToken: sourceCode.getTokenBefore(statementNode, { includeComments: false })
+                        }
+                    ]
                 });
             }
         }

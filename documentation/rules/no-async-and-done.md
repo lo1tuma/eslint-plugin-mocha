@@ -17,7 +17,7 @@ Mixing an `async` function with a callback parameter does both at once and trigg
 Examples of **incorrect** code for this rule:
 
 ```js
-it("loads data", async function (done) {
+it('loads data', async function (done) {
     done();
 });
 
@@ -30,11 +30,11 @@ beforeEach(async (done) => {
 Examples of **correct** code for this rule:
 
 ```js
-it("loads data", function (done) {
+it('loads data', function (done) {
     loadData(done);
 });
 
-it("loads data", async function () {
+it('loads data', async function () {
     await loadData();
 });
 ```

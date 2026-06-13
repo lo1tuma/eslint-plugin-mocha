@@ -14,6 +14,7 @@ ruleTester.run('no-conditional-tests', noConditionalTestsRule, {
         withInterface('TDD', 'suite("suite", function () { test("works", function () {}); });'),
         {
             code: 'foo("suite", function () { bar("works", function () {}); });',
+            name: 'valid case 1',
             settings: {
                 mocha: {
                     additionalCustomNames: [
@@ -28,31 +29,62 @@ ruleTester.run('no-conditional-tests', noConditionalTestsRule, {
     invalid: [
         {
             code: 'if (condition) { it("works", function () {}); }',
-            errors: [{ message: 'Unexpected conditional Mocha suite or test declaration.', column: 18, line: 1 }]
+            errors: [ {
+                message: 'Unexpected conditional Mocha suite or test declaration.',
+                column: 18,
+                line: 1,
+                endLine: 1,
+                endColumn: 45
+            } ]
         },
         {
             code: 'condition && describe("suite", function () {});',
-            errors: [{ message: 'Unexpected conditional Mocha suite or test declaration.', column: 14, line: 1 }]
+            errors: [ {
+                message: 'Unexpected conditional Mocha suite or test declaration.',
+                column: 14,
+                line: 1,
+                endLine: 1,
+                endColumn: 47
+            } ]
         },
         {
             code: 'condition ? it("left", function () {}) : it("right", function () {});',
             errors: [
-                { message: 'Unexpected conditional Mocha suite or test declaration.', column: 13, line: 1 },
-                { message: 'Unexpected conditional Mocha suite or test declaration.', column: 42, line: 1 }
+                {
+                    message: 'Unexpected conditional Mocha suite or test declaration.',
+                    column: 13,
+                    line: 1,
+                    endLine: 1,
+                    endColumn: 39
+                },
+                {
+                    message: 'Unexpected conditional Mocha suite or test declaration.',
+                    column: 42,
+                    line: 1,
+                    endLine: 1,
+                    endColumn: 69
+                }
             ]
         },
         withInterface('TDD', {
             code: 'condition && test("works", function () {});',
-            errors: [{ message: 'Unexpected conditional Mocha suite or test declaration.', column: 14, line: 1 }]
+            errors: [ { message: 'Unexpected conditional Mocha suite or test declaration.', column: 14, line: 1 } ]
         }),
         {
             code: 'foo && bar("works", function () {});',
+            errors: [ {
+                message: 'Unexpected conditional Mocha suite or test declaration.',
+                column: 8,
+                line: 1,
+                endLine: 1,
+                endColumn: 36
+            } ],
+            name: 'invalid case 1',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'bar', type: 'testCase', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'bar', type: 'testCase', interface: 'BDD' } ]
                 }
-            },
-            errors: [{ message: 'Unexpected conditional Mocha suite or test declaration.', column: 8, line: 1 }]
+            }
         }
     ]
 });

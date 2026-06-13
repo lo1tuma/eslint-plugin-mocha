@@ -8,7 +8,7 @@ import {
 export function collectCodeAfterCallbackHandlingNodes(
     context: Readonly<CallbackHandlingContext>
 ): readonly Rule.Node[] {
-    return collectCallbackHandlingNodes(context, (_context, pathState, operation) => {
+    return collectCallbackHandlingNodes(context, function (_context, pathState, operation) {
         return getCodeAfterCallbackHandlingNode(context.sourceCode, pathState, operation);
     });
 }

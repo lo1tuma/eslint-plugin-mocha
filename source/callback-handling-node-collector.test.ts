@@ -1,26 +1,76 @@
-import type { Rule } from 'eslint';
 import assert from 'node:assert';
+import type { Rule } from 'eslint';
+import { suite, test } from 'mocha';
 import { collectCallbackHandlingNodes } from './callback-handling-node-collector.js';
 import type { CallbackHandlingOperation } from './callback-handling-state.js';
 
 type MutableSegment = {
-    id: string;
-    nextSegments: MutableSegment[];
-    prevSegments: MutableSegment[];
+    readonly id: string;
+    readonly nextSegments: readonly MutableSegment[];
+    readonly prevSegments: readonly MutableSegment[];
 };
-type IdentifierNode = Parameters<Exclude<Rule.RuleListener['Identifier'], undefined>>[0];
+type SegmentEdge = readonly [string, string];
+type IdentifierNode = Readonly<Parameters<Exclude<Rule.RuleListener['Identifier'], undefined>>[0]>;
 
 function identifier(name: string): IdentifierNode {
     return { id: name, name, type: 'Identifier' } as unknown as IdentifierNode;
 }
 
-function createSegment(id: string): MutableSegment {
-    return { id, nextSegments: [], prevSegments: [] };
+function readSegment(segments: ReadonlyMap<string, MutableSegment>, id: string): MutableSegment {
+    const segment = segments.get(id);
+
+    if (segment === undefined) {
+        throw new Error(`Expected segment "${id}".`);
+    }
+
+    return segment;
 }
 
-function linkSegments(previous: MutableSegment, next: MutableSegment): void {
-    previous.nextSegments.push(next);
-    next.prevSegments.push(previous);
+function createSegmentGraph(
+    segmentIds: readonly string[],
+    edges: readonly SegmentEdge[]
+): ReadonlyMap<string, MutableSegment> {
+    const segments = new Map<string, MutableSegment>();
+
+    for (const id of segmentIds) {
+        segments.set(id, {
+            id,
+            get nextSegments() {
+                return edges
+                    .filter(function ([ previousId ]) {
+                        return previousId === id;
+                    })
+                    .map(function ([ , nextId ]) {
+                        return readSegment(segments, nextId);
+                    });
+            },
+            get prevSegments() {
+                return edges
+                    .filter(function ([ , nextId ]) {
+                        return nextId === id;
+                    })
+                    .map(function ([ previousId ]) {
+                        return readSegment(segments, previousId);
+                    });
+            }
+        });
+    }
+
+    return segments;
+}
+
+function createSelfReferentialSegment(id: string): MutableSegment {
+    const segment = {
+        id,
+        get nextSegments() {
+            return [ segment ];
+        },
+        get prevSegments() {
+            return [ segment ];
+        }
+    };
+
+    return segment;
 }
 
 function asCodePathSegment(segment: MutableSegment): Rule.CodePathSegment {
@@ -46,11 +96,9 @@ function bindingAssignment(node: Readonly<Rule.Node>, target: string): CallbackH
     };
 }
 
-describe('collectCallbackHandlingNodes()', function () {
-    it('stops revisiting unchanged self-referential segments without reports', function () {
-        const loop = createSegment('loop');
-
-        linkSegments(loop, loop);
+suite('collectCallbackHandlingNodes()', function () {
+    test('stops revisiting unchanged self-referential segments without reports', function () {
+        const loop = createSelfReferentialSegment('loop');
 
         const result = collectCallbackHandlingNodes(
             {
@@ -67,21 +115,19 @@ describe('collectCallbackHandlingNodes()', function () {
         assert.deepStrictEqual(result, []);
     });
 
-    it('continues into following segments after reports with unchanged path state', function () {
-        const start = createSegment('start');
-        const end = createSegment('end');
+    test('continues into following segments after reports with unchanged path state', function () {
+        const segments = createSegmentGraph([ 'start', 'end' ], [ [ 'start', 'end' ] ]);
+        const start = readSegment(segments, 'start');
         const firstNode = identifier('first');
         const secondNode = identifier('second');
-
-        linkSegments(start, end);
 
         const result = collectCallbackHandlingNodes(
             {
                 callbackBinding: 'done',
                 codePath: createCodePath(start),
                 operationsBySegmentId: new Map([
-                    ['start', [bindingAssignment(firstNode, 'first')]],
-                    ['end', [bindingAssignment(secondNode, 'second')]]
+                    [ 'start', [ bindingAssignment(firstNode, 'first') ] ],
+                    [ 'end', [ bindingAssignment(secondNode, 'second') ] ]
                 ]),
                 sourceCode: createSourceCode()
             },
@@ -90,26 +136,29 @@ describe('collectCallbackHandlingNodes()', function () {
             }
         );
 
-        assert.deepStrictEqual(result, [firstNode, secondNode]);
+        assert.deepStrictEqual(result, [ firstNode, secondNode ]);
     });
 
-    it('re-enqueues following segments when later reports keep the path state unchanged', function () {
-        const loop = createSegment('loop');
-        const end = createSegment('end');
+    test('re-enqueues following segments when later reports keep the path state unchanged', function () {
+        const segments = createSegmentGraph(
+            [ 'loop', 'end' ],
+            [
+                [ 'loop', 'end' ],
+                [ 'loop', 'loop' ]
+            ]
+        );
+        const loop = readSegment(segments, 'loop');
         const loopNode = identifier('loop');
         const endNode = identifier('end');
         let loopVisits = 0;
-
-        linkSegments(loop, end);
-        linkSegments(loop, loop);
 
         const result = collectCallbackHandlingNodes(
             {
                 callbackBinding: 'done',
                 codePath: createCodePath(loop),
                 operationsBySegmentId: new Map([
-                    ['loop', [bindingAssignment(loopNode, 'loop')]],
-                    ['end', [bindingAssignment(endNode, 'end')]]
+                    [ 'loop', [ bindingAssignment(loopNode, 'loop') ] ],
+                    [ 'end', [ bindingAssignment(endNode, 'end') ] ]
                 ]),
                 sourceCode: createSourceCode()
             },
@@ -123,6 +172,6 @@ describe('collectCallbackHandlingNodes()', function () {
             }
         );
 
-        assert.deepStrictEqual(result, [loopNode, endNode]);
+        assert.deepStrictEqual(result, [ loopNode, endNode ]);
     });
 });

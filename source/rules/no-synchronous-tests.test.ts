@@ -77,57 +77,61 @@ ruleTester.run('no-synchronous-tests', noSynchronousTestsRule, {
         },
         {
             code: 'it("", function (done) { done(); });',
-            options: []
+            options: [],
+            name: 'valid case 1'
         },
         {
             code: 'it("", function (done) { done(); });',
-            options: [{}]
+            options: [ {} ],
+            name: 'valid case 2'
         },
         {
             code:
                 'describe("Some tests", function () {it("should do something", async function () {await Promise.resolve(true);});});',
-            options: [{}]
+            options: [ {} ],
+            name: 'valid case 3'
         }
     ],
 
     invalid: [
         {
             code: 'it("", function () {});',
-            errors: [{ message: 'Unexpected synchronous test.', column: 8, line: 1 }]
+            errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1, endLine: 1, endColumn: 22 } ]
         },
         {
             code: 'it("", function () { callback(); });',
-            errors: [{ message: 'Unexpected synchronous test.', column: 8, line: 1 }]
+            errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1, endLine: 1, endColumn: 35 } ]
         },
         {
             code: 'it(function () { return; });',
-            errors: [{ message: 'Unexpected synchronous test.', column: 4, line: 1 }]
+            errors: [ { message: 'Unexpected synchronous test.', column: 4, line: 1, endLine: 1, endColumn: 27 } ]
         },
         {
             code: 'it("", function () { return "a string" });',
-            errors: [{ message: 'Unexpected synchronous test.', column: 8, line: 1 }]
+            errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1, endLine: 1, endColumn: 41 } ]
         },
         {
             code: 'it("", () => "not-a-promise" );',
             languageOptions: { ecmaVersion: 6 },
-            errors: [{ message: 'Unexpected synchronous test.', column: 8, line: 1 }]
+            errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1, endLine: 1, endColumn: 29 } ]
         },
         {
             code: 'specify("", function () {});',
-            errors: [{ message: 'Unexpected synchronous test.', column: 13, line: 1 }]
+            errors: [ { message: 'Unexpected synchronous test.', column: 13, line: 1, endLine: 1, endColumn: 27 } ]
         },
         {
             code: 'specify.only("", function () {});',
-            errors: [{ message: 'Unexpected synchronous test.', column: 18, line: 1 }]
+            errors: [ { message: 'Unexpected synchronous test.', column: 18, line: 1, endLine: 1, endColumn: 32 } ]
         },
         {
             code: 'before("", function () {});',
-            errors: [{ message: 'Unexpected synchronous test.', column: 12, line: 1 }]
+            errors: [ { message: 'Unexpected synchronous test.', column: 12, line: 1, endLine: 1, endColumn: 26 } ]
         },
         {
-            options: [{ allowedAsyncMethods: ['callback', 'async'] }],
             code: 'it("", function () { return promise(); });',
-            errors: [{ message: 'Unexpected synchronous test.', column: 8, line: 1 }]
+            options: [ { allowedAsyncMethods: [ 'callback', 'async' ] } ],
+            errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1, endLine: 1, endColumn: 41 } ],
+            name: 'invalid case 1'
         }
     ]
 });

@@ -11,7 +11,7 @@ function isConditionalNode(node: Readonly<Rule.Node>): boolean {
 function isInsideConditional(node: Readonly<Rule.Node>): boolean {
     let current = node;
 
-    while (true) {
+    for (;;) {
         const parent = getParentNode(current);
 
         if (isFunction(parent) || isProgram(parent)) {
@@ -29,15 +29,16 @@ function isInsideConditional(node: Readonly<Rule.Node>): boolean {
 export const noConditionalTestsRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'problem',
-        languages: ['js/js'],
         docs: {
             description: 'Disallow conditional suite and test declarations',
+            recommended: true,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-conditional-tests.md'
         },
+        schema: [],
         messages: {
             unexpectedConditionalTest: 'Unexpected conditional Mocha suite or test declaration.'
         },
-        schema: []
+        languages: [ 'js/js' ]
     },
     create(context) {
         return createMochaVisitors(context, {

@@ -75,14 +75,14 @@ const allRules: Linter.RulesRecord = {
     'mocha/no-root-hooks': 'error',
     'mocha/prefer-arrow-callback': 'error',
     'mocha/consistent-spacing-between-blocks': 'error',
-    'mocha/consistent-interface': ['error', { interface: 'BDD' }],
+    'mocha/consistent-interface': [ 'error', { interface: 'BDD' } ],
     'mocha/valid-suite-title': 'error',
     'mocha/valid-test-title': 'error',
     'mocha/no-empty-title': 'error'
 };
 
 const recommendedRules: Linter.RulesRecord = {
-    'mocha/consistent-structure': ['error', { disallowDuplicateHooks: true }],
+    'mocha/consistent-structure': [ 'error', { disallowDuplicateHooks: true } ],
     'mocha/handle-done-callback': 'error',
     'mocha/limit-retries': 'off',
     'mocha/limit-slow': 'off',
@@ -153,27 +153,34 @@ const rules = {
     'no-empty-title': noEmptyTitleRule
 };
 
-export type MochaPlugin = ESLint.Plugin & {
-    meta: typeof pluginMeta;
-    rules: typeof rules;
-    configs: PublishedMochaConfigs;
-};
+type ImmutablePluginShape<T> = { readonly [Key in keyof T]: T[Key]; };
+
+export type MochaPlugin = ImmutablePluginShape<
+    ESLint.Plugin & {
+        readonly meta: typeof pluginMeta;
+        readonly rules: typeof rules;
+        readonly configs: PublishedMochaConfigs;
+    }
+>;
 
 type PublishedMochaConfigs = Record<string, PublishedMochaConfig> & {
-    all: MochaConfig;
-    recommended: MochaConfig;
+    readonly all: MochaConfig;
+    readonly recommended: MochaConfig;
 };
 
-type PublishedMochaConfig =
+type PublishedMochaConfig = Readonly<
     | ConfigObject
     | ConfigObject[]
-    | LegacyConfigObject;
+    | LegacyConfigObject
+>;
 
-type MochaConfig = Linter.Config & {
-    plugins: {
-        mocha: ESLint.Plugin;
-    };
-};
+type MochaConfig = ImmutablePluginShape<
+    Linter.Config & {
+        readonly plugins: {
+            readonly mocha: ESLint.Plugin;
+        };
+    }
+>;
 
 const pluginBase = {
     meta: pluginMeta,
@@ -195,6 +202,6 @@ const configs: MochaPlugin['configs'] = {
     }
 };
 
-const plugin = Object.assign(pluginBase, { configs }) satisfies MochaPlugin;
+const plugin: MochaPlugin = Object.assign(pluginBase, { configs });
 
 export default plugin;

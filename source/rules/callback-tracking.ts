@@ -11,61 +11,66 @@ import {
 } from '../tracked-callback-reference-state.js';
 
 type TrackedCallbackFunctionBase = {
-    callbackBinding: TrackedBinding;
-    codePath: Readonly<Rule.CodePath>;
-    currentSegments: Set<Rule.CodePathSegment>;
-    operationsBySegmentId: Map<string, CallbackHandlingOperation[]>;
+    readonly callbackBinding: TrackedBinding;
+    readonly codePath: Readonly<Rule.CodePath>;
+    readonly currentSegments: ReadonlySet<Rule.CodePathSegment>;
+    readonly operationsBySegmentId: ReadonlyMap<string, readonly CallbackHandlingOperation[]>;
 };
 export type DirectTrackedCallbackFunction = TrackedCallbackFunctionBase & {
-    callbackName: string;
-    callbackNode: Rule.Node;
+    readonly callbackName: string;
+    readonly callbackNode: Rule.Node;
 };
 type InheritedTrackedCallbackFunction = TrackedCallbackFunctionBase & {
-    callbackName: undefined;
-    callbackNode: undefined;
+    readonly callbackName: undefined;
+    readonly callbackNode: undefined;
 };
 export type TrackedCallbackFunction = DirectTrackedCallbackFunction | InheritedTrackedCallbackFunction;
 
 type SharedCallbackTrackingOptions = {
-    ignorePending: boolean;
+    readonly ignorePending: boolean;
 };
 type CallbackTrackingOptions =
-    | (SharedCallbackTrackingOptions & {
-        includeInheritedCallbackBinding: false;
-        onTrackedFunctionEnd: (trackedFunction: Readonly<DirectTrackedCallbackFunction>) => void;
-    })
-    | (SharedCallbackTrackingOptions & {
-        includeInheritedCallbackBinding: true;
-        onTrackedFunctionEnd: (
+    | SharedCallbackTrackingOptions & {
+        readonly includeInheritedCallbackBinding: false;
+        readonly onTrackedFunctionEnd: (trackedFunction: Readonly<DirectTrackedCallbackFunction>) => void;
+    }
+    | SharedCallbackTrackingOptions & {
+        readonly includeInheritedCallbackBinding: true;
+        readonly onTrackedFunctionEnd: (
             trackedFunction: Readonly<DirectTrackedCallbackFunction | InheritedTrackedCallbackFunction>
         ) => void;
-    });
+    };
 type TrackedCallbackFunctionContext = {
-    codePath: Readonly<Rule.CodePath>;
-    includeInheritedCallbackBinding: boolean;
-    inheritedCallbackBinding: TrackedBinding | undefined;
-    node: Readonly<Rule.Node>;
-    sourceCode: Readonly<Rule.RuleContext['sourceCode']>;
-    trackedCallbackNodes: Readonly<WeakSet<Rule.Node>>;
+    readonly codePath: Readonly<Rule.CodePath>;
+    readonly includeInheritedCallbackBinding: boolean;
+    readonly inheritedCallbackBinding: TrackedBinding | undefined;
+    readonly node: Readonly<Rule.Node>;
+    readonly sourceCode: Readonly<Rule.RuleContext['sourceCode']>;
+    readonly trackedCallbackNodes: Readonly<WeakSet<Rule.Node>>;
 };
 type FunctionState = {
-    tracked: TrackedCallbackFunction | undefined;
-    upper: FunctionState | null;
+    readonly tracked: TrackedCallbackFunction | undefined;
+    readonly upper: FunctionState | null;
 };
 
 function pushOperation(
-    operationsBySegmentId: Map<string, CallbackHandlingOperation[]>,
+    operationsBySegmentId: ReadonlyMap<string, readonly CallbackHandlingOperation[]>,
     segmentId: string,
     operation: Readonly<CallbackHandlingOperation>
-): void {
+): ReadonlyMap<string, readonly CallbackHandlingOperation[]> {
     const operations = operationsBySegmentId.get(segmentId);
 
     if (operations === undefined) {
-        operationsBySegmentId.set(segmentId, [operation]);
-        return;
+        return new Map([
+            ...operationsBySegmentId,
+            [ segmentId, [ operation ] ]
+        ]);
     }
 
-    operations.push(operation);
+    return new Map([
+        ...operationsBySegmentId,
+        [ segmentId, [ ...operations, operation ] ]
+    ]);
 }
 
 function createTrackedCallbackFunction(
@@ -135,7 +140,7 @@ function recordMemberPropertyAssignment(
 function isDirectTrackedCallbackFunction(
     trackedFunction: Readonly<TrackedCallbackFunction>
 ): trackedFunction is Readonly<DirectTrackedCallbackFunction> {
-    return trackedFunction.callbackName !== undefined && trackedFunction.callbackNode !== undefined;
+    return trackedFunction.callbackName !== undefined;
 }
 
 function reportTrackedFunction(
@@ -170,8 +175,34 @@ export function createTrackedCallbackVisitors(
             return;
         }
 
+        const { operationsBySegmentId: initialOperationsBySegmentId } = trackedFunction;
+        let operationsBySegmentId = initialOperationsBySegmentId;
+
         for (const segment of trackedFunction.currentSegments) {
-            pushOperation(trackedFunction.operationsBySegmentId, segment.id, operation);
+            operationsBySegmentId = pushOperation(operationsBySegmentId, segment.id, operation);
+        }
+
+        if (currentFunction !== null) {
+            currentFunction = {
+                tracked: {
+                    ...trackedFunction,
+                    operationsBySegmentId
+                },
+                upper: currentFunction.upper
+            };
+        }
+    }
+
+    function updateCurrentTrackedFunction(
+        updateTrackedFunction: (trackedFunction: Readonly<TrackedCallbackFunction>) => TrackedCallbackFunction
+    ): void {
+        const trackedFunction = currentFunction?.tracked;
+
+        if (currentFunction !== null && trackedFunction !== undefined) {
+            currentFunction = {
+                ...currentFunction,
+                tracked: updateTrackedFunction(trackedFunction)
+            };
         }
     }
 
@@ -217,11 +248,25 @@ export function createTrackedCallbackVisitors(
         },
 
         onCodePathSegmentStart(segment) {
-            currentFunction?.tracked?.currentSegments.add(segment);
+            updateCurrentTrackedFunction(function (trackedFunction) {
+                return {
+                    ...trackedFunction,
+                    currentSegments: new Set([ ...trackedFunction.currentSegments, segment ])
+                };
+            });
         },
 
         onCodePathSegmentEnd(segment) {
-            currentFunction?.tracked?.currentSegments.delete(segment);
+            updateCurrentTrackedFunction(function (trackedFunction) {
+                return {
+                    ...trackedFunction,
+                    currentSegments: new Set(
+                        Array.from(trackedFunction.currentSegments).filter(function (currentSegment) {
+                            return currentSegment !== segment;
+                        })
+                    )
+                };
+            });
         },
 
         'CallExpression:exit'(node) {

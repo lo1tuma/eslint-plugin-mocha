@@ -11,9 +11,9 @@ import {
 } from './mocha-call-allowance.js';
 
 type Layer = {
-    suiteNode: Except<Rule.Node, 'parent'>;
-    hookNodes: VisitorContext[];
-    testCount: number;
+    readonly suiteNode: Except<Rule.Node, 'parent'>;
+    readonly hookNodes: readonly VisitorContext[];
+    readonly testCount: number;
 };
 
 function newSuiteLayer(suiteNode: Except<Rule.Node, 'parent'>): Readonly<Layer> {
@@ -27,16 +27,17 @@ function newSuiteLayer(suiteNode: Except<Rule.Node, 'parent'>): Readonly<Layer> 
 export const noHooksForSingleChildRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
-        languages: ['js/js'],
         docs: {
             description: 'Disallow hooks with a single direct child',
+            recommended: false,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-hooks-for-single-child.md'
         },
-        defaultOptions: [defaultAllowMochaCallOption],
+        schema: [ allowMochaCallOptionSchema ],
+        defaultOptions: [ defaultAllowMochaCallOption ],
         messages: {
             unexpectedHookForSingleChild: 'Unexpected use of Mocha `{{name}}` hook with only one direct child.'
         },
-        schema: [allowMochaCallOptionSchema]
+        languages: [ 'js/js' ]
     },
     create(context) {
         const { allow } = getRuleOption<ResolvedAllowMochaCallOption>(context);
@@ -44,7 +45,7 @@ export const noHooksForSingleChildRule: Readonly<Rule.RuleModule> = {
         let layers: Layer[] = [];
 
         function increaseTestCount(): void {
-            layers = layers.map((layer) => {
+            layers = layers.map(function (layer) {
                 return {
                     suiteNode: layer.suiteNode,
                     hookNodes: layer.hookNodes,
@@ -59,10 +60,10 @@ export const noHooksForSingleChildRule: Readonly<Rule.RuleModule> = {
                 if (layer.testCount <= 1) {
                     layer
                         .hookNodes
-                        .filter((hookNode) => {
+                        .filter(function (hookNode) {
                             return !allowedHooks.has(hookNode.name);
                         })
-                        .forEach((hookNode) => {
+                        .forEach(function (hookNode) {
                             context.report({
                                 node: hookNode.node,
                                 messageId: 'unexpectedHookForSingleChild',
@@ -97,7 +98,10 @@ export const noHooksForSingleChildRule: Readonly<Rule.RuleModule> = {
             hook(visitorContext) {
                 const currentLayer = getLastOrThrow(layers);
 
-                currentLayer.hookNodes.push(visitorContext);
+                layers.splice(-1, 1, {
+                    ...currentLayer,
+                    hookNodes: [ ...currentLayer.hookNodes, visitorContext ]
+                });
             }
         });
     }

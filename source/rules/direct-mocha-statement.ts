@@ -7,7 +7,7 @@ import {
     type Program
 } from '../ast/node-types.js';
 
-export type DirectStatementScope = AnyFunction['body'] | Program;
+export type DirectStatementScope = Readonly<AnyFunction['body'] | Program>;
 
 function isNestedStatementBoundary(node: Rule.Node): boolean {
     return node.type.endsWith('Statement') || node.type.endsWith('Declaration') || isFunction(node);
@@ -16,12 +16,12 @@ function isNestedStatementBoundary(node: Rule.Node): boolean {
 export function isDirectStatementInScope(scopeNode: DirectStatementScope, node: Rule.Node): boolean {
     let current = node;
 
-    while (getParentNode(current) !== scopeNode) {
+    while (!Object.is(getParentNode(current), scopeNode)) {
         current = getParentNode(current);
 
         if (
             isNestedStatementBoundary(current) &&
-            !(current.type === 'ExpressionStatement' && getParentNode(current) === scopeNode)
+            !(current.type === 'ExpressionStatement' && Object.is(getParentNode(current), scopeNode))
         ) {
             return false;
         }

@@ -4,13 +4,13 @@ const configFiles = [
     '^packtory\\.config\\.js$',
     '^stryker\\.config\\.js$'
 ];
-const entryPointFiles = ['^source/plugin\\.ts$'];
-const benchmarkFiles = ['^benchmarks/', '\\.bench\\.ts$'];
-const testFiles = ['\\.test\\.ts$'];
-const testSupportFiles = ['^source/mocha-interface-test-cases\\.ts$'];
-const excludedFiles = ['^(\\./)?target/'];
+const entryPointFiles = [ '^source/plugin\\.ts$' ];
+const benchmarkFiles = [ '^benchmarks/', '\\.bench\\.ts$' ];
+const testFiles = [ '\\.test\\.ts$' ];
+const testSupportFiles = [ '^source/mocha-interface-test-cases\\.ts$' ];
+const excludedFiles = [ '^(\\./)?target/' ];
 
-const ignoreFromOrphans = [...configFiles, ...entryPointFiles, ...benchmarkFiles, ...testFiles, ...testSupportFiles];
+const ignoreFromOrphans = [ ...configFiles, ...entryPointFiles, ...benchmarkFiles, ...testFiles, ...testSupportFiles ];
 
 /** @type {import('dependency-cruiser').IConfiguration} */
 export default {
@@ -28,7 +28,7 @@ export default {
             severity: 'error',
             from: {
                 orphan: true,
-                pathNot: [...ignoreFromOrphans, '\\.d\\.ts$']
+                pathNot: [ ...ignoreFromOrphans, '\\.d\\.ts$' ]
             },
             to: {}
         },
@@ -40,14 +40,14 @@ export default {
             },
             module: {
                 numberOfDependentsLessThan: 1,
-                pathNot: [...ignoreFromOrphans, '\\.d\\.ts$']
+                pathNot: [ ...ignoreFromOrphans, '\\.d\\.ts$' ]
             }
         },
         {
             name: 'no-internal-but-tested-orphans',
             severity: 'error',
             from: {
-                pathNot: [...testFiles, ...benchmarkFiles]
+                pathNot: [ ...testFiles, ...benchmarkFiles ]
             },
             module: {
                 numberOfDependentsLessThan: 1,
@@ -65,7 +65,7 @@ export default {
             severity: 'error',
             from: {},
             to: {
-                dependencyTypes: ['deprecated']
+                dependencyTypes: [ 'deprecated' ]
             }
         },
         {
@@ -73,8 +73,8 @@ export default {
             severity: 'error',
             from: {},
             to: {
-                dependencyTypes: ['npm'],
-                dependencyTypesNot: ['type-only'],
+                dependencyTypes: [ 'npm' ],
+                dependencyTypesNot: [ 'type-only' ],
                 moreThanOneDependencyType: true
             }
         },
@@ -86,9 +86,9 @@ export default {
                 pathNot: testFiles
             },
             to: {
-                dependencyTypes: ['npm-dev'],
+                dependencyTypes: [ 'npm-dev' ],
                 moreThanOneDependencyType: false,
-                pathNot: ['^node_modules/@types/', '\\.d\\.ts$']
+                pathNot: [ '^node_modules/@types/', '\\.d\\.ts$' ]
             }
         },
         {
@@ -96,29 +96,29 @@ export default {
             severity: 'error',
             from: {},
             to: {
-                dependencyTypes: ['npm-no-pkg', 'npm-unknown']
+                dependencyTypes: [ 'npm-no-pkg', 'npm-unknown' ]
             }
         },
         {
             name: 'not-test-file-import',
             severity: 'error',
             from: {
-                pathNot: [...testFiles, ...benchmarkFiles]
+                pathNot: [ ...testFiles, ...benchmarkFiles ]
             },
             to: {
-                path: [...testFiles, ...benchmarkFiles]
+                path: [ ...testFiles, ...benchmarkFiles ]
             }
         }
     ],
     options: {
         doNotFollow: {
             path: 'node_modules|target/',
-            dependencyTypes: ['npm', 'npm-dev', 'npm-optional', 'npm-peer', 'npm-bundled', 'npm-no-pkg']
+            dependencyTypes: [ 'npm', 'npm-dev', 'npm-optional', 'npm-peer', 'npm-bundled', 'npm-no-pkg' ]
         },
         exclude: {
             path: excludedFiles
         },
-        moduleSystems: ['cjs', 'es6', 'tsd'],
+        moduleSystems: [ 'cjs', 'es6', 'tsd' ],
         tsPreCompilationDeps: true,
         tsConfig: {
             fileName: 'tsconfig.json'

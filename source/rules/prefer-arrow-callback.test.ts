@@ -20,16 +20,20 @@ const ruleTester = new RuleTester({
 // Tests
 // ------------------------------------------------------------------------------
 
-const errors: [RuleTester.TestCaseError] = [{
+const errors: [RuleTester.TestCaseError] = [ {
     message: 'Unexpected function expression.'
-}];
+} ];
 
 ruleTester.run('prefer-arrow-callback', preferArrowCallbackRule, {
     valid: [
         // Smoke tests for the core ESLint rule integration.
         'foo(a => a);',
         'foo(function*() {});',
-        { code: 'foo(function bar() {});', options: [{ allowNamedFunctions: true }] },
+        {
+            code: 'foo(function bar() {});',
+            options: [ { allowNamedFunctions: true } ],
+            name: 'valid case 1'
+        },
         {
             code: 'import.meta.url',
             languageOptions: {
@@ -79,10 +83,11 @@ ruleTester.run('prefer-arrow-callback', preferArrowCallbackRule, {
         },
         {
             code: 'foo(function() { this; });',
-            // No fix applied
             output: null,
-            options: [{ allowUnboundThis: false }],
-            errors
+            // No fix applied
+            options: [ { allowUnboundThis: false } ],
+            errors,
+            name: 'invalid case 1'
         },
         {
             code: 'qux(async function (foo = 1, bar = 2, baz = 3) { return baz; })',

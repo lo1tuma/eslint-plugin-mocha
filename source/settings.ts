@@ -2,7 +2,7 @@ import type { CustomNameConfig } from './mocha/all-name-details.js';
 import { isCustomMochaEntityType, isMochaInterface, type MochaInterface } from './mocha/descriptors.js';
 import { isRecord } from './record.js';
 
-function settingFor(settings: Record<string, unknown>, propertyName: string, fallback: unknown): unknown {
+function settingFor(settings: Readonly<Record<string, unknown>>, propertyName: string, fallback: unknown): unknown {
     const value = settings[`mocha/${propertyName}`];
 
     if (value !== undefined) {
@@ -43,13 +43,13 @@ function validateAdditionalNames(value: unknown): asserts value is readonly Cust
     }
 }
 
-export function getAdditionalNames(settings: Record<string, unknown>): readonly CustomNameConfig[] {
+export function getAdditionalNames(settings: Readonly<Record<string, unknown>>): readonly CustomNameConfig[] {
     const additionalCustomNames = settingFor(settings, 'additionalCustomNames', []);
     validateAdditionalNames(additionalCustomNames);
     return additionalCustomNames;
 }
 
-export function getInterface(settings: Record<string, unknown>): MochaInterface {
+export function getInterface(settings: Readonly<Record<string, unknown>>): MochaInterface {
     const interfaceToUse = settingFor(settings, 'interface', 'BDD');
 
     if (isMochaInterface(interfaceToUse)) {

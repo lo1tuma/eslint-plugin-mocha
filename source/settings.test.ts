@@ -1,32 +1,33 @@
 import assert from 'node:assert';
+import { suite, test } from 'mocha';
 import { getAdditionalNames, getInterface } from './settings.js';
 
-describe('settings', function () {
-    describe('getAdditionalNames()', function () {
-        it('returns an empty list by default', function () {
+suite('settings', function () {
+    suite('getAdditionalNames()', function () {
+        test('returns an empty list by default', function () {
             const result = getAdditionalNames({});
             assert.deepStrictEqual(result, []);
         });
 
-        it('returns the configured additional names from flat settings', function () {
+        test('returns the configured additional names from flat settings', function () {
             const result = getAdditionalNames({
-                'mocha/additionalCustomNames': [{ interface: 'BDD', name: 'foo', type: 'suite' }]
+                'mocha/additionalCustomNames': [ { interface: 'BDD', name: 'foo', type: 'suite' } ]
             });
 
-            assert.deepStrictEqual(result, [{ interface: 'BDD', name: 'foo', type: 'suite' }]);
+            assert.deepStrictEqual(result, [ { interface: 'BDD', name: 'foo', type: 'suite' } ]);
         });
 
-        it('returns the configured additional names from nested settings', function () {
+        test('returns the configured additional names from nested settings', function () {
             const result = getAdditionalNames({
                 mocha: {
-                    additionalCustomNames: [{ interface: 'BDD', name: 'prepareTestContexts', type: 'hook' }]
+                    additionalCustomNames: [ { interface: 'BDD', name: 'prepareTestContexts', type: 'hook' } ]
                 }
             });
 
-            assert.deepStrictEqual(result, [{ interface: 'BDD', name: 'prepareTestContexts', type: 'hook' }]);
+            assert.deepStrictEqual(result, [ { interface: 'BDD', name: 'prepareTestContexts', type: 'hook' } ]);
         });
 
-        it('throws when additionalCustomNames is not an array', function () {
+        test('throws when additionalCustomNames is not an array', function () {
             assert.throws(
                 function () {
                     getAdditionalNames({ 'mocha/additionalCustomNames': 'foo' });
@@ -38,10 +39,10 @@ describe('settings', function () {
             );
         });
 
-        it('throws when an additionalCustomNames item is not an object', function () {
+        test('throws when an additionalCustomNames item is not an object', function () {
             assert.throws(
                 function () {
-                    getAdditionalNames({ 'mocha/additionalCustomNames': ['foo'] });
+                    getAdditionalNames({ 'mocha/additionalCustomNames': [ 'foo' ] });
                 },
                 function (error: unknown) {
                     return error instanceof Error &&
@@ -50,11 +51,11 @@ describe('settings', function () {
             );
         });
 
-        it('throws when an additionalCustomNames item has an invalid interface', function () {
+        test('throws when an additionalCustomNames item has an invalid interface', function () {
             assert.throws(
                 function () {
                     getAdditionalNames({
-                        'mocha/additionalCustomNames': [{ interface: 'foo', name: 'bar', type: 'suite' }]
+                        'mocha/additionalCustomNames': [ { interface: 'foo', name: 'bar', type: 'suite' } ]
                     });
                 },
                 function (error: unknown) {
@@ -64,11 +65,11 @@ describe('settings', function () {
             );
         });
 
-        it('throws when an additionalCustomNames item has no valid name', function () {
+        test('throws when an additionalCustomNames item has no valid name', function () {
             assert.throws(
                 function () {
                     getAdditionalNames({
-                        'mocha/additionalCustomNames': [{ interface: 'BDD', name: 42, type: 'suite' }]
+                        'mocha/additionalCustomNames': [ { interface: 'BDD', name: 42, type: 'suite' } ]
                     });
                 },
                 function (error: unknown) {
@@ -78,11 +79,11 @@ describe('settings', function () {
             );
         });
 
-        it('throws when an additionalCustomNames item has no valid type', function () {
+        test('throws when an additionalCustomNames item has no valid type', function () {
             assert.throws(
                 function () {
                     getAdditionalNames({
-                        'mocha/additionalCustomNames': [{ interface: 'BDD', name: 'bar', type: 42 }]
+                        'mocha/additionalCustomNames': [ { interface: 'BDD', name: 'bar', type: 42 } ]
                     });
                 },
                 function (error: unknown) {
@@ -92,11 +93,11 @@ describe('settings', function () {
             );
         });
 
-        it('throws when an additionalCustomNames item has an unknown type', function () {
+        test('throws when an additionalCustomNames item has an unknown type', function () {
             assert.throws(
                 function () {
                     getAdditionalNames({
-                        'mocha/additionalCustomNames': [{ interface: 'BDD', name: 'bar', type: 'config' }]
+                        'mocha/additionalCustomNames': [ { interface: 'BDD', name: 'bar', type: 'config' } ]
                     });
                 },
                 function (error: unknown) {
@@ -107,23 +108,23 @@ describe('settings', function () {
         });
     });
 
-    describe('getInterface()', function () {
-        it('returns "BDD" by default', function () {
+    suite('getInterface()', function () {
+        test('returns "BDD" by default', function () {
             const result = getInterface({});
             assert.strictEqual(result, 'BDD');
         });
 
-        it('returns the given valid interface', function () {
+        test('returns the given valid interface', function () {
             const result = getInterface({ 'mocha/interface': 'require' });
             assert.strictEqual(result, 'require');
         });
 
-        it('returns the given valid nested interface', function () {
+        test('returns the given valid nested interface', function () {
             const result = getInterface({ mocha: { interface: 'TDD' } });
             assert.strictEqual(result, 'TDD');
         });
 
-        it('throws an error when an invalid interface is provided', function () {
+        test('throws an error when an invalid interface is provided', function () {
             try {
                 getInterface({ 'mocha/interface': 'foo' });
                 assert.fail('Expected getInterface() to throw but it did not');

@@ -11,12 +11,12 @@ Once a callback-style test or hook calls `done()`, Mocha treats that operation a
 Examples of **incorrect** code for this rule:
 
 ```js
-it("reports too late", function (done) {
+it('reports too late', function (done) {
     done();
     expect(true).to.equal(false);
 });
 
-it("hides failures in nested callbacks", function (done) {
+it('hides failures in nested callbacks', function (done) {
     run(function () {
         done();
         expect(true).to.equal(false);
@@ -27,12 +27,12 @@ it("hides failures in nested callbacks", function (done) {
 Examples of **correct** code for this rule:
 
 ```js
-it("finishes once", function (done) {
+it('finishes once', function (done) {
     expect(true).to.equal(true);
     done();
 });
 
-it("returns immediately after finishing", function (done) {
+it('returns immediately after finishing', function (done) {
     done();
     return;
 });

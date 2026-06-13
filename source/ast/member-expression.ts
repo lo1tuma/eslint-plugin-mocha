@@ -23,7 +23,7 @@ function isConstantPathElement(element: string | symbol): element is string {
 function isCallExpressionCallee(node: Readonly<Rule.Node>): boolean {
     const parent = getParentNode(node);
 
-    return parent.type === 'CallExpression' && parent.callee === node;
+    return parent.type === 'CallExpression' && Object.is(parent.callee, node);
 }
 
 function formatName(name: string | symbol, node: Readonly<Rule.Node>): DynamicPathSegment {

@@ -3,13 +3,13 @@ import { fileURLToPath } from 'node:url';
 import { isRecord } from './record.js';
 
 export type PackageMetadata = {
-    name: string;
-    version: string;
+    readonly name: string;
+    readonly version: string;
 };
 
 export type PackageMetadataReaderDependencies = {
-    accessFile: (packageJsonPath: string) => Promise<void>;
-    readPackageJson: (packageJsonPath: string) => Promise<unknown>;
+    readonly accessFile: (packageJsonPath: string) => Promise<void>;
+    readonly readPackageJson: (packageJsonPath: string) => Promise<unknown>;
 };
 
 function parsePackageMetadata(packageJsonPath: string, packageJson: unknown): Readonly<PackageMetadata> {

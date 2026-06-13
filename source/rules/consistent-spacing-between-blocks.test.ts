@@ -6,79 +6,79 @@ const ruleTester = new RuleTester({ languageOptions: { ecmaVersion: 2020, source
 type StatementWrapper = (statement: string) => string;
 
 const nestedStatementWrappers: StatementWrapper[] = [
-    (statement) => {
+    function (statement) {
         return `{
     ${statement}
 }`;
     },
-    (statement) => {
+    function (statement) {
         return `testCases.forEach((testCase) => {
     ${statement}
 });`;
     },
-    (statement) => {
+    function (statement) {
         return `if (condition) {
     ${statement}
 }`;
     },
-    (statement) => {
+    function (statement) {
         return `if (condition)
     ${statement}`;
     },
-    (statement) => {
+    function (statement) {
         return `if (condition) {
     helper();
 } else {
     ${statement}
 }`;
     },
-    (statement) => {
+    function (statement) {
         return `for (let index = 0; index < testCases.length; index += 1) {
     ${statement}
 }`;
     },
-    (statement) => {
+    function (statement) {
         return `for (let index = 0; index < testCases.length; index += 1)
     ${statement}`;
     },
-    (statement) => {
+    function (statement) {
         return `for (const key in testCases) {
     ${statement}
 }`;
     },
-    (statement) => {
+    function (statement) {
         return `for (const key in testCases)
     ${statement}`;
     },
-    (statement) => {
+    function (statement) {
         return `for (const testCase of testCases) {
     ${statement}
 }`;
     },
-    (statement) => {
+    function (statement) {
         return `for (const testCase of testCases)
     ${statement}`;
     },
-    (statement) => {
+    function (statement) {
         return `while (condition) {
     ${statement}
 }`;
     },
-    (statement) => {
+    function (statement) {
         return `while (condition)
     ${statement}`;
     },
-    (statement) => {
+    function (statement) {
         return `do {
     ${statement}
 } while (condition);`;
     },
-    (statement) => {
+    function (statement) {
         return `do
     ${statement}
 while (condition);`;
     },
-    (statement) => {
+    function (statement) {
         return `switch (kind) {
     case 'first':
         ${statement}
@@ -87,7 +87,7 @@ while (condition);`;
         break;
 }`;
     },
-    (statement) => {
+    function (statement) {
         return `try {
     ${statement}
 } catch (error) {
@@ -96,12 +96,12 @@ while (condition);`;
     cleanup();
 }`;
     },
-    (statement) => {
+    function (statement) {
         return `function registerCase() {
     ${statement}
 }`;
     },
-    (statement) => {
+    function (statement) {
         return `const registerCase = () => {
     ${statement}
 };`;
@@ -109,12 +109,21 @@ while (condition);`;
 ];
 
 function indentLines(code: string): string[] {
-    return code.split('\n').map((line) => {
+    return code.split('\n').map(function (line) {
         return `    ${line}`;
     });
 }
 
-function createValidNestedStatementCase(wrapper: StatementWrapper): { code: string; } {
+type ValidNestedStatementCase = {
+    readonly code: string;
+};
+type InvalidNestedStatementCase = {
+    readonly code: string;
+    readonly output: string;
+    readonly errors: readonly { readonly message: string; }[];
+};
+
+function createValidNestedStatementCase(wrapper: StatementWrapper): ValidNestedStatementCase {
     return {
         code: [
             "describe('foo', () => {",
@@ -127,11 +136,7 @@ function createValidNestedStatementCase(wrapper: StatementWrapper): { code: stri
     };
 }
 
-function createInvalidNestedStatementCase(wrapper: StatementWrapper): {
-    code: string;
-    output: string;
-    errors: [{ message: string; }];
-} {
+function createInvalidNestedStatementCase(wrapper: StatementWrapper): InvalidNestedStatementCase {
     return {
         code: [
             "describe('foo', () => {",
@@ -166,11 +171,9 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
 
         describe();`,
 
-        {
-            code: `describe('My Test', () => {
+        `describe('My Test', () => {
             it('does something', () => {});
-        });`
-        },
+        });`,
 
         // Proper line break before each block within describe
         `describe('My Test', () => {
@@ -199,40 +202,30 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
         `it('does something outside a describe block', () => {});
 
         afterEach(() => {});`,
-        {
-            code: `describe('foo', () => {
+        `describe('foo', () => {
                 it('bar', () => {}).timeout(42);
-            });`
-        },
-        {
-            code: `describe('foo', () => {
+            });`,
+        `describe('foo', () => {
                 it('bar', () => {}).timeout(42);
 
                 it('baz', () => {}).timeout(42);
-            });`
-        },
-        {
-            code: `describe('foo', () => {
+            });`,
+        `describe('foo', () => {
                 it('bar', () => {})
                     .timeout(42);
 
                 it('baz', () => {})
                     .timeout(42);
-            });`
-        },
-        {
-            code: `describe('foo', () => {
+            });`,
+        `describe('foo', () => {
                 [
                     { title: 'bar' },
                     { title: 'baz' },
                 ].forEach((testCase) => {
                     it(testCase.title, () => {});
                 });
-            });`
-        },
-        {
-            code: "describe('foo', () => it('bar', () => {}));"
-        },
+            });`,
+        "describe('foo', () => it('bar', () => {}));",
         ...nestedStatementWrappers.map(createValidNestedStatementCase)
     ],
 
@@ -250,7 +243,11 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
             });`,
             errors: [
                 {
-                    message: 'Expected line break before this statement.'
+                    message: 'Expected line break before this statement.',
+                    line: 3,
+                    column: 17,
+                    endLine: 3,
+                    endColumn: 36
                 }
             ]
         },
@@ -268,7 +265,11 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
             });`,
             errors: [
                 {
-                    message: 'Expected line break before this statement.'
+                    message: 'Expected line break before this statement.',
+                    line: 3,
+                    column: 17,
+                    endLine: 3,
+                    endColumn: 47
                 }
             ]
         },
@@ -286,7 +287,11 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
             });`,
             errors: [
                 {
-                    message: 'Expected line break before this statement.'
+                    message: 'Expected line break before this statement.',
+                    line: 3,
+                    column: 17,
+                    endLine: 3,
+                    endColumn: 48
                 }
             ]
         },
@@ -304,7 +309,11 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
                 '});',
             errors: [
                 {
-                    message: 'Expected line break before this statement.'
+                    message: 'Expected line break before this statement.',
+                    line: 1,
+                    column: 63,
+                    endLine: 1,
+                    endColumn: 88
                 }
             ]
         },
@@ -320,7 +329,11 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
                 '});',
             errors: [
                 {
-                    message: 'Expected line break before this statement.'
+                    message: 'Expected line break before this statement.',
+                    line: 2,
+                    column: 14,
+                    endLine: 2,
+                    endColumn: 39
                 }
             ]
         },
@@ -330,7 +343,11 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
             output: 'describe("", () => {});\n\ndescribe("", () => {});',
             errors: [
                 {
-                    message: 'Expected line break before this statement.'
+                    message: 'Expected line break before this statement.',
+                    line: 1,
+                    column: 24,
+                    endLine: 1,
+                    endColumn: 46
                 }
             ]
         },
@@ -340,10 +357,21 @@ ruleTester.run('consistent-spacing-between-mocha-calls', consistentSpacingBetwee
             output: 'describe();\n\ndescribe();',
             errors: [
                 {
-                    message: 'Expected line break before this statement.'
+                    message: 'Expected line break before this statement.',
+                    line: 2,
+                    column: 1,
+                    endLine: 2,
+                    endColumn: 11
                 }
             ]
         },
-        ...nestedStatementWrappers.map(createInvalidNestedStatementCase)
+        ...nestedStatementWrappers.map(function (wrapper) {
+            const testCase = createInvalidNestedStatementCase(wrapper);
+
+            return {
+                ...testCase,
+                errors: Array.from(testCase.errors)
+            };
+        })
     ]
 });

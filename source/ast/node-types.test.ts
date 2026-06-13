@@ -1,5 +1,6 @@
-import type { Rule } from 'eslint';
 import assert from 'node:assert';
+import type { Rule } from 'eslint';
+import { suite, test } from 'mocha';
 import {
     expectCallExpression,
     expectMemberExpression,
@@ -7,19 +8,19 @@ import {
     isLiteral
 } from './node-types.js';
 
-function asNode(node: Record<string, unknown>): Rule.Node {
+function asNode(node: Readonly<Record<string, unknown>>): Rule.Node {
     return node as unknown as Rule.Node;
 }
 
-describe('node type helpers', function () {
-    it('getParentNode() returns the parent node', function () {
+suite('node type helpers', function () {
+    test('getParentNode() returns the parent node', function () {
         const parent = asNode({ type: 'Program' });
         const node = asNode({ type: 'Identifier', parent });
 
         assert.strictEqual(getParentNode(node), parent);
     });
 
-    it('getParentNode() throws when the parent is missing', function () {
+    test('getParentNode() throws when the parent is missing', function () {
         const node = asNode({ type: 'Program', parent: null });
 
         assert.throws(function () {
@@ -29,17 +30,17 @@ describe('node type helpers', function () {
         });
     });
 
-    it('isLiteral() rejects non-literal nodes', function () {
+    test('isLiteral() rejects non-literal nodes', function () {
         assert.strictEqual(isLiteral(asNode({ type: 'Identifier' })), false);
     });
 
-    it('expectCallExpression() returns call expression nodes', function () {
+    test('expectCallExpression() returns call expression nodes', function () {
         const node = asNode({ type: 'CallExpression', callee: asNode({ type: 'Identifier' }), arguments: [] });
 
         assert.strictEqual(expectCallExpression(node), node);
     });
 
-    it('expectCallExpression() throws for other node types', function () {
+    test('expectCallExpression() throws for other node types', function () {
         assert.throws(function () {
             expectCallExpression(asNode({ type: 'Identifier' }));
         }, function (error: unknown) {
@@ -47,7 +48,7 @@ describe('node type helpers', function () {
         });
     });
 
-    it('expectMemberExpression() returns member expression nodes', function () {
+    test('expectMemberExpression() returns member expression nodes', function () {
         const node = asNode({
             type: 'MemberExpression',
             object: asNode({ type: 'Identifier' }),
@@ -58,7 +59,7 @@ describe('node type helpers', function () {
         assert.strictEqual(expectMemberExpression(node), node);
     });
 
-    it('expectMemberExpression() throws for other node types', function () {
+    test('expectMemberExpression() throws for other node types', function () {
         assert.throws(function () {
             expectMemberExpression(asNode({ type: 'Identifier' }));
         }, function (error: unknown) {

@@ -1,46 +1,44 @@
-import type { RuleSchema } from '../rule-options.js';
-
 export const disallowModeOptionSchema = {
     type: 'object',
     properties: {
         mode: {
-            enum: ['disallow']
+            enum: [ 'disallow' ]
         }
     },
-    required: ['mode'],
+    required: [ 'mode' ],
     additionalProperties: false
-} as const satisfies RuleSchema;
+} as const;
 
 export const disallowDisabledModeOptionSchema = {
     type: 'object',
     properties: {
         mode: {
-            enum: ['disallowDisabled']
+            enum: [ 'disallowDisabled' ]
         }
     },
-    required: ['mode'],
+    required: [ 'mode' ],
     additionalProperties: false
-} as const satisfies RuleSchema;
+} as const;
 
 export const maximumNumericMochaConfigOptionSchema = {
     type: 'object',
     properties: {
         mode: {
-            enum: ['max']
+            enum: [ 'max' ]
         },
         max: {
             type: 'integer'
         }
     },
-    required: ['mode', 'max'],
+    required: [ 'mode', 'max' ],
     additionalProperties: false
-} as const satisfies RuleSchema;
+} as const;
 
 export const rangeNumericMochaConfigOptionSchema = {
     type: 'object',
     properties: {
         mode: {
-            enum: ['range']
+            enum: [ 'range' ]
         },
         min: {
             type: 'integer'
@@ -49,6 +47,6 @@ export const rangeNumericMochaConfigOptionSchema = {
             type: 'integer'
         }
     },
-    required: ['mode', 'min', 'max'],
+    required: [ 'mode', 'min', 'max' ],
     additionalProperties: false
-} as const satisfies RuleSchema;
+} as const;

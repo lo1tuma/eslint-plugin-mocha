@@ -1,39 +1,40 @@
-import type { Rule, SourceCode } from 'eslint';
 import assert from 'node:assert';
+import type { Rule, SourceCode } from 'eslint';
+import { suite, test } from 'mocha';
 import { visitChildNodes, visitWithoutNestedFunctions } from './visit-child-nodes.js';
 
-function asRuleNode(node: Record<string, unknown>): Rule.Node {
+function asRuleNode(node: Readonly<Record<string, unknown>>): Rule.Node {
     return node as unknown as Rule.Node;
 }
 
-function asSourceCode(sourceCode: Record<string, unknown>): SourceCode {
+function asSourceCode(sourceCode: Readonly<Record<string, unknown>>): SourceCode {
     return sourceCode as unknown as SourceCode;
 }
 
-describe('visit child nodes', function () {
-    it('visitChildNodes() visits array and direct child nodes', function () {
+suite('visit child nodes', function () {
+    test('visitChildNodes() visits array and direct child nodes', function () {
         const visitedTypes: string[] = [];
 
         visitChildNodes(
             asSourceCode({
                 visitorKeys: {
-                    ParentNode: ['children', 'child']
+                    ParentNode: [ 'children', 'child' ]
                 }
             }),
             asRuleNode({
                 child: { type: 'Identifier' },
-                children: [{ type: 'Literal' }, 'ignore me'],
+                children: [ { type: 'Literal' }, 'ignore me' ],
                 type: 'ParentNode'
             }),
-            (node) => {
+            function (node) {
                 visitedTypes.push(node.type);
             }
         );
 
-        assert.deepStrictEqual(visitedTypes, ['Literal', 'Identifier']);
+        assert.deepStrictEqual(visitedTypes, [ 'Literal', 'Identifier' ]);
     });
 
-    it('visitChildNodes() ignores nodes without registered visitor keys', function () {
+    test('visitChildNodes() ignores nodes without registered visitor keys', function () {
         const visitedTypes: string[] = [];
 
         visitChildNodes(
@@ -44,7 +45,7 @@ describe('visit child nodes', function () {
                 child: { type: 'Identifier' },
                 type: 'UnknownNode'
             }),
-            (node) => {
+            function (node) {
                 visitedTypes.push(node.type);
             }
         );
@@ -52,21 +53,21 @@ describe('visit child nodes', function () {
         assert.deepStrictEqual(visitedTypes, []);
     });
 
-    it('visitWithoutNestedFunctions() skips nested function bodies', function () {
+    test('visitWithoutNestedFunctions() skips nested function bodies', function () {
         const visitedTypes: string[] = [];
 
         visitWithoutNestedFunctions(
             asSourceCode({
                 visitorKeys: {
-                    Program: ['body'],
-                    ExpressionStatement: ['expression'],
-                    CallExpression: ['callee', 'arguments'],
-                    FunctionExpression: ['params', 'body'],
-                    BlockStatement: ['body']
+                    Program: [ 'body' ],
+                    ExpressionStatement: [ 'expression' ],
+                    CallExpression: [ 'callee', 'arguments' ],
+                    FunctionExpression: [ 'params', 'body' ],
+                    BlockStatement: [ 'body' ]
                 }
             }),
             asRuleNode({
-                body: [{
+                body: [ {
                     type: 'ExpressionStatement',
                     expression: {
                         type: 'CallExpression',
@@ -75,15 +76,15 @@ describe('visit child nodes', function () {
                             params: [],
                             body: {
                                 type: 'BlockStatement',
-                                body: [{ type: 'Identifier', name: 'hidden' }]
+                                body: [ { type: 'Identifier', name: 'hidden' } ]
                             }
                         },
                         arguments: []
                     }
-                }],
+                } ],
                 type: 'Program'
             }),
-            (node) => {
+            function (node) {
                 visitedTypes.push(node.type);
             }
         );

@@ -3,7 +3,7 @@ import type { Rule } from 'eslint';
 import type { Except } from 'type-fest';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { type CallExpression, isCallExpression } from '../ast/node-types.js';
-import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
+import { getRuleOption, type InferSchemaOption } from '../rule-options.js';
 
 const ERROR_MESSAGE = 'Unexpected empty test description.';
 const optionSchema = {
@@ -14,7 +14,7 @@ const optionSchema = {
         }
     },
     additionalProperties: false
-} as const satisfies RuleSchema;
+} as const;
 
 type Option = InferSchemaOption<typeof optionSchema>;
 const defaultOption: Option = {};
@@ -46,16 +46,17 @@ function isValidDescriptionArgumentNode(node: Except<Rule.Node, 'parent'> | unde
 export const noEmptyTitleRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
-        languages: ['js/js'],
         docs: {
             description: 'Disallow empty suite and test descriptions',
+            recommended: true,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-empty-title.md'
         },
-        defaultOptions: [defaultOption],
+        schema: [ optionSchema ],
+        defaultOptions: [ defaultOption ],
         messages: {
             emptyTitle: ERROR_MESSAGE
         },
-        schema: [optionSchema]
+        languages: [ 'js/js' ]
     },
     create(context) {
         const { message: customMessage } = getRuleOption<Option>(context);

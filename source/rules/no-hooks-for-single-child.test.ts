@@ -1,6 +1,8 @@
-import { type Rule, RuleTester } from 'eslint';
 import assert from 'node:assert';
+import { type Rule, RuleTester } from 'eslint';
+import { suite, test } from 'mocha';
 import { noHooksForSingleChildRule } from './no-hooks-for-single-child.js';
+
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
 function singleChildError(name: string): string {
@@ -121,7 +123,8 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
-            options: [{ allow: ['before'] }]
+            options: [ { allow: [ 'before' ] } ],
+            name: 'valid case 1'
         },
         {
             code: [
@@ -131,7 +134,8 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
-            options: [{ allow: ['before()'] }]
+            options: [ { allow: [ 'before()' ] } ],
+            name: 'valid case 2'
         },
         {
             code: [
@@ -141,7 +145,8 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
-            options: [{ allow: ['after'] }]
+            options: [ { allow: [ 'after' ] } ],
+            name: 'valid case 3'
         },
         {
             code: [
@@ -151,7 +156,8 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
-            options: [{ allow: ['beforeEach'] }]
+            options: [ { allow: [ 'beforeEach' ] } ],
+            name: 'valid case 4'
         },
         {
             code: [
@@ -161,7 +167,8 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
-            options: [{ allow: ['afterEach'] }]
+            options: [ { allow: [ 'afterEach' ] } ],
+            name: 'valid case 5'
         },
         {
             code: [
@@ -171,7 +178,8 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
-            options: [{ allow: ['after', 'afterEach'] }]
+            options: [ { allow: [ 'after', 'afterEach' ] } ],
+            name: 'valid case 6'
         },
         {
             code: [
@@ -182,9 +190,10 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
+            name: 'valid case 7',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
                 }
             }
         },
@@ -197,8 +206,9 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
+            name: 'valid case 8',
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
+                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
             }
         }
     ],
@@ -211,7 +221,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: singleChildError('before()'), column: 5, line: 2 }]
+            errors: [ { message: singleChildError('before()'), column: 5, line: 2, endLine: 2, endColumn: 26 } ]
         },
         {
             code: [
@@ -221,7 +231,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: singleChildError('before()'), column: 5, line: 2 }]
+            errors: [ { message: singleChildError('before()'), column: 5, line: 2, endLine: 2, endColumn: 26 } ]
         },
         {
             code: [
@@ -231,7 +241,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: singleChildError('before()'), column: 5, line: 3 }]
+            errors: [ { message: singleChildError('before()'), column: 5, line: 3, endLine: 3, endColumn: 26 } ]
         },
         {
             code: [
@@ -241,7 +251,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: singleChildError('after()'), column: 5, line: 2 }]
+            errors: [ { message: singleChildError('after()'), column: 5, line: 2, endLine: 2, endColumn: 25 } ]
         },
         {
             code: [
@@ -252,7 +262,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
             ]
                 .join('\n'),
             errors: [
-                { message: singleChildError('beforeEach()'), column: 5, line: 2 }
+                { message: singleChildError('beforeEach()'), column: 5, line: 2, endLine: 2, endColumn: 30 }
             ]
         },
         {
@@ -264,7 +274,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
             ]
                 .join('\n'),
             errors: [
-                { message: singleChildError('afterEach()'), column: 5, line: 2 }
+                { message: singleChildError('afterEach()'), column: 5, line: 2, endLine: 2, endColumn: 29 }
             ]
         },
         {
@@ -273,7 +283,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 'it(function() {});'
             ]
                 .join('\n'),
-            errors: [{ message: singleChildError('before()'), column: 1, line: 1 }]
+            errors: [ { message: singleChildError('before()'), column: 1, line: 1, endLine: 1, endColumn: 22 } ]
         },
         {
             code: [
@@ -283,7 +293,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: singleChildError('before()'), column: 5, line: 2 }]
+            errors: [ { message: singleChildError('before()'), column: 5, line: 2, endLine: 2, endColumn: 26 } ]
         },
         {
             code: [
@@ -293,7 +303,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: singleChildError('before()'), column: 5, line: 2 }]
+            errors: [ { message: singleChildError('before()'), column: 5, line: 2, endLine: 2, endColumn: 26 } ]
         },
         {
             code: [
@@ -303,7 +313,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: singleChildError('before()'), column: 5, line: 2 }]
+            errors: [ { message: singleChildError('before()'), column: 5, line: 2, endLine: 2, endColumn: 26 } ]
         },
         {
             code: [
@@ -317,7 +327,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
-            errors: [{ message: singleChildError('before()'), column: 9, line: 5 }]
+            errors: [ { message: singleChildError('before()'), column: 9, line: 5, endLine: 5, endColumn: 30 } ]
         },
         {
             code: [
@@ -327,8 +337,9 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
-            options: [{ allow: ['before'] }],
-            errors: [{ message: singleChildError('after()'), column: 5, line: 2 }]
+            options: [ { allow: [ 'before' ] } ],
+            errors: [ { message: singleChildError('after()'), column: 5, line: 2, endLine: 2, endColumn: 25 } ],
+            name: 'invalid case 1'
         },
         {
             code: [
@@ -337,12 +348,13 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
+            errors: [ { message: singleChildError('before()'), column: 5, line: 2, endLine: 2, endColumn: 26 } ],
+            name: 'invalid case 2',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
                 }
-            },
-            errors: [{ message: singleChildError('before()'), column: 5, line: 2 }]
+            }
         },
         {
             code: [
@@ -351,19 +363,20 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
+            errors: [ { message: singleChildError('before()'), column: 5, line: 2, endLine: 2, endColumn: 26 } ],
+            name: 'invalid case 3',
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
-            },
-            errors: [{ message: singleChildError('before()'), column: 5, line: 2 }]
+                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
+            }
         }
     ]
 });
 
-describe('no-hooks-for-single-child create()', function () {
-    it('normalizes non-string allow entries when invoked directly', function () {
+suite('no-hooks-for-single-child create()', function () {
+    test('normalizes non-string allow entries when invoked directly', function () {
         noHooksForSingleChildRule.create({
             id: 'no-hooks-for-single-child',
-            options: [{ allow: [42] }],
+            options: [ { allow: [ 42 ] } ],
             settings: {},
             sourceCode: {
                 scopeManager: {
