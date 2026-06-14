@@ -17,7 +17,7 @@
         "type-fest": "4.40.0"
     },
     "devDependencies": {
-        "@ben_12/eslint-plugin-dprint": "1.19.0",
+        "@ben_12/eslint-plugin-dprint": "1.22.0",
         "@dprint/json": "0.21.3",
         "@dprint/markdown": "0.22.1",
         "@dprint/typescript": "0.96.1",
