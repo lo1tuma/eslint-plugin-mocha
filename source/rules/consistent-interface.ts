@@ -1,10 +1,10 @@
 import type { AST, Rule, Scope, SourceCode } from 'eslint';
 import type * as ESTree from 'estree';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { expectNodeLocation, expectNodeRange } from '../ast/node-location.js';
-import { getLastOrThrow } from '../list.js';
-import { getRuleOption, type InferSchemaOption } from '../rule-options.js';
-import { getInterface } from '../settings.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { expectNodeLocation, expectNodeRange } from '../ast/node-location.ts';
+import { getLastOrThrow } from '../list.ts';
+import { getRuleOption, type InferSchemaOption } from '../rule-options.ts';
+import { getInterface } from '../settings.ts';
 
 const interfaces = [ 'BDD', 'TDD' ] as const;
 const optionSchema = {

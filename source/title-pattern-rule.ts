@@ -1,8 +1,8 @@
 import type { Rule } from 'eslint';
-import { createMochaVisitors, type VisitorContext } from './ast/mocha-visitors.js';
-import { type CallExpression, isCallExpression } from './ast/node-types.js';
-import { getTitleDescription } from './title-description.js';
-import { getRuleOption, type InferSchemaOption } from './rule-options.js';
+import { createMochaVisitors, type VisitorContext } from './ast/mocha-visitors.ts';
+import { type CallExpression, isCallExpression } from './ast/node-types.ts';
+import { getTitleDescription } from './title-description.ts';
+import { getRuleOption, type InferSchemaOption } from './rule-options.ts';
 
 type NormalizedOptions = {
     readonly pattern: RegExp;

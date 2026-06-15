@@ -1,5 +1,5 @@
 import { RuleTester } from 'eslint';
-import { noIdenticalTitleRule } from './no-identical-title.js';
+import { noIdenticalTitleRule } from './no-identical-title.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 

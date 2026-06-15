@@ -2,8 +2,8 @@ import assert from 'node:assert';
 import * as typescriptParser from '@typescript-eslint/parser';
 import { RuleTester } from 'eslint';
 import { suite, test } from 'mocha';
-import { withInterface } from '../mocha-interface-test-cases.js';
-import { handleDoneCallbackRule } from './handle-done-callback.js';
+import { withInterface } from '../mocha-interface-test-cases.ts';
+import { handleDoneCallbackRule } from './handle-done-callback.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const typescriptLanguageOptions = { parser: typescriptParser };

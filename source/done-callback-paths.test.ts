@@ -21,10 +21,10 @@ import {
     property,
     readSegment,
     spreadElement
-} from './done-callback-paths.test-support.js';
+} from './done-callback-paths.test-support.ts';
 import {
     getMemberExpressionBindingAndProperty
-} from './tracked-callback-reference-state.js';
+} from './tracked-callback-reference-state.ts';
 
 function createTwoBranchCodePath(): Rule.CodePath {
     const segments = createSegmentGraph(

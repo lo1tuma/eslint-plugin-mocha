@@ -1,5 +1,5 @@
 import { RuleTester } from 'eslint';
-import { consistentSpacingBetweenBlocksRule } from './consistent-spacing-between-blocks.js';
+import { consistentSpacingBetweenBlocksRule } from './consistent-spacing-between-blocks.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { ecmaVersion: 2020, sourceType: 'script' } });
 

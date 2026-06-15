@@ -3,8 +3,8 @@ import type { Rule, Scope, SourceCode } from 'eslint';
 import { suite, test } from 'mocha';
 import {
     collectCodeAfterCallbackHandlingNodes
-} from './callback-handling-paths.js';
-import type { CallbackHandlingOperation } from './callback-handling-state.js';
+} from './callback-handling-paths.ts';
+import type { CallbackHandlingOperation } from './callback-handling-state.ts';
 
 type MutableSegment = {
     readonly id: string;

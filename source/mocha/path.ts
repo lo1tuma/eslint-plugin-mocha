@@ -1,5 +1,5 @@
-import type { DynamicPath } from '../ast/member-expression.js';
-import type { NameDetails } from './name-details.js';
+import type { DynamicPath } from '../ast/member-expression.ts';
+import type { NameDetails } from './name-details.ts';
 
 export function convertNameToPathArray(name: string): readonly string[] {
     return name.split('.');

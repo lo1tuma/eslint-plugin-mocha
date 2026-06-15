@@ -1,18 +1,18 @@
 import type { Rule } from 'eslint';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { type CallExpression, isCallExpression } from '../ast/node-types.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { type CallExpression, isCallExpression } from '../ast/node-types.ts';
 import {
     getStaticNumericConfigValue,
     isDisabledTimeoutValue,
     visitMochaContextConfigCalls
-} from '../mocha/config-call.js';
-import { getRuleOption, type InferSchemaOption } from '../rule-options.js';
+} from '../mocha/config-call.ts';
+import { getRuleOption, type InferSchemaOption } from '../rule-options.ts';
 import {
     disallowDisabledModeOptionSchema,
     disallowModeOptionSchema,
     maximumNumericMochaConfigOptionSchema,
     rangeNumericMochaConfigOptionSchema
-} from './numeric-mocha-config-option-schemas.js';
+} from './numeric-mocha-config-option-schemas.ts';
 
 const optionSchema = {
     oneOf: [

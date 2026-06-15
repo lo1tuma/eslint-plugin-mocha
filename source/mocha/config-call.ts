@@ -8,9 +8,9 @@ import {
     isLiteral,
     isMemberExpression,
     type MemberExpression
-} from '../ast/node-types.js';
-import { type TraversableNode, visitChildNodes } from '../ast/visit-child-nodes.js';
-import { configCallNames, type MochaConfigCall } from './descriptors.js';
+} from '../ast/node-types.ts';
+import { type TraversableNode, visitChildNodes } from '../ast/visit-child-nodes.ts';
+import { configCallNames, type MochaConfigCall } from './descriptors.ts';
 
 const suiteConfig = new Set<string>(configCallNames);
 const maximumTimeout = Number.parseInt('2147483647', 10);

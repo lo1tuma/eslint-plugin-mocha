@@ -1,12 +1,12 @@
-import { type DynamicPath, isConstantPath } from '../ast/member-expression.js';
-import { filterWithArgs, flatMapWithArgs, mapWithArgs } from '../list.js';
+import { type DynamicPath, isConstantPath } from '../ast/member-expression.ts';
+import { filterWithArgs, flatMapWithArgs, mapWithArgs } from '../list.ts';
 import {
     configCallNames,
     type MochaConfigCall,
     type MochaEntityType,
     type MochaInterface,
     type NameDetailsConfig
-} from './descriptors.js';
+} from './descriptors.ts';
 
 function hasMatchingType(item: Readonly<NameDetailsConfig>, typesToMatch: readonly MochaEntityType[]): boolean {
     return typesToMatch.includes(item.type);

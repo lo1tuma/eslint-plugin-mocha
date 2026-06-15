@@ -1,5 +1,5 @@
 import { RuleTester } from 'eslint';
-import { noAsyncSuiteRule } from './no-async-suite.js';
+import { noAsyncSuiteRule } from './no-async-suite.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 

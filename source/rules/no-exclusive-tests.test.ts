@@ -1,6 +1,6 @@
 import { RuleTester } from 'eslint';
-import { withInterface } from '../mocha-interface-test-cases.js';
-import { noExclusiveTestsRule } from './no-exclusive-tests.js';
+import { withInterface } from '../mocha-interface-test-cases.ts';
+import { noExclusiveTestsRule } from './no-exclusive-tests.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const expectedErrorMessage = 'Unexpected exclusive mocha test.';

@@ -1,8 +1,8 @@
 import assert from 'node:assert';
 import { Linter, type Rule, type SourceCode } from 'eslint';
 import { suite, test } from 'mocha';
-import type { CallExpression } from './ast/node-types.js';
-import { getTitleDescription } from './title-description.js';
+import type { CallExpression } from './ast/node-types.ts';
+import { getTitleDescription } from './title-description.ts';
 
 type ReadExpressionResult = {
     readonly sourceCode: Readonly<SourceCode>;

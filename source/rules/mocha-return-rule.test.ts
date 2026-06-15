@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import { suite, test } from 'mocha';
-import { isLiteralOrUndefinedReturn } from './mocha-return-rule.js';
+import { isLiteralOrUndefinedReturn } from './mocha-return-rule.ts';
 
 suite('mocha-return-rule helpers', function () {
     test('treats bare returns as allowed', function () {

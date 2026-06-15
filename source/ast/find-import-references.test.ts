@@ -2,9 +2,9 @@ import assert from 'node:assert';
 import { Linter, type Rule } from 'eslint';
 import type { Except } from 'type-fest';
 import { suite, test } from 'mocha';
-import type { NameDetails } from '../mocha/name-details.js';
-import { findImportReferencesByName } from './find-import-references.js';
-import type { ResolvedReference } from './resolved-reference.js';
+import type { NameDetails } from '../mocha/name-details.ts';
+import { findImportReferencesByName } from './find-import-references.ts';
+import type { ResolvedReference } from './resolved-reference.ts';
 
 type MockImportDefinition = {
     readonly node: unknown;

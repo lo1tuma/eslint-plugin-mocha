@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion -- needed */
 import type { Rule, SourceCode } from 'eslint';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { type ArrowFunctionExpression, getParentNode, isArrowFunctionExpression } from '../ast/node-types.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { type ArrowFunctionExpression, getParentNode, isArrowFunctionExpression } from '../ast/node-types.ts';
 
 function extractSourceTextByRange(sourceCode: Readonly<SourceCode>, start: number, end: number): string {
     return sourceCode.text.slice(start, end).trim();

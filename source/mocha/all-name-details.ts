@@ -3,9 +3,9 @@ import {
     type CustomMochaEntityType,
     type MochaInterface,
     type NameDetailsConfig
-} from './descriptors.js';
-import { buildAllNameDetailsWithVariants, type NameDetails } from './name-details.js';
-import { convertNameToPathArray } from './path.js';
+} from './descriptors.ts';
+import { buildAllNameDetailsWithVariants, type NameDetails } from './name-details.ts';
+import { convertNameToPathArray } from './path.ts';
 
 export type CustomNameConfig = Pick<NameDetailsConfig, 'interface'> & {
     readonly name: string;

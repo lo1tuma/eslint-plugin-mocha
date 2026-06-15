@@ -1,7 +1,7 @@
 import assert from 'node:assert';
 import { type Rule, RuleTester } from 'eslint';
 import { suite, test } from 'mocha';
-import { noHooksRule } from './no-hooks.js';
+import { noHooksRule } from './no-hooks.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 

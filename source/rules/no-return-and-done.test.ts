@@ -1,5 +1,5 @@
 import { RuleTester } from 'eslint';
-import { noReturnAndDoneRule } from './no-return-and-done.js';
+import { noReturnAndDoneRule } from './no-return-and-done.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const message = 'Unexpected use of `return` in a test with callback';

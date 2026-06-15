@@ -6,7 +6,7 @@ import {
     getLastOrThrow,
     mapWithArgs,
     reduceWithArgs
-} from './list.js';
+} from './list.ts';
 
 suite('list helpers', function () {
     test('flatMapWithArgs() maps and flattens with additional args', function () {

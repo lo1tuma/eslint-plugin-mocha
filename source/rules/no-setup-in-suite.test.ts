@@ -1,8 +1,8 @@
 import assert from 'node:assert';
 import { type Rule, RuleTester } from 'eslint';
 import { suite, test } from 'mocha';
-import { withInterface } from '../mocha-interface-test-cases.js';
-import { noSetupInSuiteRule } from './no-setup-in-suite.js';
+import { withInterface } from '../mocha-interface-test-cases.ts';
+import { noSetupInSuiteRule } from './no-setup-in-suite.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const memberExpressionError = 'Unexpected member expression in suite block. ' +

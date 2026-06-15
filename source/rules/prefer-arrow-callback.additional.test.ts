@@ -2,7 +2,7 @@ import assert from 'node:assert';
 import { Linter, type Rule } from 'eslint';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { suite, test } from 'mocha';
-import { hasProperty, isRecord } from '../record.js';
+import { hasProperty, isRecord } from '../record.ts';
 
 const builtinRuleName = 'prefer-arrow-callback';
 const originalGet = builtinRules.get.bind(builtinRules);

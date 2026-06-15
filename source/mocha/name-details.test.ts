@@ -1,8 +1,8 @@
 import assert from 'node:assert';
 import { Linter, type Rule, type SourceCode } from 'eslint';
 import { suite, test } from 'mocha';
-import { extractMemberExpressionPath } from '../ast/member-expression.js';
-import { buildAllNameDetailsWithVariants, reformatLastPathSegmentWithCallExpressions } from './name-details.js';
+import { extractMemberExpressionPath } from '../ast/member-expression.ts';
+import { buildAllNameDetailsWithVariants, reformatLastPathSegmentWithCallExpressions } from './name-details.ts';
 
 function prefixPending(name: string): string {
     return `x${name}`;

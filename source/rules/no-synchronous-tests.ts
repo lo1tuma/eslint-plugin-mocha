@@ -1,8 +1,8 @@
 import type { Rule } from 'eslint';
 import type { Except } from 'type-fest';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { type AnyFunction, type BlockStatement, isBlockStatement, type ReturnStatement } from '../ast/node-types.js';
-import { getRuleOption, type InferSchemaOption } from '../rule-options.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { type AnyFunction, type BlockStatement, isBlockStatement, type ReturnStatement } from '../ast/node-types.ts';
+import { getRuleOption, type InferSchemaOption } from '../rule-options.ts';
 
 const asyncMethods = [ 'async', 'callback', 'promise' ] as const;
 const optionSchema = {

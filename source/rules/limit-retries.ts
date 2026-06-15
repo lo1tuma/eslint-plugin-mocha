@@ -1,4 +1,4 @@
-import { createSimpleNumericMochaConfigLimitRule } from './mocha-config-value-rule.js';
+import { createSimpleNumericMochaConfigLimitRule } from './mocha-config-value-rule.ts';
 
 export const limitRetriesRule = createSimpleNumericMochaConfigLimitRule({
     configName: 'retries',

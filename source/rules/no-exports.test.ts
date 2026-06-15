@@ -1,5 +1,5 @@
 import { RuleTester } from 'eslint';
-import { noExportsRule } from './no-exports.js';
+import { noExportsRule } from './no-exports.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const expectedErrorMessage = 'Unexpected export from a test file';

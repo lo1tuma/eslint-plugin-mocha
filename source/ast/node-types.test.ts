@@ -6,7 +6,7 @@ import {
     expectMemberExpression,
     getParentNode,
     isLiteral
-} from './node-types.js';
+} from './node-types.ts';
 
 function asNode(node: Readonly<Record<string, unknown>>): Rule.Node {
     return node as unknown as Rule.Node;

@@ -1,16 +1,16 @@
 /* eslint-disable import/max-dependencies -- needs to be refactored */
 import type { Rule } from 'eslint';
-import { reduceWithArgs } from '../list.js';
-import { getAllNames } from '../mocha/all-name-details.js';
-import type { MochaInterface } from '../mocha/descriptors.js';
-import { type NameDetails, reformatLastPathSegmentWithCallExpressions } from '../mocha/name-details.js';
-import { isSamePath } from '../mocha/path.js';
-import { resolveAliasedReferences } from './alias-references.js';
-import { findGlobalReferencesByName } from './find-global-references.js';
-import { findImportReferencesByName } from './find-import-references.js';
-import { type DynamicPath, isConstantPath } from './member-expression.js';
-import { type CallExpression, isCallExpression, isMemberExpression } from './node-types.js';
-import type { ResolvedReference } from './resolved-reference.js';
+import { reduceWithArgs } from '../list.ts';
+import { getAllNames } from '../mocha/all-name-details.ts';
+import type { MochaInterface } from '../mocha/descriptors.ts';
+import { type NameDetails, reformatLastPathSegmentWithCallExpressions } from '../mocha/name-details.ts';
+import { isSamePath } from '../mocha/path.ts';
+import { resolveAliasedReferences } from './alias-references.ts';
+import { findGlobalReferencesByName } from './find-global-references.ts';
+import { findImportReferencesByName } from './find-import-references.ts';
+import { type DynamicPath, isConstantPath } from './member-expression.ts';
+import { type CallExpression, isCallExpression, isMemberExpression } from './node-types.ts';
+import type { ResolvedReference } from './resolved-reference.ts';
 
 type CallResolvedReference = ResolvedReference & {
     readonly node: CallExpression;

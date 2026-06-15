@@ -1,7 +1,7 @@
 import type { Rule } from 'eslint';
-import { hasUnhandledReturnPath } from '../done-callback-paths.js';
-import { getRuleOption, type InferSchemaOption } from '../rule-options.js';
-import { createTrackedCallbackVisitors, type DirectTrackedCallbackFunction } from './callback-tracking.js';
+import { hasUnhandledReturnPath } from '../done-callback-paths.ts';
+import { getRuleOption, type InferSchemaOption } from '../rule-options.ts';
+import { createTrackedCallbackVisitors, type DirectTrackedCallbackFunction } from './callback-tracking.ts';
 
 const optionSchema = {
     type: 'object',

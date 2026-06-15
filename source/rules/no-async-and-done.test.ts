@@ -1,6 +1,6 @@
 import * as typescriptParser from '@typescript-eslint/parser';
 import { RuleTester } from 'eslint';
-import { noAsyncAndDoneRule } from './no-async-and-done.js';
+import { noAsyncAndDoneRule } from './no-async-and-done.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const message = 'Do not use an async function together with a Mocha callback parameter';

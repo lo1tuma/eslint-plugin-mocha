@@ -1,14 +1,14 @@
 import type { Rule } from 'eslint';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { isFunction } from '../ast/node-types.js';
-import { asRuleNode } from '../ast/rule-node.js';
-import type { CallbackHandlingOperation } from '../callback-handling-state.js';
-import { getIdentifierCallbackParameter } from '../mocha/callback-parameter.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { isFunction } from '../ast/node-types.ts';
+import { asRuleNode } from '../ast/rule-node.ts';
+import type { CallbackHandlingOperation } from '../callback-handling-state.ts';
+import { getIdentifierCallbackParameter } from '../mocha/callback-parameter.ts';
 import {
     getMemberExpressionBindingAndProperty,
     getTrackedBinding,
     type TrackedBinding
-} from '../tracked-callback-reference-state.js';
+} from '../tracked-callback-reference-state.ts';
 
 type TrackedCallbackFunctionBase = {
     readonly callbackBinding: TrackedBinding;

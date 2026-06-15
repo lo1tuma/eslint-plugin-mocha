@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import { suite, test } from 'mocha';
-import { createPackageMetadataReader } from './package-metadata-reader.js';
+import { createPackageMetadataReader } from './package-metadata-reader.ts';
 
 suite('package metadata reader', function () {
     test('skips missing package files when access throws an ENOENT-shaped record', async function () {

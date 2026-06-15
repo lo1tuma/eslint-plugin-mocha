@@ -1,6 +1,6 @@
 import { RuleTester } from 'eslint';
-import { withInterface } from '../mocha-interface-test-cases.js';
-import { noNestedSuitesRule } from './no-nested-suites.js';
+import { withInterface } from '../mocha-interface-test-cases.ts';
+import { noNestedSuitesRule } from './no-nested-suites.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 

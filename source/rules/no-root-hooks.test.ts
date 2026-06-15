@@ -1,5 +1,5 @@
 import { RuleTester } from 'eslint';
-import { noRootHooksRule } from './no-root-hooks.js';
+import { noRootHooksRule } from './no-root-hooks.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 

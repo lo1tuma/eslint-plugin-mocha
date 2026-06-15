@@ -1,13 +1,13 @@
 import type { Rule, SourceCode } from 'eslint';
-import { extractMemberExpressionPath, isConstantPath } from '../ast/member-expression.js';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { type AnyFunction, isFunction } from '../ast/node-types.js';
-import { asRuleNode } from '../ast/rule-node.js';
-import { type TraversableNode, visitWithoutNestedFunctions } from '../ast/visit-child-nodes.js';
-import { getFirstMeaningfulParameter, hasCallbackParameter } from '../mocha/callback-parameter.js';
-import { stripCallExpressions } from '../mocha/name-details.js';
-import { isRecord } from '../record.js';
-import { getRuleOption, type InferSchemaOption } from '../rule-options.js';
+import { extractMemberExpressionPath, isConstantPath } from '../ast/member-expression.ts';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { type AnyFunction, isFunction } from '../ast/node-types.ts';
+import { asRuleNode } from '../ast/rule-node.ts';
+import { type TraversableNode, visitWithoutNestedFunctions } from '../ast/visit-child-nodes.ts';
+import { getFirstMeaningfulParameter, hasCallbackParameter } from '../mocha/callback-parameter.ts';
+import { stripCallExpressions } from '../mocha/name-details.ts';
+import { isRecord } from '../record.ts';
+import { getRuleOption, type InferSchemaOption } from '../rule-options.ts';
 
 type CallExpression = Extract<TraversableNode, { readonly type: 'CallExpression'; }>;
 type UnexpectedAsyncOperation = {

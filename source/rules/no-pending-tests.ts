@@ -1,7 +1,7 @@
 import type { Rule, SourceCode } from 'eslint';
 import type { Comment as EstreeComment } from 'estree';
-import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
-import { expectNodeRange } from '../ast/node-location.js';
+import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.ts';
+import { expectNodeRange } from '../ast/node-location.ts';
 import {
     type AnyFunction,
     expectCallExpression,
@@ -12,10 +12,10 @@ import {
     isLiteral,
     isMemberExpression,
     type MemberExpression
-} from '../ast/node-types.js';
-import { asRuleNode } from '../ast/rule-node.js';
-import { type TraversableNode, visitChildNodes } from '../ast/visit-child-nodes.js';
-import { getRuleOption, type InferSchemaOption } from '../rule-options.js';
+} from '../ast/node-types.ts';
+import { asRuleNode } from '../ast/rule-node.ts';
+import { type TraversableNode, visitChildNodes } from '../ast/visit-child-nodes.ts';
+import { getRuleOption, type InferSchemaOption } from '../rule-options.ts';
 
 const optionSchema = {
     type: 'object',
@@ -35,6 +35,10 @@ type PendingRuleConfiguration = {
 type CallExpression = Readonly<Extract<TraversableNode, { readonly type: 'CallExpression'; }>>;
 type RemovablePendingCallee = Extract<CallExpression['callee'], { readonly type: 'Identifier'; }> | PendingMemberCallee;
 type RemovablePendingCallExpression = CallExpression & { readonly callee: RemovablePendingCallee; };
+type LocationRange = {
+    readonly start: { readonly line: number; };
+    readonly end: { readonly line: number; };
+};
 
 const defaultOption: ResolvedOption = {
     allowSkippedWithComment: false
@@ -42,13 +46,7 @@ const defaultOption: ResolvedOption = {
 
 type PendingMemberCallee = Extract<CallExpression['callee'], { readonly type: 'MemberExpression'; }>;
 type Locatable = {
-    readonly loc?:
-        | {
-            readonly start: { readonly line: number; };
-            readonly end: { readonly line: number; };
-        }
-        | null
-        | undefined;
+    readonly loc?: LocationRange | null | undefined;
 };
 type KnownLocation = Locatable & {
     readonly loc: NonNullable<Locatable['loc']>;
@@ -184,21 +182,20 @@ function reportSkipped(
     messageId: 'unexpectedPendingTest' | 'unexpectedSkippedTestWithoutComment'
 ): void {
     const nodeToReport = node.callee.type === 'MemberExpression' ? node.callee.property : node.callee;
+    const reportDescriptor: Rule.ReportDescriptor = canRemovePendingModifier(node)
+        ? {
+            node: nodeToReport,
+            messageId,
+            suggest: [ {
+                messageId: 'removePendingModifier' as const,
+                fix(fixer: Rule.RuleFixer) {
+                    return fixPendingTest(fixer, context.sourceCode, node);
+                }
+            } ]
+        }
+        : { node: nodeToReport, messageId };
 
-    context.report({
-        node: nodeToReport,
-        messageId,
-        ...canRemovePendingModifier(node)
-            ? {
-                suggest: [ {
-                    messageId: 'removePendingModifier' as const,
-                    fix(fixer: Rule.RuleFixer) {
-                        return fixPendingTest(fixer, context.sourceCode, node);
-                    }
-                } ]
-            }
-            : {}
-    });
+    context.report(reportDescriptor);
 }
 
 function checkPendingTestCase(

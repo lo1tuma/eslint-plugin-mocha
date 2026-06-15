@@ -1,4 +1,4 @@
-import { type AnyFunction, isIdentifier } from '../ast/node-types.js';
+import { type AnyFunction, isIdentifier } from '../ast/node-types.ts';
 
 function isTypeScriptThisParameter(param: Readonly<AnyFunction['params'][number]> | undefined): boolean {
     return param !== undefined && isIdentifier(param) && param.name === 'this';

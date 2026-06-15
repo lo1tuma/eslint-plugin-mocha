@@ -1,14 +1,14 @@
 import type { Rule } from 'eslint';
 import type { Except } from 'type-fest';
-import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
-import { getLastOrThrow } from '../list.js';
-import { getRuleOption } from '../rule-options.js';
+import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.ts';
+import { getLastOrThrow } from '../list.ts';
+import { getRuleOption } from '../rule-options.ts';
 import {
     allowMochaCallOptionSchema,
     defaultAllowMochaCallOption,
     normalizeMochaCallName,
     type ResolvedAllowMochaCallOption
-} from './mocha-call-allowance.js';
+} from './mocha-call-allowance.ts';
 
 type Layer = {
     readonly suiteNode: Except<Rule.Node, 'parent'>;
@@ -98,10 +98,10 @@ export const noHooksForSingleChildRule: Readonly<Rule.RuleModule> = {
             hook(visitorContext) {
                 const currentLayer = getLastOrThrow(layers);
 
-                layers.splice(-1, 1, {
+                layers[layers.length - 1] = {
                     ...currentLayer,
                     hookNodes: [ ...currentLayer.hookNodes, visitorContext ]
-                });
+                };
             }
         });
     }

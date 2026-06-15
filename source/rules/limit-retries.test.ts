@@ -1,8 +1,8 @@
 import assert from 'node:assert';
 import { Linter, RuleTester } from 'eslint';
 import { suite, test } from 'mocha';
-import { withInterface } from '../mocha-interface-test-cases.js';
-import { limitRetriesRule } from './limit-retries.js';
+import { withInterface } from '../mocha-interface-test-cases.ts';
+import { limitRetriesRule } from './limit-retries.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const unexpectedRetries = 'Unexpected use of Mocha retry configuration.';

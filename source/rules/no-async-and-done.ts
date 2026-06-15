@@ -1,7 +1,7 @@
 import type { Rule } from 'eslint';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { isFunction } from '../ast/node-types.js';
-import { hasCallbackParameter } from '../mocha/callback-parameter.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { isFunction } from '../ast/node-types.ts';
+import { hasCallbackParameter } from '../mocha/callback-parameter.ts';
 
 function checkNodeForAsyncAndDone(context: Readonly<Rule.RuleContext>, node: Readonly<Rule.Node>): void {
     if (!isFunction(node) || node.async !== true || !hasCallbackParameter(node)) {

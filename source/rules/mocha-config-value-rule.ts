@@ -1,16 +1,16 @@
 import type { Rule } from 'eslint';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { type CallExpression, isCallExpression } from '../ast/node-types.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { type CallExpression, isCallExpression } from '../ast/node-types.ts';
 import {
     getStaticNumericConfigValue,
     visitMochaContextConfigCalls
-} from '../mocha/config-call.js';
-import { getRuleOption } from '../rule-options.js';
+} from '../mocha/config-call.ts';
+import { getRuleOption } from '../rule-options.ts';
 import {
     disallowModeOptionSchema,
     maximumNumericMochaConfigOptionSchema,
     rangeNumericMochaConfigOptionSchema
-} from './numeric-mocha-config-option-schemas.js';
+} from './numeric-mocha-config-option-schemas.ts';
 
 type MochaConfigName = Parameters<typeof visitMochaContextConfigCalls> extends [
     unknown,

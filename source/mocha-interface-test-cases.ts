@@ -1,6 +1,6 @@
 import type { RuleTester } from 'eslint';
-import type { MochaInterface } from './mocha/descriptors.js';
-import { isRecord } from './record.js';
+import type { MochaInterface } from './mocha/descriptors.ts';
+import { isRecord } from './record.ts';
 
 type RuleTestCase = RuleTester.InvalidTestCase | RuleTester.ValidTestCase;
 

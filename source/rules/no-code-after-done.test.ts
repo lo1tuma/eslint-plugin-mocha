@@ -1,6 +1,6 @@
 import * as typescriptParser from '@typescript-eslint/parser';
 import { RuleTester } from 'eslint';
-import { noCodeAfterDoneRule } from './no-code-after-done.js';
+import { noCodeAfterDoneRule } from './no-code-after-done.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const message = 'Do not execute code after calling the Mocha callback';

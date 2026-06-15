@@ -1,10 +1,10 @@
 import type { AST, Rule } from 'eslint';
 import type { Except } from 'type-fest';
-import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
-import { expectNodeRange } from '../ast/node-location.js';
-import { type BlockStatement, isBlockStatement, type Program } from '../ast/node-types.js';
-import { getLastOrThrow } from '../list.js';
-import { getTopLevelMochaExpression, isDirectStatementInScope } from './direct-mocha-statement.js';
+import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.ts';
+import { expectNodeRange } from '../ast/node-location.ts';
+import { type BlockStatement, isBlockStatement, type Program } from '../ast/node-types.ts';
+import { getLastOrThrow } from '../list.ts';
+import { getTopLevelMochaExpression, isDirectStatementInScope } from './direct-mocha-statement.ts';
 
 const minimumAmountOfLinesBetweenNeeded = 2;
 
@@ -88,7 +88,7 @@ export const consistentSpacingBetweenBlocksRule: Readonly<Rule.RuleModule> = {
             const currentLayer = getLastOrThrow(layers);
             if (isDirectStatementInScope(currentLayer.scopeNode, visitorContext.node)) {
                 const statementNode = getTopLevelMochaExpression(visitorContext.node);
-                layers.splice(-1, 1, {
+                layers[layers.length - 1] = {
                     ...currentLayer,
                     entities: [
                         ...currentLayer.entities,
@@ -98,7 +98,7 @@ export const consistentSpacingBetweenBlocksRule: Readonly<Rule.RuleModule> = {
                             beforeToken: sourceCode.getTokenBefore(statementNode, { includeComments: false })
                         }
                     ]
-                });
+                };
             }
         }
 

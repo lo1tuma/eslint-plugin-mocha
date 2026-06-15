@@ -12,7 +12,7 @@ import {
     mergeIncomingPendingPathStates,
     type PendingPathState,
     type TrackedBinding
-} from './tracked-callback-reference-state.js';
+} from './tracked-callback-reference-state.ts';
 
 type IdentifierNode = Readonly<Parameters<Exclude<Rule.RuleListener['Identifier'], undefined>>[0]>;
 type PropertyNode = Readonly<Parameters<Exclude<Rule.RuleListener['Property'], undefined>>[0]>;

@@ -3,7 +3,7 @@ import { suite, test } from 'mocha';
 import {
     defaultAllowMochaCallOption,
     normalizeMochaCallName
-} from './mocha-call-allowance.js';
+} from './mocha-call-allowance.ts';
 
 suite('mocha-call-allowance helpers', function () {
     test('exposes the expected default option', function () {

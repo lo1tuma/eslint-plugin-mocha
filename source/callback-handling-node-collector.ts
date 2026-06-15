@@ -7,8 +7,8 @@ import {
     clonePathState,
     createEntryState,
     updatePathState
-} from './callback-handling-state.js';
-import { enqueueNextSegments } from './done-callback-paths.js';
+} from './callback-handling-state.ts';
+import { enqueueNextSegments } from './done-callback-paths.ts';
 
 type PathState = CallbackPathState;
 type PendingSegmentCollection = {

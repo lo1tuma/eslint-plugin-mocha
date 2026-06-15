@@ -3,6 +3,7 @@ declare module '@eslint-community/eslint-utils' {
     import type { Except } from 'type-fest';
 
     type Node = Except<Rule.Node, 'parent'>;
+    type StaticValue = { readonly value: unknown; readonly optional?: true; };
 
     export function findVariable(
         initialScope: Readonly<Scope.Scope>,
@@ -17,5 +18,5 @@ declare module '@eslint-community/eslint-utils' {
     export function getStaticValue(
         node: Readonly<Node>,
         initialScope?: Readonly<Scope.Scope> | null
-    ): { readonly value: unknown; readonly optional?: true; } | null;
+    ): StaticValue | null;
 }

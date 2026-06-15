@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { isRecord } from './record.js';
+import { isRecord } from './record.ts';
 
 export type PackageMetadata = {
     readonly name: string;

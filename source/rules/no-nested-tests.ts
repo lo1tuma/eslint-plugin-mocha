@@ -1,5 +1,5 @@
 import type { Rule } from 'eslint';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
 
 export const noNestedTestsRule: Readonly<Rule.RuleModule> = {
     meta: {

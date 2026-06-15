@@ -1,8 +1,8 @@
 import assert from 'node:assert';
 import type { Rule } from 'eslint';
 import { suite, test } from 'mocha';
-import { collectCallbackHandlingNodes } from './callback-handling-node-collector.js';
-import type { CallbackHandlingOperation } from './callback-handling-state.js';
+import { collectCallbackHandlingNodes } from './callback-handling-node-collector.ts';
+import type { CallbackHandlingOperation } from './callback-handling-state.ts';
 
 type MutableSegment = {
     readonly id: string;

@@ -1,7 +1,7 @@
 import type { Rule, SourceCode } from 'eslint';
 import type { Except } from 'type-fest';
-import { hasProperty, isRecord } from '../record.js';
-import { isFunction } from './node-types.js';
+import { hasProperty, isRecord } from '../record.ts';
+import { isFunction } from './node-types.ts';
 
 export type TraversableNode = Except<Rule.Node, 'parent'>;
 

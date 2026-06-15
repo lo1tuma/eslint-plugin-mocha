@@ -2,9 +2,9 @@ import assert from 'node:assert';
 import * as typescriptParser from '@typescript-eslint/parser';
 import { Linter, RuleTester } from 'eslint';
 import { suite, test } from 'mocha';
-import { withInterface } from '../mocha-interface-test-cases.js';
-import { isRecord } from '../record.js';
-import { noAsyncInSyncTestsRule } from './no-async-in-sync-tests.js';
+import { withInterface } from '../mocha-interface-test-cases.ts';
+import { isRecord } from '../record.ts';
+import { noAsyncInSyncTestsRule } from './no-async-in-sync-tests.ts';
 
 const slowTypedTestTimeout = 30_000;
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });

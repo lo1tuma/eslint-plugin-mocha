@@ -1,7 +1,7 @@
 import type { Rule } from 'eslint';
-import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
-import { expectCallExpression, isLiteral } from '../ast/node-types.js';
-import { getLastOrThrow } from '../list.js';
+import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.ts';
+import { expectCallExpression, isLiteral } from '../ast/node-types.ts';
+import { getLastOrThrow } from '../list.ts';
 
 type Layer = {
     readonly suiteTitles: readonly string[];
@@ -53,10 +53,10 @@ export const noIdenticalTitleRule: Readonly<Rule.RuleModule> = {
                     messageId: 'duplicateTestTitle'
                 });
             }
-            titleLayers.splice(-1, 1, {
+            titleLayers[titleLayers.length - 1] = {
                 ...currentLayer,
                 testTitles: [ ...titles, title ]
-            });
+            };
         }
 
         function handleTestSuiteTitles(visitorContext: Readonly<VisitorContext>, title: string): void {
@@ -69,10 +69,10 @@ export const noIdenticalTitleRule: Readonly<Rule.RuleModule> = {
                     messageId: 'duplicateSuiteTitle'
                 });
             }
-            titleLayers.splice(-1, 1, {
+            titleLayers[titleLayers.length - 1] = {
                 ...currentLayer,
                 suiteTitles: [ ...titles, title ]
-            });
+            };
         }
 
         return createMochaVisitors(context, {

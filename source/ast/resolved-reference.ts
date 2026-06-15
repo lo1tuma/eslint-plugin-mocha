@@ -1,6 +1,6 @@
 import type { Rule, Scope, SourceCode } from 'eslint';
-import { type DynamicPath, extractMemberExpressionPath } from './member-expression.js';
-import { getParentNode } from './node-types.js';
+import { type DynamicPath, extractMemberExpressionPath } from './member-expression.ts';
+import { getParentNode } from './node-types.ts';
 
 export type Reference = {
     readonly node: Rule.Node;
@@ -13,21 +13,31 @@ export type ResolvedReference = {
     readonly resolvedPath: DynamicPath;
 };
 
-export function findParentNodeAndPathForIdentifier(sourceCode: SourceCode, node: Rule.Node): Reference {
+function getNextReferenceNode(node: Rule.Node): Rule.Node | null {
     const parent = getParentNode(node);
 
     if (parent.type === 'MemberExpression') {
-        return findParentNodeAndPathForIdentifier(sourceCode, parent);
+        return parent;
     }
-    if (parent.type === 'CallExpression') {
-        const grandparent = getParentNode(parent);
-
-        if (grandparent.type === 'MemberExpression') {
-            return findParentNodeAndPathForIdentifier(sourceCode, grandparent);
-        }
+    if (parent.type !== 'CallExpression') {
+        return null;
     }
 
-    return { node: parent, path: extractMemberExpressionPath(sourceCode, node) };
+    const grandparent = getParentNode(parent);
+
+    return grandparent.type === 'MemberExpression' ? grandparent : null;
+}
+
+export function findParentNodeAndPathForIdentifier(sourceCode: SourceCode, node: Rule.Node): Reference {
+    let currentNode = node;
+    let nextReferenceNode = getNextReferenceNode(currentNode);
+
+    while (nextReferenceNode !== null) {
+        currentNode = nextReferenceNode;
+        nextReferenceNode = getNextReferenceNode(currentNode);
+    }
+
+    return { node: getParentNode(currentNode), path: extractMemberExpressionPath(sourceCode, currentNode) };
 }
 
 export function initialReferenceToResolvedReference(

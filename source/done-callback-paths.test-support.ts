@@ -1,5 +1,5 @@
 import { Linter, type Rule } from 'eslint';
-import { hasUnhandledReturnPath } from './done-callback-paths.js';
+import { hasUnhandledReturnPath } from './done-callback-paths.ts';
 
 type SegmentEdge = readonly [string, string];
 

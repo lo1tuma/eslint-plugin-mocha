@@ -1,5 +1,5 @@
 import { RuleTester } from 'eslint';
-import { noSynchronousTestsRule } from './no-synchronous-tests.js';
+import { noSynchronousTestsRule } from './no-synchronous-tests.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 

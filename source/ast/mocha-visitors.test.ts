@@ -1,5 +1,5 @@
 import { type Rule, RuleTester } from 'eslint';
-import { createMochaVisitors } from './mocha-visitors.js';
+import { createMochaVisitors } from './mocha-visitors.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 type ProgramNode = Readonly<Parameters<Exclude<Rule.RuleListener['Program'], undefined>>[0]>;

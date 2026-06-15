@@ -1,12 +1,12 @@
 import { findVariable } from '@eslint-community/eslint-utils';
 import type { Rule, Scope, SourceCode } from 'eslint';
-import { flatMapWithArgs, mapWithArgs } from '../list.js';
+import { flatMapWithArgs, mapWithArgs } from '../list.ts';
 import {
     type DynamicPath,
     extractMemberExpressionPath,
     getIdentifierName,
     isConstantPath
-} from './member-expression.js';
+} from './member-expression.ts';
 import {
     type IdentifierPattern,
     isAssignmentProperty,
@@ -15,9 +15,9 @@ import {
     isVariableDeclarator,
     type ObjectPattern,
     type VariableDeclarator
-} from './node-types.js';
-import { findParentNodeAndPathForIdentifier, type ResolvedReference } from './resolved-reference.js';
-import { asRuleNode } from './rule-node.js';
+} from './node-types.ts';
+import { findParentNodeAndPathForIdentifier, type ResolvedReference } from './resolved-reference.ts';
+import { asRuleNode } from './rule-node.ts';
 
 function isConstVariableDeclarationParent(
     parent: Rule.Node | null
