@@ -1,5 +1,5 @@
 import type { Rule, Scope } from 'eslint';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
 
 function isTopLevelScope(scope: Readonly<Scope.Scope>): boolean {
     return scope.type === 'global' || scope.type === 'module';

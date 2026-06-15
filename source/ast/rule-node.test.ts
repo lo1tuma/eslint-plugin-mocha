@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import { suite, test } from 'mocha';
-import { asRuleNode } from './rule-node.js';
+import { asRuleNode } from './rule-node.ts';
 
 suite('rule node helpers', function () {
     test('asRuleNode() returns nodes with a type property', function () {

@@ -1,6 +1,6 @@
 import type { Rule } from 'eslint';
-import { collectRepeatedCallbackHandlingNodes } from '../repeated-callback-handling-paths.js';
-import { createTrackedCallbackVisitors, type TrackedCallbackFunction } from './callback-tracking.js';
+import { collectRepeatedCallbackHandlingNodes } from '../repeated-callback-handling-paths.ts';
+import { createTrackedCallbackVisitors, type TrackedCallbackFunction } from './callback-tracking.ts';
 
 function reportDoneTwice(
     context: Readonly<Rule.RuleContext>,

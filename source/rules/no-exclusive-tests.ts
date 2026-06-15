@@ -1,8 +1,8 @@
 import type { Rule, SourceCode } from 'eslint';
-import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
-import { expectNodeRange } from '../ast/node-location.js';
-import { expectCallExpression, expectMemberExpression, type MemberExpression } from '../ast/node-types.js';
-import { asRuleNode } from '../ast/rule-node.js';
+import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.ts';
+import { expectNodeRange } from '../ast/node-location.ts';
+import { expectCallExpression, expectMemberExpression, type MemberExpression } from '../ast/node-types.ts';
+import { asRuleNode } from '../ast/rule-node.ts';
 
 type ImmutableCallNode<T> = { readonly [Key in keyof T]: T[Key]; };
 type ExclusiveCallNode = ImmutableCallNode<

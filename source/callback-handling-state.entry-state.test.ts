@@ -7,7 +7,7 @@ import {
     type CallbackPathState,
     createEntryState,
     updatePathState
-} from './callback-handling-state.js';
+} from './callback-handling-state.ts';
 
 type MutableSegment = {
     readonly id: string;

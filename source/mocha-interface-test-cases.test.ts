@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import { suite, test } from 'mocha';
-import { withInterface } from './mocha-interface-test-cases.js';
+import { withInterface } from './mocha-interface-test-cases.ts';
 
 suite('mocha-interface-test-cases', function () {
     test('adds interface settings to string test cases', function () {

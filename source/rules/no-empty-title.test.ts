@@ -1,6 +1,6 @@
 import { RuleTester } from 'eslint';
-import { withInterface } from '../mocha-interface-test-cases.js';
-import { noEmptyTitleRule } from './no-empty-title.js';
+import { withInterface } from '../mocha-interface-test-cases.ts';
+import { noEmptyTitleRule } from './no-empty-title.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 

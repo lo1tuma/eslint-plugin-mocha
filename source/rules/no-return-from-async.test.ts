@@ -1,5 +1,5 @@
 import { RuleTester } from 'eslint';
-import { noReturnFromAsyncRule } from './no-return-from-async.js';
+import { noReturnFromAsyncRule } from './no-return-from-async.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const message = 'Unexpected use of `return` in a test with an async function';

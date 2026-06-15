@@ -1,7 +1,7 @@
 import assert from 'node:assert';
 import type { AST } from 'eslint';
 import { suite, test } from 'mocha';
-import { expectNodeLocation, expectNodeRange } from './node-location.js';
+import { expectNodeLocation, expectNodeRange } from './node-location.ts';
 
 suite('node location helpers', function () {
     test('expectNodeRange() returns ranges and throws for missing ones', function () {

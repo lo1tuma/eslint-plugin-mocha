@@ -1,7 +1,7 @@
 import assert from 'node:assert';
 import { type Rule, RuleTester } from 'eslint';
 import { suite, test } from 'mocha';
-import { noHooksForSingleChildRule } from './no-hooks-for-single-child.js';
+import { noHooksForSingleChildRule } from './no-hooks-for-single-child.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 

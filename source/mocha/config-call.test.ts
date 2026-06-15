@@ -1,13 +1,13 @@
 import assert from 'node:assert';
 import { Linter, type Rule, type SourceCode } from 'eslint';
 import { suite, test } from 'mocha';
-import type { TraversableNode } from '../ast/visit-child-nodes.js';
+import type { TraversableNode } from '../ast/visit-child-nodes.ts';
 import {
     getStaticNumericConfigValue,
     isDisabledTimeoutValue,
     isSuiteConfigCall,
     visitMochaContextConfigCalls
-} from './config-call.js';
+} from './config-call.ts';
 
 type ReadExpressionResult = {
     readonly sourceCode: Readonly<SourceCode>;

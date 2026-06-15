@@ -1,10 +1,10 @@
 import type { Rule } from 'eslint';
 import type { Except } from 'type-fest';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import type { AnyFunction, ReturnStatement } from '../ast/node-types.js';
-import { findReturnStatement } from '../ast/return-statement.js';
-import { getIdentifierCallbackParameter } from '../mocha/callback-parameter.js';
-import { isLiteralOrUndefinedReturn } from './mocha-return-rule.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import type { AnyFunction, ReturnStatement } from '../ast/node-types.ts';
+import { findReturnStatement } from '../ast/return-statement.ts';
+import { getIdentifierCallbackParameter } from '../mocha/callback-parameter.ts';
+import { isLiteralOrUndefinedReturn } from './mocha-return-rule.ts';
 
 function isFunctionCallWithName(
     node: Readonly<Except<Rule.Node, 'parent'>> | null | undefined,

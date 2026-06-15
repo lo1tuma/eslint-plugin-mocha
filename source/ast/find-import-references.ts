@@ -1,12 +1,12 @@
 import type { Rule, Scope, SourceCode } from 'eslint';
 import type { Except } from 'type-fest';
-import { flatMapWithArgs, mapWithArgs } from '../list.js';
-import type { NameDetails } from '../mocha/name-details.js';
-import { getUniqueBaseNames } from '../mocha/path.js';
-import { isRecord } from '../record.js';
-import { type DynamicPath, isConstantPath } from './member-expression.js';
-import { getParentNode } from './node-types.js';
-import { findParentNodeAndPathForIdentifier, type ResolvedReference } from './resolved-reference.js';
+import { flatMapWithArgs, mapWithArgs } from '../list.ts';
+import type { NameDetails } from '../mocha/name-details.ts';
+import { getUniqueBaseNames } from '../mocha/path.ts';
+import { isRecord } from '../record.ts';
+import { type DynamicPath, isConstantPath } from './member-expression.ts';
+import { getParentNode } from './node-types.ts';
+import { findParentNodeAndPathForIdentifier, type ResolvedReference } from './resolved-reference.ts';
 
 function isLiteralWithValue(node: Except<Rule.Node, 'parent'>, expectedValue: string | null): boolean {
     return node.type === 'Literal' && (expectedValue === null || node.value === expectedValue);

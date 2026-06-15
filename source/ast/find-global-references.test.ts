@@ -2,9 +2,9 @@ import assert from 'node:assert';
 import { Linter, type Rule } from 'eslint';
 import type { Except } from 'type-fest';
 import { suite, test } from 'mocha';
-import type { NameDetails } from '../mocha/name-details.js';
-import { findGlobalReferencesByName } from './find-global-references.js';
-import type { ResolvedReference } from './resolved-reference.js';
+import type { NameDetails } from '../mocha/name-details.ts';
+import { findGlobalReferencesByName } from './find-global-references.ts';
+import type { ResolvedReference } from './resolved-reference.ts';
 
 function findReferenceNames(
     code: string,

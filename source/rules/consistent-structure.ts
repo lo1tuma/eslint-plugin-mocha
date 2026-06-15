@@ -1,18 +1,18 @@
 import type { Rule } from 'eslint';
-import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
+import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.ts';
 import {
     type AnyFunction,
     isBlockStatement,
     isFunction,
     isProgram,
     type Program
-} from '../ast/node-types.js';
-import { getLastOrThrow } from '../list.js';
-import { getRuleOption, type InferSchemaOption } from '../rule-options.js';
+} from '../ast/node-types.ts';
+import { getLastOrThrow } from '../list.ts';
+import { getRuleOption, type InferSchemaOption } from '../rule-options.ts';
 import {
     getTopLevelMochaExpression as getDirectTopLevelMochaExpression,
     isDirectStatementInScope
-} from './direct-mocha-statement.js';
+} from './direct-mocha-statement.ts';
 
 const optionSchema = {
     type: 'object',

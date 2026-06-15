@@ -1,9 +1,9 @@
 import { getStringIfConstant } from '@eslint-community/eslint-utils';
 import type { Rule } from 'eslint';
 import type { Except } from 'type-fest';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { type CallExpression, isCallExpression } from '../ast/node-types.js';
-import { getRuleOption, type InferSchemaOption } from '../rule-options.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { type CallExpression, isCallExpression } from '../ast/node-types.ts';
+import { getRuleOption, type InferSchemaOption } from '../rule-options.ts';
 
 const ERROR_MESSAGE = 'Unexpected empty test description.';
 const optionSchema = {

@@ -5,7 +5,7 @@ import {
     extractMemberExpressionPath,
     getIdentifierName,
     isConstantPath
-} from './member-expression.js';
+} from './member-expression.ts';
 
 type ReadExpressionResult = {
     readonly sourceCode: Readonly<SourceCode>;

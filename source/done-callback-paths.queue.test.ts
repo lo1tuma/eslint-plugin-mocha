@@ -1,7 +1,7 @@
 import assert from 'node:assert';
 import type { Rule } from 'eslint';
 import { suite, test } from 'mocha';
-import { enqueueNextSegments } from './done-callback-paths.js';
+import { enqueueNextSegments } from './done-callback-paths.ts';
 
 function createSegment(id: string): Rule.CodePathSegment {
     return {

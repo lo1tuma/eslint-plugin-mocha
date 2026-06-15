@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import { suite, test } from 'mocha';
-import { getAdditionalNames, getInterface } from './settings.js';
+import { getAdditionalNames, getInterface } from './settings.ts';
 
 suite('settings', function () {
     suite('getAdditionalNames()', function () {

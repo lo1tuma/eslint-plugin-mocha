@@ -1,5 +1,5 @@
 import type { Rule } from 'eslint';
-import { createSuiteTitlePatternRule } from '../title-pattern-rule.js';
+import { createSuiteTitlePatternRule } from '../title-pattern-rule.ts';
 
 export const validSuiteTitleRule: Readonly<Rule.RuleModule> = {
     ...createSuiteTitlePatternRule({

@@ -1,6 +1,6 @@
 import type { Rule } from 'eslint';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { expectNodeRange } from '../ast/node-location.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { expectNodeRange } from '../ast/node-location.ts';
 
 type ExportNamedDeclarationNode = Readonly<Parameters<NonNullable<Rule.RuleListener['ExportNamedDeclaration']>>[0]>;
 type ExportDefaultDeclarationNode = Readonly<Parameters<NonNullable<Rule.RuleListener['ExportDefaultDeclaration']>>[0]>;

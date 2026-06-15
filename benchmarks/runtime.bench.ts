@@ -1,8 +1,8 @@
 import assert from 'node:assert';
 import { Linter } from 'eslint';
 import { suite, test } from 'mocha';
-import mochaPlugin from '../source/plugin.js';
-import { cpuSpeed, runSyncBenchmark } from './measure.js';
+import mochaPlugin from '../source/plugin.ts';
+import { cpuSpeed, runSyncBenchmark } from './measure.ts';
 
 const { configs: { all } } = mochaPlugin;
 

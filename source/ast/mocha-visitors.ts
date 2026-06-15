@@ -1,15 +1,15 @@
 import type { Rule, SourceCode } from 'eslint';
 import type { Except } from 'type-fest';
-import { getAllCustomNameDetails, getCustomNameDetailsForInterface } from '../mocha/all-name-details.js';
-import type { MochaConfigCall, MochaEntityType, MochaInterface, MochaModifier } from '../mocha/descriptors.js';
-import { getAdditionalNames, getInterface } from '../settings.js';
-import { findMochaVariableCalls, type ResolvedReferenceWithNameDetails } from './find-mocha-variable-calls.js';
+import { getAllCustomNameDetails, getCustomNameDetailsForInterface } from '../mocha/all-name-details.ts';
+import type { MochaConfigCall, MochaEntityType, MochaInterface, MochaModifier } from '../mocha/descriptors.ts';
+import { getAdditionalNames, getInterface } from '../settings.ts';
+import { findMochaVariableCalls, type ResolvedReferenceWithNameDetails } from './find-mocha-variable-calls.ts';
 import {
     type AnyFunctionExpressionNode,
     getFunctionExpressionLastArgument
-} from './function-expression-arguments.js';
-import { createListenerRecord } from './listener-record.js';
-import { expectCallExpression } from './node-types.js';
+} from './function-expression-arguments.ts';
+import { createListenerRecord } from './listener-record.ts';
+import { expectCallExpression } from './node-types.ts';
 
 type MochaVisitor = (context: Readonly<VisitorContext>) => void;
 type ExpressionListener<Name extends keyof Rule.RuleListener> = Exclude<Rule.RuleListener[Name], undefined>;

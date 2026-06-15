@@ -1,6 +1,6 @@
 import type { Rule } from 'eslint';
-import { collectCodeAfterCallbackHandlingNodes } from '../callback-handling-paths.js';
-import { createTrackedCallbackVisitors, type TrackedCallbackFunction } from './callback-tracking.js';
+import { collectCodeAfterCallbackHandlingNodes } from '../callback-handling-paths.ts';
+import { createTrackedCallbackVisitors, type TrackedCallbackFunction } from './callback-tracking.ts';
 
 function reportCodeAfterDone(
     context: Readonly<Rule.RuleContext>,

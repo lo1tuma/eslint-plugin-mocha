@@ -1,5 +1,5 @@
 import type { Rule, SourceCode } from 'eslint';
-import { asRuleNode } from './ast/rule-node.js';
+import { asRuleNode } from './ast/rule-node.ts';
 import {
     applyBindingSourceValue,
     applyContainerPropertyAssignment as applyTrackedContainerPropertyAssignment,
@@ -12,7 +12,7 @@ import {
     mergeIncomingPendingPathStates,
     type PendingPathState,
     type TrackedBinding
-} from './tracked-callback-reference-state.js';
+} from './tracked-callback-reference-state.ts';
 
 type CallExpressionNode = Readonly<Parameters<Exclude<Rule.RuleListener['CallExpression'], undefined>>[0]>;
 

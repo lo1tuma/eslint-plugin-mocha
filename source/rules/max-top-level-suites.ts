@@ -1,6 +1,6 @@
 import type { Rule, Scope } from 'eslint';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { getRuleOption, type InferSchemaOption } from '../rule-options.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { getRuleOption, type InferSchemaOption } from '../rule-options.ts';
 
 const defaultSuiteLimit = 1;
 const optionSchema = {

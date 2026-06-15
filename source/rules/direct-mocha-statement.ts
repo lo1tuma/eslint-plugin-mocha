@@ -5,7 +5,7 @@ import {
     isFunction,
     isMemberExpression,
     type Program
-} from '../ast/node-types.js';
+} from '../ast/node-types.ts';
 
 export type DirectStatementScope = Readonly<AnyFunction['body'] | Program>;
 

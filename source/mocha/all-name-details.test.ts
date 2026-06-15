@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import { suite, test } from 'mocha';
-import { getAllNames } from './all-name-details.js';
+import { getAllNames } from './all-name-details.ts';
 
 suite('all-name-details', function () {
     test('includes custom names for the require interface', function () {
@@ -25,11 +25,9 @@ suite('all-name-details', function () {
         assert.ok(names.some(function (nameDetails) {
             return nameDetails.path.join('.') === 'custom';
         }));
-        assert.ok(
-            !names.some(function (nameDetails) {
-                return nameDetails.path.join('.') === 'customTdd';
-            })
-        );
+        assert.ok(names.every(function (nameDetails) {
+            return nameDetails.path.join('.') !== 'customTdd';
+        }));
     });
 
     test('can include all interfaces regardless of the configured interface', function () {

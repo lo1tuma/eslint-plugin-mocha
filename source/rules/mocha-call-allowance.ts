@@ -1,4 +1,4 @@
-import type { InferSchemaOption } from '../rule-options.js';
+import type { InferSchemaOption } from '../rule-options.ts';
 
 export const allowMochaCallOptionSchema = {
     type: 'object',

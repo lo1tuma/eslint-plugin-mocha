@@ -1,8 +1,8 @@
 import assert from 'node:assert';
 import { Linter, RuleTester } from 'eslint';
 import { suite, test } from 'mocha';
-import { withInterface } from '../mocha-interface-test-cases.js';
-import { limitSlowRule } from './limit-slow.js';
+import { withInterface } from '../mocha-interface-test-cases.ts';
+import { limitSlowRule } from './limit-slow.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const unexpectedSlow = 'Unexpected use of Mocha slow threshold configuration.';

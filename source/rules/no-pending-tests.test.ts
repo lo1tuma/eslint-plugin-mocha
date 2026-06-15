@@ -1,8 +1,8 @@
 import assert from 'node:assert';
 import { RuleTester } from 'eslint';
 import { suite, test } from 'mocha';
-import { withInterface } from '../mocha-interface-test-cases.js';
-import { noPendingTestsRule } from './no-pending-tests.js';
+import { withInterface } from '../mocha-interface-test-cases.ts';
+import { noPendingTestsRule } from './no-pending-tests.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const expectedErrorMessage = 'Unexpected pending mocha test.';

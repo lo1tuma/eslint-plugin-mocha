@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import { suite, test } from 'mocha';
-import { cpuSpeed, importFresh, runAsyncBenchmark } from './measure.js';
+import { cpuSpeed, importFresh, runAsyncBenchmark } from './measure.ts';
 
 const iterations = 50;
 

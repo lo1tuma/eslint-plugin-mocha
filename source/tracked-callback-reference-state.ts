@@ -1,6 +1,6 @@
 import { findVariable, getStringIfConstant } from '@eslint-community/eslint-utils';
 import type { Rule, Scope, SourceCode } from 'eslint';
-import { asRuleNode } from './ast/rule-node.js';
+import { asRuleNode } from './ast/rule-node.ts';
 
 type MemberExpressionNode = Readonly<Parameters<Exclude<Rule.RuleListener['MemberExpression'], undefined>>[0]>;
 type PropertyNode = Readonly<Parameters<Exclude<Rule.RuleListener['Property'], undefined>>[0]>;
@@ -9,6 +9,7 @@ type ObjectExpressionNode = Readonly<Parameters<Exclude<Rule.RuleListener['Objec
 type IdentifierLike = Readonly<Pick<IdentifierNode, 'name' | 'type'>>;
 type MemberExpressionLike = Readonly<Pick<MemberExpressionNode, 'computed' | 'object' | 'property' | 'type'>>;
 type PropertyLike = Readonly<Pick<PropertyNode, 'computed' | 'key' | 'type'>>;
+type PropertyKeyNode = Readonly<MemberExpressionLike['property'] | PropertyLike['key']>;
 
 const dynamicPropertyName = '<dynamic>';
 
@@ -44,17 +45,23 @@ function hasPendingPathStates(
     return states.length > 0;
 }
 
+function getPropertyNode(node: MemberExpressionLike | PropertyLike): PropertyKeyNode {
+    if (node.type === 'MemberExpression') {
+        return node.property;
+    }
+
+    return node.key;
+}
+
 function getComputedPropertyName(
     sourceCode: Readonly<SourceCode>,
     node: MemberExpressionLike | PropertyLike
 ): string | undefined {
-    const keyNode = node.type === 'MemberExpression' ? node.property : node.key;
-
-    return getStringIfConstant(keyNode, sourceCode.getScope(asRuleNode(node))) ?? undefined;
+    return getStringIfConstant(asRuleNode(getPropertyNode(node)), sourceCode.getScope(asRuleNode(node))) ?? undefined;
 }
 
 function getNamedPropertyName(node: MemberExpressionLike | PropertyLike): string | undefined {
-    const keyNode = node.type === 'MemberExpression' ? node.property : node.key;
+    const keyNode = getPropertyNode(node);
 
     if (keyNode.type === 'Identifier') {
         return keyNode.name;

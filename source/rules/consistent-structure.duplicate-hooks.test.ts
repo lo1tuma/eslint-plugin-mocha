@@ -1,6 +1,6 @@
 import { RuleTester } from 'eslint';
-import { withInterface } from '../mocha-interface-test-cases.js';
-import { consistentStructureRule } from './consistent-structure.js';
+import { withInterface } from '../mocha-interface-test-cases.ts';
+import { consistentStructureRule } from './consistent-structure.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const options = [ { disallowDuplicateHooks: true } ];

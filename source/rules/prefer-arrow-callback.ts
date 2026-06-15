@@ -5,8 +5,8 @@
  */
 import type { Rule } from 'eslint';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { isMochaCallbackReport } from './prefer-arrow-callback-report.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { isMochaCallbackReport } from './prefer-arrow-callback-report.ts';
 
 const coreRule = builtinRules.get('prefer-arrow-callback');
 const docsUrl = 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/prefer-arrow-callback.md';

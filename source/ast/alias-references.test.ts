@@ -1,8 +1,8 @@
 import assert from 'node:assert';
 import { Linter, type Rule, type Scope, type SourceCode } from 'eslint';
 import { suite, test } from 'mocha';
-import { resolveAliasedReferences } from './alias-references.js';
-import { initialReferenceToResolvedReference, type ResolvedReference } from './resolved-reference.js';
+import { resolveAliasedReferences } from './alias-references.ts';
+import { initialReferenceToResolvedReference, type ResolvedReference } from './resolved-reference.ts';
 
 function findResolvedAliasesOfGlobalVariables(code: string): readonly ResolvedReference[] {
     const linter = new Linter();

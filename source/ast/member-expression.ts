@@ -7,7 +7,7 @@ import {
     isIdentifier,
     isMemberExpression,
     type MemberExpression
-} from './node-types.js';
+} from './node-types.ts';
 
 const dynamicMemberSymbol = Symbol('dynamic member access symbol');
 

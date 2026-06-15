@@ -1,6 +1,6 @@
 import * as typescriptParser from '@typescript-eslint/parser';
 import { RuleTester } from 'eslint';
-import { noDoneTwiceRule } from './no-done-twice.js';
+import { noDoneTwiceRule } from './no-done-twice.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const message = 'Do not call the Mocha callback more than once';

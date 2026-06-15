@@ -1,5 +1,5 @@
 import { RuleTester } from 'eslint';
-import { consistentInterfaceRule } from './consistent-interface.js';
+import { consistentInterfaceRule } from './consistent-interface.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { ecmaVersion: 2020, sourceType: 'module' } });
 
@@ -320,9 +320,12 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
             code: `import {describe, run} from 'mocha'; describe('foo', () => {
                 run();
             });`,
-            output: `import {run} from 'mocha'; describe('foo', () => {
-                run();
-            });`,
+            output: [
+                "import {run} from 'mocha'; describe('foo', () => {",
+                '                run();',
+                '            });'
+            ]
+                .join('\n'),
             options: [ { interface: 'BDD' } ],
             errors: [
                 {

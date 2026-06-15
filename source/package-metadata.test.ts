@@ -4,23 +4,32 @@ import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { suite, test } from 'mocha';
-import { readClosestPackageMetadata } from './package-metadata.js';
-import { hasProperty, isRecord } from './record.js';
+import { readClosestPackageMetadata } from './package-metadata.ts';
+import { hasProperty, isRecord } from './record.ts';
+
+type ProjectFile = {
+    readonly path: string;
+    readonly contents: string;
+};
+
+async function writeTemporaryProjectFiles(projectRoot: string, files: readonly ProjectFile[]): Promise<void> {
+    for (const file of files) {
+        const filePath = path.join(projectRoot, file.path);
+
+        await fs.mkdir(path.dirname(filePath), { recursive: true });
+        await fs.writeFile(filePath, file.contents, 'utf8');
+    }
+}
 
 async function withTemporaryProject(
-    files: readonly { readonly path: string; readonly contents: string; }[],
+    files: readonly ProjectFile[],
     runTest: (projectRoot: string) => Promise<void>
 ): Promise<void> {
     const projectRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'eslint-plugin-mocha-package-metadata-'));
 
+    await writeTemporaryProjectFiles(projectRoot, files);
+
     try {
-        for (const file of files) {
-            const filePath = path.join(projectRoot, file.path);
-
-            await fs.mkdir(path.dirname(filePath), { recursive: true });
-            await fs.writeFile(filePath, file.contents, 'utf8');
-        }
-
         await runTest(projectRoot);
     } finally {
         await fs.rm(projectRoot, { recursive: true, force: true });

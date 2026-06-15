@@ -1,17 +1,17 @@
 import type { Rule } from 'eslint';
-import { extractMemberExpressionPath, isConstantPath } from '../ast/member-expression.js';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import type { CallExpression, MemberExpression } from '../ast/node-types.js';
-import { isSuiteConfigCall } from '../mocha/config-call.js';
-import { reformatLastPathSegmentWithCallExpressions } from '../mocha/name-details.js';
-import { convertNameToPathArray, isSamePath } from '../mocha/path.js';
-import { getRuleOption } from '../rule-options.js';
+import { extractMemberExpressionPath, isConstantPath } from '../ast/member-expression.ts';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import type { CallExpression, MemberExpression } from '../ast/node-types.ts';
+import { isSuiteConfigCall } from '../mocha/config-call.ts';
+import { reformatLastPathSegmentWithCallExpressions } from '../mocha/name-details.ts';
+import { convertNameToPathArray, isSamePath } from '../mocha/path.ts';
+import { getRuleOption } from '../rule-options.ts';
 import {
     allowMochaCallOptionSchema,
     defaultAllowMochaCallOption,
     normalizeMochaCallName,
     type ResolvedAllowMochaCallOption
-} from './mocha-call-allowance.js';
+} from './mocha-call-allowance.ts';
 
 const FUNCTION = 1;
 const SUITE = 2;

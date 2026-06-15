@@ -4,8 +4,8 @@ import path from 'node:path';
 import globals from 'globals';
 import { camelCase } from 'change-case';
 import { suite, test } from 'mocha';
-import { readClosestPackageMetadata } from './package-metadata.js';
-import plugin from './plugin.js';
+import { readClosestPackageMetadata } from './package-metadata.ts';
+import plugin from './plugin.ts';
 
 const { pathname: currentFolderName } = new URL('.', import.meta.url);
 
@@ -18,6 +18,14 @@ type RecommendedRuleDecision = Readonly<NonNullable<typeof plugin.configs.recomm
 
 async function importModuleExports(filePath: string): Promise<Readonly<Record<string, unknown>>> {
     return await import(filePath) as Readonly<Record<string, unknown>>;
+}
+
+function ownPropertyValue(record: Readonly<Record<string, unknown>>, key: string): unknown {
+    return Object.getOwnPropertyDescriptor(record, key)?.value;
+}
+
+function ruleExportName(ruleName: string): string {
+    return `${camelCase(ruleName)}Rule`;
 }
 
 function sourceRuleFileName(file: string): readonly string[] {
@@ -40,7 +48,7 @@ async function isPublicRuleFile(file: string): Promise<boolean> {
     const importedRuleModule = await importModuleExports(path.join(rulesDir, file));
     const ruleName = path.basename(file, '.js');
 
-    return importedRuleModule[`${camelCase(ruleName)}Rule`] !== undefined;
+    return ownPropertyValue(importedRuleModule, ruleExportName(ruleName)) !== undefined;
 }
 
 async function determineAllRuleFiles(): Promise<string[]> {
@@ -160,10 +168,10 @@ suite('eslint-plugin-mocha', function () {
             const ruleName = path.basename(file, '.js');
             assert.ok(Object.hasOwn(plugin.rules, ruleName));
             const importedRuleModule = await importModuleExports(path.join(rulesDir, file));
-            const importedRule = importedRuleModule[`${camelCase(ruleName)}Rule`];
+            const importedRule = ownPropertyValue(importedRuleModule, ruleExportName(ruleName));
 
             assert.notStrictEqual(importedRule, undefined);
-            assert.strictEqual(plugin.rules[ruleName], importedRule);
+            assert.strictEqual(ownPropertyValue(plugin.rules, ruleName), importedRule);
         }
     });
 

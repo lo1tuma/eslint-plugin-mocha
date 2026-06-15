@@ -1,7 +1,7 @@
 import assert from 'node:assert';
 import { Linter, type Rule } from 'eslint';
 import { suite, test } from 'mocha';
-import { createTrackedCallbackVisitors } from './callback-tracking.js';
+import { createTrackedCallbackVisitors } from './callback-tracking.ts';
 
 function createSourceCode(): Rule.RuleContext['sourceCode'] {
     const linter = new Linter();

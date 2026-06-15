@@ -1,6 +1,6 @@
 import { RuleTester } from 'eslint';
-import { withInterface } from '../mocha-interface-test-cases.js';
-import { maxTopLevelSuitesRule } from './max-top-level-suites.js';
+import { withInterface } from '../mocha-interface-test-cases.ts';
+import { maxTopLevelSuitesRule } from './max-top-level-suites.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 

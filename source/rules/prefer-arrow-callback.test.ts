@@ -11,10 +11,10 @@
 import assert from 'node:assert';
 import { type Rule, RuleTester } from 'eslint';
 import { suite, test } from 'mocha';
-import { asRuleNode } from '../ast/rule-node.js';
-import { withInterface } from '../mocha-interface-test-cases.js';
-import { preferArrowCallbackRule } from './prefer-arrow-callback.js';
-import { isMochaCallbackReport } from './prefer-arrow-callback-report.js';
+import { asRuleNode } from '../ast/rule-node.ts';
+import { withInterface } from '../mocha-interface-test-cases.ts';
+import { preferArrowCallbackRule } from './prefer-arrow-callback.ts';
+import { isMochaCallbackReport } from './prefer-arrow-callback-report.ts';
 
 const ruleTester = new RuleTester({
     languageOptions: { ecmaVersion: 2017, sourceType: 'script' }

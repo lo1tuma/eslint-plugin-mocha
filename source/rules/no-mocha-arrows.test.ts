@@ -1,5 +1,5 @@
 import { RuleTester } from 'eslint';
-import { noMochaArrowsRule } from './no-mocha-arrows.js';
+import { noMochaArrowsRule } from './no-mocha-arrows.ts';
 
 const ruleTester = new RuleTester({
     languageOptions: { ecmaVersion: 2017, sourceType: 'script' }

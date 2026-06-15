@@ -1,6 +1,6 @@
 import type { Rule } from 'eslint';
-import { isRuleNode } from '../ast/rule-node.js';
-import { isRecord } from '../record.js';
+import { isRuleNode } from '../ast/rule-node.ts';
+import { isRecord } from '../record.ts';
 
 function readReportNode(descriptor: unknown): Rule.Node | undefined {
     if (!isRecord(descriptor)) {

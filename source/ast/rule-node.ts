@@ -1,5 +1,5 @@
 import type { Rule } from 'eslint';
-import { isRecord } from '../record.js';
+import { isRecord } from '../record.ts';
 
 export function isRuleNode(node: unknown): node is Rule.Node {
     return isRecord(node) && typeof node.type === 'string';

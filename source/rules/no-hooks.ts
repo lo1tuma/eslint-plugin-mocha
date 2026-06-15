@@ -1,12 +1,12 @@
 import type { Rule } from 'eslint';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { getRuleOption } from '../rule-options.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { getRuleOption } from '../rule-options.ts';
 import {
     allowMochaCallOptionSchema,
     defaultAllowMochaCallOption,
     normalizeMochaCallName,
     type ResolvedAllowMochaCallOption
-} from './mocha-call-allowance.js';
+} from './mocha-call-allowance.ts';
 
 export const noHooksRule: Readonly<Rule.RuleModule> = {
     meta: {

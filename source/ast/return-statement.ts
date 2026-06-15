@@ -1,6 +1,6 @@
 import type { Rule } from 'eslint';
 import type { Except } from 'type-fest';
-import { type BlockStatement, isIdentifier, isReturnStatement, type ReturnStatement } from './node-types.js';
+import { type BlockStatement, isIdentifier, isReturnStatement, type ReturnStatement } from './node-types.ts';
 
 function isExplicitUndefined(
     node: Readonly<Except<Rule.Node, 'parent'>> | undefined

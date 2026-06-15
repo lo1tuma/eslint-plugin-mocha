@@ -1,9 +1,9 @@
 import assert from 'node:assert';
 import { Linter, type Rule, RuleTester, type SourceCode } from 'eslint';
 import { suite, test } from 'mocha';
-import { withInterface } from '../mocha-interface-test-cases.js';
-import { consistentStructureRule } from './consistent-structure.js';
-import { getTopLevelMochaExpression } from './direct-mocha-statement.js';
+import { withInterface } from '../mocha-interface-test-cases.ts';
+import { consistentStructureRule } from './consistent-structure.ts';
+import { getTopLevelMochaExpression } from './direct-mocha-statement.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 

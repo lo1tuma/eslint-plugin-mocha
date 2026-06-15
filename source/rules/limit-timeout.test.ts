@@ -1,8 +1,8 @@
 import assert from 'node:assert';
 import { Linter, RuleTester } from 'eslint';
 import { suite, test } from 'mocha';
-import { withInterface } from '../mocha-interface-test-cases.js';
-import { limitTimeoutRule } from './limit-timeout.js';
+import { withInterface } from '../mocha-interface-test-cases.ts';
+import { limitTimeoutRule } from './limit-timeout.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const unexpectedTimeout = 'Unexpected use of Mocha timeout configuration.';

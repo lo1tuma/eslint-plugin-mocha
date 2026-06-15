@@ -1,6 +1,6 @@
 import { RuleTester } from 'eslint';
-import { withInterface } from '../mocha-interface-test-cases.js';
-import { noConditionalTestsRule } from './no-conditional-tests.js';
+import { withInterface } from '../mocha-interface-test-cases.ts';
+import { noConditionalTestsRule } from './no-conditional-tests.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 

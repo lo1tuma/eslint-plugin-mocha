@@ -1,11 +1,15 @@
 import type { Rule } from 'eslint';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { getParentNode, isFunction, isProgram } from '../ast/node-types.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { getParentNode, isFunction, isProgram } from '../ast/node-types.ts';
+
+const conditionalNodeTypes = new Set<Rule.Node['type']>([
+    'IfStatement',
+    'ConditionalExpression',
+    'LogicalExpression'
+]);
 
 function isConditionalNode(node: Readonly<Rule.Node>): boolean {
-    return node.type === 'IfStatement' ||
-        node.type === 'ConditionalExpression' ||
-        node.type === 'LogicalExpression';
+    return conditionalNodeTypes.has(node.type);
 }
 
 function isInsideConditional(node: Readonly<Rule.Node>): boolean {

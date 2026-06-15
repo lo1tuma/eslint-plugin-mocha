@@ -1,8 +1,8 @@
 import assert from 'node:assert';
 import { Linter, type Rule } from 'eslint';
 import { suite, test } from 'mocha';
-import type { NameDetails } from '../mocha/name-details.js';
-import { findMochaVariableCalls } from './find-mocha-variable-calls.js';
+import type { NameDetails } from '../mocha/name-details.ts';
+import { findMochaVariableCalls } from './find-mocha-variable-calls.ts';
 
 type ResolvedReferenceWithNameDetails = ReturnType<typeof findMochaVariableCalls>[number];
 

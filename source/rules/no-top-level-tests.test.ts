@@ -1,6 +1,6 @@
 import { RuleTester } from 'eslint';
-import { withInterface } from '../mocha-interface-test-cases.js';
-import { noTopLevelTestsRule } from './no-top-level-tests.js';
+import { withInterface } from '../mocha-interface-test-cases.ts';
+import { noTopLevelTestsRule } from './no-top-level-tests.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const expectedErrorMessage = 'Unexpected top-level mocha test.';

@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import { suite, test } from 'mocha';
-import { hasProperty, isRecord } from './record.js';
+import { hasProperty, isRecord } from './record.ts';
 
 suite('record', function () {
     suite('isRecord()', function () {

@@ -1,8 +1,8 @@
 import assert from 'node:assert';
 import { RuleTester } from 'eslint';
 import { suite, test } from 'mocha';
-import { withInterface } from '../mocha-interface-test-cases.js';
-import { validTestTitleRule } from './valid-test-title.js';
+import { withInterface } from '../mocha-interface-test-cases.ts';
+import { validTestTitleRule } from './valid-test-title.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 

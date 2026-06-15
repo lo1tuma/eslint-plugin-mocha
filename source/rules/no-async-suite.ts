@@ -1,8 +1,8 @@
 import type { Rule, SourceCode } from 'eslint';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { expectNodeRange } from '../ast/node-location.js';
-import { type AnyFunction, isFunction } from '../ast/node-types.js';
-import { type TraversableNode, visitChildNodes } from '../ast/visit-child-nodes.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { expectNodeRange } from '../ast/node-location.ts';
+import { type AnyFunction, isFunction } from '../ast/node-types.ts';
+import { type TraversableNode, visitChildNodes } from '../ast/visit-child-nodes.ts';
 
 function containsDirectAwait(
     sourceCode: Readonly<SourceCode>,

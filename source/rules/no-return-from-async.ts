@@ -1,8 +1,8 @@
 import type { Rule } from 'eslint';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import type { AnyFunction } from '../ast/node-types.js';
-import { findReturnStatement } from '../ast/return-statement.js';
-import { isLiteralOrUndefinedReturn } from './mocha-return-rule.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import type { AnyFunction } from '../ast/node-types.ts';
+import { findReturnStatement } from '../ast/return-statement.ts';
+import { isLiteralOrUndefinedReturn } from './mocha-return-rule.ts';
 
 function checkNodeForReturnFromAsync(context: Readonly<Rule.RuleContext>, node: Readonly<AnyFunction>): void {
     if (node.async !== true) {

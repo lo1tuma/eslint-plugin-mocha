@@ -1,6 +1,6 @@
 import { getStringIfConstant } from '@eslint-community/eslint-utils';
 import type { SourceCode } from 'eslint';
-import type { CallExpression } from './ast/node-types.js';
+import type { CallExpression } from './ast/node-types.ts';
 
 export type TitleDescription =
     | { readonly kind: 'dynamic'; }

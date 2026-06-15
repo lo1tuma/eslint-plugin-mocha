@@ -5,7 +5,7 @@ import {
     type CallbackHandlingOperation,
     type CallbackPathState,
     getCodeAfterCallbackHandlingNode
-} from './callback-handling-state.js';
+} from './callback-handling-state.ts';
 
 type CallExpressionNode = Readonly<Extract<CallbackHandlingOperation, { readonly type: 'call'; }>['node']>;
 type MemberExpressionNode = Readonly<Parameters<Exclude<Rule.RuleListener['MemberExpression'], undefined>>[0]>;

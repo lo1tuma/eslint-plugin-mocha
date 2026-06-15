@@ -1,7 +1,7 @@
 import assert from 'node:assert';
 import type { Rule, SourceCode } from 'eslint';
 import { suite, test } from 'mocha';
-import { visitChildNodes, visitWithoutNestedFunctions } from './visit-child-nodes.js';
+import { visitChildNodes, visitWithoutNestedFunctions } from './visit-child-nodes.ts';
 
 function asRuleNode(node: Readonly<Record<string, unknown>>): Rule.Node {
     return node as unknown as Rule.Node;
