@@ -1,31 +1,31 @@
 /* eslint-disable import/max-dependencies -- needs to be refactored */
 import type { Rule } from 'eslint';
-import { reduceWithArgs } from '../list.js';
-import { getAllNames } from '../mocha/all-name-details.js';
-import type { MochaInterface } from '../mocha/descriptors.js';
-import { type NameDetails, reformatLastPathSegmentWithCallExpressions } from '../mocha/name-details.js';
-import { isSamePath } from '../mocha/path.js';
-import { resolveAliasedReferences } from './alias-references.js';
-import { findGlobalReferencesByName } from './find-global-references.js';
-import { findImportReferencesByName } from './find-import-references.js';
-import { type DynamicPath, isConstantPath } from './member-expression.js';
-import { type CallExpression, isCallExpression, isMemberExpression } from './node-types.js';
-import type { ResolvedReference } from './resolved-reference.js';
+import { reduceWithArgs } from '../list.ts';
+import { getAllNames } from '../mocha/all-name-details.ts';
+import type { MochaInterface } from '../mocha/descriptors.ts';
+import { type NameDetails, reformatLastPathSegmentWithCallExpressions } from '../mocha/name-details.ts';
+import { isSamePath } from '../mocha/path.ts';
+import { resolveAliasedReferences } from './alias-references.ts';
+import { findGlobalReferencesByName } from './find-global-references.ts';
+import { findImportReferencesByName } from './find-import-references.ts';
+import { type DynamicPath, isConstantPath } from './member-expression.ts';
+import { type CallExpression, isCallExpression, isMemberExpression } from './node-types.ts';
+import type { ResolvedReference } from './resolved-reference.ts';
 
-function isCallExpressionReference(reference: Readonly<ResolvedReference>): boolean {
-    return reference.node.type === 'CallExpression';
-}
+type CallResolvedReference = ResolvedReference & {
+    readonly node: CallExpression;
+};
 
 function addReferenceToResults(
-    results: readonly ResolvedReference[],
-    matchingReference: Readonly<ResolvedReference>
-): readonly ResolvedReference[] {
-    return [...results, matchingReference];
+    results: readonly CallResolvedReference[],
+    matchingReference: Readonly<CallResolvedReference>
+): readonly CallResolvedReference[] {
+    return [ ...results, matchingReference ];
 }
 
-type CallExpressionDetails = { node: CallExpression; amountOfCallExpressions: number; };
+type CallExpressionDetails = { readonly node: CallExpression; readonly amountOfCallExpressions: number; };
 
-function getCallDetails(reference: Readonly<ResolvedReference>): Readonly<CallExpressionDetails> {
+function getCallDetails(reference: Readonly<CallResolvedReference>): Readonly<CallExpressionDetails> {
     let { node } = reference;
     let count = 0;
 
@@ -38,21 +38,26 @@ function getCallDetails(reference: Readonly<ResolvedReference>): Readonly<CallEx
 }
 
 function shouldProcessReference(
-    results: readonly ResolvedReference[],
+    results: readonly CallResolvedReference[],
     reference: Readonly<ResolvedReference>
-): readonly ResolvedReference[] {
-    if (isCallExpressionReference(reference)) {
-        const { node: newNode, amountOfCallExpressions } = getCallDetails(reference);
-        return addReferenceToResults(results, {
-            ...reference,
-            node: newNode,
-            resolvedPath: reformatLastPathSegmentWithCallExpressions(
-                reference.resolvedPath,
-                amountOfCallExpressions
-            )
-        });
+): readonly CallResolvedReference[] {
+    if (!isCallExpression(reference.node)) {
+        return results;
     }
-    return results;
+
+    const callReference: CallResolvedReference = {
+        ...reference,
+        node: reference.node
+    };
+    const { node: newNode, amountOfCallExpressions } = getCallDetails(callReference);
+    return addReferenceToResults(results, {
+        ...callReference,
+        node: newNode,
+        resolvedPath: reformatLastPathSegmentWithCallExpressions(
+            reference.resolvedPath,
+            amountOfCallExpressions
+        )
+    });
 }
 
 function findMatchingNameDetails(
@@ -68,12 +73,16 @@ function findMatchingNameDetails(
     return null;
 }
 
-export type ResolvedReferenceWithNameDetails = ResolvedReference & { nameDetails: NameDetails; name: string; };
+export type ResolvedReferenceWithNameDetails = ResolvedReference & {
+    readonly nameDetails: NameDetails;
+    readonly name: string;
+    readonly node: CallExpression;
+};
 
 // eslint-disable-next-line max-statements -- needs to be refactored
 function shouldAddReferenceToResults(
     results: readonly ResolvedReferenceWithNameDetails[],
-    reference: Readonly<ResolvedReference>,
+    reference: Readonly<CallResolvedReference>,
     names: readonly NameDetails[]
 ): readonly ResolvedReferenceWithNameDetails[] {
     const nameDetails = findMatchingNameDetails(reference.resolvedPath, names);
@@ -105,7 +114,7 @@ function shouldAddReferenceToResults(
         }
     }
 
-    return [...results, { ...reference, nameDetails, name: reference.resolvedPath.join('.') }];
+    return [ ...results, { ...reference, nameDetails, name: reference.resolvedPath.join('.') } ];
 }
 
 function isResultWithConstantPath(result: Readonly<ResolvedReference>): boolean {
@@ -119,10 +128,10 @@ type SplitCustomNames = {
 
 function splitCustomNamesByInterface(customNames: readonly NameDetails[]): Readonly<SplitCustomNames> {
     return {
-        require: customNames.filter((nameDetails) => {
+        require: customNames.filter(function (nameDetails) {
             return nameDetails.interface === 'require';
         }),
-        globals: customNames.filter((nameDetails) => {
+        globals: customNames.filter(function (nameDetails) {
             return nameDetails.interface !== 'require';
         })
     };
@@ -161,6 +170,6 @@ export function findMochaVariableCalls(
         filteredReferences,
         shouldAddReferenceToResults,
         [],
-        [...builtinNames, ...customNames]
+        [ ...builtinNames, ...customNames ]
     );
 }

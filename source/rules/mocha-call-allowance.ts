@@ -1,4 +1,4 @@
-import type { InferSchemaOption, RuleSchema } from '../rule-options.js';
+import type { InferSchemaOption } from '../rule-options.ts';
 
 export const allowMochaCallOptionSchema = {
     type: 'object',
@@ -11,10 +11,10 @@ export const allowMochaCallOptionSchema = {
         }
     },
     additionalProperties: false
-} as const satisfies RuleSchema;
+} as const;
 
 type AllowMochaCallOption = InferSchemaOption<typeof allowMochaCallOptionSchema>;
-export type ResolvedAllowMochaCallOption = AllowMochaCallOption & { allow: string[]; };
+export type ResolvedAllowMochaCallOption = AllowMochaCallOption & { readonly allow: readonly string[]; };
 
 export const defaultAllowMochaCallOption: ResolvedAllowMochaCallOption = { allow: [] };
 

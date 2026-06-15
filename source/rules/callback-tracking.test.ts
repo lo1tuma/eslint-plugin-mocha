@@ -1,6 +1,7 @@
-import { Linter, type Rule } from 'eslint';
 import assert from 'node:assert';
-import { createTrackedCallbackVisitors } from './callback-tracking.js';
+import { Linter, type Rule } from 'eslint';
+import { suite, test } from 'mocha';
+import { createTrackedCallbackVisitors } from './callback-tracking.ts';
 
 function createSourceCode(): Rule.RuleContext['sourceCode'] {
     const linter = new Linter();
@@ -42,7 +43,7 @@ function collectOperationTypes(code: string): readonly string[] {
                 onTrackedFunctionEnd(trackedFunction) {
                     const operations = Array.from(trackedFunction.operationsBySegmentId.values()).flat();
 
-                    operationTypes = operations.map((operation) => {
+                    operationTypes = operations.map(function (operation) {
                         return operation.type;
                     });
                 }
@@ -54,15 +55,15 @@ function collectOperationTypes(code: string): readonly string[] {
         plugins: { 'test-plugin': { rules: { 'test-rule': testRule } } },
         languageOptions: { ecmaVersion: 2020, sourceType: 'script' },
         rules: { 'test-plugin/test-rule': 'error' }
-    } as Linter.Config);
+    });
 
     assert.deepStrictEqual(messages, []);
 
     return operationTypes;
 }
 
-describe('callback tracking', function () {
-    it('ignores non-mocha functions without inherited callback bindings', function () {
+suite('callback tracking', function () {
+    test('ignores non-mocha functions without inherited callback bindings', function () {
         const trackedFunctions: unknown[] = [];
         const visitors = createTrackedCallbackVisitors(
             {
@@ -86,7 +87,7 @@ describe('callback tracking', function () {
         assert.deepStrictEqual(trackedFunctions, []);
     });
 
-    it('ignores delete expressions without member access inside tracked callbacks', function () {
+    test('ignores delete expressions without member access inside tracked callbacks', function () {
         const operationTypes = collectOperationTypes(
             'it("title", function(done) { const callbackAlias = done; delete callbackAlias; });'
         );
@@ -95,7 +96,7 @@ describe('callback tracking', function () {
         assert.strictEqual(operationTypes.includes('containerPropertyAssignment'), false);
     });
 
-    it('ignores non-delete unary member access inside tracked callbacks', function () {
+    test('ignores non-delete unary member access inside tracked callbacks', function () {
         const operationTypes = collectOperationTypes(
             'it("title", function(done) { const callbacks = { complete: done }; typeof callbacks.complete; });'
         );

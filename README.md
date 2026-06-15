@@ -22,11 +22,11 @@ npm install --save-dev eslint-plugin-mocha
 Use the plugin with ESLint's [flat config](https://eslint.org/docs/latest/use/configure/configuration-files-new). Apply it only to Mocha test files, and adjust `files` to match your project:
 
 ```js
-import mochaPlugin from "eslint-plugin-mocha";
+import mochaPlugin from 'eslint-plugin-mocha';
 
 export default [
     {
-        files: ["test/**/*.js"],
+        files: [ 'test/**/*.js' ],
         ...mochaPlugin.configs.recommended
     }
 ];
@@ -40,11 +40,11 @@ export default [
   for stable long-term lint output.
 
 ```js
-import mochaPlugin from "eslint-plugin-mocha";
+import mochaPlugin from 'eslint-plugin-mocha';
 
 export default [
     {
-        files: ["test/**/*.js"],
+        files: [ 'test/**/*.js' ],
         ...mochaPlugin.configs.all
     }
 ];
@@ -89,25 +89,25 @@ The `name` field supports these forms:
 - Plain name, such as `describeModule`:
 
 ```js
-describeModule("example", function () {});
+describeModule('example', function () {});
 ```
 
 - Dotted name, such as `describe.modifier`:
 
 ```js
-describe.modifier("example", function () {});
+describe.modifier('example', function () {});
 ```
 
 - Name with parentheses, such as `forEach().describe`:
 
 ```js
-forEach([1, 2, 3]).describe("example", function (n) {});
+forEach([ 1, 2, 3 ]).describe('example', function (n) {});
 ```
 
 - Combination, such as `forEach().describeModule.modifier`:
 
 ```js
-forEach([1, 2, 3]).describeModule.modifier("example", function (n) {});
+forEach([ 1, 2, 3 ]).describeModule.modifier('example', function (n) {});
 ```
 
 - `type`: Selects `suite`, `testCase`, or `hook`.
@@ -121,6 +121,7 @@ For wrapper APIs that still expose suite, test, or hook call functions, use `add
 
 For maintainers: the rules table below is generated, and the headers in `documentation/rules/*.md` are partly generated. Refresh them with `npx just update-eslint-docs`. Run mutation testing with `npx just test-mutation`.
 
+<!-- dprint-ignore-start -->
 <!-- begin auto-generated rules list -->
 
 💼 [Configurations](https://github.com/lo1tuma/eslint-plugin-mocha#configs) enabled in.\
@@ -167,3 +168,4 @@ For maintainers: the rules table below is generated, and the headers in `documen
 | [valid-test-title](documentation/rules/valid-test-title.md)                                   | Require test descriptions to match a pre-configured regular expression  |    |    | ✅  |    |    |
 
 <!-- end auto-generated rules list -->
+<!-- dprint-ignore-end -->

@@ -1,8 +1,9 @@
 import assert from 'node:assert';
-import { isLiteralOrUndefinedReturn } from './mocha-return-rule.js';
+import { suite, test } from 'mocha';
+import { isLiteralOrUndefinedReturn } from './mocha-return-rule.ts';
 
-describe('mocha-return-rule helpers', function () {
-    it('treats bare returns as allowed', function () {
+suite('mocha-return-rule helpers', function () {
+    test('treats bare returns as allowed', function () {
         assert.strictEqual(
             isLiteralOrUndefinedReturn({
                 type: 'ReturnStatement',
@@ -12,7 +13,7 @@ describe('mocha-return-rule helpers', function () {
         );
     });
 
-    it('treats literal returns as allowed', function () {
+    test('treats literal returns as allowed', function () {
         assert.strictEqual(
             isLiteralOrUndefinedReturn({
                 type: 'ReturnStatement',
@@ -22,7 +23,7 @@ describe('mocha-return-rule helpers', function () {
         );
     });
 
-    it('treats missing return arguments as disallowed', function () {
+    test('treats missing return arguments as disallowed', function () {
         assert.strictEqual(
             isLiteralOrUndefinedReturn({
                 type: 'ReturnStatement'

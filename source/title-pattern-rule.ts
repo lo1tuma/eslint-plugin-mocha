@@ -1,12 +1,12 @@
-import { getStringIfConstant } from '@eslint-community/eslint-utils';
 import type { Rule } from 'eslint';
-import { createMochaVisitors, type VisitorContext } from './ast/mocha-visitors.js';
-import { type CallExpression, isCallExpression } from './ast/node-types.js';
-import { getRuleOption, type InferSchemaOption, type RuleSchema } from './rule-options.js';
+import { createMochaVisitors, type VisitorContext } from './ast/mocha-visitors.ts';
+import { type CallExpression, isCallExpression } from './ast/node-types.ts';
+import { getTitleDescription } from './title-description.ts';
+import { getRuleOption, type InferSchemaOption } from './rule-options.ts';
 
 type NormalizedOptions = {
-    pattern: RegExp;
-    message: string | undefined;
+    readonly pattern: RegExp;
+    readonly message: string | undefined;
 };
 
 const optionSchema = {
@@ -20,16 +20,16 @@ const optionSchema = {
         }
     },
     additionalProperties: false
-} as const satisfies RuleSchema;
+} as const;
 
 type Option = InferSchemaOption<typeof optionSchema>;
-type ResolvedOption = Option & { pattern: string; };
+type ResolvedOption = { readonly [Key in keyof Option]: Option[Key]; } & { readonly pattern: string; };
 
 type TitlePatternRuleDefinition = {
-    defaultPattern: string;
-    description: string;
-    documentationFile: string;
-    messageId: string;
+    readonly defaultPattern: string;
+    readonly description: string;
+    readonly documentationFile: string;
+    readonly messageId: string;
 };
 
 type CreateVisitors = (
@@ -49,22 +49,20 @@ function hasValidOrNoDescription(
     mochaCallExpression: Readonly<CallExpression>,
     pattern: Readonly<RegExp>
 ): boolean {
-    const descriptionArgument = mochaCallExpression.arguments[0];
-    const description = descriptionArgument === undefined
-        ? null
-        : getStringIfConstant(
-            descriptionArgument,
-            context.sourceCode.getScope(mochaCallExpression)
-        );
+    const description = getTitleDescription(context.sourceCode, mochaCallExpression);
 
-    return description === null || pattern.test(description);
+    if (description.kind === 'missing' || description.kind === 'dynamic') {
+        return true;
+    }
+
+    return pattern.test(description.value);
 }
 
 function createTitlePatternRule(
     definition: Readonly<TitlePatternRuleDefinition>,
     createVisitors: CreateVisitors
 ): Readonly<Rule.RuleModule> {
-    const defaultOptions: [ResolvedOption] = [{ pattern: definition.defaultPattern }];
+    const defaultOptions: [ResolvedOption] = [ { pattern: definition.defaultPattern } ];
     const messages = {
         [definition.messageId]: 'Invalid "{{name}}" description found.'
     };
@@ -72,14 +70,14 @@ function createTitlePatternRule(
     return {
         meta: {
             type: 'suggestion',
-            languages: ['js/js'],
+            languages: [ 'js/js' ],
             docs: {
                 description: definition.description,
                 url: `https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/${definition.documentationFile}.md`
             },
             defaultOptions,
             messages,
-            schema: [optionSchema]
+            schema: [ optionSchema ]
         },
         create(context) {
             const options = getRuleOption<ResolvedOption>(context);
@@ -107,7 +105,7 @@ function createTitlePatternRule(
 export function createSuiteTitlePatternRule(
     definition: Readonly<TitlePatternRuleDefinition>
 ): Readonly<Rule.RuleModule> {
-    return createTitlePatternRule(definition, (context, checkTitle) => {
+    return createTitlePatternRule(definition, function (context, checkTitle) {
         return createMochaVisitors(context, { suite: checkTitle });
     });
 }
@@ -115,7 +113,7 @@ export function createSuiteTitlePatternRule(
 export function createTestCaseTitlePatternRule(
     definition: Readonly<TitlePatternRuleDefinition>
 ): Readonly<Rule.RuleModule> {
-    return createTitlePatternRule(definition, (context, checkTitle) => {
+    return createTitlePatternRule(definition, function (context, checkTitle) {
         return createMochaVisitors(context, { testCase: checkTitle });
     });
 }

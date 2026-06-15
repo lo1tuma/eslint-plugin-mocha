@@ -1,14 +1,15 @@
 import type { Rule } from 'eslint';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
 
 export const noNestedTestsRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'problem',
-        languages: ['js/js'],
         docs: {
             description: 'Disallow tests to be nested within other tests',
+            recommended: true,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-nested-tests.md'
         },
+        schema: [],
         messages: {
             suiteNestedInHook: 'Unexpected suite nested within a test hook.',
             suiteNestedInTest: 'Unexpected suite nested within a test.',
@@ -16,7 +17,7 @@ export const noNestedTestsRule: Readonly<Rule.RuleModule> = {
             testNestedInHook: 'Unexpected test nested within a test hook.',
             hookNestedInHook: 'Unexpected test hook nested within a test hook.'
         },
-        schema: []
+        languages: [ 'js/js' ]
     },
     create(context) {
         function report(node: Readonly<Rule.Node>, messageId: string): void {

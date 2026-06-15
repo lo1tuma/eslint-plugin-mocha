@@ -1,20 +1,28 @@
-import { Linter, type Rule, type SourceCode } from 'eslint';
 import assert from 'node:assert';
+import { Linter, type Rule, type SourceCode } from 'eslint';
+import { suite, test } from 'mocha';
 import {
     extractMemberExpressionPath,
     getIdentifierName,
     isConstantPath
-} from './member-expression.js';
+} from './member-expression.ts';
 
-function readExpression(code: string): { sourceCode: Readonly<SourceCode>; expression: Readonly<Rule.Node>; } {
+type ReadExpressionResult = {
+    readonly sourceCode: Readonly<SourceCode>;
+    readonly expression: Readonly<Rule.Node>;
+};
+
+function readExpression(
+    code: string
+): ReadExpressionResult {
     const linter = new Linter();
-    let result: { sourceCode: Readonly<SourceCode>; expression: Readonly<Rule.Node>; } | null = null;
+    let result: ReadExpressionResult | null = null;
 
     const testRule: Rule.RuleModule = {
         create(ruleContext) {
             return {
                 Program() {
-                    const [firstStatement] = ruleContext.sourceCode.ast.body;
+                    const [ firstStatement ] = ruleContext.sourceCode.ast.body;
                     assert.notStrictEqual(firstStatement, undefined);
                     assert.strictEqual(firstStatement?.type, 'ExpressionStatement');
 
@@ -35,34 +43,37 @@ function readExpression(code: string): { sourceCode: Readonly<SourceCode>; expre
     assert.deepStrictEqual(messages, []);
     assert.notStrictEqual(result, null);
 
-    return result as unknown as { sourceCode: Readonly<SourceCode>; expression: Readonly<Rule.Node>; };
+    return result as unknown as {
+        readonly sourceCode: Readonly<SourceCode>;
+        readonly expression: Readonly<Rule.Node>;
+    };
 }
 
-describe('member expression helpers', function () {
-    it('extractMemberExpressionPath() tracks member calls', function () {
+suite('member expression helpers', function () {
+    test('extractMemberExpressionPath() tracks member calls', function () {
         const { sourceCode, expression } = readExpression('foo.bar();');
         const result = extractMemberExpressionPath(sourceCode, expression);
 
-        assert.deepStrictEqual(result, ['foo', 'bar()']);
+        assert.deepStrictEqual(result, [ 'foo', 'bar()' ]);
         assert.strictEqual(isConstantPath(result), true);
     });
 
-    it('extractMemberExpressionPath() tracks computed constant members', function () {
+    test('extractMemberExpressionPath() tracks computed constant members', function () {
         const { sourceCode, expression } = readExpression('foo["bar"];');
         const result = extractMemberExpressionPath(sourceCode, expression);
 
-        assert.deepStrictEqual(result, ['foo', 'bar']);
+        assert.deepStrictEqual(result, [ 'foo', 'bar' ]);
     });
 
-    it('extractMemberExpressionPath() returns a path for identifiers', function () {
+    test('extractMemberExpressionPath() returns a path for identifiers', function () {
         const { sourceCode, expression } = readExpression('foo;');
         const result = extractMemberExpressionPath(sourceCode, expression);
 
-        assert.deepStrictEqual(result, ['foo']);
+        assert.deepStrictEqual(result, [ 'foo' ]);
         assert.strictEqual(isConstantPath(result), true);
     });
 
-    it('extractMemberExpressionPath() preserves dynamic members', function () {
+    test('extractMemberExpressionPath() preserves dynamic members', function () {
         const { sourceCode, expression } = readExpression('foo[bar];');
         const result = extractMemberExpressionPath(sourceCode, expression);
 
@@ -71,7 +82,7 @@ describe('member expression helpers', function () {
         assert.strictEqual(isConstantPath(result), false);
     });
 
-    it('getIdentifierName() returns a symbol for non-identifiers', function () {
+    test('getIdentifierName() returns a symbol for non-identifiers', function () {
         const { expression } = readExpression('foo["bar"];');
         assert.strictEqual(expression.type, 'MemberExpression');
 
@@ -80,14 +91,14 @@ describe('member expression helpers', function () {
         assert.strictEqual(typeof result, 'symbol');
     });
 
-    it('extractMemberExpressionPath() returns an empty path for a null input', function () {
+    test('extractMemberExpressionPath() returns an empty path for a null input', function () {
         const { sourceCode } = readExpression('foo.bar;');
         const result = extractMemberExpressionPath(sourceCode, null as never);
 
         assert.deepStrictEqual(result, []);
     });
 
-    it('extractMemberExpressionPath() returns an empty path for unsupported nodes', function () {
+    test('extractMemberExpressionPath() returns an empty path for unsupported nodes', function () {
         const { sourceCode, expression } = readExpression('42;');
         const result = extractMemberExpressionPath(sourceCode, expression);
 

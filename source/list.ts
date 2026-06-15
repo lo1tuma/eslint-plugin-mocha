@@ -20,7 +20,7 @@ export function mapWithArgs<ListItem, MappedReturnValue, Args extends readonly u
     callback: (item: ListItem, ...args: Args) => MappedReturnValue,
     ...args: Args
 ): readonly MappedReturnValue[] {
-    return list.map((item) => {
+    return list.map(function (item) {
         return callback(item, ...args);
     });
 }

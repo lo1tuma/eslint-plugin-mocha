@@ -3,6 +3,7 @@
     "entry": [
         "benchmarks/**/*.ts",
         "source/**/*.test.ts",
+        "source/**/*.test-support.ts",
         "source/third-party-type-definitions.d.ts!",
         "dependency-cruiser.config.js",
         "packtory.config.js"
@@ -13,15 +14,14 @@
         "source/**/*.d.ts!",
         "*.js",
         "!source/mocha-interface-test-cases.ts!",
-        "!source/**/*.test.ts!"
+        "!source/**/*.test.ts!",
+        "!source/**/*.test-support.ts!"
     ],
     "ignoreDependencies": [
         "c8",
         "coveralls",
-        "dprint",
         "eslint-doc-generator",
         "jscpd",
-        "markdownlint-cli",
         "pr-log"
     ],
     "ignoreBinaries": []

@@ -1,12 +1,12 @@
 import { findVariable } from '@eslint-community/eslint-utils';
 import type { Rule, Scope, SourceCode } from 'eslint';
-import { flatMapWithArgs, mapWithArgs } from '../list.js';
+import { flatMapWithArgs, mapWithArgs } from '../list.ts';
 import {
     type DynamicPath,
     extractMemberExpressionPath,
     getIdentifierName,
     isConstantPath
-} from './member-expression.js';
+} from './member-expression.ts';
 import {
     type IdentifierPattern,
     isAssignmentProperty,
@@ -15,13 +15,13 @@ import {
     isVariableDeclarator,
     type ObjectPattern,
     type VariableDeclarator
-} from './node-types.js';
-import { findParentNodeAndPathForIdentifier, type ResolvedReference } from './resolved-reference.js';
-import { asRuleNode } from './rule-node.js';
+} from './node-types.ts';
+import { findParentNodeAndPathForIdentifier, type ResolvedReference } from './resolved-reference.ts';
+import { asRuleNode } from './rule-node.ts';
 
 function isConstVariableDeclarationParent(
     parent: Rule.Node | null
-): parent is Extract<Rule.Node, { type: 'VariableDeclaration'; }> {
+): parent is Extract<Rule.Node, { readonly type: 'VariableDeclaration'; }> {
     return parent?.type === 'VariableDeclaration' && parent.kind === 'const';
 }
 
@@ -29,18 +29,18 @@ function isAliasConstAssignment(node: Rule.Node): node is VariableDeclarator {
     return isVariableDeclarator(node) && isConstVariableDeclarationParent(node.parent);
 }
 
-type IdentifierWithPath = { identifier: IdentifierPattern; path: DynamicPath; };
+type IdentifierWithPath = { readonly identifier: IdentifierPattern; readonly path: DynamicPath; };
 
 function extractIdentifiersFromObjectPattern(
     node: Readonly<ObjectPattern>,
     currentPath: DynamicPath
 ): readonly IdentifierWithPath[] {
-    return node.properties.flatMap((property): readonly IdentifierWithPath[] => {
+    return node.properties.flatMap(function (property): readonly IdentifierWithPath[] {
         if (!isAssignmentProperty(property)) {
             return [];
         }
         if (property.value.type === 'Identifier') {
-            return [{ identifier: property.value, path: [...currentPath, getIdentifierName(property.key)] }];
+            return [ { identifier: property.value, path: [ ...currentPath, getIdentifierName(property.key) ] } ];
         }
         if (property.value.type === 'ObjectPattern') {
             return extractIdentifiersFromObjectPattern(property.value, [
@@ -54,9 +54,9 @@ function extractIdentifiersFromObjectPattern(
 }
 
 type IdentifierWithAssignmentPaths = {
-    identifier: IdentifierPattern;
-    leftHandSidePath: DynamicPath;
-    rightHandSidePath: DynamicPath;
+    readonly identifier: IdentifierPattern;
+    readonly leftHandSidePath: DynamicPath;
+    readonly rightHandSidePath: DynamicPath;
 };
 
 function getDeclaredIdentifiers(
@@ -66,12 +66,12 @@ function getDeclaredIdentifiers(
     const path = extractMemberExpressionPath(sourceCode, asRuleNode(node.init));
 
     if (isIdentifierPattern(node.id)) {
-        return [{ identifier: node.id, leftHandSidePath: [], rightHandSidePath: path }];
+        return [ { identifier: node.id, leftHandSidePath: [], rightHandSidePath: path } ];
     }
 
     if (isObjectPattern(node.id)) {
         const allPatternIdentifiers = extractIdentifiersFromObjectPattern(node.id, []);
-        return allPatternIdentifiers.map((patternIdentifiers) => {
+        return allPatternIdentifiers.map(function (patternIdentifiers) {
             return {
                 identifier: patternIdentifiers.identifier,
                 leftHandSidePath: patternIdentifiers.path,
@@ -88,8 +88,8 @@ function extendPath(
     originalPath: DynamicPath,
     identifierPath: DynamicPath
 ): DynamicPath {
-    const extendedPath = [...parentReference.resolvedPath, ...originalPath, ...identifierPath.slice(1)];
-    const [callAlias] = identifierPath;
+    const extendedPath = [ ...parentReference.resolvedPath, ...originalPath, ...identifierPath.slice(1) ];
+    const [ callAlias ] = identifierPath;
 
     if (identifierPath.length === 1 && String(callAlias).endsWith('()')) {
         const lastIndex = extendedPath.length - 1;
@@ -127,7 +127,7 @@ function resolveAliasReferencesRecursively(
     sourceCode: Readonly<SourceCode>
 ): readonly ResolvedReference[] {
     const { node } = reference;
-    const result = [reference];
+    const result = [ reference ];
 
     function resolveAliasedReferencesForIdentifier(
         identifierPath: DynamicPath,

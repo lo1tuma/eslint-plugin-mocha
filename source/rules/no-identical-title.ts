@@ -1,11 +1,11 @@
 import type { Rule } from 'eslint';
-import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
-import { isCallExpression, isLiteral } from '../ast/node-types.js';
-import { getLastOrThrow } from '../list.js';
+import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.ts';
+import { expectCallExpression, isLiteral } from '../ast/node-types.ts';
+import { getLastOrThrow } from '../list.ts';
 
 type Layer = {
-    suiteTitles: string[];
-    testTitles: string[];
+    readonly suiteTitles: readonly string[];
+    readonly testTitles: readonly string[];
 };
 
 function newLayer(): Readonly<Layer> {
@@ -16,11 +16,10 @@ function newLayer(): Readonly<Layer> {
 }
 
 function extractTitleArgument(node: Readonly<Rule.Node>): string | null {
-    if (isCallExpression(node)) {
-        const [firstArg] = node.arguments;
-        if (firstArg !== undefined && isLiteral(firstArg)) {
-            return firstArg.value?.toString() ?? null;
-        }
+    const [ firstArg ] = expectCallExpression(node).arguments;
+
+    if (firstArg !== undefined && isLiteral(firstArg)) {
+        return firstArg.value?.toString() ?? null;
     }
 
     return null;
@@ -29,19 +28,20 @@ function extractTitleArgument(node: Readonly<Rule.Node>): string | null {
 export const noIdenticalTitleRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
-        languages: ['js/js'],
         docs: {
             description: 'Disallow identical titles',
+            recommended: true,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-identical-title.md'
         },
+        schema: [],
         messages: {
             duplicateTestTitle: 'Test title is used multiple times in the same test suite.',
             duplicateSuiteTitle: 'Test suite title is used multiple times.'
         },
-        schema: []
+        languages: [ 'js/js' ]
     },
     create(context) {
-        const titleLayers: [Layer, ...Layer[]] = [newLayer()];
+        const titleLayers: [Layer, ...Layer[]] = [ newLayer() ];
 
         function handleTestCaseTitles(visitorContext: Readonly<VisitorContext>, title: string): void {
             const currentLayer = getLastOrThrow(titleLayers);
@@ -53,7 +53,10 @@ export const noIdenticalTitleRule: Readonly<Rule.RuleModule> = {
                     messageId: 'duplicateTestTitle'
                 });
             }
-            titles.push(title);
+            titleLayers[titleLayers.length - 1] = {
+                ...currentLayer,
+                testTitles: [ ...titles, title ]
+            };
         }
 
         function handleTestSuiteTitles(visitorContext: Readonly<VisitorContext>, title: string): void {
@@ -66,7 +69,10 @@ export const noIdenticalTitleRule: Readonly<Rule.RuleModule> = {
                     messageId: 'duplicateSuiteTitle'
                 });
             }
-            titles.push(title);
+            titleLayers[titleLayers.length - 1] = {
+                ...currentLayer,
+                suiteTitles: [ ...titles, title ]
+            };
         }
 
         return createMochaVisitors(context, {

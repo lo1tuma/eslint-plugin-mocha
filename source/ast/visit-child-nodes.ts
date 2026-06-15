@@ -1,15 +1,22 @@
 import type { Rule, SourceCode } from 'eslint';
 import type { Except } from 'type-fest';
-import { isFunction } from './node-types.js';
+import { hasProperty, isRecord } from '../record.ts';
+import { isFunction } from './node-types.ts';
 
 export type TraversableNode = Except<Rule.Node, 'parent'>;
 
 function getNodeProperty(node: TraversableNode, key: string): unknown {
-    return Reflect.get(node, key);
+    if (!isRecord(node)) {
+        return undefined;
+    }
+
+    const record: Record<string, unknown> = node;
+
+    return hasProperty(record, key) ? record[key] : undefined;
 }
 
 function isNode(value: unknown): value is TraversableNode {
-    return typeof value === 'object' && value !== null && 'type' in value;
+    return isRecord(value) && hasProperty(value, 'type');
 }
 
 export function visitChildNodes(
@@ -27,7 +34,7 @@ export function visitChildNodes(
         const value = getNodeProperty(node, key);
 
         if (Array.isArray(value)) {
-            value.forEach((item) => {
+            value.forEach(function (item) {
                 if (isNode(item)) {
                     visitor(item);
                 }
@@ -49,7 +56,7 @@ export function visitWithoutNestedFunctions(
         return;
     }
 
-    visitChildNodes(sourceCode, node, (childNode) => {
+    visitChildNodes(sourceCode, node, function (childNode) {
         visitWithoutNestedFunctions(sourceCode, childNode, visitor);
     });
 }

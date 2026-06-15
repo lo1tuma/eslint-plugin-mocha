@@ -1,8 +1,10 @@
 import type { Rule } from 'eslint';
 
-type CallExpressionNode = Parameters<Exclude<Rule.RuleListener['CallExpression'], undefined>>[0];
-type FunctionExpressionNode = Parameters<Exclude<Rule.RuleListener['FunctionExpression'], undefined>>[0];
-type ArrowFunctionExpressionNode = Parameters<Exclude<Rule.RuleListener['ArrowFunctionExpression'], undefined>>[0];
+type CallExpressionNode = Readonly<Parameters<Exclude<Rule.RuleListener['CallExpression'], undefined>>[0]>;
+type FunctionExpressionNode = Readonly<Parameters<Exclude<Rule.RuleListener['FunctionExpression'], undefined>>[0]>;
+type ArrowFunctionExpressionNode = Readonly<
+    Parameters<Exclude<Rule.RuleListener['ArrowFunctionExpression'], undefined>>[0]
+>;
 
 export type AnyFunctionExpressionNode = ArrowFunctionExpressionNode | FunctionExpressionNode;
 

@@ -1,5 +1,5 @@
 import { RuleTester } from 'eslint';
-import { noRootHooksRule } from './no-root-hooks.js';
+import { noRootHooksRule } from './no-root-hooks.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
@@ -22,47 +22,53 @@ ruleTester.run('no-root-hooks', noRootHooksRule, {
         'var before = 2; before + 3;',
         {
             code: 'foo(function() { before(function() {}); });',
+            name: 'allows hooks inside custom suites from legacy settings',
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
+                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
             }
         },
         {
             code: 'foo(function() { before(function() {}); });',
+            name: 'allows hooks inside custom suites from nested settings',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
                 }
             }
         },
         {
             code: 'describe.foo(function() { before(function() {}); });',
+            name: 'allows hooks inside custom member-expression suites',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'describe.foo', type: 'suite', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'describe.foo', type: 'suite', interface: 'BDD' } ]
                 }
             }
         },
         {
             code: 'describe.foo()(function() { before(function() {}); });',
+            name: 'allows hooks inside custom chained suites',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'describe.foo()', type: 'suite', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'describe.foo()', type: 'suite', interface: 'BDD' } ]
                 }
             }
         },
         {
             code: 'forEach().describe(function() { before(function() {}); });',
+            name: 'allows hooks inside custom nested chained suites',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'forEach().describe', type: 'suite', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'forEach().describe', type: 'suite', interface: 'BDD' } ]
                 }
             }
         },
         {
             code: 'describe(function() { prepareTestContexts(function() {}); });',
+            name: 'allows custom hooks inside suites',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'prepareTestContexts', type: 'hook', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'prepareTestContexts', type: 'hook', interface: 'BDD' } ]
                 }
             }
         },
@@ -77,100 +83,123 @@ ruleTester.run('no-root-hooks', noRootHooksRule, {
     invalid: [
         {
             code: 'before(function() {});',
-            errors: [{
+            errors: [ {
                 message: 'Unexpected use of Mocha `before()` hook outside of a test suite',
                 column: 1,
-                line: 1
-            }]
+                line: 1,
+                endLine: 1,
+                endColumn: 22
+            } ]
         },
         {
             code: 'after(function() {});',
-            errors: [{
+            errors: [ {
                 message: 'Unexpected use of Mocha `after()` hook outside of a test suite',
                 column: 1,
-                line: 1
-            }]
+                line: 1,
+                endLine: 1,
+                endColumn: 21
+            } ]
         },
         {
             code: 'beforeEach(function() {});',
-            errors: [{
+            errors: [ {
                 message: 'Unexpected use of Mocha `beforeEach()` hook outside of a test suite',
                 column: 1,
-                line: 1
-            }]
+                line: 1,
+                endLine: 1,
+                endColumn: 26
+            } ]
         },
         {
             code: 'afterEach(function() {});',
-            errors: [{
+            errors: [ {
                 message: 'Unexpected use of Mocha `afterEach()` hook outside of a test suite',
                 column: 1,
-                line: 1
-            }]
+                line: 1,
+                endLine: 1,
+                endColumn: 25
+            } ]
         },
         {
             code: 'describe(function() {}); before(function() {});',
-            errors: [{
+            errors: [ {
                 message: 'Unexpected use of Mocha `before()` hook outside of a test suite',
                 column: 26,
-                line: 1
-            }]
+                line: 1,
+                endLine: 1,
+                endColumn: 47
+            } ]
         },
         {
             code: 'before(function() {}); describe(function() {});',
-            errors: [{
+            errors: [ {
                 message: 'Unexpected use of Mocha `before()` hook outside of a test suite',
                 column: 1,
-                line: 1
-            }]
+                line: 1,
+                endLine: 1,
+                endColumn: 22
+            } ]
         },
         {
             code: 'foo(function() {}); before(function() {});',
-            errors: [{
+            errors: [ {
                 message: 'Unexpected use of Mocha `before()` hook outside of a test suite',
                 column: 21,
-                line: 1
-            }]
+                line: 1,
+                endLine: 1,
+                endColumn: 42
+            } ]
         },
         {
             code: 'describe()(function() {}); before(function() {});',
-            errors: [{
+            errors: [ {
                 message: 'Unexpected use of Mocha `before()` hook outside of a test suite',
                 column: 28,
-                line: 1
-            }]
+                line: 1,
+                endLine: 1,
+                endColumn: 49
+            } ]
         },
         {
             code: 'describe.foo()(function() {}); before(function() {});',
-            errors: [{
+            errors: [ {
                 message: 'Unexpected use of Mocha `before()` hook outside of a test suite',
                 column: 32,
-                line: 1
-            }]
+                line: 1,
+                endLine: 1,
+                endColumn: 53
+            } ]
         },
         {
             code: 'prepareTestContexts(function() {});',
-            settings: {
-                mocha: {
-                    additionalCustomNames: [{ name: 'prepareTestContexts', type: 'hook', interface: 'BDD' }]
-                }
-            },
-            errors: [{
+            errors: [ {
                 message: 'Unexpected use of Mocha `prepareTestContexts()` hook outside of a test suite',
                 column: 1,
-                line: 1
-            }]
+                line: 1,
+                endLine: 1,
+                endColumn: 35
+            } ],
+            name: 'reports custom root hooks',
+            settings: {
+                mocha: {
+                    additionalCustomNames: [ { name: 'prepareTestContexts', type: 'hook', interface: 'BDD' } ]
+                }
+            }
         },
         {
             code: 'before(function() {});',
-            errors: [{
-                message: 'Unexpected use of Mocha `before()` hook outside of a test suite',
-                column: 1,
-                line: 1
-            }],
             languageOptions: {
                 ecmaVersion: 2019,
                 sourceType: 'module'
-            }
+            },
+            errors: [ {
+                message: 'Unexpected use of Mocha `before()` hook outside of a test suite',
+                column: 1,
+                line: 1,
+                endLine: 1,
+                endColumn: 22
+            } ]
         }
     ]
 });

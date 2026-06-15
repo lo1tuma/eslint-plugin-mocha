@@ -7,46 +7,38 @@
         "node": ">=22.0.0"
     },
     "exports": "./target/build/source/plugin.js",
-    "scripts": {},
     "dependencies": {
-        "@eslint/core": "^1.2.0",
         "@eslint-community/eslint-utils": "4.4.1",
+        "@eslint/core": "1.2.1",
         "globals": "15.14.0",
         "json-schema-to-ts": "3.1.1",
         "tslib": "2.8.1",
         "type-fest": "4.40.0"
     },
     "devDependencies": {
-        "@ben_12/eslint-plugin-dprint": "1.19.0",
-        "@dprint/json": "0.21.3",
-        "@dprint/markdown": "0.22.1",
-        "@dprint/typescript": "0.96.1",
-        "@enormora/eslint-config-base": "0.0.32",
-        "@enormora/eslint-config-mocha": "0.0.27",
-        "@enormora/eslint-config-node": "0.0.27",
-        "@enormora/eslint-config-typescript": "0.0.37",
+        "@enormora/eslint-config-base": "0.0.43",
+        "@enormora/eslint-config-eslint-plugin": "0.0.6",
+        "@enormora/eslint-config-mocha": "0.0.40",
+        "@enormora/eslint-config-node": "0.0.34",
+        "@enormora/eslint-config-typescript": "0.0.50",
         "@packtory/cli": "0.0.26",
         "@stryker-mutator/core": "9.6.1",
         "@stryker-mutator/mocha-runner": "9.6.1",
         "@types/estree": "1.0.9",
         "@types/mocha": "10.0.10",
-        "@typescript-eslint/parser": "8.59.3",
+        "@typescript-eslint/parser": "8.61.0",
         "c8": "11.0.0",
         "change-case": "5.4.4",
         "coveralls": "3.1.1",
         "dependency-cruiser": "17.4.2",
-        "dprint": "0.48.0",
-        "dprint-plugin-yaml": "0.6.0",
-        "eslint": "10.4.0",
+        "eslint": "10.4.1",
         "eslint-doc-generator": "2.0.2",
-        "eslint-plugin-eslint-plugin": "6.4.0",
         "jscpd": "4.2.3",
         "knip": "6.14.2",
-        "markdownlint-cli": "0.43.0",
         "mocha": "11.1.0",
         "pr-log": "6.1.1",
         "rust-just": "1.51.0",
-        "typescript": "5.7.3"
+        "typescript": "6.0.3"
     },
     "pr-log": {
         "collapseRules": [
@@ -69,8 +61,14 @@
     },
     "author": "Mathias Schreck <schreck.mathias@gmail.com>",
     "contributors": [
-        "Alexander Schmidt <alexanderschmidt1@gmail.com>",
-        "Christian Rackerseder <github@echooff.de>"
+        {
+            "name": "Alexander Schmidt",
+            "email": "alexanderschmidt1@gmail.com"
+        },
+        {
+            "name": "Christian Rackerseder",
+            "email": "github@echooff.de"
+        }
     ],
     "license": "MIT",
     "bugs": {

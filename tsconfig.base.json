@@ -3,6 +3,8 @@
         "target": "ES2023",
         "module": "node16",
         "moduleResolution": "node16",
+        "erasableSyntaxOnly": true,
+        "rewriteRelativeImportExtensions": true,
         "resolveJsonModule": true,
         "strict": true,
         "sourceMap": true,

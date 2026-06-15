@@ -1,11 +1,11 @@
 import type { Rule } from 'eslint';
-import { collectCallbackHandlingNodes } from './callback-handling-node-collector.js';
+import { collectCallbackHandlingNodes } from './callback-handling-node-collector.ts';
 import {
     type CallbackHandlingContext,
     type CallbackHandlingOperation,
     type CallbackPathState,
     getCodeAfterCallbackHandlingNode
-} from './callback-handling-state.js';
+} from './callback-handling-state.ts';
 
 function getRepeatedCallbackHandlingNode(
     context: Readonly<CallbackHandlingContext>,

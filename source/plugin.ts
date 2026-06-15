@@ -1,40 +1,40 @@
 import type { ConfigObject, LegacyConfigObject } from '@eslint/core';
 import type { ESLint, Linter } from 'eslint';
 import globals from 'globals';
-import { readClosestPackageMetadata } from './package-metadata.js';
-import { consistentInterfaceRule } from './rules/consistent-interface.js';
-import { consistentSpacingBetweenBlocksRule } from './rules/consistent-spacing-between-blocks.js';
-import { consistentStructureRule } from './rules/consistent-structure.js';
-import { handleDoneCallbackRule } from './rules/handle-done-callback.js';
-import { limitRetriesRule } from './rules/limit-retries.js';
-import { limitSlowRule } from './rules/limit-slow.js';
-import { limitTimeoutRule } from './rules/limit-timeout.js';
-import { maxTopLevelSuitesRule } from './rules/max-top-level-suites.js';
-import { noAsyncAndDoneRule } from './rules/no-async-and-done.js';
-import { noAsyncInSyncTestsRule } from './rules/no-async-in-sync-tests.js';
-import { noAsyncSuiteRule } from './rules/no-async-suite.js';
-import { noCodeAfterDoneRule } from './rules/no-code-after-done.js';
-import { noConditionalTestsRule } from './rules/no-conditional-tests.js';
-import { noDoneTwiceRule } from './rules/no-done-twice.js';
-import { noEmptyTitleRule } from './rules/no-empty-title.js';
-import { noExclusiveTestsRule } from './rules/no-exclusive-tests.js';
-import { noExportsRule } from './rules/no-exports.js';
-import { noHooksForSingleChildRule } from './rules/no-hooks-for-single-child.js';
-import { noHooksRule } from './rules/no-hooks.js';
-import { noIdenticalTitleRule } from './rules/no-identical-title.js';
-import { noMochaArrowsRule } from './rules/no-mocha-arrows.js';
-import { noNestedSuitesRule } from './rules/no-nested-suites.js';
-import { noNestedTestsRule } from './rules/no-nested-tests.js';
-import { noPendingTestsRule } from './rules/no-pending-tests.js';
-import { noReturnAndDoneRule } from './rules/no-return-and-done.js';
-import { noReturnFromAsyncRule } from './rules/no-return-from-async.js';
-import { noRootHooksRule } from './rules/no-root-hooks.js';
-import { noSetupInSuiteRule } from './rules/no-setup-in-suite.js';
-import { noSynchronousTestsRule } from './rules/no-synchronous-tests.js';
-import { noTopLevelTestsRule } from './rules/no-top-level-tests.js';
-import { preferArrowCallbackRule } from './rules/prefer-arrow-callback.js';
-import { validSuiteTitleRule } from './rules/valid-suite-title.js';
-import { validTestTitleRule } from './rules/valid-test-title.js';
+import { readClosestPackageMetadata } from './package-metadata.ts';
+import { consistentInterfaceRule } from './rules/consistent-interface.ts';
+import { consistentSpacingBetweenBlocksRule } from './rules/consistent-spacing-between-blocks.ts';
+import { consistentStructureRule } from './rules/consistent-structure.ts';
+import { handleDoneCallbackRule } from './rules/handle-done-callback.ts';
+import { limitRetriesRule } from './rules/limit-retries.ts';
+import { limitSlowRule } from './rules/limit-slow.ts';
+import { limitTimeoutRule } from './rules/limit-timeout.ts';
+import { maxTopLevelSuitesRule } from './rules/max-top-level-suites.ts';
+import { noAsyncAndDoneRule } from './rules/no-async-and-done.ts';
+import { noAsyncInSyncTestsRule } from './rules/no-async-in-sync-tests.ts';
+import { noAsyncSuiteRule } from './rules/no-async-suite.ts';
+import { noCodeAfterDoneRule } from './rules/no-code-after-done.ts';
+import { noConditionalTestsRule } from './rules/no-conditional-tests.ts';
+import { noDoneTwiceRule } from './rules/no-done-twice.ts';
+import { noEmptyTitleRule } from './rules/no-empty-title.ts';
+import { noExclusiveTestsRule } from './rules/no-exclusive-tests.ts';
+import { noExportsRule } from './rules/no-exports.ts';
+import { noHooksForSingleChildRule } from './rules/no-hooks-for-single-child.ts';
+import { noHooksRule } from './rules/no-hooks.ts';
+import { noIdenticalTitleRule } from './rules/no-identical-title.ts';
+import { noMochaArrowsRule } from './rules/no-mocha-arrows.ts';
+import { noNestedSuitesRule } from './rules/no-nested-suites.ts';
+import { noNestedTestsRule } from './rules/no-nested-tests.ts';
+import { noPendingTestsRule } from './rules/no-pending-tests.ts';
+import { noReturnAndDoneRule } from './rules/no-return-and-done.ts';
+import { noReturnFromAsyncRule } from './rules/no-return-from-async.ts';
+import { noRootHooksRule } from './rules/no-root-hooks.ts';
+import { noSetupInSuiteRule } from './rules/no-setup-in-suite.ts';
+import { noSynchronousTestsRule } from './rules/no-synchronous-tests.ts';
+import { noTopLevelTestsRule } from './rules/no-top-level-tests.ts';
+import { preferArrowCallbackRule } from './rules/prefer-arrow-callback.ts';
+import { validSuiteTitleRule } from './rules/valid-suite-title.ts';
+import { validTestTitleRule } from './rules/valid-test-title.ts';
 
 const pluginMeta = await readClosestPackageMetadata(import.meta.url);
 
@@ -75,14 +75,14 @@ const allRules: Linter.RulesRecord = {
     'mocha/no-root-hooks': 'error',
     'mocha/prefer-arrow-callback': 'error',
     'mocha/consistent-spacing-between-blocks': 'error',
-    'mocha/consistent-interface': ['error', { interface: 'BDD' }],
+    'mocha/consistent-interface': [ 'error', { interface: 'BDD' } ],
     'mocha/valid-suite-title': 'error',
     'mocha/valid-test-title': 'error',
     'mocha/no-empty-title': 'error'
 };
 
 const recommendedRules: Linter.RulesRecord = {
-    'mocha/consistent-structure': ['error', { disallowDuplicateHooks: true }],
+    'mocha/consistent-structure': [ 'error', { disallowDuplicateHooks: true } ],
     'mocha/handle-done-callback': 'error',
     'mocha/limit-retries': 'off',
     'mocha/limit-slow': 'off',
@@ -153,27 +153,34 @@ const rules = {
     'no-empty-title': noEmptyTitleRule
 };
 
-export type MochaPlugin = ESLint.Plugin & {
-    meta: typeof pluginMeta;
-    rules: typeof rules;
-    configs: PublishedMochaConfigs;
-};
+type ImmutablePluginShape<T> = { readonly [Key in keyof T]: T[Key]; };
+
+export type MochaPlugin = ImmutablePluginShape<
+    ESLint.Plugin & {
+        readonly meta: typeof pluginMeta;
+        readonly rules: typeof rules;
+        readonly configs: PublishedMochaConfigs;
+    }
+>;
 
 type PublishedMochaConfigs = Record<string, PublishedMochaConfig> & {
-    all: MochaConfig;
-    recommended: MochaConfig;
+    readonly all: MochaConfig;
+    readonly recommended: MochaConfig;
 };
 
-type PublishedMochaConfig =
+type PublishedMochaConfig = Readonly<
     | ConfigObject
     | ConfigObject[]
-    | LegacyConfigObject;
+    | LegacyConfigObject
+>;
 
-type MochaConfig = Linter.Config & {
-    plugins: {
-        mocha: ESLint.Plugin;
-    };
-};
+type MochaConfig = ImmutablePluginShape<
+    Linter.Config & {
+        readonly plugins: {
+            readonly mocha: ESLint.Plugin;
+        };
+    }
+>;
 
 const pluginBase = {
     meta: pluginMeta,
@@ -195,6 +202,6 @@ const configs: MochaPlugin['configs'] = {
     }
 };
 
-const plugin = Object.assign(pluginBase, { configs }) satisfies MochaPlugin;
+const plugin: MochaPlugin = Object.assign(pluginBase, { configs });
 
 export default plugin;

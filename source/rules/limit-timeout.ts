@@ -1,18 +1,18 @@
 import type { Rule } from 'eslint';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { type CallExpression, isCallExpression } from '../ast/node-types.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { type CallExpression, isCallExpression } from '../ast/node-types.ts';
 import {
     getStaticNumericConfigValue,
     isDisabledTimeoutValue,
     visitMochaContextConfigCalls
-} from '../mocha/config-call.js';
-import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
+} from '../mocha/config-call.ts';
+import { getRuleOption, type InferSchemaOption } from '../rule-options.ts';
 import {
     disallowDisabledModeOptionSchema,
     disallowModeOptionSchema,
     maximumNumericMochaConfigOptionSchema,
     rangeNumericMochaConfigOptionSchema
-} from './numeric-mocha-config-option-schemas.js';
+} from './numeric-mocha-config-option-schemas.ts';
 
 const optionSchema = {
     oneOf: [
@@ -21,7 +21,7 @@ const optionSchema = {
         maximumNumericMochaConfigOptionSchema,
         rangeNumericMochaConfigOptionSchema
     ]
-} as const satisfies RuleSchema;
+} as const;
 
 type Option = InferSchemaOption<typeof optionSchema>;
 const defaultOption: Option = { mode: 'disallow' };
@@ -32,11 +32,15 @@ type TimeoutMessageId =
     | 'unexpectedTimeoutOutsideRange';
 type ReportMessageDetails = {
     readonly messageId: TimeoutMessageId;
-    readonly data?: Record<string, string>;
+    readonly data?: Readonly<Record<string, string>>;
 };
 
 function validateOption(option: Readonly<Option>): void {
-    if (option.mode === 'range' && option.min > option.max) {
+    if (option.mode !== 'range') {
+        return;
+    }
+
+    if (option.min > option.max) {
         throw new TypeError('`min` must be less than or equal to `max`.');
     }
 }
@@ -76,7 +80,7 @@ function reportTimeoutAboveMax(
 function reportTimeoutOutsideRange(
     context: Readonly<Rule.RuleContext>,
     node: Readonly<CallExpression>,
-    option: Readonly<Extract<Option, { mode: 'range'; }>>,
+    option: Readonly<Extract<Option, { readonly mode: 'range'; }>>,
     timeoutValue: number
 ): void {
     reportUnexpectedTimeout(context, node, {
@@ -120,7 +124,7 @@ function checkMaximumTimeoutCall(
 function checkTimeoutRangeCall(
     context: Readonly<Rule.RuleContext>,
     node: Readonly<CallExpression>,
-    option: Readonly<Extract<Option, { mode: 'range'; }>>,
+    option: Readonly<Extract<Option, { readonly mode: 'range'; }>>,
     timeoutValue: number
 ): void {
     if (timeoutValue < option.min || timeoutValue > option.max) {
@@ -131,7 +135,7 @@ function checkTimeoutRangeCall(
 function checkConfiguredTimeoutCall(
     context: Readonly<Rule.RuleContext>,
     node: Readonly<CallExpression>,
-    option: Exclude<Option, { mode: 'disallow'; }>,
+    option: Exclude<Option, { readonly mode: 'disallow'; }>,
     timeoutValue: number
 ): void {
     if (option.mode === 'disallowDisabled') {
@@ -150,12 +154,13 @@ function checkConfiguredTimeoutCall(
 export const limitTimeoutRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
-        languages: ['js/js'],
         docs: {
             description: 'Enforce limits for Mocha timeouts',
+            recommended: false,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/limit-timeout.md'
         },
-        defaultOptions: [defaultOption],
+        schema: [ optionSchema ],
+        defaultOptions: [ defaultOption ],
         messages: {
             unexpectedTimeout: 'Unexpected use of Mocha timeout configuration.',
             unexpectedDisabledTimeout: 'Unexpected disabled Mocha timeout.',
@@ -163,7 +168,7 @@ export const limitTimeoutRule: Readonly<Rule.RuleModule> = {
             unexpectedTimeoutOutsideRange:
                 'Unexpected Mocha timeout value {{value}}. Expected a value between {{min}} and {{max}}.'
         },
-        schema: [optionSchema]
+        languages: [ 'js/js' ]
     },
     create(context) {
         const option = getRuleOption<Option>(context);

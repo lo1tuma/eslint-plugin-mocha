@@ -1,12 +1,12 @@
 import type { Rule, Scope, SourceCode } from 'eslint';
 import type { Except } from 'type-fest';
-import { flatMapWithArgs, mapWithArgs } from '../list.js';
-import type { NameDetails } from '../mocha/name-details.js';
-import { getUniqueBaseNames } from '../mocha/path.js';
-import { isRecord } from '../record.js';
-import { type DynamicPath, isConstantPath } from './member-expression.js';
-import { getParentNode } from './node-types.js';
-import { findParentNodeAndPathForIdentifier, type ResolvedReference } from './resolved-reference.js';
+import { flatMapWithArgs, mapWithArgs } from '../list.ts';
+import type { NameDetails } from '../mocha/name-details.ts';
+import { getUniqueBaseNames } from '../mocha/path.ts';
+import { isRecord } from '../record.ts';
+import { type DynamicPath, isConstantPath } from './member-expression.ts';
+import { getParentNode } from './node-types.ts';
+import { findParentNodeAndPathForIdentifier, type ResolvedReference } from './resolved-reference.ts';
 
 function isLiteralWithValue(node: Except<Rule.Node, 'parent'>, expectedValue: string | null): boolean {
     return node.type === 'Literal' && (expectedValue === null || node.value === expectedValue);
@@ -28,6 +28,10 @@ type NamedImportBindingVariable = Readonly<Scope.Variable> & {
     readonly defs: readonly [ImportBindingDefinition, ...(readonly Scope.Definition[])];
 };
 
+function getFirstChildScope(scope: Readonly<Scope.Scope> | null | undefined): Scope.Scope | undefined {
+    return scope?.childScopes[0];
+}
+
 function isImportSpecifierNode(node: unknown): node is Readonly<ImportSpecifierNode> {
     return isRecord(node) &&
         node.type === 'ImportSpecifier' &&
@@ -43,8 +47,7 @@ function isExclusiveNamedImportBindingWithMatchingSource(
     const importNode: unknown = importDef?.node;
 
     return (
-        importDef !== undefined &&
-        importDef.type === 'ImportBinding' &&
+        importDef?.type === 'ImportBinding' &&
         isImportSpecifierNode(importNode) &&
         isLiteralWithValue(importDef.parent.source, expectedSource)
     );
@@ -54,7 +57,7 @@ function getAllNamedImportBindingVariables(
     moduleScope: Readonly<Scope.Scope>,
     expectedSource: string | null
 ): readonly NamedImportBindingVariable[] {
-    return moduleScope.variables.filter((variable): variable is NamedImportBindingVariable => {
+    return moduleScope.variables.filter(function (variable): variable is NamedImportBindingVariable {
         return isExclusiveNamedImportBindingWithMatchingSource(variable, expectedSource);
     });
 }
@@ -64,10 +67,8 @@ function isNonAssignmentReference(reference: Readonly<Scope.Reference>): boolean
     const node = reference.identifier as Rule.Node;
     const parent = getParentNode(node);
 
-    return (
-        parent.type !== 'AssignmentExpression' ||
-        parent.left !== node
-    );
+    return parent.type !== 'AssignmentExpression' ||
+        !Object.is(parent.left, node);
 }
 
 function isBindingConstant(variable: Readonly<Scope.Variable>): boolean {
@@ -76,14 +77,14 @@ function isBindingConstant(variable: Readonly<Scope.Variable>): boolean {
 
 function replaceFirstSegment(path: DynamicPath, replacement: string): DynamicPath {
     if (isConstantPath(path)) {
-        const [firstSegment, ...remainingPath] = path;
+        const [ firstSegment, ...remainingPath ] = path;
 
         if (firstSegment === undefined) {
-            return [replacement];
+            return [ replacement ];
         }
 
         const suffix = firstSegment.endsWith('()') ? '()' : '';
-        return [`${replacement}${suffix}`, ...remainingPath];
+        return [ `${replacement}${suffix}`, ...remainingPath ];
     }
     return path;
 }
@@ -135,7 +136,7 @@ export function findImportReferencesByName(
 ): readonly ResolvedReference[] {
     const { sourceCode } = context;
     const { globalScope } = sourceCode.scopeManager;
-    const maybeModuleScope = globalScope?.childScopes?.[0];
+    const maybeModuleScope = getFirstChildScope(globalScope);
 
     if (maybeModuleScope?.type !== 'module') {
         return [];

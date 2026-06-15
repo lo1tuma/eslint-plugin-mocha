@@ -8,9 +8,9 @@ import {
     isLiteral,
     isMemberExpression,
     type MemberExpression
-} from '../ast/node-types.js';
-import { type TraversableNode, visitChildNodes } from '../ast/visit-child-nodes.js';
-import { configCallNames, type MochaConfigCall } from './descriptors.js';
+} from '../ast/node-types.ts';
+import { type TraversableNode, visitChildNodes } from '../ast/visit-child-nodes.ts';
+import { configCallNames, type MochaConfigCall } from './descriptors.ts';
 
 const suiteConfig = new Set<string>(configCallNames);
 const maximumTimeout = Number.parseInt('2147483647', 10);
@@ -26,25 +26,19 @@ function isFiniteNumber(value: unknown): value is number {
 }
 
 function getNamedConfigPropertyName(property: Readonly<CallExpression['callee']>): MochaConfigCall | null {
-    if (!isMemberExpression(property) || !isIdentifier(property.property) || property.computed) {
-        return null;
-    }
-
-    return isMochaConfigCallName(property.property.name)
+    const name = isMemberExpression(property) && !property.computed && isIdentifier(property.property)
         ? property.property.name
         : null;
+
+    return name !== null && isMochaConfigCallName(name) ? name : null;
 }
 
 function getComputedConfigPropertyName(property: Readonly<CallExpression['callee']>): MochaConfigCall | null {
-    if (!isMemberExpression(property) || !property.computed || !isLiteral(property.property)) {
-        return null;
-    }
-
-    const name = String(property.property.value);
-
-    return isMochaConfigCallName(name)
-        ? name
+    const name = isMemberExpression(property) && property.computed && isLiteral(property.property)
+        ? String(property.property.value)
         : null;
+
+    return name !== null && isMochaConfigCallName(name) ? name : null;
 }
 
 function getPropertyName(
@@ -55,7 +49,7 @@ function getPropertyName(
 
 function getMochaContextConfigExpression(
     callee: Readonly<CallExpression['callee']>
-): Readonly<Extract<CallExpression['callee'], { type: 'MemberExpression'; }>> | null {
+): Readonly<Extract<CallExpression['callee'], { readonly type: 'MemberExpression'; }>> | null {
     if (!isMemberExpression(callee) || callee.object.type !== 'ThisExpression') {
         return null;
     }
@@ -68,7 +62,7 @@ function getMochaContextConfigExpression(
 function getFirstArgument(
     node: Readonly<CallExpression>
 ): Readonly<CallExpression['arguments'][number]> | undefined {
-    const [firstArgument] = node.arguments;
+    const [ firstArgument ] = node.arguments;
 
     return firstArgument?.type === 'SpreadElement' ? undefined : firstArgument;
 }
@@ -128,7 +122,7 @@ export function visitMochaContextConfigCalls(
         return;
     }
 
-    visitChildNodes(sourceCode, node, (childNode) => {
+    visitChildNodes(sourceCode, node, function (childNode) {
         visitMochaContextConfigCalls(sourceCode, childNode, configName, visitor);
     });
 }

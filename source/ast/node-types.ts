@@ -55,9 +55,9 @@ export function isVariableDeclarator(node: Rule.Node): node is VariableDeclarato
     return node.type === 'VariableDeclarator';
 }
 
-export type Pattern = VariableDeclarator['id'];
-export type ObjectPattern = Extract<Pattern, { type: 'ObjectPattern'; }>;
-export type IdentifierPattern = Extract<Pattern, { type: 'Identifier'; }>;
+export type Pattern = Readonly<VariableDeclarator['id']>;
+export type ObjectPattern = Extract<Pattern, { readonly type: 'ObjectPattern'; }>;
+export type IdentifierPattern = Extract<Pattern, { readonly type: 'Identifier'; }>;
 
 export function isObjectPattern(pattern: Pattern): pattern is ObjectPattern {
     return pattern.type === 'ObjectPattern';
@@ -67,7 +67,7 @@ export function isIdentifierPattern(pattern: Pattern): pattern is IdentifierPatt
     return pattern.type === 'Identifier';
 }
 
-export type AssignmentProperty = Extract<ObjectPattern['properties'][number], { type: 'Property'; }>;
+export type AssignmentProperty = Extract<ObjectPattern['properties'][number], { readonly type: 'Property'; }>;
 
 export function isAssignmentProperty(property: ObjectPattern['properties'][number]): property is AssignmentProperty {
     return property.type === 'Property';

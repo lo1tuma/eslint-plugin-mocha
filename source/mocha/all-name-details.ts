@@ -3,13 +3,13 @@ import {
     type CustomMochaEntityType,
     type MochaInterface,
     type NameDetailsConfig
-} from './descriptors.js';
-import { buildAllNameDetailsWithVariants, type NameDetails } from './name-details.js';
-import { convertNameToPathArray } from './path.js';
+} from './descriptors.ts';
+import { buildAllNameDetailsWithVariants, type NameDetails } from './name-details.ts';
+import { convertNameToPathArray } from './path.ts';
 
 export type CustomNameConfig = Pick<NameDetailsConfig, 'interface'> & {
-    name: string;
-    type: CustomMochaEntityType;
+    readonly name: string;
+    readonly type: CustomMochaEntityType;
 };
 
 function nameConfigToNameDetails(nameConfig: Readonly<CustomNameConfig>): Readonly<NameDetailsConfig> {
@@ -37,7 +37,7 @@ function filterByInterface(
     nameDetailsList: readonly NameDetailsConfig[],
     interfaceToUse: MochaInterface
 ): readonly NameDetailsConfig[] {
-    return nameDetailsList.filter((nameDetails) => {
+    return nameDetailsList.filter(function (nameDetails) {
         return hasMatchingInterface(nameDetails, interfaceToUse);
     });
 }
@@ -46,7 +46,7 @@ function filterCustomNamesByInterface(
     nameDetailsList: readonly NameDetailsConfig[],
     interfaceToUse: MochaInterface
 ): readonly NameDetailsConfig[] {
-    return nameDetailsList.filter((nameDetails) => {
+    return nameDetailsList.filter(function (nameDetails) {
         return hasMatchingCustomInterface(nameDetails, interfaceToUse);
     });
 }
@@ -98,8 +98,8 @@ export function getAllNames(
 
     return [
         ...builtinNameDetails,
-        ...(includeAllInterfaces
+        ...includeAllInterfaces
             ? getAllCustomNameDetails(additionalNames)
-            : getCustomNameDetailsForInterface(additionalNames, interfaceToUse))
+            : getCustomNameDetailsForInterface(additionalNames, interfaceToUse)
     ];
 }

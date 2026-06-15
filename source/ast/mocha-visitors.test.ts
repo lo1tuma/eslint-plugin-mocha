@@ -1,8 +1,8 @@
 import { type Rule, RuleTester } from 'eslint';
-import { createMochaVisitors } from './mocha-visitors.js';
+import { createMochaVisitors } from './mocha-visitors.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
-type ProgramNode = Parameters<Exclude<Rule.RuleListener['Program'], undefined>>[0];
+type ProgramNode = Readonly<Parameters<Exclude<Rule.RuleListener['Program'], undefined>>[0]>;
 
 function readProgramBody(node: ProgramNode): Readonly<ProgramNode['body']> {
     return node.body;
@@ -55,7 +55,7 @@ ruleTester.run('mocha-visitors config dispatch', configDispatchRule, {
     invalid: [
         {
             code: 'it("name", function () {}).timeout(1000);',
-            errors: [{ message: 'timeout:it().timeout()' }]
+            errors: [ { message: 'timeout:it().timeout()' } ]
         }
     ]
 });
@@ -93,7 +93,7 @@ ruleTester.run('mocha-visitors isolates config dispatch', isolatedConfigDispatch
     invalid: [
         {
             code: 'it("name", function () {}).timeout(1000);',
-            errors: [{ message: 'config:it().timeout()' }]
+            errors: [ { message: 'config:it().timeout()' } ]
         }
     ]
 });
@@ -127,7 +127,7 @@ ruleTester.run('mocha-visitors keeps hooks out of suite-or-test-case dispatch', 
     invalid: [
         {
             code: 'beforeEach(function () {});',
-            errors: [{ message: 'hook:hook' }]
+            errors: [ { message: 'hook:hook' } ]
         }
     ]
 });

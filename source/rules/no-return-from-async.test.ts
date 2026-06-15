@@ -1,5 +1,5 @@
 import { RuleTester } from 'eslint';
-import { noReturnFromAsyncRule } from './no-return-from-async.js';
+import { noReturnFromAsyncRule } from './no-return-from-async.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 const message = 'Unexpected use of `return` in a test with an async function';
@@ -84,58 +84,64 @@ ruleTester.run('no-return-from-async', noReturnFromAsyncRule, {
     invalid: [
         {
             code: 'it("title", async function() { return foo; });',
-            errors: [{ message, column: 32, line: 1 }],
-            languageOptions: es6LanguageOptions
+            languageOptions: es6LanguageOptions,
+            errors: [ { message, column: 32, line: 1, endLine: 1, endColumn: 43 } ]
         },
         {
             code: 'it("title", async function() { return foo.then(function() {}).catch(function() {}); });',
-            errors: [{ message, column: 32, line: 1 }],
-            languageOptions: es6LanguageOptions
+            languageOptions: es6LanguageOptions,
+            errors: [ { message, column: 32, line: 1, endLine: 1, endColumn: 84 } ]
         },
         {
             code: 'it("title", async function() { var foo = bar(); return foo.then(function() {}); });',
-            errors: [{ message, column: 49, line: 1 }],
-            languageOptions: es6LanguageOptions
+            languageOptions: es6LanguageOptions,
+            errors: [ { message, column: 49, line: 1, endLine: 1, endColumn: 80 } ]
         },
         {
             code: 'it("title", async () => { return foo.then(function() {}).catch(function() {}); });',
-            errors: [{ message, column: 27, line: 1 }],
-            languageOptions: es6LanguageOptions
+            languageOptions: es6LanguageOptions,
+            errors: [ { message, column: 27, line: 1, endLine: 1, endColumn: 79 } ]
         },
         {
             code: 'it("title", async () => foo.then(function() {}));',
-            errors: [{ message: 'Confusing implicit return in a test with an async function', column: 25, line: 1 }],
-            languageOptions: es6LanguageOptions
+            languageOptions: es6LanguageOptions,
+            errors: [ {
+                message: 'Confusing implicit return in a test with an async function',
+                column: 25,
+                line: 1,
+                endLine: 1,
+                endColumn: 48
+            } ]
         },
         {
             code: 'it.only("title", async function() { return foo.then(function () {}); });',
-            errors: [{ message, column: 37, line: 1 }],
-            languageOptions: es6LanguageOptions
+            languageOptions: es6LanguageOptions,
+            errors: [ { message, column: 37, line: 1, endLine: 1, endColumn: 69 } ]
         },
         {
             code: 'before("title", async function() { return foo.then(function() {}); });',
-            errors: [{ message, column: 36, line: 1 }],
-            languageOptions: es6LanguageOptions
+            languageOptions: es6LanguageOptions,
+            errors: [ { message, column: 36, line: 1, endLine: 1, endColumn: 67 } ]
         },
         {
             code: 'beforeEach("title", async function() { return foo.then(function() {}); });',
-            errors: [{ message, column: 40, line: 1 }],
-            languageOptions: es6LanguageOptions
+            languageOptions: es6LanguageOptions,
+            errors: [ { message, column: 40, line: 1, endLine: 1, endColumn: 71 } ]
         },
         {
             code: 'after("title", async function() { return foo.then(function() {}); });',
-            errors: [{ message, column: 35, line: 1 }],
-            languageOptions: es6LanguageOptions
+            languageOptions: es6LanguageOptions,
+            errors: [ { message, column: 35, line: 1, endLine: 1, endColumn: 66 } ]
         },
         {
             code: 'afterEach("title", async function() { return foo.then(function() {}); });',
-            errors: [{ message, column: 39, line: 1 }],
-            languageOptions: es6LanguageOptions
+            languageOptions: es6LanguageOptions,
+            errors: [ { message, column: 39, line: 1, endLine: 1, endColumn: 70 } ]
         },
         {
             code: 'afterEach("title", async function() { return foo; });',
-            errors: [{ message, column: 39, line: 1 }],
-            languageOptions: es6LanguageOptions
+            languageOptions: es6LanguageOptions,
+            errors: [ { message, column: 39, line: 1, endLine: 1, endColumn: 50 } ]
         }
     ]
 });
