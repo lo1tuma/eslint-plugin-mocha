@@ -504,7 +504,9 @@ suite('findImportReferencesByName()', function () {
                 {
                     sourceCode: {
                         scopeManager: {
-                            globalScope: {}
+                            globalScope: {
+                                childScopes: []
+                            }
                         }
                     }
                 } as unknown as Rule.RuleContext,

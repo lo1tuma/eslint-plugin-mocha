@@ -124,7 +124,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
             ]
                 .join('\n'),
             options: [ { allow: [ 'before' ] } ],
-            name: 'valid case 1'
+            name: 'allows before hooks when configured'
         },
         {
             code: [
@@ -135,7 +135,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
             ]
                 .join('\n'),
             options: [ { allow: [ 'before()' ] } ],
-            name: 'valid case 2'
+            name: 'allows before hook call paths when configured'
         },
         {
             code: [
@@ -146,7 +146,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
             ]
                 .join('\n'),
             options: [ { allow: [ 'after' ] } ],
-            name: 'valid case 3'
+            name: 'allows after hooks when configured'
         },
         {
             code: [
@@ -157,7 +157,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
             ]
                 .join('\n'),
             options: [ { allow: [ 'beforeEach' ] } ],
-            name: 'valid case 4'
+            name: 'allows beforeEach hooks when configured'
         },
         {
             code: [
@@ -168,7 +168,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
             ]
                 .join('\n'),
             options: [ { allow: [ 'afterEach' ] } ],
-            name: 'valid case 5'
+            name: 'allows afterEach hooks when configured'
         },
         {
             code: [
@@ -179,7 +179,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
             ]
                 .join('\n'),
             options: [ { allow: [ 'after', 'afterEach' ] } ],
-            name: 'valid case 6'
+            name: 'allows any configured hook from multiple allowed names'
         },
         {
             code: [
@@ -190,7 +190,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
-            name: 'valid case 7',
+            name: 'allows custom suites with multiple children',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
@@ -206,7 +206,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 '});'
             ]
                 .join('\n'),
-            name: 'valid case 8',
+            name: 'allows custom suites from legacy settings with multiple children',
             settings: {
                 'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
             }
@@ -339,7 +339,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
                 .join('\n'),
             options: [ { allow: [ 'before' ] } ],
             errors: [ { message: singleChildError('after()'), column: 5, line: 2, endLine: 2, endColumn: 25 } ],
-            name: 'invalid case 1'
+            name: 'reports disallowed hooks in single-child suites'
         },
         {
             code: [
@@ -349,7 +349,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
             ]
                 .join('\n'),
             errors: [ { message: singleChildError('before()'), column: 5, line: 2, endLine: 2, endColumn: 26 } ],
-            name: 'invalid case 2',
+            name: 'reports custom single-child suites from nested settings',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
@@ -364,7 +364,7 @@ ruleTester.run('no-hooks-for-single-child', noHooksForSingleChildRule, {
             ]
                 .join('\n'),
             errors: [ { message: singleChildError('before()'), column: 5, line: 2, endLine: 2, endColumn: 26 } ],
-            name: 'invalid case 3',
+            name: 'reports custom single-child suites from legacy settings',
             settings: {
                 'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
             }

@@ -12,7 +12,7 @@ ruleTester.run('no-nested-suites', noNestedSuitesRule, {
         withInterface('TDD', 'suite("", function () { test(); });'),
         {
             code: 'foo("", function () { it(); });',
-            name: 'valid case 1',
+            name: 'allows custom suites with nested tests',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
@@ -78,7 +78,7 @@ ruleTester.run('no-nested-suites', noNestedSuitesRule, {
                 endLine: 1,
                 endColumn: 33
             } ],
-            name: 'invalid case 1',
+            name: 'reports custom suites nested inside suites',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]

@@ -1,6 +1,6 @@
 import type { Rule } from 'eslint';
 import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
-import { isCallExpression, isLiteral } from '../ast/node-types.js';
+import { expectCallExpression, isLiteral } from '../ast/node-types.js';
 import { getLastOrThrow } from '../list.js';
 
 type Layer = {
@@ -16,11 +16,10 @@ function newLayer(): Readonly<Layer> {
 }
 
 function extractTitleArgument(node: Readonly<Rule.Node>): string | null {
-    if (isCallExpression(node)) {
-        const [ firstArg ] = node.arguments;
-        if (firstArg !== undefined && isLiteral(firstArg)) {
-            return firstArg.value?.toString() ?? null;
-        }
+    const [ firstArg ] = expectCallExpression(node).arguments;
+
+    if (firstArg !== undefined && isLiteral(firstArg)) {
+        return firstArg.value?.toString() ?? null;
     }
 
     return null;

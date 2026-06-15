@@ -174,4 +174,40 @@ suite('collectCallbackHandlingNodes()', function () {
 
         assert.deepStrictEqual(result, [ loopNode, endNode ]);
     });
+
+    test('does not enqueue an already pending segment through another path', function () {
+        const segments = createSegmentGraph(
+            [ 'start', 'left', 'right' ],
+            [
+                [ 'start', 'left' ],
+                [ 'start', 'right' ],
+                [ 'left', 'right' ]
+            ]
+        );
+        const start = readSegment(segments, 'start');
+        const rightNode = identifier('right');
+        let rightVisits = 0;
+
+        collectCallbackHandlingNodes(
+            {
+                callbackBinding: 'done',
+                codePath: createCodePath(start),
+                operationsBySegmentId: new Map([
+                    [ 'start', [ bindingAssignment(identifier('start'), 'start') ] ],
+                    [ 'left', [ bindingAssignment(identifier('left'), 'left') ] ],
+                    [ 'right', [ bindingAssignment(rightNode, 'right') ] ]
+                ]),
+                sourceCode: createSourceCode()
+            },
+            function (_context, _pathState, operation) {
+                if (operation.node === rightNode) {
+                    rightVisits += 1;
+                }
+
+                return undefined;
+            }
+        );
+
+        assert.strictEqual(rightVisits, 1);
+    });
 });

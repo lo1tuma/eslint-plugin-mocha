@@ -67,7 +67,7 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
         'describe("", function () { describe("", function () { it(); }); it(); })',
         {
             code: 'foo("", function () { it(); })',
-            name: 'valid case 1',
+            name: 'allows custom suites without setup from legacy settings',
             settings: {
                 'mocha/additionalCustomNames': [
                     { name: 'foo', type: 'suite', interface: 'BDD' }
@@ -76,7 +76,7 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
         },
         {
             code: 'foo("", function () { it(); })',
-            name: 'valid case 2',
+            name: 'allows custom suites without setup from nested settings',
             settings: {
                 mocha: {
                     additionalCustomNames: [
@@ -87,7 +87,7 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
         },
         {
             code: 'foo("", function () { it("", function () { b(); }); })',
-            name: 'valid case 3',
+            name: 'allows setup inside custom test callbacks',
             settings: {
                 mocha: {
                     additionalCustomNames: [
@@ -115,22 +115,22 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
         {
             code: 'describe("", function () { const token = Symbol("bar"); it(); })',
             options: [ { allow: [ 'Symbol' ] } ],
-            name: 'valid case 4'
+            name: 'allows configured Symbol calls'
         },
         {
             code: 'describe("", function () { const token = Symbol("bar"); it(); })',
             options: [ { allow: [ 'Symbol()' ] } ],
-            name: 'valid case 5'
+            name: 'allows configured Symbol call paths'
         },
         {
             code: 'describe("", function () { Object.freeze({}); it(); })',
             options: [ { allow: [ 'Object.freeze' ] } ],
-            name: 'valid case 6'
+            name: 'allows configured Object.freeze calls'
         },
         {
             code: 'describe("", function () { Object.freeze({}); it(); })',
             options: [ { allow: [ 'Object.freeze()' ] } ],
-            name: 'valid case 7'
+            name: 'allows configured Object.freeze call paths'
         }
     ],
 
@@ -228,7 +228,7 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
                     endColumn: 24
                 }
             ],
-            name: 'invalid case 1',
+            name: 'reports custom suite setup from nested settings',
             settings: {
                 mocha: {
                     additionalCustomNames: [
@@ -248,7 +248,7 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
                     endColumn: 27
                 }
             ],
-            name: 'invalid case 2',
+            name: 'reports custom suite setup calls with member expressions',
             settings: {
                 mocha: {
                     additionalCustomNames: [
@@ -268,7 +268,7 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
                     endColumn: 29
                 }
             ],
-            name: 'invalid case 3',
+            name: 'reports custom suite setup from legacy settings',
             settings: {
                 mocha: {
                     additionalCustomNames: [
@@ -319,7 +319,7 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
                     endColumn: 26
                 }
             ],
-            name: 'invalid case 4',
+            name: 'reports setup in custom nested suites',
             settings: {
                 mocha: {
                     additionalCustomNames: [
@@ -404,7 +404,7 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
                     endColumn: 63
                 }
             ],
-            name: 'invalid case 5'
+            name: 'reports disallowed calls alongside allowed calls'
         },
         {
             code: 'describe("", function () { Object.freeze; it(); })',
@@ -418,7 +418,7 @@ ruleTester.run('no-setup-in-suite', noSetupInSuiteRule, {
                     endColumn: 41
                 }
             ],
-            name: 'invalid case 6'
+            name: 'reports configured Object.freeze references without calls'
         }
     ]
 });

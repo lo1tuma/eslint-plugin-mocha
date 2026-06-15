@@ -3,7 +3,6 @@ import type * as ESTree from 'estree';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
 import { expectNodeLocation, expectNodeRange } from '../ast/node-location.js';
 import { getLastOrThrow } from '../list.js';
-import { hasProperty, isRecord } from '../record.js';
 import { getRuleOption, type InferSchemaOption } from '../rule-options.js';
 import { getInterface } from '../settings.js';
 
@@ -31,9 +30,6 @@ type NamedImportDeclarationNode = ImportDeclarationNode & {
 type MochaImportBinding = {
     readonly importDeclaration: Readonly<ImportDeclarationNode>;
     readonly specifier: Readonly<ImportSpecifierNode>;
-};
-type ScopeWithChildScopes = Readonly<Scope.Scope> & {
-    readonly childScopes: readonly Scope.Scope[];
 };
 type ImmutableImportDefinition<T> = { readonly [Key in keyof T]: T[Key]; };
 type MochaImportDefinition = ImmutableImportDefinition<
@@ -69,22 +65,8 @@ const interfaceMethodNames = new Set([
     'teardown'
 ]);
 
-function hasChildScopes(scope: Readonly<Scope.Scope>): scope is ScopeWithChildScopes {
-    return isRecord(scope) && hasProperty(scope, 'childScopes') && Array.isArray(scope.childScopes);
-}
-
 function getFirstChildScope(scope: Readonly<Scope.Scope> | null | undefined): Scope.Scope | undefined {
-    if (scope === null || scope === undefined || !hasChildScopes(scope)) {
-        return undefined;
-    }
-
-    return scope.childScopes[0];
-}
-
-function isImportedIdentifier(specifier: Readonly<ImportSpecifierNode>): specifier is Readonly<ImportSpecifierNode> & {
-    readonly imported: ESTree.Identifier;
-} {
-    return specifier.imported.type === 'Identifier';
+    return scope?.childScopes[0];
 }
 
 function reportUnexpectedInterface(
@@ -131,16 +113,20 @@ function getMochaImportBinding(variable: Readonly<Scope.Variable>): Readonly<Moc
     };
 }
 
+function getImportedName(specifier: Readonly<ImportSpecifierNode>): string {
+    return specifier.imported.type === 'Identifier'
+        ? specifier.imported.name
+        : String(specifier.imported.value);
+}
+
 function isInterfaceMethodImport(
     specifier: Readonly<ImportSpecifierNode>
 ): boolean {
-    return specifier.imported.type === 'Identifier'
-        ? interfaceMethodNames.has(specifier.imported.name)
-        : interfaceMethodNames.has(String(specifier.imported.value));
+    return interfaceMethodNames.has(getImportedName(specifier));
 }
 
 function isCanonicalNamedImportSpecifier(specifier: Readonly<ImportSpecifierNode>): boolean {
-    return isImportedIdentifier(specifier) && specifier.local.name === specifier.imported.name;
+    return specifier.local.name === getImportedName(specifier);
 }
 
 function isImportSpecifier(

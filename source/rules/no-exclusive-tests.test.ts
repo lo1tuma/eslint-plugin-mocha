@@ -25,7 +25,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
         'specify.skip()',
         {
             code: 'a.b.c.skip()',
-            name: 'valid case 1',
+            name: 'allows skipped custom member-expression tests',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'a.b.c', type: 'testCase', interface: 'BDD' } ]
@@ -34,7 +34,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
         },
         {
             code: 'a[b].c.skip()',
-            name: 'valid case 2',
+            name: 'ignores dynamic custom member-expression paths',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'a.b.c', type: 'testCase', interface: 'BDD' } ]
@@ -47,7 +47,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 ecmaVersion: 2018,
                 sourceType: 'module'
             },
-            name: 'valid case 3',
+            name: 'ignores mocha imports when require interface is not configured',
             settings: { mocha: { interface: 'BDD' } }
         },
         {
@@ -56,7 +56,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 ecmaVersion: 2018,
                 sourceType: 'module'
             },
-            name: 'valid case 4',
+            name: 'ignores aliased mocha imports when require interface is not configured',
             settings: { mocha: { interface: 'BDD' } }
         },
         {
@@ -65,7 +65,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 ecmaVersion: 2018,
                 sourceType: 'module'
             },
-            name: 'valid case 5',
+            name: 'ignores imports from non-mocha modules',
             settings: { mocha: { interface: 'require' } }
         }
     ],
@@ -118,7 +118,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 endLine: 1,
                 endColumn: 36
             } ],
-            name: 'invalid case 1',
+            name: 'reports required imported exclusive tests',
             settings: { mocha: { interface: 'require' } }
         },
         {
@@ -138,7 +138,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 endLine: 1,
                 endColumn: 44
             } ],
-            name: 'invalid case 2',
+            name: 'reports required aliased exclusive tests',
             settings: { mocha: { interface: 'require' } }
         },
         {
@@ -160,7 +160,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 endLine: 1,
                 endColumn: 61
             } ],
-            name: 'invalid case 3',
+            name: 'reports required exclusive tests through local aliases',
             settings: { mocha: { interface: 'require' } }
         },
         {
@@ -264,7 +264,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 endLine: 1,
                 endColumn: 12
             } ],
-            name: 'invalid case 4',
+            name: 'reports custom exclusive calls from legacy settings',
             settings: {
                 'mocha/additionalCustomNames': [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]
             }
@@ -279,7 +279,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 endLine: 1,
                 endColumn: 14
             } ],
-            name: 'invalid case 5',
+            name: 'reports computed custom exclusive calls from legacy settings',
             settings: {
                 'mocha/additionalCustomNames': [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]
             }
@@ -294,7 +294,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 endLine: 1,
                 endColumn: 12
             } ],
-            name: 'invalid case 6',
+            name: 'reports custom exclusive calls from nested settings',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]
@@ -311,7 +311,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 endLine: 1,
                 endColumn: 14
             } ],
-            name: 'invalid case 7',
+            name: 'reports computed custom exclusive calls from nested settings',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]
@@ -328,7 +328,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 endLine: 1,
                 endColumn: 13
             } ],
-            name: 'invalid case 8',
+            name: 'reports custom member-expression exclusive calls',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo.bar', type: 'testCase', interface: 'BDD' } ]
@@ -345,7 +345,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 endLine: 1,
                 endColumn: 15
             } ],
-            name: 'invalid case 9',
+            name: 'reports computed exclusive modifiers on custom member-expression calls',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo.bar', type: 'testCase', interface: 'BDD' } ]
@@ -362,7 +362,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 endLine: 1,
                 endColumn: 16
             } ],
-            name: 'invalid case 10',
+            name: 'reports custom member expressions with computed path segments',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo.bar', type: 'testCase', interface: 'BDD' } ]
@@ -379,7 +379,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 endLine: 1,
                 endColumn: 18
             } ],
-            name: 'invalid case 11',
+            name: 'reports custom member expressions with computed paths and modifiers',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo.bar', type: 'testCase', interface: 'BDD' } ]
@@ -396,7 +396,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 endLine: 1,
                 endColumn: 11
             } ],
-            name: 'invalid case 12',
+            name: 'reports deeply nested custom exclusive calls',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'a.b.c', type: 'testCase', interface: 'BDD' } ]
@@ -420,7 +420,7 @@ ruleTester.run('no-exclusive-tests', noExclusiveTestsRule, {
                 endLine: 1,
                 endColumn: 52
             } ],
-            name: 'invalid case 13',
+            name: 'reports imported custom exclusive tests from legacy settings',
             settings: {
                 'mocha/additionalCustomNames': [ { name: 'custom', type: 'testCase', interface: 'require' } ]
             }

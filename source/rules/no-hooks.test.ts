@@ -22,62 +22,62 @@ ruleTester.run('no-hooks', noHooksRule, {
         {
             code: 'describe(function() { before(function() {}); });',
             options: [ { allow: [ 'before' ] } ],
-            name: 'valid case 1'
+            name: 'allows before hooks when configured'
         },
         {
             code: 'describe(function() { after(function() {}); });',
             options: [ { allow: [ 'after' ] } ],
-            name: 'valid case 2'
+            name: 'allows after hooks when configured'
         },
         {
             code: 'describe(function() { beforeEach(function() {}); });',
             options: [ { allow: [ 'beforeEach' ] } ],
-            name: 'valid case 3'
+            name: 'allows beforeEach hooks when configured'
         },
         {
             code: 'describe(function() { afterEach(function() {}); });',
             options: [ { allow: [ 'afterEach' ] } ],
-            name: 'valid case 4'
+            name: 'allows afterEach hooks when configured'
         },
         {
             code: 'describe(function() { beforeAll(function() {}); });',
             options: [ { allow: [ 'beforeAll' ] } ],
-            name: 'valid case 5'
+            name: 'allows beforeAll aliases when configured'
         },
         {
             code: 'describe(function() { afterAll(function() {}); });',
             options: [ { allow: [ 'afterAll' ] } ],
-            name: 'valid case 6'
+            name: 'allows afterAll aliases when configured'
         },
         {
             code: 'describe(function() { setup(function() {}); });',
             options: [ { allow: [ 'setup' ] } ],
-            name: 'valid case 7'
+            name: 'allows setup hooks when configured'
         },
         {
             code: 'describe(function() { teardown(function() {}); });',
             options: [ { allow: [ 'teardown' ] } ],
-            name: 'valid case 8'
+            name: 'allows teardown hooks when configured'
         },
         {
             code: 'describe(function() { suiteSetup(function() {}); });',
             options: [ { allow: [ 'suiteSetup' ] } ],
-            name: 'valid case 9'
+            name: 'allows suiteSetup hooks when configured'
         },
         {
             code: 'describe(function() { suiteTeardown(function() {}); });',
             options: [ { allow: [ 'suiteTeardown' ] } ],
-            name: 'valid case 10'
+            name: 'allows suiteTeardown hooks when configured'
         },
         {
             code: 'describe(function() { suiteTeardown(function() {}); });',
             options: [ { allow: [ 'suiteTeardown()' ] } ],
-            name: 'valid case 11'
+            name: 'allows suiteTeardown call paths when configured'
         },
         {
             code: 'describe(function() { prepareTestContexts(function() {}); });',
             options: [ { allow: [ 'prepareTestContexts()' ] } ],
-            name: 'valid case 12',
+            name: 'allows custom hook call paths when configured',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'prepareTestContexts', type: 'hook', interface: 'BDD' } ]
@@ -147,7 +147,7 @@ ruleTester.run('no-hooks', noHooksRule, {
                 endLine: 1,
                 endColumn: 43
             } ],
-            name: 'invalid case 1'
+            name: 'reports disallowed built-in hooks'
         },
         {
             code: 'describe(function() { prepareTestContexts(function() {}); });',
@@ -158,7 +158,7 @@ ruleTester.run('no-hooks', noHooksRule, {
                 endLine: 1,
                 endColumn: 57
             } ],
-            name: 'invalid case 2',
+            name: 'reports disallowed custom hooks',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'prepareTestContexts', type: 'hook', interface: 'BDD' } ]

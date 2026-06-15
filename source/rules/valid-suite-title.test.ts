@@ -11,12 +11,12 @@ ruleTester.run('valid-suite-title', validSuiteTitleRule, {
         {
             code: 'describe("This is a test", function () { });',
             options: [ { pattern: '^[A-Z]' } ],
-            name: 'valid case 1'
+            name: 'accepts describe titles matching the configured pattern'
         },
         {
             code: 'context("This is a test", function () { });',
             options: [ { pattern: '^[A-Z]' } ],
-            name: 'valid case 2'
+            name: 'accepts context titles matching the configured pattern'
         },
         withInterface('TDD', {
             options: [ { pattern: '^[A-Z]' } ],
@@ -25,7 +25,7 @@ ruleTester.run('valid-suite-title', validSuiteTitleRule, {
         {
             code: 'someFunction("Should do something", function () { });',
             options: [ { pattern: '^[A-Z]' } ],
-            name: 'valid case 3',
+            name: 'accepts custom suite titles matching the configured pattern',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'someFunction', type: 'suite', interface: 'BDD' } ]
@@ -35,41 +35,41 @@ ruleTester.run('valid-suite-title', validSuiteTitleRule, {
         {
             code: 'someFunction("Should do something", function () { });',
             options: [ { pattern: '^[A-Z]', message: 'some error message' } ],
-            name: 'valid case 4'
+            name: 'accepts custom suite titles when a custom message is configured'
         },
         {
             code: 'someFunction("Should do something", function () { });',
             options: [ {} ],
-            name: 'valid case 5'
+            name: 'accepts custom suite titles with default options'
         },
         'someOtherFunction();',
         {
             code: 'describe(`Foo with template strings`, function () {});',
             options: [ { pattern: '^Foo' } ],
             languageOptions: { ecmaVersion: 2017 },
-            name: 'valid case 6'
+            name: 'accepts template literal suite titles matching the pattern'
         },
         {
             code: 'describe(anyTag`with template strings`, function () {});',
             options: [ { pattern: '^Foo' } ],
             languageOptions: { ecmaVersion: 2019 },
-            name: 'valid case 7'
+            name: 'ignores tagged template suite titles'
         },
         {
             code: [ 'describe(`', '{dynamicVar} with template strings`, function () {});' ].join('$'),
             options: [ { pattern: '^Foo' } ],
             languageOptions: { ecmaVersion: 2019 },
-            name: 'valid case 8'
+            name: 'ignores dynamic template literal suite titles'
         },
         {
             code: 'describe();',
             options: [ { pattern: '^Foo' } ],
-            name: 'valid case 9'
+            name: 'allows suites without titles'
         },
         {
             code: 'describe("😀", function () { });',
             options: [ { pattern: '^.$' } ],
-            name: 'valid case 10'
+            name: 'matches unicode suite titles by code point'
         }
     ],
 
@@ -80,7 +80,7 @@ ruleTester.run('valid-suite-title', validSuiteTitleRule, {
             errors: [
                 { message: 'Invalid "describe()" description found.', line: 1, column: 1, endLine: 1, endColumn: 44 }
             ],
-            name: 'invalid case 1'
+            name: 'reports describe titles that do not match the pattern'
         },
         {
             code: 'context("this is a test", function () { });',
@@ -88,7 +88,7 @@ ruleTester.run('valid-suite-title', validSuiteTitleRule, {
             errors: [
                 { message: 'Invalid "context()" description found.', line: 1, column: 1, endLine: 1, endColumn: 43 }
             ],
-            name: 'invalid case 2'
+            name: 'reports context titles that do not match the pattern'
         },
         withInterface('TDD', {
             options: [ { pattern: '^[A-Z]' } ],
@@ -109,7 +109,7 @@ ruleTester.run('valid-suite-title', validSuiteTitleRule, {
                     endColumn: 50
                 }
             ],
-            name: 'invalid case 3',
+            name: 'reports custom suite titles that do not match the pattern',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'customFunction', type: 'suite', interface: 'BDD' } ]
@@ -122,7 +122,7 @@ ruleTester.run('valid-suite-title', validSuiteTitleRule, {
             errors: [
                 { message: 'some error message', line: 1, column: 1, endLine: 1, endColumn: 50 }
             ],
-            name: 'invalid case 4',
+            name: 'uses custom messages for invalid custom suite titles',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'customFunction', type: 'suite', interface: 'BDD' } ]
@@ -138,7 +138,7 @@ ruleTester.run('valid-suite-title', validSuiteTitleRule, {
             errors: [
                 { message: 'Invalid "describe()" description found.', line: 1, column: 1, endLine: 1, endColumn: 44 }
             ],
-            name: 'invalid case 5'
+            name: 'reports template literal suite titles that do not match the pattern'
         },
         {
             code: [ 'const foo = "this"; describe(`', '{foo} is a test`, function () { });' ].join('$'),
@@ -149,7 +149,7 @@ ruleTester.run('valid-suite-title', validSuiteTitleRule, {
             errors: [
                 { message: 'Invalid "describe()" description found.', line: 1, column: 21, endLine: 1, endColumn: 66 }
             ],
-            name: 'invalid case 6'
+            name: 'reports dynamic template literal suite titles after constant folding'
         }
     ]
 });

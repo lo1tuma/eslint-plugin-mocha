@@ -22,14 +22,14 @@ ruleTester.run('no-root-hooks', noRootHooksRule, {
         'var before = 2; before + 3;',
         {
             code: 'foo(function() { before(function() {}); });',
-            name: 'valid case 1',
+            name: 'allows hooks inside custom suites from legacy settings',
             settings: {
                 'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
             }
         },
         {
             code: 'foo(function() { before(function() {}); });',
-            name: 'valid case 2',
+            name: 'allows hooks inside custom suites from nested settings',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
@@ -38,7 +38,7 @@ ruleTester.run('no-root-hooks', noRootHooksRule, {
         },
         {
             code: 'describe.foo(function() { before(function() {}); });',
-            name: 'valid case 3',
+            name: 'allows hooks inside custom member-expression suites',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'describe.foo', type: 'suite', interface: 'BDD' } ]
@@ -47,7 +47,7 @@ ruleTester.run('no-root-hooks', noRootHooksRule, {
         },
         {
             code: 'describe.foo()(function() { before(function() {}); });',
-            name: 'valid case 4',
+            name: 'allows hooks inside custom chained suites',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'describe.foo()', type: 'suite', interface: 'BDD' } ]
@@ -56,7 +56,7 @@ ruleTester.run('no-root-hooks', noRootHooksRule, {
         },
         {
             code: 'forEach().describe(function() { before(function() {}); });',
-            name: 'valid case 5',
+            name: 'allows hooks inside custom nested chained suites',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'forEach().describe', type: 'suite', interface: 'BDD' } ]
@@ -65,7 +65,7 @@ ruleTester.run('no-root-hooks', noRootHooksRule, {
         },
         {
             code: 'describe(function() { prepareTestContexts(function() {}); });',
-            name: 'valid case 6',
+            name: 'allows custom hooks inside suites',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'prepareTestContexts', type: 'hook', interface: 'BDD' } ]
@@ -180,7 +180,7 @@ ruleTester.run('no-root-hooks', noRootHooksRule, {
                 endLine: 1,
                 endColumn: 35
             } ],
-            name: 'invalid case 1',
+            name: 'reports custom root hooks',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'prepareTestContexts', type: 'hook', interface: 'BDD' } ]

@@ -10,7 +10,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                 it('bar', () => {});
             });`,
             options: [ { interface: 'BDD' } ],
-            name: 'valid case 1',
+            name: 'accepts global BDD when BDD is expected',
             settings: { mocha: { interface: 'BDD' } }
         },
         {
@@ -18,7 +18,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                 test('bar', () => {});
             });`,
             options: [ { interface: 'TDD' } ],
-            name: 'valid case 2',
+            name: 'accepts global TDD when TDD is expected',
             settings: { mocha: { interface: 'TDD' } }
         },
         {
@@ -26,7 +26,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                 test('bar', () => {});
             });`,
             options: [ { interface: 'TDD' } ],
-            name: 'valid case 3',
+            name: 'accepts required TDD imports when require interface is configured',
             settings: { mocha: { interface: 'require' } }
         },
         {
@@ -34,7 +34,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                 it('bar', () => {});
             });`,
             options: [ { interface: 'BDD' } ],
-            name: 'valid case 4',
+            name: 'accepts required BDD imports when require interface is configured',
             settings: { mocha: { interface: 'require' } }
         },
         {
@@ -42,7 +42,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                 bar('bar', () => {});
             });`,
             options: [ { interface: 'BDD' } ],
-            name: 'valid case 5',
+            name: 'accepts aliased required BDD imports when require interface is configured',
             settings: { mocha: { interface: 'require' } }
         },
         {
@@ -51,43 +51,50 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
             });`,
             options: [ { interface: 'BDD' } ],
             languageOptions: { ecmaVersion: 2022, sourceType: 'module' },
-            name: 'valid case 6',
+            name: 'accepts string-literal BDD imports when require interface is configured',
             settings: { mocha: { interface: 'require' } }
+        },
+        {
+            code: 'import {"run" as run} from "mocha"; run();',
+            options: [ { interface: 'BDD' } ],
+            languageOptions: { ecmaVersion: 2022, sourceType: 'module' },
+            name: 'ignores non-interface string-literal imports',
+            settings: { mocha: { interface: 'BDD' } }
         },
         {
             code: 'import {run} from "mocha"; run();',
             options: [ { interface: 'BDD' } ],
-            name: 'valid case 7',
+            name: 'ignores non-interface named imports',
             settings: { mocha: { interface: 'BDD' } }
         },
         {
             code: 'import mocha from "mocha"; mocha.describe("foo", () => {});',
-            name: 'valid case 8',
+            name: 'ignores default mocha imports',
             settings: { mocha: { interface: 'BDD' } }
         },
         {
             code: 'import * as mocha from "mocha"; mocha.describe("foo", () => {});',
-            name: 'valid case 9',
+            name: 'ignores namespace mocha imports',
             settings: { mocha: { interface: 'BDD' } }
         },
         {
             code: 'describe("foo", function () {});',
             options: [ { interface: 'BDD' } ],
             languageOptions: { ecmaVersion: 2020, sourceType: 'script' },
-            name: 'valid case 10',
+            name: 'accepts script globals without module scope',
             settings: { mocha: { interface: 'BDD' } }
         },
         {
             code: 'import {setup, teardown} from "mocha"; setup(() => {}); teardown(() => {});',
             options: [ { interface: 'TDD' } ],
-            name: 'valid case 11',
+            name: 'accepts required TDD hooks when require interface is configured',
             settings: { mocha: { interface: 'require' } }
         },
         {
             code: `describe('foo', () => {
                 it('bar', () => {});
             });`,
-            name: 'valid case 12',
+            name: 'uses the settings interface when options are omitted',
             settings: { mocha: { interface: 'BDD' } }
         }
     ],
@@ -106,7 +113,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                 endLine: 2,
                 endColumn: 38
             } ],
-            name: 'invalid case 1',
+            name: 'reports TDD tests when BDD is expected',
             settings: { mocha: { interface: 'BDD' } }
         },
         {
@@ -122,7 +129,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                 endLine: 3,
                 endColumn: 15
             } ],
-            name: 'invalid case 2',
+            name: 'reports BDD suites when TDD is expected',
             settings: { mocha: { interface: 'TDD' } }
         },
         {
@@ -147,7 +154,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                     endColumn: 38
                 }
             ],
-            name: 'invalid case 3',
+            name: 'reports required TDD imports when BDD is expected',
             settings: { mocha: { interface: 'require' } }
         },
         {
@@ -172,7 +179,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                     endColumn: 36
                 }
             ],
-            name: 'invalid case 4',
+            name: 'reports required BDD imports when TDD is expected',
             settings: { mocha: { interface: 'require' } }
         },
         {
@@ -199,7 +206,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                     endColumn: 21
                 }
             ],
-            name: 'invalid case 5',
+            name: 'removes BDD imports when global BDD is expected',
             settings: { mocha: { interface: 'BDD' } }
         },
         {
@@ -226,7 +233,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                     endColumn: 20
                 }
             ],
-            name: 'invalid case 6',
+            name: 'removes TDD imports when global TDD is expected',
             settings: { mocha: { interface: 'TDD' } }
         },
         {
@@ -251,14 +258,16 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                     endColumn: 35
                 }
             ],
-            name: 'invalid case 7',
+            name: 'reports aliased BDD imports when global TDD is configured',
             settings: { mocha: { interface: 'TDD' } }
         },
         {
             code: `import {"describe" as describe, "it" as it} from 'mocha'; describe('foo', () => {
                 it('bar', () => {});
             });`,
-            output: null,
+            output: `describe('foo', () => {
+                it('bar', () => {});
+            });`,
             options: [ { interface: 'BDD' } ],
             languageOptions: { ecmaVersion: 2022, sourceType: 'module' },
             errors: [
@@ -277,7 +286,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                     endColumn: 43
                 }
             ],
-            name: 'invalid case 8',
+            name: 'reports string-literal BDD imports when global TDD is configured',
             settings: { mocha: { interface: 'TDD' } }
         },
         {
@@ -304,7 +313,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                     endColumn: 21
                 }
             ],
-            name: 'invalid case 9',
+            name: 'uses settings interface for import removal when options differ',
             settings: { mocha: { interface: 'BDD' } }
         },
         {
@@ -324,7 +333,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                     endColumn: 17
                 }
             ],
-            name: 'invalid case 10',
+            name: 'removes a leading fixable import specifier',
             settings: { mocha: { interface: 'BDD' } }
         },
         {
@@ -340,7 +349,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                     endColumn: 22
                 }
             ],
-            name: 'invalid case 11',
+            name: 'removes a trailing fixable import specifier',
             settings: { mocha: { interface: 'BDD' } }
         },
         {
@@ -402,7 +411,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                     endColumn: 63
                 }
             ],
-            name: 'invalid case 12',
+            name: 'removes BDD hook imports when global BDD is expected',
             settings: { mocha: { interface: 'BDD' } }
         },
         {
@@ -446,7 +455,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                     endColumn: 51
                 }
             ],
-            name: 'invalid case 13',
+            name: 'removes TDD hook imports when global TDD is expected',
             settings: { mocha: { interface: 'TDD' } }
         },
         {
@@ -462,7 +471,7 @@ ruleTester.run('consistent-interface', consistentInterfaceRule, {
                     endColumn: 24
                 }
             ],
-            name: 'invalid case 14',
+            name: 'does not fix mixed default and named imports',
             settings: { mocha: { interface: 'BDD' } }
         }
     ]

@@ -35,17 +35,17 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
         {
             code: '// SKIP pending #201\nit.skip("works", function() {})',
             options: [ allowSkippedWithCommentOption ],
-            name: 'valid case 1'
+            name: 'allows skipped tests with an adjacent line comment'
         },
         {
             code: 'something();\n// SKIP pending #201\nit.skip("works", function() {})',
             options: [ allowSkippedWithCommentOption ],
-            name: 'valid case 2'
+            name: 'allows skipped tests with a preceding line comment after code'
         },
         {
             code: '/* SKIP pending #201 */ xdescribe("works", function() {})',
             options: [ allowSkippedWithCommentOption ],
-            name: 'valid case 3'
+            name: 'allows skipped suites with an adjacent block comment'
         },
         withInterface('TDD', {
             code: '// SKIP pending #201\ntest.skip("works", function() {})',
@@ -54,19 +54,19 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
         {
             code: '// SKIP pending #201\nit("works", function() { this.skip(); })',
             options: [ allowSkippedWithCommentOption ],
-            name: 'valid case 4'
+            name: 'allows runtime test skips with an adjacent line comment'
         },
         {
             code: '// SKIP pending #201\nbefore(function() { this.skip(); })',
             options: [ allowSkippedWithCommentOption ],
-            name: 'valid case 5'
+            name: 'allows runtime hook skips with an adjacent line comment'
         },
         'it("works", function() { this.only(); })',
         'it("works", function() { this["only"](); })',
         'it("works", function() { function later() { this.skip(); } later.call(this); })',
         {
             code: 'xcustom()',
-            name: 'valid case 6',
+            name: 'ignores unmatched custom pending aliases',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'custom', type: 'testCase', interface: 'TDD' } ]
@@ -76,7 +76,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
         {
             code: '// SKIP pending #201\nxcustom()',
             options: [ allowSkippedWithCommentOption ],
-            name: 'valid case 7',
+            name: 'allows custom pending aliases from legacy settings with comments',
             settings: {
                 'mocha/additionalCustomNames': [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]
             }
@@ -263,7 +263,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                 endLine: 1,
                 endColumn: 12
             } ],
-            name: 'invalid case 1',
+            name: 'reports custom pending aliases from legacy settings',
             settings: {
                 'mocha/additionalCustomNames': [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]
             }
@@ -278,7 +278,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                 endLine: 1,
                 endColumn: 14
             } ],
-            name: 'invalid case 2',
+            name: 'reports custom skipped aliases from legacy settings',
             settings: {
                 'mocha/additionalCustomNames': [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]
             }
@@ -293,7 +293,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                 endLine: 1,
                 endColumn: 8
             } ],
-            name: 'invalid case 3',
+            name: 'reports custom pending calls from legacy settings',
             settings: {
                 'mocha/additionalCustomNames': [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]
             }
@@ -308,7 +308,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                 endLine: 1,
                 endColumn: 12
             } ],
-            name: 'invalid case 4',
+            name: 'reports custom pending aliases from nested settings',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]
@@ -325,7 +325,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                 endLine: 1,
                 endColumn: 14
             } ],
-            name: 'invalid case 5',
+            name: 'reports custom skipped aliases from nested settings',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]
@@ -342,7 +342,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                 endLine: 1,
                 endColumn: 8
             } ],
-            name: 'invalid case 6',
+            name: 'reports custom pending calls from nested settings',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]
@@ -353,7 +353,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
             code: 'it("is pending")',
             options: [ allowSkippedWithCommentOption ],
             errors: [ { message: expectedErrorMessage, column: 1, line: 1, endLine: 1, endColumn: 17 } ],
-            name: 'invalid case 7'
+            name: 'reports pending tests without accepted comments'
         },
         {
             code: 'xdescribe("works", function() {})',
@@ -366,7 +366,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                 endLine: 1,
                 endColumn: 10
             } ],
-            name: 'invalid case 8'
+            name: 'reports skipped suites without accepted comments'
         },
         {
             code: 'it.skip("works", function() {})',
@@ -379,7 +379,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                 endLine: 1,
                 endColumn: 8
             } ],
-            name: 'invalid case 9'
+            name: 'reports skipped tests without accepted comments'
         },
         {
             code: '// SKIP pending #201\n\nit.skip("works", function() {})',
@@ -395,7 +395,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                 endLine: 3,
                 endColumn: 8
             } ],
-            name: 'invalid case 10'
+            name: 'requires the accepted comment to be adjacent'
         },
         {
             code: 'something(); // SKIP pending #201\nit.skip("works", function() {})',
@@ -411,7 +411,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                 endLine: 2,
                 endColumn: 8
             } ],
-            name: 'invalid case 11'
+            name: 'ignores accepted comments on unrelated statements'
         },
         {
             code: 'xcustom()',
@@ -424,7 +424,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
                 endLine: 1,
                 endColumn: 8
             } ],
-            name: 'invalid case 12',
+            name: 'reports custom pending aliases without accepted comments',
             settings: {
                 'mocha/additionalCustomNames': [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]
             }
@@ -445,7 +445,7 @@ ruleTester.run('no-pending-tests', noPendingTestsRule, {
             code: 'it("works", function() { this.skip(); })',
             options: [ allowSkippedWithCommentOption ],
             errors: [ { message: expectedMissingCommentMessage, column: 31, line: 1, endLine: 1, endColumn: 35 } ],
-            name: 'invalid case 13'
+            name: 'requires accepted comments for runtime test skips'
         },
         withInterface('TDD', {
             code: 'var dynamicOnly = "skip"; suite[dynamicOnly]()',

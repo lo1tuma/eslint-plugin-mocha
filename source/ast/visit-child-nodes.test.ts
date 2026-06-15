@@ -53,6 +53,73 @@ suite('visit child nodes', function () {
         assert.deepStrictEqual(visitedTypes, []);
     });
 
+    test('visitChildNodes() ignores non-record child values', function () {
+        const visitedTypes: string[] = [];
+
+        visitChildNodes(
+            asSourceCode({
+                visitorKeys: {
+                    ParentNode: [ 'child' ]
+                }
+            }),
+            asRuleNode({
+                child: null,
+                type: 'ParentNode'
+            }),
+            function (node) {
+                visitedTypes.push(node.type);
+            }
+        );
+
+        assert.deepStrictEqual(visitedTypes, []);
+    });
+
+    test('visitChildNodes() ignores missing child properties', function () {
+        const visitedTypes: string[] = [];
+
+        visitChildNodes(
+            asSourceCode({
+                visitorKeys: {
+                    ParentNode: [ 'missingChild' ]
+                }
+            }),
+            asRuleNode({
+                type: 'ParentNode'
+            }),
+            function (node) {
+                visitedTypes.push(node.type);
+            }
+        );
+
+        assert.deepStrictEqual(visitedTypes, []);
+    });
+
+    test('visitChildNodes() ignores non-record parent values', function () {
+        const visitedTypes: string[] = [];
+        const callableParent = Object.assign(function createCallableParent(): void {
+            return undefined;
+        }, {
+            child: {
+                type: 'ChildNode'
+            },
+            type: 'ParentNode'
+        }) as unknown as Rule.Node;
+
+        visitChildNodes(
+            asSourceCode({
+                visitorKeys: {
+                    ParentNode: [ 'child' ]
+                }
+            }),
+            callableParent,
+            function (node) {
+                visitedTypes.push(node.type);
+            }
+        );
+
+        assert.deepStrictEqual(visitedTypes, []);
+    });
+
     test('visitWithoutNestedFunctions() skips nested function bodies', function () {
         const visitedTypes: string[] = [];
 

@@ -19,33 +19,33 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
         {
             code: 'describe("This is a test", function () { });',
             options: [ { limit: 2 } ],
-            name: 'valid case 1'
+            name: 'allows top-level suites below the configured limit'
         },
         {
             code: 'someOtherFunction();',
             options: [ { limit: 1 } ],
-            name: 'valid case 2'
+            name: 'ignores non-suite calls with a positive limit'
         },
         {
             code: 'someOtherFunction();',
             options: [ { limit: 0 } ],
-            name: 'valid case 3'
+            name: 'ignores non-suite calls with a zero limit'
         },
         {
             code: 'someOtherFunction();',
             options: [ {} ],
-            name: 'valid case 4'
+            name: 'ignores non-suite calls with default options'
         },
         {
             code: 'foo("This is a test", function () { });',
-            name: 'valid case 5',
+            name: 'allows custom suites from legacy settings below the limit',
             settings: {
                 'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
             }
         },
         {
             code: 'foo("This is a test", function () { });',
-            name: 'valid case 6',
+            name: 'allows custom suites from nested settings below the limit',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
@@ -80,7 +80,7 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                 sourceType: 'module',
                 ecmaVersion: 2015
             },
-            name: 'valid case 7',
+            name: 'allows imported custom member-expression suites below the limit',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'describe.foo', type: 'suite', interface: 'BDD' } ]
@@ -99,7 +99,7 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                 sourceType: 'module',
                 ecmaVersion: 2015
             },
-            name: 'valid case 8',
+            name: 'allows imported custom chained suites below the limit',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'describe.foo()', type: 'suite', interface: 'BDD' } ]
@@ -227,7 +227,7 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                     endColumn: 168
                 }
             ],
-            name: 'invalid case 1'
+            name: 'reports BDD suites above the configured limit'
         },
         {
             code: 'xdescribe("this is a test", function () { });' +
@@ -243,7 +243,7 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                     endColumn: 104
                 }
             ],
-            name: 'invalid case 2'
+            name: 'reports exclusive and pending BDD suites above the limit'
         },
         withInterface('TDD', {
             options: [ { limit: 2 } ],
@@ -268,7 +268,7 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                     endColumn: 165
                 }
             ],
-            name: 'invalid case 3'
+            name: 'reports TDD suites above the configured limit'
         },
         {
             code: 'describe("this is a test", function () { });',
@@ -282,7 +282,7 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                     endColumn: 44
                 }
             ],
-            name: 'invalid case 4'
+            name: 'reports suites when the configured limit is zero'
         },
         {
             code: 'describe("this is a test", function () { });' +
@@ -297,7 +297,7 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                     endColumn: 103
                 }
             ],
-            name: 'invalid case 5'
+            name: 'reports suites above the default limit'
         },
         {
             code: 'foo("this is a test", function () { });' +
@@ -311,7 +311,7 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                     endColumn: 88
                 }
             ],
-            name: 'invalid case 6',
+            name: 'reports custom suites from legacy settings above the limit',
             settings: {
                 'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
             }
@@ -328,7 +328,7 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                     endColumn: 88
                 }
             ],
-            name: 'invalid case 7',
+            name: 'reports custom suites from nested settings above the limit',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
@@ -347,7 +347,7 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                     endColumn: 112
                 }
             ],
-            name: 'invalid case 8',
+            name: 'reports mixed custom member-expression suites above the limit',
             settings: {
                 mocha: {
                     additionalCustomNames: [
@@ -369,7 +369,7 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                     endColumn: 122
                 }
             ],
-            name: 'invalid case 9',
+            name: 'reports mixed custom chained suites above the limit',
             settings: {
                 mocha: {
                     additionalCustomNames: [

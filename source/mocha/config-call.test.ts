@@ -57,13 +57,20 @@ function asTraversableNode(node: Readonly<Rule.Node>): Readonly<TraversableNode>
 
 suite('config call helpers', function () {
     test('isSuiteConfigCall() detects this-bound config calls', function () {
-        const timeoutExpression = readExpression('this.timeout(5000);').expression;
-        const chainedExpression = readExpression('it("works", function () {}).timeout(5000);').expression;
-        const computedNonConfigExpression = readExpression('this["custom"](5000);').expression;
+        const fixtures = [
+            { code: 'this.timeout(5000);', expected: true },
+            { code: 'this["timeout"](5000);', expected: true },
+            { code: 'timeout(5000);', expected: false },
+            { code: 'it("works", function () {}).timeout(5000);', expected: false },
+            { code: 'this[timeout](5000);', expected: false },
+            { code: 'this["custom"](5000);', expected: false }
+        ];
 
-        assert.strictEqual(isSuiteConfigCall(asTraversableNode(timeoutExpression)), true);
-        assert.strictEqual(isSuiteConfigCall(asTraversableNode(chainedExpression)), false);
-        assert.strictEqual(isSuiteConfigCall(asTraversableNode(computedNonConfigExpression)), false);
+        for (const fixture of fixtures) {
+            const { expression } = readExpression(fixture.code);
+
+            assert.strictEqual(isSuiteConfigCall(asTraversableNode(expression)), fixture.expected);
+        }
     });
 
     test('getStaticNumericConfigValue() resolves static numeric arguments', function () {

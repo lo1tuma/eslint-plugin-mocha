@@ -83,7 +83,38 @@ function createConvergingLoopCodePath(): Rule.CodePath {
     return createCodePath(readSegment(segments, 'start'), [ readSegment(segments, 'end') ]);
 }
 
+function failUnexpectedTraversal(): void {
+    throw new Error('Unexpected traversal.');
+}
+
 suite('done callback path helpers', function () {
+    suite('fixtures', function () {
+        test('readSegment() throws for unknown segment ids', function () {
+            assert.throws(
+                function readMissingSegment() {
+                    readSegment(createSegmentGraph([ 'start' ], []), 'missing');
+                },
+                {
+                    message: 'Expected segment "missing".'
+                }
+            );
+        });
+
+        test('createCodePath() does not support segment traversal', function () {
+            const segment = createSegment('start');
+            const codePath = createCodePath(segment, [ segment ]);
+
+            assert.throws(
+                function traverseCodePath() {
+                    codePath.traverseSegments(failUnexpectedTraversal);
+                },
+                {
+                    message: 'Code path traversal is not supported by this fixture.'
+                }
+            );
+        });
+    });
+
     suite('member expressions', function () {
         test('getMemberExpressionBindingAndProperty() resolves static and computed properties', function () {
             const sourceCode = createSourceCode();
@@ -320,6 +351,51 @@ suite('done callback path helpers', function () {
                             containerPropertyAssignment('obj', 'otherFunc', identifier('done')),
                             containerPropertyAssignment('obj', 'someFunc', null),
                             callOperation(identifier('foo'), [ identifier('obj') ])
+                        ]
+                    ]
+                ]),
+                createCodePath(start, [ start ])
+            );
+
+            assert.strictEqual(result, false);
+        });
+
+        test('hasUnhandledReturnPath() clears container properties on binding reassignment', function () {
+            const start = createSegment('start');
+
+            const result = analyzeOperations(
+                new Map([
+                    [
+                        'start',
+                        [
+                            containerPropertyAssignment('obj', 'someFunc', identifier('done')),
+                            bindingAssignment('obj', objectExpression([])),
+                            callOperation(identifier('foo'), [
+                                memberExpression(identifier('obj'), identifier('someFunc'))
+                            ])
+                        ]
+                    ]
+                ]),
+                createCodePath(start, [ start ])
+            );
+
+            assert.strictEqual(result, true);
+        });
+
+        test('hasUnhandledReturnPath() preserves unrelated container properties on binding reassignment', function () {
+            const start = createSegment('start');
+
+            const result = analyzeOperations(
+                new Map([
+                    [
+                        'start',
+                        [
+                            containerPropertyAssignment('obj', 'someFunc', identifier('done')),
+                            containerPropertyAssignment('otherObj', 'someFunc', identifier('done')),
+                            bindingAssignment('obj', objectExpression([])),
+                            callOperation(identifier('foo'), [
+                                memberExpression(identifier('otherObj'), identifier('someFunc'))
+                            ])
                         ]
                     ]
                 ]),

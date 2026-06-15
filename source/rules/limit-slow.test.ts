@@ -15,34 +15,34 @@ ruleTester.run('limit-slow', limitSlowRule, {
         {
             code: 'it("works", function () {}).slow();',
             options: [ { mode: 'max', max: 200 } ],
-            name: 'valid case 1'
+            name: 'allows slow calls without configured values'
         },
         {
             code: 'describe("suite", function () { this.slow(200); });',
             options: [ { mode: 'max', max: 200 } ],
-            name: 'valid case 2'
+            name: 'allows suite slow values at the maximum'
         },
         {
             code: 'it("works", function () { this["slow"](200); });',
             options: [ { mode: 'range', min: 50, max: 200 } ],
-            name: 'valid case 3'
+            name: 'allows computed slow calls inside the configured range'
         },
         {
             code: 'it("works", function () { (() => this.slow(200))(); });',
             options: [ { mode: 'range', min: 50, max: 200 } ],
             languageOptions: { ecmaVersion: 2015 },
-            name: 'valid case 4'
+            name: 'ignores slow calls inside nested functions'
         },
         {
             code: 'it("works", function () { function later() { this.slow(300); } });',
             options: [ { mode: 'max', max: 200 } ],
-            name: 'valid case 5'
+            name: 'ignores out-of-range slow calls inside nested functions'
         },
         {
             code: 'const slowThreshold = 200; it("works", function () {}).slow(slowThreshold);',
             options: [ { mode: 'max', max: 200 } ],
             languageOptions: { ecmaVersion: 2015 },
-            name: 'valid case 6'
+            name: 'allows static slow constants at the maximum'
         },
         {
             code: 'import { it } from "mocha"; it("works", function () {}).slow(200);',
@@ -51,13 +51,13 @@ ruleTester.run('limit-slow', limitSlowRule, {
                 ecmaVersion: 2018,
                 sourceType: 'module'
             },
-            name: 'valid case 7',
+            name: 'allows required test slow values at the maximum',
             settings: { mocha: { interface: 'require' } }
         },
         {
             code: 'custom("works", function () {}).slow(200);',
             options: [ { mode: 'max', max: 200 } ],
-            name: 'valid case 8',
+            name: 'allows custom test slow values at the maximum',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]
@@ -94,7 +94,7 @@ ruleTester.run('limit-slow', limitSlowRule, {
                 endLine: 1,
                 endColumn: 38
             } ],
-            name: 'invalid case 1'
+            name: 'reports slow values above the maximum'
         },
         {
             code: 'const slowThreshold = 300; it("works", function () {}).slow(slowThreshold);',
@@ -107,7 +107,7 @@ ruleTester.run('limit-slow', limitSlowRule, {
                 endLine: 1,
                 endColumn: 75
             } ],
-            name: 'invalid case 2'
+            name: 'reports static slow constants above the maximum'
         },
         {
             code: 'it("works", function () {}).slow(25);',
@@ -119,7 +119,7 @@ ruleTester.run('limit-slow', limitSlowRule, {
                 endLine: 1,
                 endColumn: 37
             } ],
-            name: 'invalid case 3'
+            name: 'reports slow values below the configured range'
         },
         {
             code: 'describe("suite", function () { this["slow"](250); });',
@@ -131,7 +131,7 @@ ruleTester.run('limit-slow', limitSlowRule, {
                 endLine: 1,
                 endColumn: 50
             } ],
-            name: 'invalid case 4'
+            name: 'reports computed slow calls above the configured range'
         },
         {
             code: 'import { it } from "mocha"; it("works", function () {}).slow(200);',
@@ -140,13 +140,13 @@ ruleTester.run('limit-slow', limitSlowRule, {
                 sourceType: 'module'
             },
             errors: [ { message: unexpectedSlow, line: 1, column: 29, endLine: 1, endColumn: 66 } ],
-            name: 'invalid case 5',
+            name: 'reports required test slow calls without explicit options',
             settings: { mocha: { interface: 'require' } }
         },
         {
             code: 'custom("works", function () {}).slow(200);',
             errors: [ { message: unexpectedSlow, line: 1, column: 1, endLine: 1, endColumn: 42 } ],
-            name: 'invalid case 6',
+            name: 'reports custom test slow calls without explicit options',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]

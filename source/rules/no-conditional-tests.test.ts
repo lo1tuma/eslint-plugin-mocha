@@ -14,7 +14,7 @@ ruleTester.run('no-conditional-tests', noConditionalTestsRule, {
         withInterface('TDD', 'suite("suite", function () { test("works", function () {}); });'),
         {
             code: 'foo("suite", function () { bar("works", function () {}); });',
-            name: 'valid case 1',
+            name: 'allows custom suite and test calls without conditionals',
             settings: {
                 mocha: {
                     additionalCustomNames: [
@@ -79,7 +79,7 @@ ruleTester.run('no-conditional-tests', noConditionalTestsRule, {
                 endLine: 1,
                 endColumn: 36
             } ],
-            name: 'invalid case 1',
+            name: 'reports a conditional custom test call',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'bar', type: 'testCase', interface: 'BDD' } ]

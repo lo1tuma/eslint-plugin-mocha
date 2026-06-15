@@ -18,7 +18,7 @@ ruleTester.run('consistent-structure duplicate hooks invalid cases', consistentS
                 endLine: 1,
                 endColumn: 67
             } ],
-            name: 'invalid case 1'
+            name: 'reports duplicate before hook'
         },
         {
             code: 'describe(function() { after(function() {}); after(function() {}); });',
@@ -30,7 +30,7 @@ ruleTester.run('consistent-structure duplicate hooks invalid cases', consistentS
                 endLine: 1,
                 endColumn: 65
             } ],
-            name: 'invalid case 2'
+            name: 'reports duplicate after hook'
         },
         {
             code: 'describe(function() { beforeEach(function() {}); beforeEach(function() {}); });',
@@ -42,7 +42,7 @@ ruleTester.run('consistent-structure duplicate hooks invalid cases', consistentS
                 endLine: 1,
                 endColumn: 75
             } ],
-            name: 'invalid case 3'
+            name: 'reports duplicate beforeEach hook'
         },
         {
             code: 'describe(function() { afterEach(function() {}); afterEach(function() {}); });',
@@ -54,7 +54,7 @@ ruleTester.run('consistent-structure duplicate hooks invalid cases', consistentS
                 endLine: 1,
                 endColumn: 73
             } ],
-            name: 'invalid case 4'
+            name: 'reports duplicate afterEach hook'
         },
         withInterface('TDD', {
             code: 'setup(function() {}); setup(function() {});',
@@ -80,7 +80,7 @@ ruleTester.run('consistent-structure duplicate hooks invalid cases', consistentS
                 endLine: 5,
                 endColumn: 30
             } ],
-            name: 'invalid case 5'
+            name: 'reports duplicate hook inside child suite'
         },
         {
             code: [
@@ -101,7 +101,7 @@ ruleTester.run('consistent-structure duplicate hooks invalid cases', consistentS
                 endLine: 6,
                 endColumn: 26
             } ],
-            name: 'invalid case 6'
+            name: 'reports duplicate parent hook after child suite'
         },
         {
             code: [
@@ -122,7 +122,7 @@ ruleTester.run('consistent-structure duplicate hooks invalid cases', consistentS
                 endLine: 6,
                 endColumn: 26
             } ],
-            name: 'invalid case 7',
+            name: 'reports duplicate hook with legacy custom suite settings',
             settings: {
                 'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
             }
@@ -146,7 +146,7 @@ ruleTester.run('consistent-structure duplicate hooks invalid cases', consistentS
                 endLine: 4,
                 endColumn: 30
             } ],
-            name: 'invalid case 8'
+            name: 'reports duplicate hook inside function-created suite'
         },
         {
             code: [
@@ -167,7 +167,7 @@ ruleTester.run('consistent-structure duplicate hooks invalid cases', consistentS
                 endLine: 6,
                 endColumn: 26
             } ],
-            name: 'invalid case 9',
+            name: 'reports duplicate hook with custom suite settings',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
@@ -193,7 +193,7 @@ ruleTester.run('consistent-structure duplicate hooks invalid cases', consistentS
                 endLine: 6,
                 endColumn: 26
             } ],
-            name: 'invalid case 10',
+            name: 'reports duplicate hook with custom member suite name',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'describe.foo', type: 'suite', interface: 'BDD' } ]
@@ -219,7 +219,7 @@ ruleTester.run('consistent-structure duplicate hooks invalid cases', consistentS
                 endLine: 6,
                 endColumn: 26
             } ],
-            name: 'invalid case 11',
+            name: 'reports duplicate hook with custom callable member suite name',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'describe.foo()', type: 'suite', interface: 'BDD' } ]
@@ -245,7 +245,7 @@ ruleTester.run('consistent-structure duplicate hooks invalid cases', consistentS
                 endLine: 6,
                 endColumn: 26
             } ],
-            name: 'invalid case 12',
+            name: 'reports duplicate hook with dynamic custom suite name',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'forEach().describe', type: 'suite', interface: 'BDD' } ]

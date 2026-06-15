@@ -17,6 +17,7 @@ const config = {
     mutate: [
         'source/**/*.ts',
         '!source/**/*.test.ts',
+        '!source/**/*.test-support.ts',
         '!source/**/*.d.ts',
         '!source/mocha-interface-test-cases.ts'
     ],

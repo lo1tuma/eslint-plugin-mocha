@@ -8,9 +8,13 @@
 // Requirements
 // ------------------------------------------------------------------------------
 
-import { RuleTester } from 'eslint';
+import assert from 'node:assert';
+import { type Rule, RuleTester } from 'eslint';
+import { suite, test } from 'mocha';
+import { asRuleNode } from '../ast/rule-node.js';
 import { withInterface } from '../mocha-interface-test-cases.js';
 import { preferArrowCallbackRule } from './prefer-arrow-callback.js';
+import { isMochaCallbackReport } from './prefer-arrow-callback-report.js';
 
 const ruleTester = new RuleTester({
     languageOptions: { ecmaVersion: 2017, sourceType: 'script' }
@@ -32,7 +36,7 @@ ruleTester.run('prefer-arrow-callback', preferArrowCallbackRule, {
         {
             code: 'foo(function bar() {});',
             options: [ { allowNamedFunctions: true } ],
-            name: 'valid case 1'
+            name: 'allows named functions when configured'
         },
         {
             code: 'import.meta.url',
@@ -87,7 +91,7 @@ ruleTester.run('prefer-arrow-callback', preferArrowCallbackRule, {
             // No fix applied
             options: [ { allowUnboundThis: false } ],
             errors,
-            name: 'invalid case 1'
+            name: 'does not fix unbound this when disallowed'
         },
         {
             code: 'qux(async function (foo = 1, bar = 2, baz = 3) { return baz; })',
@@ -102,4 +106,31 @@ ruleTester.run('prefer-arrow-callback', preferArrowCallbackRule, {
             errors
         }
     ]
+});
+
+suite('prefer-arrow-callback report filtering', function () {
+    test('isMochaCallbackReport() ignores non-record reports', function () {
+        const mochaCallbacks = new WeakSet<Rule.Node>();
+
+        assert.strictEqual(isMochaCallbackReport(mochaCallbacks, null), false);
+    });
+
+    test('isMochaCallbackReport() ignores reports without rule nodes', function () {
+        const mochaCallbacks = new WeakSet<Rule.Node>();
+
+        assert.strictEqual(
+            isMochaCallbackReport(mochaCallbacks, { message: 'Unexpected function expression.' }),
+            false
+        );
+    });
+
+    test('isMochaCallbackReport() recognizes registered callback nodes', function () {
+        const node = asRuleNode({ type: 'FunctionExpression' });
+        const mochaCallbacks = new WeakSet<Rule.Node>([ node ]);
+
+        assert.strictEqual(
+            isMochaCallbackReport(mochaCallbacks, { message: 'Unexpected function expression.', node }),
+            true
+        );
+    });
 });

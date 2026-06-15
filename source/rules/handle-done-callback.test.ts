@@ -57,7 +57,7 @@ ruleTester.run('handle-done-callback', handleDoneCallbackRule, {
         {
             code: 'it.skip("", function (done) { });',
             options: [ { ignorePending: true } ],
-            name: 'valid case 1'
+            name: 'ignores pending tests when configured'
         },
         {
             code: 'it("", function (done) { (done as number)++; done(); });',

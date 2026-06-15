@@ -78,18 +78,18 @@ ruleTester.run('no-synchronous-tests', noSynchronousTestsRule, {
         {
             code: 'it("", function (done) { done(); });',
             options: [],
-            name: 'valid case 1'
+            name: 'allows callback tests with default options'
         },
         {
             code: 'it("", function (done) { done(); });',
             options: [ {} ],
-            name: 'valid case 2'
+            name: 'allows callback tests with empty options'
         },
         {
             code:
                 'describe("Some tests", function () {it("should do something", async function () {await Promise.resolve(true);});});',
             options: [ {} ],
-            name: 'valid case 3'
+            name: 'allows async tests inside suites'
         }
     ],
 
@@ -131,7 +131,7 @@ ruleTester.run('no-synchronous-tests', noSynchronousTestsRule, {
             code: 'it("", function () { return promise(); });',
             options: [ { allowedAsyncMethods: [ 'callback', 'async' ] } ],
             errors: [ { message: 'Unexpected synchronous test.', column: 8, line: 1, endLine: 1, endColumn: 41 } ],
-            name: 'invalid case 1'
+            name: 'reports returned promises when only callbacks and async are allowed'
         }
     ]
 });

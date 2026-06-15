@@ -24,7 +24,7 @@ ruleTester.run('valid-test-title', validTestTitleRule, {
         {
             code: 'someFunction("should do something", function () { });',
             options: [ { pattern: '^should' } ],
-            name: 'valid case 1',
+            name: 'accepts custom test titles matching the configured pattern',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'someFunction', type: 'testCase', interface: 'BDD' } ]
@@ -34,7 +34,7 @@ ruleTester.run('valid-test-title', validTestTitleRule, {
         {
             code: 'someFunction("should do something", function () { });',
             options: [ { pattern: '^should', message: 'some error message' } ],
-            name: 'valid case 2',
+            name: 'accepts custom test titles when a custom message is configured',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'someFunction', type: 'testCase', interface: 'BDD' } ]
@@ -81,7 +81,7 @@ ruleTester.run('valid-test-title', validTestTitleRule, {
             errors: [
                 { message: 'Invalid "it()" description found.', line: 1, column: 1, endLine: 1, endColumn: 38 }
             ],
-            name: 'invalid case 1'
+            name: 'reports it titles that do not match the pattern'
         },
         {
             code: 'specify("this is a test", function () { });',
@@ -89,7 +89,7 @@ ruleTester.run('valid-test-title', validTestTitleRule, {
             errors: [
                 { message: 'Invalid "specify()" description found.', line: 1, column: 1, endLine: 1, endColumn: 43 }
             ],
-            name: 'invalid case 2'
+            name: 'reports specify titles that do not match the pattern'
         },
         withInterface('TDD', {
             options: [ { pattern: 'required' } ],
@@ -110,7 +110,7 @@ ruleTester.run('valid-test-title', validTestTitleRule, {
                     endColumn: 50
                 }
             ],
-            name: 'invalid case 3',
+            name: 'reports custom test titles that do not match the pattern',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'customFunction', type: 'testCase', interface: 'BDD' } ]
@@ -123,7 +123,7 @@ ruleTester.run('valid-test-title', validTestTitleRule, {
             errors: [
                 { message: 'some error message', line: 1, column: 1, endLine: 1, endColumn: 50 }
             ],
-            name: 'invalid case 4',
+            name: 'uses custom messages for invalid custom test titles',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'customFunction', type: 'testCase', interface: 'BDD' } ]
@@ -136,7 +136,7 @@ ruleTester.run('valid-test-title', validTestTitleRule, {
             errors: [
                 { message: 'Invalid "it()" description found.', line: 1, column: 1, endLine: 1, endColumn: 38 }
             ],
-            name: 'invalid case 5'
+            name: 'reports invalid test titles with default options'
         },
         {
             code: 'it(`this is a test`, function () { });',
