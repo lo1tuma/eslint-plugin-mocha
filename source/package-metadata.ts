@@ -1,8 +1,9 @@
 import fs from 'node:fs/promises';
-import { createPackageMetadataReader } from './package-metadata-reader.js';
+import { createPackageMetadataReader } from './package-metadata-reader.ts';
 
 async function readPackageJson(packageJsonPath: string): Promise<unknown> {
-    const packageJsonContents = new TextDecoder().decode(await fs.readFile(packageJsonPath));
+    const textDecoder = new TextDecoder();
+    const packageJsonContents = textDecoder.decode(await fs.readFile(packageJsonPath));
 
     return JSON.parse(packageJsonContents) as unknown;
 }

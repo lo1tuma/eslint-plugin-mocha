@@ -1,6 +1,6 @@
 import type { Rule } from 'eslint';
-import { collectRepeatedCallbackHandlingNodes } from '../repeated-callback-handling-paths.js';
-import { createTrackedCallbackVisitors, type TrackedCallbackFunction } from './callback-tracking.js';
+import { collectRepeatedCallbackHandlingNodes } from '../repeated-callback-handling-paths.ts';
+import { createTrackedCallbackVisitors, type TrackedCallbackFunction } from './callback-tracking.ts';
 
 function reportDoneTwice(
     context: Readonly<Rule.RuleContext>,
@@ -24,15 +24,16 @@ function reportDoneTwice(
 export const noDoneTwiceRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'problem',
-        languages: ['js/js'],
         docs: {
             description: 'Disallow calling a Mocha callback more than once',
+            recommended: true,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-done-twice.md'
         },
+        schema: [],
         messages: {
             unexpectedDoneTwice: 'Do not call the Mocha callback more than once'
         },
-        schema: []
+        languages: [ 'js/js' ]
     },
     create(context) {
         return createTrackedCallbackVisitors(context, {

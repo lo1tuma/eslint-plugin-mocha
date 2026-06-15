@@ -43,7 +43,7 @@ export const config = {
         },
         requiredFiles: {
             enabled: true,
-            files: ['LICENSE', 'readme.md']
+            files: [ 'LICENSE', 'readme.md' ]
         },
         uniqueTargetPaths: {
             enabled: true

@@ -43,13 +43,17 @@ describe['skip']('bar', function () {});
 it['skip']('bar', function () {});
 xdescribe('baz', function () {});
 xit('baz', function () {});
-it('qux', function () { this.skip(); });
+it('qux', function () {
+    this.skip();
+});
 
 suite.skip('foo', function () {});
 test.skip('foo', function () {});
 suite['skip']('bar', function () {});
 test['skip']('bar', function () {});
-beforeEach(function () { this.skip(); });
+beforeEach(function () {
+    this.skip();
+});
 ```
 
 These patterns are not considered warnings:
@@ -80,7 +84,9 @@ it.skip('foo', function () {});
 xdescribe('bar', function () {});
 
 // SKIP pending #203
-before(function () { this.skip(); });
+before(function () {
+    this.skip();
+});
 ```
 
 ## When Not To Use It

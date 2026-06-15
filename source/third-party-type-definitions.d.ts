@@ -3,19 +3,20 @@ declare module '@eslint-community/eslint-utils' {
     import type { Except } from 'type-fest';
 
     type Node = Except<Rule.Node, 'parent'>;
+    type StaticValue = { readonly value: unknown; readonly optional?: true; };
 
     export function findVariable(
-        initialScope: Scope.Scope,
-        nameOrNode: Node | string
+        initialScope: Readonly<Scope.Scope>,
+        nameOrNode: Readonly<Node> | string
     ): Scope.Variable | null;
 
     export function getStringIfConstant(
-        node: Node,
-        initialScope?: Scope.Scope | null
+        node: Readonly<Node>,
+        initialScope?: Readonly<Scope.Scope> | null
     ): string | null;
 
     export function getStaticValue(
-        node: Node,
-        initialScope?: Scope.Scope | null
-    ): { value: unknown; optional?: true; } | null;
+        node: Readonly<Node>,
+        initialScope?: Readonly<Scope.Scope> | null
+    ): StaticValue | null;
 }

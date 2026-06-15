@@ -1,7 +1,7 @@
 import os from 'node:os';
 import { performance as performanceHooks } from 'node:perf_hooks';
 
-const [{ speed: cpuSpeed } = { speed: 0 }] = os.cpus();
+const [ { speed: cpuSpeed } = { speed: 0 } ] = os.cpus();
 
 export { cpuSpeed };
 
@@ -28,7 +28,7 @@ type MedianResult = {
 
 function median(list: readonly number[]): number {
     const listParts = 2;
-    const sortedList = Array.from(list).toSorted((left, right) => {
+    const sortedList = Array.from(list).toSorted(function (left, right) {
         return left - right;
     });
     const medianIndex = Math.floor(sortedList.length / listParts);
@@ -45,7 +45,7 @@ function median(list: readonly number[]): number {
 export function runSyncBenchmark(fn: () => void, count: number): Readonly<MedianResult> {
     const results: Result[] = [];
 
-    Array.from({ length: count }).forEach(() => {
+    Array.from({ length: count }).forEach(function () {
         const startTime = performanceHooks.now();
         const startMemory = process.memoryUsage.rss();
         fn();
@@ -57,12 +57,12 @@ export function runSyncBenchmark(fn: () => void, count: number): Readonly<Median
         results.push({ duration, memory });
     });
 
-    const medianDuration = median(results.map((result) => {
+    const medianDuration = median(results.map(function (result) {
         return result.duration;
     }));
     const medianMemory = median(
         results
-            .map((result) => {
+            .map(function (result) {
                 return result.memory;
             })
             .filter(isPositiveNumber)
@@ -91,12 +91,12 @@ export async function runAsyncBenchmark(fn: () => Promise<void>, count: number):
         results.push(result);
     }
 
-    const medianDuration = median(results.map((result) => {
+    const medianDuration = median(results.map(function (result) {
         return result.duration;
     }));
     const medianMemory = median(
         results
-            .map((result) => {
+            .map(function (result) {
                 return result.memory;
             })
             .filter(isPositiveNumber)

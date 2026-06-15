@@ -1,7 +1,8 @@
-import { RuleTester } from 'eslint';
 import assert from 'node:assert';
-import { withInterface } from '../mocha-interface-test-cases.js';
-import { validTestTitleRule } from './valid-test-title.js';
+import { RuleTester } from 'eslint';
+import { suite, test } from 'mocha';
+import { withInterface } from '../mocha-interface-test-cases.ts';
+import { validTestTitleRule } from './valid-test-title.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
@@ -17,39 +18,41 @@ ruleTester.run('valid-test-title', validTestTitleRule, {
         'specify();',
         withInterface('TDD', 'test();'),
         withInterface('TDD', {
-            options: [{ pattern: 'test' }],
+            options: [ { pattern: 'test' } ],
             code: 'test("this is a test", function () { });'
         }),
         {
-            options: [{ pattern: '^should' }],
             code: 'someFunction("should do something", function () { });',
+            options: [ { pattern: '^should' } ],
+            name: 'accepts custom test titles matching the configured pattern',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'someFunction', type: 'testCase', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'someFunction', type: 'testCase', interface: 'BDD' } ]
                 }
             }
         },
         {
-            options: [{ pattern: '^should', message: 'some error message' }],
             code: 'someFunction("should do something", function () { });',
+            options: [ { pattern: '^should', message: 'some error message' } ],
+            name: 'accepts custom test titles when a custom message is configured',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'someFunction', type: 'testCase', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'someFunction', type: 'testCase', interface: 'BDD' } ]
                 }
             }
         },
         'someOtherFunction();',
         {
-            languageOptions: { ecmaVersion: 2017 },
-            code: 'it(`should work with template strings`, function () {});'
+            code: 'it(`should work with template strings`, function () {});',
+            languageOptions: { ecmaVersion: 2017 }
         },
         {
-            languageOptions: { ecmaVersion: 2019 },
-            code: 'it(foo`work with template strings`, function () {});'
+            code: 'it(foo`work with template strings`, function () {});',
+            languageOptions: { ecmaVersion: 2019 }
         },
         {
-            languageOptions: { ecmaVersion: 2019 },
-            code: 'it(`${foo} work with template strings`, function () {});'
+            code: [ 'it(`', '{foo} work with template strings`, function () {});' ].join('$'),
+            languageOptions: { ecmaVersion: 2019 }
         }
     ],
 
@@ -57,13 +60,13 @@ ruleTester.run('valid-test-title', validTestTitleRule, {
         {
             code: 'it("does something", function() { });',
             errors: [
-                { message: 'Invalid "it()" description found.' }
+                { message: 'Invalid "it()" description found.', line: 1, column: 1, endLine: 1, endColumn: 37 }
             ]
         },
         {
             code: 'specify("does something", function() { });',
             errors: [
-                { message: 'Invalid "specify()" description found.' }
+                { message: 'Invalid "specify()" description found.', line: 1, column: 1, endLine: 1, endColumn: 42 }
             ]
         },
         withInterface('TDD', {
@@ -73,56 +76,67 @@ ruleTester.run('valid-test-title', validTestTitleRule, {
             ]
         }),
         {
-            options: [{ pattern: 'required' }],
             code: 'it("this is a test", function () { });',
+            options: [ { pattern: 'required' } ],
             errors: [
-                { message: 'Invalid "it()" description found.' }
-            ]
+                { message: 'Invalid "it()" description found.', line: 1, column: 1, endLine: 1, endColumn: 38 }
+            ],
+            name: 'reports it titles that do not match the pattern'
         },
         {
-            options: [{ pattern: 'required' }],
             code: 'specify("this is a test", function () { });',
+            options: [ { pattern: 'required' } ],
             errors: [
-                { message: 'Invalid "specify()" description found.' }
-            ]
+                { message: 'Invalid "specify()" description found.', line: 1, column: 1, endLine: 1, endColumn: 43 }
+            ],
+            name: 'reports specify titles that do not match the pattern'
         },
         withInterface('TDD', {
-            options: [{ pattern: 'required' }],
+            options: [ { pattern: 'required' } ],
             code: 'test("this is a test", function () { });',
             errors: [
                 { message: 'Invalid "test()" description found.' }
             ]
         }),
         {
-            options: [{ pattern: 'required' }],
             code: 'customFunction("this is a test", function () { });',
+            options: [ { pattern: 'required' } ],
+            errors: [
+                {
+                    message: 'Invalid "customFunction()" description found.',
+                    line: 1,
+                    column: 1,
+                    endLine: 1,
+                    endColumn: 50
+                }
+            ],
+            name: 'reports custom test titles that do not match the pattern',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'customFunction', type: 'testCase', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'customFunction', type: 'testCase', interface: 'BDD' } ]
                 }
-            },
-            errors: [
-                { message: 'Invalid "customFunction()" description found.' }
-            ]
+            }
         },
         {
-            options: [{ pattern: 'required', message: 'some error message' }],
+            code: 'customFunction("this is a test", function () { });',
+            options: [ { pattern: 'required', message: 'some error message' } ],
+            errors: [
+                { message: 'some error message', line: 1, column: 1, endLine: 1, endColumn: 50 }
+            ],
+            name: 'uses custom messages for invalid custom test titles',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'customFunction', type: 'testCase', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'customFunction', type: 'testCase', interface: 'BDD' } ]
                 }
-            },
-            code: 'customFunction("this is a test", function () { });',
-            errors: [
-                { message: 'some error message' }
-            ]
+            }
         },
         {
-            options: [{}],
             code: 'it("this is a test", function () { });',
+            options: [ {} ],
             errors: [
-                { message: 'Invalid "it()" description found.' }
-            ]
+                { message: 'Invalid "it()" description found.', line: 1, column: 1, endLine: 1, endColumn: 38 }
+            ],
+            name: 'reports invalid test titles with default options'
         },
         {
             code: 'it(`this is a test`, function () { });',
@@ -130,23 +144,23 @@ ruleTester.run('valid-test-title', validTestTitleRule, {
                 ecmaVersion: 2019
             },
             errors: [
-                { message: 'Invalid "it()" description found.', line: 1, column: 1 }
+                { message: 'Invalid "it()" description found.', line: 1, column: 1, endLine: 1, endColumn: 38 }
             ]
         },
         {
-            code: 'const foo = "this"; it(`${foo} is a test`, function () { });',
+            code: [ 'const foo = "this"; it(`', '{foo} is a test`, function () { });' ].join('$'),
             languageOptions: {
                 ecmaVersion: 2019
             },
             errors: [
-                { message: 'Invalid "it()" description found.', line: 1, column: 21 }
+                { message: 'Invalid "it()" description found.', line: 1, column: 21, endLine: 1, endColumn: 60 }
             ]
         }
     ]
 });
 
-describe('valid-test-title metadata', function () {
-    it('should default to the should-pattern', function () {
-        assert.deepStrictEqual(validTestTitleRule.meta?.defaultOptions, [{ pattern: '^should' }]);
+suite('valid-test-title metadata', function () {
+    test('should default to the should-pattern', function () {
+        assert.deepStrictEqual(validTestTitleRule.meta?.defaultOptions, [ { pattern: '^should' } ]);
     });
 });

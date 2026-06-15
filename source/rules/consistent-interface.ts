@@ -1,12 +1,12 @@
 import type { AST, Rule, Scope, SourceCode } from 'eslint';
 import type * as ESTree from 'estree';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { expectNodeLocation, expectNodeRange } from '../ast/node-location.js';
-import { getLastOrThrow } from '../list.js';
-import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
-import { getInterface } from '../settings.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { expectNodeLocation, expectNodeRange } from '../ast/node-location.ts';
+import { getLastOrThrow } from '../list.ts';
+import { getRuleOption, type InferSchemaOption } from '../rule-options.ts';
+import { getInterface } from '../settings.ts';
 
-const interfaces = ['BDD', 'TDD'] as const;
+const interfaces = [ 'BDD', 'TDD' ] as const;
 const optionSchema = {
     type: 'object',
     properties: {
@@ -16,25 +16,28 @@ const optionSchema = {
         }
     },
     additionalProperties: false
-} as const satisfies RuleSchema;
+} as const;
 
 type InterfaceName = (typeof interfaces)[number];
 type Option = InferSchemaOption<typeof optionSchema>;
-type ResolvedOption = Option & { interface: InterfaceName; };
-type ImportSpecifierNode = ESTree.ImportSpecifier;
-type ImportDeclarationNode = ESTree.ImportDeclaration;
-type ImportDeclarationSpecifier = ImportDeclarationNode['specifiers'][number];
+type ResolvedOption = Option & { readonly interface: InterfaceName; };
+type ImportSpecifierNode = Readonly<ESTree.ImportSpecifier>;
+type ImportDeclarationNode = Readonly<ESTree.ImportDeclaration>;
+type ImportDeclarationSpecifier = Readonly<ImportDeclarationNode['specifiers'][number]>;
 type NamedImportDeclarationNode = ImportDeclarationNode & {
-    specifiers: readonly ImportSpecifierNode[];
+    readonly specifiers: readonly ImportSpecifierNode[];
 };
 type MochaImportBinding = {
-    importDeclaration: Readonly<ImportDeclarationNode>;
-    specifier: Readonly<ImportSpecifierNode>;
+    readonly importDeclaration: Readonly<ImportDeclarationNode>;
+    readonly specifier: Readonly<ImportSpecifierNode>;
 };
-type MochaImportDefinition = Extract<Scope.Definition, { type: 'ImportBinding'; }> & {
-    node: ESTree.ImportSpecifier;
-    parent: ESTree.ImportDeclaration;
-};
+type ImmutableImportDefinition<T> = { readonly [Key in keyof T]: T[Key]; };
+type MochaImportDefinition = ImmutableImportDefinition<
+    Extract<Scope.Definition, { readonly type: 'ImportBinding'; }> & {
+        readonly node: ESTree.ImportSpecifier;
+        readonly parent: ESTree.ImportDeclaration;
+    }
+>;
 type UnexpectedImportDescriptor = {
     readonly loc: AST.SourceLocation;
     readonly messageId: 'unexpectedInterface';
@@ -62,10 +65,8 @@ const interfaceMethodNames = new Set([
     'teardown'
 ]);
 
-function isImportedIdentifier(specifier: Readonly<ImportSpecifierNode>): specifier is Readonly<ImportSpecifierNode> & {
-    imported: ESTree.Identifier;
-} {
-    return specifier.imported.type === 'Identifier';
+function getFirstChildScope(scope: Readonly<Scope.Scope> | null | undefined): Scope.Scope | undefined {
+    return scope?.childScopes[0];
 }
 
 function reportUnexpectedInterface(
@@ -86,7 +87,7 @@ function reportUnexpectedInterface(
 
 function getMochaModuleScope(sourceCode: Readonly<SourceCode>): Readonly<Scope.Scope> | null {
     const { globalScope } = sourceCode.scopeManager;
-    const maybeModuleScope = globalScope?.childScopes?.[0];
+    const maybeModuleScope = getFirstChildScope(globalScope);
 
     return maybeModuleScope?.type === 'module' ? maybeModuleScope : null;
 }
@@ -112,16 +113,20 @@ function getMochaImportBinding(variable: Readonly<Scope.Variable>): Readonly<Moc
     };
 }
 
+function getImportedName(specifier: Readonly<ImportSpecifierNode>): string {
+    return specifier.imported.type === 'Identifier'
+        ? specifier.imported.name
+        : String(specifier.imported.value);
+}
+
 function isInterfaceMethodImport(
     specifier: Readonly<ImportSpecifierNode>
 ): boolean {
-    return specifier.imported.type === 'Identifier'
-        ? interfaceMethodNames.has(specifier.imported.name)
-        : interfaceMethodNames.has(String(specifier.imported.value));
+    return interfaceMethodNames.has(getImportedName(specifier));
 }
 
 function isCanonicalNamedImportSpecifier(specifier: Readonly<ImportSpecifierNode>): boolean {
-    return isImportedIdentifier(specifier) && specifier.local.name === specifier.imported.name;
+    return specifier.local.name === getImportedName(specifier);
 }
 
 function isImportSpecifier(
@@ -150,14 +155,16 @@ function removeFullImportDeclaration(
     const nextTokenOffset = trailingSource.search(/\S/u);
     const nextRangeStart = range[1] + Math.max(nextTokenOffset, 0);
 
-    return fixer.removeRange([range[0], nextRangeStart]);
+    return fixer.removeRange([ range[0], nextRangeStart ]);
 }
 
 function shouldRemoveFullImportDeclaration(importDeclaration: Readonly<ImportDeclarationNode>): boolean {
     return importDeclaration.specifiers.length > 0 &&
-        importDeclaration.specifiers.every((currentSpecifier): currentSpecifier is Readonly<ImportSpecifierNode> => {
-            return isImportSpecifier(currentSpecifier) && isFixableImportSpecifier(currentSpecifier);
-        });
+        importDeclaration.specifiers.every(
+            function (currentSpecifier): currentSpecifier is Readonly<ImportSpecifierNode> {
+                return isImportSpecifier(currentSpecifier) && isFixableImportSpecifier(currentSpecifier);
+            }
+        );
 }
 
 function getRangeBeforeNextSpecifier(
@@ -167,7 +174,7 @@ function getRangeBeforeNextSpecifier(
     const specifierRange = expectNodeRange(specifier);
     const nextSpecifierRange = expectNodeRange(nextSpecifier);
 
-    return [specifierRange[0], nextSpecifierRange[0]];
+    return [ specifierRange[0], nextSpecifierRange[0] ];
 }
 
 function getRangeAfterPreviousSpecifier(
@@ -177,7 +184,7 @@ function getRangeAfterPreviousSpecifier(
     const previousSpecifierRange = expectNodeRange(previousSpecifier);
     const specifierRange = expectNodeRange(specifier);
 
-    return [previousSpecifierRange[1], specifierRange[1]];
+    return [ previousSpecifierRange[1], specifierRange[1] ];
 }
 
 function getImportSpecifierRemovalRange(
@@ -269,17 +276,18 @@ function reportUnexpectedImportBindingsInModule(
 export const consistentInterfaceRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'problem',
-        languages: ['js/js'],
         docs: {
             description: 'Enforces consistent use of mocha interfaces',
+            recommended: false,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/consistent-interface.md'
         },
-        defaultOptions: [defaultOption],
         fixable: 'code',
+        schema: [ optionSchema ],
+        defaultOptions: [ defaultOption ],
         messages: {
             unexpectedInterface: 'Unexpected use of {{actualInterface}} interface instead of {{expectedInterface}}'
         },
-        schema: [optionSchema]
+        languages: [ 'js/js' ]
     },
     create(context) {
         const { interface: interfaceToUse } = getRuleOption<ResolvedOption>(context);

@@ -1,18 +1,18 @@
-import { type DynamicPath, isConstantPath } from '../ast/member-expression.js';
-import { filterWithArgs, flatMapWithArgs, mapWithArgs } from '../list.js';
+import { type DynamicPath, isConstantPath } from '../ast/member-expression.ts';
+import { filterWithArgs, flatMapWithArgs, mapWithArgs } from '../list.ts';
 import {
     configCallNames,
     type MochaConfigCall,
     type MochaEntityType,
     type MochaInterface,
     type NameDetailsConfig
-} from './descriptors.js';
+} from './descriptors.ts';
 
 function hasMatchingType(item: Readonly<NameDetailsConfig>, typesToMatch: readonly MochaEntityType[]): boolean {
     return typesToMatch.includes(item.type);
 }
 
-const testCaseAndSuite = ['testCase', 'suite'] as const;
+const testCaseAndSuite = [ 'testCase', 'suite' ] as const;
 function filterTestCasesAndSuites(nameDetailsList: readonly NameDetailsConfig[]): readonly NameDetailsConfig[] {
     return filterWithArgs(nameDetailsList, hasMatchingType, testCaseAndSuite);
 }
@@ -29,10 +29,10 @@ function filterByInterface(
 }
 
 function formatXVariant(nameDetails: Readonly<NameDetailsConfig>): Readonly<NameDetailsConfig> {
-    const [firstPathSegment, ...remainingPath] = nameDetails.path;
+    const [ firstPathSegment, ...remainingPath ] = nameDetails.path;
     return {
         ...nameDetails,
-        path: [`x${firstPathSegment}`, ...remainingPath],
+        path: [ `x${firstPathSegment}`, ...remainingPath ],
         modifier: 'pending'
     };
 }
@@ -45,7 +45,7 @@ function buildXVariants(nameDetailsList: readonly NameDetailsConfig[]): readonly
 function formatSkipVariant(nameDetails: Readonly<NameDetailsConfig>): Readonly<NameDetailsConfig> {
     return {
         ...nameDetails,
-        path: [...nameDetails.path, 'skip'],
+        path: [ ...nameDetails.path, 'skip' ],
         modifier: 'pending'
     };
 }
@@ -58,7 +58,7 @@ function buildSkipVariants(nameDetailsList: readonly NameDetailsConfig[]): reado
 function formatExclusiveVariants(nameDetails: Readonly<NameDetailsConfig>): Readonly<NameDetailsConfig> {
     return {
         ...nameDetails,
-        path: [...nameDetails.path, 'only'],
+        path: [ ...nameDetails.path, 'only' ],
         modifier: 'exclusive'
     };
 }
@@ -69,7 +69,7 @@ function buildExclusiveVariants(nameDetailsList: readonly NameDetailsConfig[]): 
 }
 
 export type NameDetails = NameDetailsConfig & {
-    normalizedPath: DynamicPath;
+    readonly normalizedPath: DynamicPath;
 };
 
 function formatConfigVariant(nameDetails: Readonly<NameDetails>, config: MochaConfigCall): Readonly<NameDetails> {
@@ -77,8 +77,8 @@ function formatConfigVariant(nameDetails: Readonly<NameDetails>, config: MochaCo
         ...nameDetails,
         config,
         type: 'config',
-        path: [...nameDetails.path, config],
-        normalizedPath: [...nameDetails.normalizedPath, `${config}()`]
+        path: [ ...nameDetails.path, config ],
+        normalizedPath: [ ...nameDetails.normalizedPath, `${config}()` ]
     };
 }
 
@@ -106,11 +106,11 @@ export function reformatLastPathSegmentWithCallExpressions(
     const segment = mutablePath.pop();
     const suffix = callExpressionSuffix.repeat(amountOfCallExpressions);
 
-    return [...mutablePath, `${segment}${suffix}`];
+    return [ ...mutablePath, `${segment}${suffix}` ];
 }
 
 export function stripCallExpressions(path: readonly string[]): readonly string[] {
-    return path.map((segment) => {
+    return path.map(function (segment) {
         if (segment.endsWith(callExpressionSuffix)) {
             return segment.slice(0, -callExpressionSuffix.length);
         }
@@ -137,5 +137,5 @@ export function buildAllNameDetailsWithVariants(
     ];
     const allNormalizedNameDetails = allNameDetails.map(normalizePathForNameDetails);
 
-    return [...allNormalizedNameDetails, ...buildConfigVariants(allNormalizedNameDetails)];
+    return [ ...allNormalizedNameDetails, ...buildConfigVariants(allNormalizedNameDetails) ];
 }

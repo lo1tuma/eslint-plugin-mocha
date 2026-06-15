@@ -1,12 +1,12 @@
-import type { DynamicPath } from '../ast/member-expression.js';
-import type { NameDetails } from './name-details.js';
+import type { DynamicPath } from '../ast/member-expression.ts';
+import type { NameDetails } from './name-details.ts';
 
 export function convertNameToPathArray(name: string): readonly string[] {
     return name.split('.');
 }
 
 function isPathPrefixOf(fullPath: DynamicPath, pathToMatch: DynamicPath): boolean {
-    return pathToMatch.every((segment, index) => {
+    return pathToMatch.every(function (segment, index) {
         return segment === fullPath[index];
     });
 }
@@ -19,7 +19,7 @@ export function getUniqueBaseNames(nameDetailsList: readonly NameDetails[]): rea
     const baseNames = new Set<string>();
 
     for (const nameDetails of nameDetailsList) {
-        const [baseName] = nameDetails.path;
+        const [ baseName ] = nameDetails.path;
         if (baseName !== undefined) {
             baseNames.add(baseName);
         }

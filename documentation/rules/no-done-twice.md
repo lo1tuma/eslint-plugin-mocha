@@ -11,12 +11,12 @@ Calling `done()` more than once is a common callback-style test bug. It can prod
 Examples of **incorrect** code for this rule:
 
 ```js
-it("calls done twice", function (done) {
+it('calls done twice', function (done) {
     done();
     done();
 });
 
-it("calls done on two paths", function (done) {
+it('calls done on two paths', function (done) {
     if (failed) {
         done(error);
     }
@@ -28,13 +28,13 @@ it("calls done on two paths", function (done) {
 Examples of **correct** code for this rule:
 
 ```js
-it("completes once", function (done) {
+it('completes once', function (done) {
     work(function (error) {
         done(error);
     });
 });
 
-it("returns after completion", function (done) {
+it('returns after completion', function (done) {
     return done();
 });
 ```

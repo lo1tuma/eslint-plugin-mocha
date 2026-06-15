@@ -1,5 +1,6 @@
-import type { Rule, Scope, SourceCode } from 'eslint';
 import assert from 'node:assert';
+import type { Rule, Scope, SourceCode } from 'eslint';
+import { suite, test } from 'mocha';
 import {
     applyBindingSourceValue,
     applyContainerPropertyAssignment,
@@ -11,14 +12,17 @@ import {
     mergeIncomingPendingPathStates,
     type PendingPathState,
     type TrackedBinding
-} from './tracked-callback-reference-state.js';
+} from './tracked-callback-reference-state.ts';
 
-type IdentifierNode = Parameters<Exclude<Rule.RuleListener['Identifier'], undefined>>[0];
-type PropertyNode = Parameters<Exclude<Rule.RuleListener['Property'], undefined>>[0];
-type ObjectExpressionNode = Parameters<Exclude<Rule.RuleListener['ObjectExpression'], undefined>>[0];
-type SpreadElementNode = Extract<Readonly<ObjectExpressionNode['properties'][number]>, { type: 'SpreadElement'; }>;
+type IdentifierNode = Readonly<Parameters<Exclude<Rule.RuleListener['Identifier'], undefined>>[0]>;
+type PropertyNode = Readonly<Parameters<Exclude<Rule.RuleListener['Property'], undefined>>[0]>;
+type ObjectExpressionNode = Readonly<Parameters<Exclude<Rule.RuleListener['ObjectExpression'], undefined>>[0]>;
+type SpreadElementNode = Extract<
+    Readonly<ObjectExpressionNode['properties'][number]>,
+    { readonly type: 'SpreadElement'; }
+>;
 
-function asSourceCode(sourceCode: Record<string, unknown>): SourceCode {
+function asSourceCode(sourceCode: Readonly<Record<string, unknown>>): SourceCode {
     return sourceCode as unknown as SourceCode;
 }
 
@@ -68,35 +72,35 @@ function pendingPathState(
     return {
         aliasBindings: new Set(aliasBindings),
         containerPropertiesByBinding: new Map(
-            containerPropertiesByBinding.map(([binding, properties]) => {
-                return [binding, new Set(properties)] as const;
+            containerPropertiesByBinding.map(function ([ binding, properties ]) {
+                return [ binding, new Set(properties) ] as const;
             })
         ),
         hasUnhandledPath
     };
 }
 
-describe('tracked callback reference state', function () {
-    it('haveSamePendingPathStates() distinguishes handled and unhandled states with the same references', function () {
+suite('tracked callback reference state', function () {
+    test('haveSamePendingPathStates() distinguishes handled and unhandled states with the same references', function () {
         assert.strictEqual(
             haveSamePendingPathStates(
-                pendingPathState(true, ['done']),
-                pendingPathState(false, ['done'])
+                pendingPathState(true, [ 'done' ]),
+                pendingPathState(false, [ 'done' ])
             ),
             false
         );
     });
 
-    it('mergeIncomingPendingPathStates() drops bindings without shared properties', function () {
+    test('mergeIncomingPendingPathStates() drops bindings without shared properties', function () {
         const nextState = mergeIncomingPendingPathStates([
-            pendingPathState(true, [], [['callbacks', ['done']]]),
-            pendingPathState(true, [], [['callbacks', []]])
+            pendingPathState(true, [], [ [ 'callbacks', [ 'done' ] ] ]),
+            pendingPathState(true, [], [ [ 'callbacks', [] ] ])
         ]);
 
         assert.deepStrictEqual(nextState.containerPropertiesByBinding, new Map());
     });
 
-    it('getTrackedContainerPropertiesFromExpression() returns undefined for untracked identifiers', function () {
+    test('getTrackedContainerPropertiesFromExpression() returns undefined for untracked identifiers', function () {
         assert.strictEqual(
             getTrackedContainerPropertiesFromExpression(
                 createSourceCode(),
@@ -107,18 +111,18 @@ describe('tracked callback reference state', function () {
         );
     });
 
-    it('getTrackedContainerPropertiesFromExpression() returns undefined for callback containers without tracked properties', function () {
+    test('getTrackedContainerPropertiesFromExpression() returns undefined for callback containers without tracked properties', function () {
         assert.strictEqual(
             getTrackedContainerPropertiesFromExpression(
                 createSourceCode(),
-                objectExpression([property(identifier('done'), identifier('done'), 'get')]),
-                pendingPathState(true, ['done'])
+                objectExpression([ property(identifier('done'), identifier('done'), 'get') ]),
+                pendingPathState(true, [ 'done' ])
             ),
             undefined
         );
     });
 
-    it('applyBindingSourceValue() ignores identifier sources without tracked container properties', function () {
+    test('applyBindingSourceValue() ignores identifier sources without tracked container properties', function () {
         const nextState = applyBindingSourceValue(
             createSourceCode(),
             pendingPathState(true),
@@ -129,59 +133,98 @@ describe('tracked callback reference state', function () {
         assert.deepStrictEqual(nextState.containerPropertiesByBinding, new Map());
     });
 
-    it('collectTrackedCallbackObjectProperties() ignores non-property entries even when they look initialized', function () {
+    test('collectTrackedCallbackObjectProperties() ignores spread entries even when they look initialized', function () {
         const trackedProperties = collectTrackedCallbackObjectProperties(
             createSourceCode(),
-            objectExpression([{
+            objectExpression([ {
                 argument: identifier('rest'),
                 kind: 'init',
                 type: 'SpreadElement'
-            } as unknown as SpreadElementNode]),
-            pendingPathState(true, ['done'])
+            } as unknown as SpreadElementNode ]),
+            pendingPathState(true, [ 'done' ])
         );
 
         assert.deepStrictEqual(trackedProperties, new Set());
     });
 
-    it('applyContainerPropertyAssignment() removes bindings whose tracked properties become empty', function () {
-        const nextState = applyContainerPropertyAssignment(
-            createSourceCode(),
-            pendingPathState(true, [], [['callbacks', ['done']]]),
-            {
-                propertyName: 'done',
-                source: null,
-                target: 'callbacks'
-            }
-        );
+    suite('container property assignments', function () {
+        test('applyContainerPropertyAssignment() removes bindings whose tracked properties become empty', function () {
+            const nextState = applyContainerPropertyAssignment(
+                createSourceCode(),
+                pendingPathState(true, [], [ [ 'callbacks', [ 'done' ] ] ]),
+                {
+                    propertyName: 'done',
+                    source: null,
+                    target: 'callbacks'
+                }
+            );
 
-        assert.deepStrictEqual(nextState.containerPropertiesByBinding, new Map());
+            assert.deepStrictEqual(nextState.containerPropertiesByBinding, new Map());
+        });
+
+        test('applyContainerPropertyAssignment() preserves unrelated tracked containers', function () {
+            const nextState = applyContainerPropertyAssignment(
+                createSourceCode(),
+                pendingPathState(true, [], [
+                    [ 'callbacks', [ 'done' ] ],
+                    [ 'otherCallbacks', [ 'finish' ] ]
+                ]),
+                {
+                    propertyName: 'done',
+                    source: null,
+                    target: 'callbacks'
+                }
+            );
+
+            assert.deepStrictEqual(
+                nextState.containerPropertiesByBinding,
+                new Map([ [ 'otherCallbacks', new Set([ 'finish' ]) ] ])
+            );
+        });
+
+        test('applyContainerPropertyAssignment() removes only the assigned tracked property', function () {
+            const nextState = applyContainerPropertyAssignment(
+                createSourceCode(),
+                pendingPathState(true, [], [ [ 'callbacks', [ 'done', 'finish' ] ] ]),
+                {
+                    propertyName: 'done',
+                    source: null,
+                    target: 'callbacks'
+                }
+            );
+
+            assert.deepStrictEqual(
+                nextState.containerPropertiesByBinding,
+                new Map([ [ 'callbacks', new Set([ 'finish' ]) ] ])
+            );
+        });
     });
 
-    it('collectTrackedCallbackObjectProperties() ignores non-property entries even when they look initialized', function () {
+    test('collectTrackedCallbackObjectProperties() ignores non-property entries even when they look initialized', function () {
         const trackedProperties = collectTrackedCallbackObjectProperties(
             createSourceCode(),
-            objectExpression([{
+            objectExpression([ {
                 argument: identifier('rest'),
                 kind: 'init',
                 type: 'SpreadElement'
-            } as unknown as SpreadElementNode]),
-            pendingPathState(true, ['done'])
+            } as unknown as SpreadElementNode ]),
+            pendingPathState(true, [ 'done' ])
         );
 
         assert.deepStrictEqual(trackedProperties, new Set());
     });
 
-    it('haveSameTrackedBindings() detects different binding counts', function () {
-        assert.strictEqual(haveSameTrackedBindings(new Set(['done']), new Set()), false);
-        assert.strictEqual(haveSameTrackedBindings(new Set(['done']), new Set(['done', 'finish'])), false);
-        assert.strictEqual(haveSameTrackedBindings(new Set(['done', 'finish']), new Set(['done', 'other'])), false);
+    test('haveSameTrackedBindings() detects different binding counts', function () {
+        assert.strictEqual(haveSameTrackedBindings(new Set([ 'done' ]), new Set()), false);
+        assert.strictEqual(haveSameTrackedBindings(new Set([ 'done' ]), new Set([ 'done', 'finish' ])), false);
+        assert.strictEqual(haveSameTrackedBindings(new Set([ 'done', 'finish' ]), new Set([ 'done', 'other' ])), false);
     });
 
-    it('haveSameTrackedContainerProperties() detects different tracked properties', function () {
+    test('haveSameTrackedContainerProperties() detects different tracked properties', function () {
         assert.strictEqual(
             haveSameTrackedContainerProperties(
                 new Map([
-                    ['obj', new Set(['someFunc'])]
+                    [ 'obj', new Set([ 'someFunc' ]) ]
                 ]),
                 new Map()
             ),
@@ -190,11 +233,11 @@ describe('tracked callback reference state', function () {
         assert.strictEqual(
             haveSameTrackedContainerProperties(
                 new Map([
-                    ['obj', new Set(['someFunc'])]
+                    [ 'obj', new Set([ 'someFunc' ]) ]
                 ]),
                 new Map([
-                    ['other', new Set(['someFunc'])],
-                    ['obj', new Set(['someFunc'])]
+                    [ 'other', new Set([ 'someFunc' ]) ],
+                    [ 'obj', new Set([ 'someFunc' ]) ]
                 ])
             ),
             false
@@ -202,10 +245,10 @@ describe('tracked callback reference state', function () {
         assert.strictEqual(
             haveSameTrackedContainerProperties(
                 new Map([
-                    ['obj', new Set(['someFunc'])]
+                    [ 'obj', new Set([ 'someFunc' ]) ]
                 ]),
                 new Map([
-                    ['other', new Set(['someFunc'])]
+                    [ 'other', new Set([ 'someFunc' ]) ]
                 ])
             ),
             false
@@ -213,10 +256,10 @@ describe('tracked callback reference state', function () {
         assert.strictEqual(
             haveSameTrackedContainerProperties(
                 new Map([
-                    ['obj', new Set(['someFunc'])]
+                    [ 'obj', new Set([ 'someFunc' ]) ]
                 ]),
                 new Map([
-                    ['obj', new Set(['someFunc', 'otherFunc'])]
+                    [ 'obj', new Set([ 'someFunc', 'otherFunc' ]) ]
                 ])
             ),
             false
@@ -224,10 +267,10 @@ describe('tracked callback reference state', function () {
         assert.strictEqual(
             haveSameTrackedContainerProperties(
                 new Map([
-                    ['obj', new Set(['someFunc', 'otherFunc'])]
+                    [ 'obj', new Set([ 'someFunc', 'otherFunc' ]) ]
                 ]),
                 new Map([
-                    ['obj', new Set(['someFunc', 'thirdFunc'])]
+                    [ 'obj', new Set([ 'someFunc', 'thirdFunc' ]) ]
                 ])
             ),
             false

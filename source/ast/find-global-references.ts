@@ -1,8 +1,8 @@
 import type { Rule, Scope, SourceCode } from 'eslint';
-import { filterWithArgs, flatMapWithArgs, mapWithArgs } from '../list.js';
-import type { NameDetails } from '../mocha/name-details.js';
-import { getUniqueBaseNames } from '../mocha/path.js';
-import { initialReferenceToResolvedReference, type ResolvedReference } from './resolved-reference.js';
+import { filterWithArgs, flatMapWithArgs, mapWithArgs } from '../list.ts';
+import type { NameDetails } from '../mocha/name-details.ts';
+import { getUniqueBaseNames } from '../mocha/path.ts';
+import { initialReferenceToResolvedReference, type ResolvedReference } from './resolved-reference.ts';
 
 function matchIdentifierName(reference: Readonly<Scope.Reference>, nameToMatch: string): boolean {
     return reference.identifier.name === nameToMatch;
@@ -11,7 +11,7 @@ function matchIdentifierName(reference: Readonly<Scope.Reference>, nameToMatch: 
 function findGlobalVariableReferences(globalScope: Readonly<Scope.Scope>, name: string): readonly Scope.Reference[] {
     const variable = globalScope.set.get(name);
 
-    if (variable !== undefined && variable.defs.length === 0) {
+    if (variable?.defs.length === 0) {
         return variable.references;
     }
 

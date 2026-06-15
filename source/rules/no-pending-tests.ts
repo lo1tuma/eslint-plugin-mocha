@@ -1,7 +1,7 @@
 import type { Rule, SourceCode } from 'eslint';
 import type { Comment as EstreeComment } from 'estree';
-import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
-import { expectNodeRange } from '../ast/node-location.js';
+import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.ts';
+import { expectNodeRange } from '../ast/node-location.ts';
 import {
     type AnyFunction,
     expectCallExpression,
@@ -12,10 +12,10 @@ import {
     isLiteral,
     isMemberExpression,
     type MemberExpression
-} from '../ast/node-types.js';
-import { asRuleNode } from '../ast/rule-node.js';
-import { type TraversableNode, visitChildNodes } from '../ast/visit-child-nodes.js';
-import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
+} from '../ast/node-types.ts';
+import { asRuleNode } from '../ast/rule-node.ts';
+import { type TraversableNode, visitChildNodes } from '../ast/visit-child-nodes.ts';
+import { getRuleOption, type InferSchemaOption } from '../rule-options.ts';
 
 const optionSchema = {
     type: 'object',
@@ -25,30 +25,28 @@ const optionSchema = {
         }
     },
     additionalProperties: false
-} as const satisfies RuleSchema;
+} as const;
 
 type Option = InferSchemaOption<typeof optionSchema>;
-type ResolvedOption = Option & { allowSkippedWithComment: boolean; };
+type ResolvedOption = Option & { readonly allowSkippedWithComment: boolean; };
 type PendingRuleConfiguration = {
     readonly allowSkippedWithComment: boolean;
 };
-type CallExpression = Extract<TraversableNode, { type: 'CallExpression'; }>;
-type RemovablePendingCallee = Extract<CallExpression['callee'], { type: 'Identifier'; }> | PendingMemberCallee;
-type RemovablePendingCallExpression = CallExpression & { callee: RemovablePendingCallee; };
+type CallExpression = Readonly<Extract<TraversableNode, { readonly type: 'CallExpression'; }>>;
+type RemovablePendingCallee = Extract<CallExpression['callee'], { readonly type: 'Identifier'; }> | PendingMemberCallee;
+type RemovablePendingCallExpression = CallExpression & { readonly callee: RemovablePendingCallee; };
+type LocationRange = {
+    readonly start: { readonly line: number; };
+    readonly end: { readonly line: number; };
+};
 
 const defaultOption: ResolvedOption = {
     allowSkippedWithComment: false
 };
 
-type PendingMemberCallee = Extract<CallExpression['callee'], { type: 'MemberExpression'; }>;
+type PendingMemberCallee = Extract<CallExpression['callee'], { readonly type: 'MemberExpression'; }>;
 type Locatable = {
-    readonly loc?:
-        | {
-            readonly start: { readonly line: number; };
-            readonly end: { readonly line: number; };
-        }
-        | null
-        | undefined;
+    readonly loc?: LocationRange | null | undefined;
 };
 type KnownLocation = Locatable & {
     readonly loc: NonNullable<Locatable['loc']>;
@@ -56,8 +54,8 @@ type KnownLocation = Locatable & {
 type KnownLocationComment = EstreeComment & KnownLocation;
 
 function isCallbackMissing(node: CallExpression): boolean {
-    const [firstArgument] = node.arguments;
-    return firstArgument !== undefined && firstArgument.type === 'Literal' && node.arguments.length === 1;
+    const [ firstArgument ] = node.arguments;
+    return firstArgument?.type === 'Literal' && node.arguments.length === 1;
 }
 
 function isNamedSkipProperty(property: Readonly<MemberExpression['property']>): boolean {
@@ -70,20 +68,20 @@ function isLiteralSkipProperty(property: Readonly<MemberExpression['property']>)
 
 function isPendingMemberExpression(
     callee: Readonly<CallExpression['callee']>
-): callee is Extract<CallExpression['callee'], { type: 'MemberExpression'; }> {
+): callee is Extract<CallExpression['callee'], { readonly type: 'MemberExpression'; }> {
     if (!isMemberExpression(callee)) {
         return false;
     }
 
     const { property } = callee;
 
-    return (!callee.computed && isNamedSkipProperty(property)) ||
-        (callee.computed && isLiteralSkipProperty(property));
+    return !callee.computed && isNamedSkipProperty(property) ||
+        callee.computed && isLiteralSkipProperty(property);
 }
 
 function isThisSkipMemberExpression(
     callee: Readonly<CallExpression['callee']>
-): callee is Extract<CallExpression['callee'], { type: 'MemberExpression'; }> {
+): callee is Extract<CallExpression['callee'], { readonly type: 'MemberExpression'; }> {
     return isPendingMemberExpression(callee) && callee.object.type === 'ThisExpression';
 }
 
@@ -157,7 +155,7 @@ function shouldAllowSkippedWithComment(
 
 function canRemovePendingModifier(node: Readonly<CallExpression>): node is Readonly<RemovablePendingCallExpression> {
     return isIdentifier(node.callee) ||
-        (isPendingMemberExpression(node.callee) && !isThisSkipMemberExpression(node.callee));
+        isPendingMemberExpression(node.callee) && !isThisSkipMemberExpression(node.callee);
 }
 
 function visitThisSkipCalls(
@@ -173,7 +171,7 @@ function visitThisSkipCalls(
         return;
     }
 
-    visitChildNodes(sourceCode, node, (childNode) => {
+    visitChildNodes(sourceCode, node, function (childNode) {
         visitThisSkipCalls(sourceCode, childNode, visitor);
     });
 }
@@ -184,21 +182,20 @@ function reportSkipped(
     messageId: 'unexpectedPendingTest' | 'unexpectedSkippedTestWithoutComment'
 ): void {
     const nodeToReport = node.callee.type === 'MemberExpression' ? node.callee.property : node.callee;
+    const reportDescriptor: Rule.ReportDescriptor = canRemovePendingModifier(node)
+        ? {
+            node: nodeToReport,
+            messageId,
+            suggest: [ {
+                messageId: 'removePendingModifier' as const,
+                fix(fixer: Rule.RuleFixer) {
+                    return fixPendingTest(fixer, context.sourceCode, node);
+                }
+            } ]
+        }
+        : { node: nodeToReport, messageId };
 
-    context.report({
-        node: nodeToReport,
-        messageId,
-        ...(canRemovePendingModifier(node)
-            ? {
-                suggest: [{
-                    messageId: 'removePendingModifier' as const,
-                    fix(fixer: Rule.RuleFixer) {
-                        return fixPendingTest(fixer, context.sourceCode, node);
-                    }
-                }]
-            }
-            : {})
-    });
+    context.report(reportDescriptor);
 }
 
 function checkPendingTestCase(
@@ -253,7 +250,7 @@ function checkPendingCallback(
 ): void {
     const callbackParent = getParentNode(callbackNode);
 
-    visitThisSkipCalls(context.sourceCode, callbackNode.body, (thisSkipCall) => {
+    visitThisSkipCalls(context.sourceCode, callbackNode.body, function (thisSkipCall) {
         if (
             configuration.allowSkippedWithComment &&
             (hasAdjacentLeadingComment(context.sourceCode, asRuleNode(thisSkipCall)) ||
@@ -273,19 +270,20 @@ function checkPendingCallback(
 export const noPendingTestsRule: Rule.RuleModule = {
     meta: {
         type: 'suggestion',
-        languages: ['js/js'],
         docs: {
             description: 'Disallow pending tests',
+            recommended: true,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-pending-tests.md'
         },
-        defaultOptions: [defaultOption],
         hasSuggestions: true,
+        schema: [ optionSchema ],
+        defaultOptions: [ defaultOption ],
         messages: {
             unexpectedPendingTest: 'Unexpected pending mocha test.',
             unexpectedSkippedTestWithoutComment: 'Unexpected skipped mocha test without a preceding comment.',
             removePendingModifier: 'Remove the pending modifier from this Mocha call.'
         },
-        schema: [optionSchema]
+        languages: [ 'js/js' ]
     },
     create(context) {
         const configuration = getRuleOption<ResolvedOption>(context);

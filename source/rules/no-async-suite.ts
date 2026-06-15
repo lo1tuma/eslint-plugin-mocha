@@ -1,12 +1,12 @@
 import type { Rule, SourceCode } from 'eslint';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { expectNodeRange } from '../ast/node-location.js';
-import { type AnyFunction, isFunction } from '../ast/node-types.js';
-import { type TraversableNode, visitChildNodes } from '../ast/visit-child-nodes.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { expectNodeRange } from '../ast/node-location.ts';
+import { type AnyFunction, isFunction } from '../ast/node-types.ts';
+import { type TraversableNode, visitChildNodes } from '../ast/visit-child-nodes.ts';
 
 function containsDirectAwait(
     sourceCode: Readonly<SourceCode>,
-    node: AnyFunction['body'] | TraversableNode
+    node: Readonly<AnyFunction['body'] | TraversableNode>
 ): boolean {
     if (node.type === 'AwaitExpression') {
         return true;
@@ -18,7 +18,7 @@ function containsDirectAwait(
 
     let hasDirectAwait = false;
 
-    visitChildNodes(sourceCode, node, (childNode) => {
+    visitChildNodes(sourceCode, node, function (childNode) {
         if (!hasDirectAwait && containsDirectAwait(sourceCode, childNode)) {
             hasDirectAwait = true;
         }
@@ -27,7 +27,7 @@ function containsDirectAwait(
     return hasDirectAwait;
 }
 
-function isAsyncFunction(node: Rule.Node): node is AnyFunction {
+function isAsyncFunction(node: Readonly<Rule.Node>): node is AnyFunction {
     return (node.type === 'FunctionExpression' ||
         node.type === 'ArrowFunctionExpression') &&
         node.async === true;
@@ -40,9 +40,9 @@ function fixAsyncFunction(
 ): Readonly<Rule.Fix | null> {
     if (!containsDirectAwait(sourceCode, fn.body)) {
         const asyncPrefixLength = 'async '.length;
-        const [start] = expectNodeRange(fn);
+        const [ start ] = expectNodeRange(fn);
 
-        return fixer.removeRange([start, start + asyncPrefixLength]);
+        return fixer.removeRange([ start, start + asyncPrefixLength ]);
     }
     return null;
 }
@@ -50,16 +50,17 @@ function fixAsyncFunction(
 export const noAsyncSuiteRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'problem',
-        languages: ['js/js'],
         docs: {
             description: 'Disallow async functions passed to a suite',
+            recommended: true,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-async-suite.md'
         },
         fixable: 'code',
+        schema: [],
         messages: {
             unexpectedAsyncSuite: 'Unexpected async function in {{name}}'
         },
-        schema: []
+        languages: [ 'js/js' ]
     },
     create(context) {
         const { sourceCode } = context;

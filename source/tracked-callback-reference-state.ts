@@ -1,31 +1,37 @@
 import { findVariable, getStringIfConstant } from '@eslint-community/eslint-utils';
 import type { Rule, Scope, SourceCode } from 'eslint';
-import { asRuleNode } from './ast/rule-node.js';
+import { asRuleNode } from './ast/rule-node.ts';
 
-type MemberExpressionNode = Parameters<Exclude<Rule.RuleListener['MemberExpression'], undefined>>[0];
-type PropertyNode = Parameters<Exclude<Rule.RuleListener['Property'], undefined>>[0];
-type IdentifierNode = Parameters<Exclude<Rule.RuleListener['Identifier'], undefined>>[0];
-type ObjectExpressionNode = Parameters<Exclude<Rule.RuleListener['ObjectExpression'], undefined>>[0];
+type MemberExpressionNode = Readonly<Parameters<Exclude<Rule.RuleListener['MemberExpression'], undefined>>[0]>;
+type PropertyNode = Readonly<Parameters<Exclude<Rule.RuleListener['Property'], undefined>>[0]>;
+type IdentifierNode = Readonly<Parameters<Exclude<Rule.RuleListener['Identifier'], undefined>>[0]>;
+type ObjectExpressionNode = Readonly<Parameters<Exclude<Rule.RuleListener['ObjectExpression'], undefined>>[0]>;
 type IdentifierLike = Readonly<Pick<IdentifierNode, 'name' | 'type'>>;
 type MemberExpressionLike = Readonly<Pick<MemberExpressionNode, 'computed' | 'object' | 'property' | 'type'>>;
 type PropertyLike = Readonly<Pick<PropertyNode, 'computed' | 'key' | 'type'>>;
+type PropertyKeyNode = Readonly<MemberExpressionLike['property'] | PropertyLike['key']>;
 
 const dynamicPropertyName = '<dynamic>';
 
-export type TrackedBinding = Scope.Variable | string;
+export type TrackedBinding = Readonly<Scope.Variable> | string;
 export type TrackedReferenceState = {
-    aliasBindings: ReadonlySet<TrackedBinding>;
-    containerPropertiesByBinding: ReadonlyMap<TrackedBinding, ReadonlySet<string>>;
+    readonly aliasBindings: ReadonlySet<TrackedBinding>;
+    readonly containerPropertiesByBinding: ReadonlyMap<TrackedBinding, ReadonlySet<string>>;
 };
 export type PendingPathState = {
-    aliasBindings: Set<TrackedBinding>;
-    containerPropertiesByBinding: Map<TrackedBinding, Set<string>>;
-    hasUnhandledPath: boolean;
+    readonly aliasBindings: ReadonlySet<TrackedBinding>;
+    readonly containerPropertiesByBinding: ReadonlyMap<TrackedBinding, ReadonlySet<string>>;
+    readonly hasUnhandledPath: boolean;
 };
 
 type BindingAndProperty = {
-    binding: TrackedBinding;
-    propertyName: string | undefined;
+    readonly binding: TrackedBinding;
+    readonly propertyName: string | undefined;
+};
+type ContainerPropertyAssignment = {
+    readonly propertyName: string | undefined;
+    readonly source: Readonly<Rule.Node> | null;
+    readonly target: TrackedBinding;
 };
 type NonEmptyPendingPathStates = readonly [Readonly<PendingPathState>, ...Readonly<PendingPathState>[]];
 
@@ -39,17 +45,23 @@ function hasPendingPathStates(
     return states.length > 0;
 }
 
+function getPropertyNode(node: MemberExpressionLike | PropertyLike): PropertyKeyNode {
+    if (node.type === 'MemberExpression') {
+        return node.property;
+    }
+
+    return node.key;
+}
+
 function getComputedPropertyName(
     sourceCode: Readonly<SourceCode>,
     node: MemberExpressionLike | PropertyLike
 ): string | undefined {
-    const keyNode = node.type === 'MemberExpression' ? node.property : node.key;
-
-    return getStringIfConstant(keyNode, sourceCode.getScope(asRuleNode(node))) ?? undefined;
+    return getStringIfConstant(asRuleNode(getPropertyNode(node)), sourceCode.getScope(asRuleNode(node))) ?? undefined;
 }
 
 function getNamedPropertyName(node: MemberExpressionLike | PropertyLike): string | undefined {
-    const keyNode = node.type === 'MemberExpression' ? node.property : node.key;
+    const keyNode = getPropertyNode(node);
 
     if (keyNode.type === 'Identifier') {
         return keyNode.name;
@@ -94,18 +106,18 @@ export function createHandledPendingPathState(): PendingPathState {
 
 export function createInitialPendingPathState(callbackBinding: TrackedBinding): PendingPathState {
     return {
-        aliasBindings: new Set([callbackBinding]),
+        aliasBindings: new Set([ callbackBinding ]),
         containerPropertiesByBinding: new Map(),
         hasUnhandledPath: true
     };
 }
 
 export function cloneTrackedContainerProperties(
-    containerPropertiesByBinding: TrackedReferenceState['containerPropertiesByBinding']
+    containerPropertiesByBinding: ReadonlyMap<TrackedBinding, ReadonlySet<string>>
 ): Map<TrackedBinding, Set<string>> {
     return new Map(
-        Array.from(containerPropertiesByBinding, ([binding, properties]) => {
-            return [binding, new Set(properties)] as const;
+        Array.from(containerPropertiesByBinding, function ([ binding, properties ]) {
+            return [ binding, new Set(properties) ] as const;
         })
     );
 }
@@ -126,7 +138,7 @@ export function haveSameTrackedBindings(
         return false;
     }
 
-    return Array.from(left).every((binding) => {
+    return Array.from(left).every(function (binding) {
         return right.has(binding);
     });
 }
@@ -139,14 +151,14 @@ export function haveSameTrackedContainerProperties(
         return false;
     }
 
-    return Array.from(left).every(([binding, properties]) => {
+    return Array.from(left).every(function ([ binding, properties ]) {
         const otherProperties = right.get(binding);
 
-        if (otherProperties === undefined || properties.size !== otherProperties.size) {
+        if (properties.size !== otherProperties?.size) {
             return false;
         }
 
-        return Array.from(properties).every((property) => {
+        return Array.from(properties).every(function (property) {
             return otherProperties.has(property);
         });
     });
@@ -165,11 +177,11 @@ export function haveSamePendingPathStates(
 }
 
 function intersectBindingSets(states: NonEmptyPendingPathStates): Set<TrackedBinding> {
-    const [firstState, ...otherStates] = states;
+    const [ firstState, ...otherStates ] = states;
     const bindings = new Set(firstState.aliasBindings);
 
     for (const binding of Array.from(bindings)) {
-        const isSharedBinding = otherStates.every((state) => {
+        const isSharedBinding = otherStates.every(function (state) {
             return state.aliasBindings.has(binding);
         });
 
@@ -189,7 +201,7 @@ function sharedPropertiesForBinding(
     const sharedProperties = new Set(firstProperties);
 
     for (const property of Array.from(sharedProperties)) {
-        const isSharedProperty = otherStates.every((state) => {
+        const isSharedProperty = otherStates.every(function (state) {
             return state.containerPropertiesByBinding.get(binding)?.has(property) === true;
         });
 
@@ -204,10 +216,10 @@ function sharedPropertiesForBinding(
 function intersectTrackedContainerPropertiesByBinding(
     states: NonEmptyPendingPathStates
 ): Map<TrackedBinding, Set<string>> {
-    const [firstState, ...otherStates] = states;
+    const [ firstState, ...otherStates ] = states;
     const sharedPropertiesByBinding = new Map<TrackedBinding, Set<string>>();
 
-    for (const [binding, properties] of firstState.containerPropertiesByBinding) {
+    for (const [ binding, properties ] of firstState.containerPropertiesByBinding) {
         const sharedProperties = sharedPropertiesForBinding(binding, properties, otherStates);
 
         if (sharedProperties.size > 0) {
@@ -221,7 +233,7 @@ function intersectTrackedContainerPropertiesByBinding(
 export function mergeIncomingPendingPathStates(
     previousStates: readonly Readonly<PendingPathState>[]
 ): PendingPathState {
-    const unhandledStates = previousStates.filter((state) => {
+    const unhandledStates = previousStates.filter(function (state) {
         return state.hasUnhandledPath;
     });
 
@@ -323,26 +335,34 @@ export function getTrackedContainerPropertiesFromExpression(
 
 export function applyBindingSourceValue(
     sourceCode: Readonly<SourceCode>,
-    state: PendingPathState,
+    state: Readonly<PendingPathState>,
     source: Readonly<Rule.Node> | null,
     target: TrackedBinding
 ): PendingPathState {
     if (source === null) {
-        return state;
+        return clonePendingPathState(state);
     }
 
     if (isTrackedCallbackExpression(sourceCode, source, state)) {
-        state.aliasBindings.add(target);
-        return state;
+        return {
+            ...state,
+            aliasBindings: new Set([ ...state.aliasBindings, target ])
+        };
     }
 
     const containerProperties = getTrackedContainerPropertiesFromExpression(sourceCode, source, state);
 
     if (containerProperties !== undefined) {
-        state.containerPropertiesByBinding.set(target, containerProperties);
+        return {
+            ...state,
+            containerPropertiesByBinding: new Map([
+                ...state.containerPropertiesByBinding,
+                [ target, containerProperties ]
+            ])
+        };
     }
 
-    return state;
+    return clonePendingPathState(state);
 }
 
 function nextPropertiesForAssignment(
@@ -363,11 +383,7 @@ function nextPropertiesForAssignment(
 export function applyContainerPropertyAssignment(
     sourceCode: Readonly<SourceCode>,
     state: Readonly<PendingPathState>,
-    assignment: {
-        readonly propertyName: string | undefined;
-        readonly source: Readonly<Rule.Node> | null;
-        readonly target: TrackedBinding;
-    }
+    assignment: Readonly<ContainerPropertyAssignment>
 ): PendingPathState {
     const { propertyName, source, target } = assignment;
     const nextState = clonePendingPathState(state);
@@ -379,14 +395,31 @@ export function applyContainerPropertyAssignment(
         isTrackedCallbackExpression(sourceCode, source, nextState);
 
     if (shouldTrackProperty) {
-        nextProperties.add(propertyName ?? dynamicPropertyName);
+        return {
+            ...nextState,
+            containerPropertiesByBinding: new Map([
+                ...nextState.containerPropertiesByBinding,
+                [ target, new Set([ ...nextProperties, propertyName ?? dynamicPropertyName ]) ]
+            ])
+        };
     }
-
-    nextState.containerPropertiesByBinding.delete(target);
 
     if (nextProperties.size > 0) {
-        nextState.containerPropertiesByBinding.set(target, nextProperties);
+        return {
+            ...nextState,
+            containerPropertiesByBinding: new Map([
+                ...nextState.containerPropertiesByBinding,
+                [ target, nextProperties ]
+            ])
+        };
     }
 
-    return nextState;
+    return {
+        ...nextState,
+        containerPropertiesByBinding: new Map(
+            Array.from(nextState.containerPropertiesByBinding).filter(function ([ binding ]) {
+                return binding !== target;
+            })
+        )
+    };
 }

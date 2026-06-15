@@ -1,4 +1,4 @@
-import { createSimpleNumericMochaConfigLimitRule } from './mocha-config-value-rule.js';
+import { createSimpleNumericMochaConfigLimitRule } from './mocha-config-value-rule.ts';
 
 export const limitSlowRule = createSimpleNumericMochaConfigLimitRule({
     configName: 'slow',

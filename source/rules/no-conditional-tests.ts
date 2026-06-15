@@ -1,17 +1,21 @@
 import type { Rule } from 'eslint';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { getParentNode, isFunction, isProgram } from '../ast/node-types.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { getParentNode, isFunction, isProgram } from '../ast/node-types.ts';
+
+const conditionalNodeTypes = new Set<Rule.Node['type']>([
+    'IfStatement',
+    'ConditionalExpression',
+    'LogicalExpression'
+]);
 
 function isConditionalNode(node: Readonly<Rule.Node>): boolean {
-    return node.type === 'IfStatement' ||
-        node.type === 'ConditionalExpression' ||
-        node.type === 'LogicalExpression';
+    return conditionalNodeTypes.has(node.type);
 }
 
 function isInsideConditional(node: Readonly<Rule.Node>): boolean {
     let current = node;
 
-    while (true) {
+    for (;;) {
         const parent = getParentNode(current);
 
         if (isFunction(parent) || isProgram(parent)) {
@@ -29,15 +33,16 @@ function isInsideConditional(node: Readonly<Rule.Node>): boolean {
 export const noConditionalTestsRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'problem',
-        languages: ['js/js'],
         docs: {
             description: 'Disallow conditional suite and test declarations',
+            recommended: true,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-conditional-tests.md'
         },
+        schema: [],
         messages: {
             unexpectedConditionalTest: 'Unexpected conditional Mocha suite or test declaration.'
         },
-        schema: []
+        languages: [ 'js/js' ]
     },
     create(context) {
         return createMochaVisitors(context, {

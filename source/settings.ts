@@ -1,18 +1,23 @@
-import type { CustomNameConfig } from './mocha/all-name-details.js';
-import { isCustomMochaEntityType, isMochaInterface, type MochaInterface } from './mocha/descriptors.js';
-import { isRecord } from './record.js';
+import type { CustomNameConfig } from './mocha/all-name-details.ts';
+import { isCustomMochaEntityType, isMochaInterface, type MochaInterface } from './mocha/descriptors.ts';
+import { isRecord } from './record.ts';
 
-function settingFor(settings: Record<string, unknown>, propertyName: string, fallback: unknown): unknown {
-    const value = settings[`mocha/${propertyName}`];
+function ownPropertyValue(settings: Readonly<Record<string, unknown>>, propertyName: string): unknown {
+    return Object.getOwnPropertyDescriptor(settings, propertyName)?.value;
+}
+
+function settingFor(settings: Readonly<Record<string, unknown>>, propertyName: string, fallback: unknown): unknown {
+    const value = ownPropertyValue(settings, `mocha/${propertyName}`);
 
     if (value !== undefined) {
         return value;
     }
 
     const mochaSettings = isRecord(settings.mocha) ? settings.mocha : {};
+    const mochaSetting = ownPropertyValue(mochaSettings, propertyName);
 
-    if (mochaSettings[propertyName] !== undefined) {
-        return mochaSettings[propertyName];
+    if (mochaSetting !== undefined) {
+        return mochaSetting;
     }
 
     return fallback;
@@ -43,13 +48,13 @@ function validateAdditionalNames(value: unknown): asserts value is readonly Cust
     }
 }
 
-export function getAdditionalNames(settings: Record<string, unknown>): readonly CustomNameConfig[] {
+export function getAdditionalNames(settings: Readonly<Record<string, unknown>>): readonly CustomNameConfig[] {
     const additionalCustomNames = settingFor(settings, 'additionalCustomNames', []);
     validateAdditionalNames(additionalCustomNames);
     return additionalCustomNames;
 }
 
-export function getInterface(settings: Record<string, unknown>): MochaInterface {
+export function getInterface(settings: Readonly<Record<string, unknown>>): MochaInterface {
     const interfaceToUse = settingFor(settings, 'interface', 'BDD');
 
     if (isMochaInterface(interfaceToUse)) {

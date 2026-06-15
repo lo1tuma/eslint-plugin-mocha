@@ -1,22 +1,29 @@
 import type { Rule } from 'eslint';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { expectNodeRange } from '../ast/node-location.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { expectNodeRange } from '../ast/node-location.ts';
 
-type ExportNamedDeclarationNode = Parameters<NonNullable<Rule.RuleListener['ExportNamedDeclaration']>>[0];
-type ExportDefaultDeclarationNode = Parameters<NonNullable<Rule.RuleListener['ExportDefaultDeclaration']>>[0];
-type ExportAllDeclarationNode = Parameters<NonNullable<Rule.RuleListener['ExportAllDeclaration']>>[0];
-type ExportNode = ExportAllDeclarationNode | ExportDefaultDeclarationNode | ExportNamedDeclarationNode;
-type NamedExportWithDeclaration = ExportNamedDeclarationNode & {
-    declaration: Exclude<ExportNamedDeclarationNode['declaration'], null | undefined>;
-};
-type DefaultExportWithNamedDeclaration = ExportDefaultDeclarationNode & {
-    declaration: {
-        id: Record<string, unknown>;
-        range?: Readonly<Rule.Node['range']>;
-        type: 'ClassDeclaration' | 'FunctionDeclaration';
-    };
-};
-type ExportSuggestion = NonNullable<Rule.ReportDescriptor['suggest']>[number];
+type ExportNamedDeclarationNode = Readonly<Parameters<NonNullable<Rule.RuleListener['ExportNamedDeclaration']>>[0]>;
+type ExportDefaultDeclarationNode = Readonly<Parameters<NonNullable<Rule.RuleListener['ExportDefaultDeclaration']>>[0]>;
+type ExportAllDeclarationNode = Readonly<Parameters<NonNullable<Rule.RuleListener['ExportAllDeclaration']>>[0]>;
+type ImmutableExportNode<T> = { readonly [Key in keyof T]: T[Key]; };
+type ExportNode = ImmutableExportNode<
+    ExportAllDeclarationNode | ExportDefaultDeclarationNode | ExportNamedDeclarationNode
+>;
+type NamedExportWithDeclaration = ImmutableExportNode<
+    ExportNamedDeclarationNode & {
+        readonly declaration: Exclude<ExportNamedDeclarationNode['declaration'], null | undefined>;
+    }
+>;
+type DefaultExportWithNamedDeclaration = ImmutableExportNode<
+    ExportDefaultDeclarationNode & {
+        readonly declaration: {
+            readonly id: Readonly<Record<string, unknown>>;
+            readonly range?: Readonly<Rule.Node['range']>;
+            readonly type: 'ClassDeclaration' | 'FunctionDeclaration';
+        };
+    }
+>;
+type ExportSuggestion = Readonly<NonNullable<Rule.ReportDescriptor['suggest']>[number]>;
 
 function isNamedExportWithDeclaration(node: Readonly<ExportNode>): node is Readonly<NamedExportWithDeclaration> {
     return node.type === 'ExportNamedDeclaration' && node.declaration !== null;
@@ -35,15 +42,19 @@ function isLocalNamedExportList(node: Readonly<ExportNode>): node is Readonly<Ex
         node.source === null;
 }
 
+type NodeWithOptionalRange = {
+    readonly range?: Readonly<readonly [number, number]> | null | undefined;
+};
+
 function fixRemoveExportKeyword(
     fixer: Rule.RuleFixer,
     node: Readonly<ExportNode>,
-    declaration: { readonly range?: Readonly<[number, number]> | null | undefined; }
+    declaration: NodeWithOptionalRange
 ): Readonly<Rule.Fix | null> {
     const range = expectNodeRange(node);
     const declarationRange = expectNodeRange(declaration);
 
-    return fixer.removeRange([range[0], declarationRange[0]]);
+    return fixer.removeRange([ range[0], declarationRange[0] ]);
 }
 
 function fixRemoveDefaultExportKeyword(
@@ -62,30 +73,30 @@ function fixRemoveExportStatement(
 
 function createExportSuggestions(node: Readonly<ExportNode>): ExportSuggestion[] {
     if (isNamedExportWithDeclaration(node)) {
-        return [{
+        return [ {
             messageId: 'removeExportKeyword',
             fix(fixer) {
                 return fixRemoveExportKeyword(fixer, node, node.declaration);
             }
-        }];
+        } ];
     }
 
     if (isNamedDefaultExportDeclaration(node)) {
-        return [{
+        return [ {
             messageId: 'removeExportKeyword',
             fix(fixer) {
                 return fixRemoveDefaultExportKeyword(fixer, node);
             }
-        }];
+        } ];
     }
 
     if (isLocalNamedExportList(node)) {
-        return [{
+        return [ {
             messageId: 'removeExportStatement',
             fix(fixer) {
                 return fixRemoveExportStatement(fixer, node);
             }
-        }];
+        } ];
     }
 
     return [];
@@ -93,19 +104,20 @@ function createExportSuggestions(node: Readonly<ExportNode>): ExportSuggestion[]
 
 export const noExportsRule: Readonly<Rule.RuleModule> = {
     meta: {
+        type: 'suggestion',
         docs: {
             description: 'Disallow exports from test files',
+            recommended: true,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-exports.md'
         },
         hasSuggestions: true,
+        schema: [],
         messages: {
             unexpectedExport: 'Unexpected export from a test file',
             removeExportKeyword: 'Remove the export keyword',
             removeExportStatement: 'Remove this export statement'
         },
-        type: 'suggestion',
-        languages: ['js/js'],
-        schema: []
+        languages: [ 'js/js' ]
     },
     create(context) {
         const exportNodes: ExportNode[] = [];

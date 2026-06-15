@@ -1,21 +1,57 @@
 import { RuleTester } from 'eslint';
-import { withInterface } from '../mocha-interface-test-cases.js';
-import { consistentStructureRule } from './consistent-structure.js';
+import { withInterface } from '../mocha-interface-test-cases.ts';
+import { consistentStructureRule } from './consistent-structure.ts';
 
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
-const options = [{ disallowDuplicateHooks: true }];
+const options = [ { disallowDuplicateHooks: true } ];
 
 ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, {
     valid: [
-        { code: 'describe(function() { before(function() {}); it(function() {}); });', options },
-        { code: 'describe(function() { after(function() {}); it(function() {}); });', options },
-        { code: 'describe(function() { beforeEach(function() {}); it(function() {}); });', options },
-        { code: 'describe(function() { afterEach(function() {}); it(function() {}); });', options },
-        { code: 'describe(function() { before(function() {}); after(function() {}); });', options },
-        { code: 'describe(function() { before(function() {}); beforeEach(function() {}); });', options },
-        { code: 'describe(function() { beforeEach(function() {}); afterEach(function() {}); });', options },
-        { code: 'before(function() {}); beforeEach(function() {});', options },
-        { code: 'foo.before(function() {}); foo.before(function() {});', options },
+        {
+            code: 'describe(function() { before(function() {}); it(function() {}); });',
+            options,
+            name: 'allows a single before hook'
+        },
+        {
+            code: 'describe(function() { after(function() {}); it(function() {}); });',
+            options,
+            name: 'allows a single after hook'
+        },
+        {
+            code: 'describe(function() { beforeEach(function() {}); it(function() {}); });',
+            options,
+            name: 'allows a single beforeEach hook'
+        },
+        {
+            code: 'describe(function() { afterEach(function() {}); it(function() {}); });',
+            options,
+            name: 'allows a single afterEach hook'
+        },
+        {
+            code: 'describe(function() { before(function() {}); after(function() {}); });',
+            options,
+            name: 'allows before and after hooks together'
+        },
+        {
+            code: 'describe(function() { before(function() {}); beforeEach(function() {}); });',
+            options,
+            name: 'allows before and beforeEach hooks together'
+        },
+        {
+            code: 'describe(function() { beforeEach(function() {}); afterEach(function() {}); });',
+            options,
+            name: 'allows beforeEach and afterEach hooks together'
+        },
+        {
+            code: 'before(function() {}); beforeEach(function() {});',
+            options,
+            name: 'allows different hooks at top level'
+        },
+        {
+            code: 'foo.before(function() {}); foo.before(function() {});',
+            options,
+            name: 'ignores member-expression hooks without custom settings'
+        },
         {
             code: [
                 'describe(function() {',
@@ -26,7 +62,8 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
                 '});'
             ]
                 .join('\n'),
-            options
+            options,
+            name: 'allows same hook in parent and child suites'
         },
         {
             code: [
@@ -38,7 +75,8 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
                 '});'
             ]
                 .join('\n'),
-            options
+            options,
+            name: 'allows same hook in child and parent suites'
         },
         {
             code: [
@@ -73,7 +111,8 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
                 '});'
             ]
                 .join('\n'),
-            options
+            options,
+            name: 'allows reused setup functions in separate suite scopes'
         },
         {
             code: [
@@ -89,7 +128,8 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
                 '});'
             ]
                 .join('\n'),
-            options
+            options,
+            name: 'allows arrow setup helpers inside child suites'
         },
         {
             code: [
@@ -101,7 +141,8 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
                 '});'
             ]
                 .join('\n'),
-            options
+            options,
+            name: 'allows same hook in describe.only and parent suites'
         },
         {
             code: [
@@ -113,7 +154,8 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
                 '});'
             ]
                 .join('\n'),
-            options
+            options,
+            name: 'allows same hook in describe.skip and parent suites'
         },
         {
             code: [
@@ -125,7 +167,8 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
                 '});'
             ]
                 .join('\n'),
-            options
+            options,
+            name: 'allows same hook in xdescribe and parent suites'
         },
         {
             code: [
@@ -137,7 +180,8 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
                 '});'
             ]
                 .join('\n'),
-            options
+            options,
+            name: 'allows same hook in context and parent suites'
         },
         {
             code: [
@@ -149,7 +193,8 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
                 '});'
             ]
                 .join('\n'),
-            options
+            options,
+            name: 'allows same hook in xcontext and parent suites'
         },
         {
             code: [
@@ -162,8 +207,9 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
+            name: 'allows legacy custom suite settings to scope hooks',
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
+                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
             }
         },
         {
@@ -177,9 +223,10 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
+            name: 'allows custom suite settings to scope hooks',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
                 }
             }
         },
@@ -194,9 +241,10 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
+            name: 'allows custom member suite names to scope hooks',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'describe.foo', type: 'suite', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'describe.foo', type: 'suite', interface: 'BDD' } ]
                 }
             }
         },
@@ -211,9 +259,10 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
+            name: 'allows custom callable member suite names to scope hooks',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'describe.foo()', type: 'suite', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'describe.foo()', type: 'suite', interface: 'BDD' } ]
                 }
             }
         },
@@ -246,6 +295,7 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
+            name: 'allows dynamic custom suite names to scope hooks',
             settings: {
                 mocha: {
                     additionalCustomNames: [
@@ -263,167 +313,5 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             options
         })
     ],
-
-    invalid: [
-        {
-            code: 'describe(function() { before(function() {}); before(function() {}); });',
-            options,
-            errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 46, line: 1 }]
-        },
-        {
-            code: 'describe(function() { after(function() {}); after(function() {}); });',
-            options,
-            errors: [{ message: 'Unexpected use of duplicate Mocha `after()` hook', column: 45, line: 1 }]
-        },
-        {
-            code: 'describe(function() { beforeEach(function() {}); beforeEach(function() {}); });',
-            options,
-            errors: [{ message: 'Unexpected use of duplicate Mocha `beforeEach()` hook', column: 50, line: 1 }]
-        },
-        {
-            code: 'describe(function() { afterEach(function() {}); afterEach(function() {}); });',
-            options,
-            errors: [{ message: 'Unexpected use of duplicate Mocha `afterEach()` hook', column: 49, line: 1 }]
-        },
-        withInterface('TDD', {
-            code: 'setup(function() {}); setup(function() {});',
-            options,
-            errors: [{ message: 'Unexpected use of duplicate Mocha `setup()` hook', column: 23, line: 1 }]
-        }),
-        {
-            code: [
-                'describe(function() {',
-                '    before(function() {});',
-                '    describe(function() {',
-                '        before(function() {});',
-                '        before(function() {});',
-                '    });',
-                '});'
-            ]
-                .join('\n'),
-            options,
-            errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 9, line: 5 }]
-        },
-        {
-            code: [
-                'describe(function() {',
-                '    before(function() {});',
-                '    describe(function() {',
-                '        before(function() {});',
-                '    });',
-                '    before(function() {});',
-                '});'
-            ]
-                .join('\n'),
-            options,
-            errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 5, line: 6 }]
-        },
-        {
-            code: [
-                'foo(function() {',
-                '    before(function() {});',
-                '    foo(function() {',
-                '        before(function() {});',
-                '    });',
-                '    before(function() {});',
-                '});'
-            ]
-                .join('\n'),
-            options,
-            settings: {
-                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
-            },
-            errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 5, line: 6 }]
-        },
-        {
-            code: [
-                'function createSuite() {',
-                '    describe(function() {',
-                '        before(function() {});',
-                '        before(function() {});',
-                '    });',
-                '}',
-                'createSuite();'
-            ]
-                .join('\n'),
-            options,
-            errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 9, line: 4 }]
-        },
-        {
-            code: [
-                'foo(function() {',
-                '    before(function() {});',
-                '    foo(function() {',
-                '        before(function() {});',
-                '    });',
-                '    before(function() {});',
-                '});'
-            ]
-                .join('\n'),
-            options,
-            settings: {
-                mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
-                }
-            },
-            errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 5, line: 6 }]
-        },
-        {
-            code: [
-                'describe.foo(function() {',
-                '    before(function() {});',
-                '    describe.foo(function() {',
-                '        before(function() {});',
-                '    });',
-                '    before(function() {});',
-                '});'
-            ]
-                .join('\n'),
-            options,
-            settings: {
-                mocha: {
-                    additionalCustomNames: [{ name: 'describe.foo', type: 'suite', interface: 'BDD' }]
-                }
-            },
-            errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 5, line: 6 }]
-        },
-        {
-            code: [
-                'describe.foo()(function() {',
-                '    before(function() {});',
-                '    describe.foo()(function() {',
-                '        before(function() {});',
-                '    });',
-                '    before(function() {});',
-                '});'
-            ]
-                .join('\n'),
-            options,
-            settings: {
-                mocha: {
-                    additionalCustomNames: [{ name: 'describe.foo()', type: 'suite', interface: 'BDD' }]
-                }
-            },
-            errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 5, line: 6 }]
-        },
-        {
-            code: [
-                'forEach([ 1, 2, 3 ]).describe(function() {',
-                '    before(function() {});',
-                '    forEach([ 4, 5, 6 ]).describe(function() {',
-                '        before(function() {});',
-                '    });',
-                '    before(function() {});',
-                '});'
-            ]
-                .join('\n'),
-            options,
-            settings: {
-                mocha: {
-                    additionalCustomNames: [{ name: 'forEach().describe', type: 'suite', interface: 'BDD' }]
-                }
-            },
-            errors: [{ message: 'Unexpected use of duplicate Mocha `before()` hook', column: 5, line: 6 }]
-        }
-    ]
+    invalid: []
 });

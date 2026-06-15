@@ -1,29 +1,29 @@
 import type { Rule } from 'eslint';
-import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.js';
+import { createMochaVisitors, type VisitorContext } from '../ast/mocha-visitors.ts';
 import {
     type AnyFunction,
     isBlockStatement,
     isFunction,
     isProgram,
     type Program
-} from '../ast/node-types.js';
-import { getLastOrThrow } from '../list.js';
-import { getRuleOption, type InferSchemaOption, type RuleSchema } from '../rule-options.js';
+} from '../ast/node-types.ts';
+import { getLastOrThrow } from '../list.ts';
+import { getRuleOption, type InferSchemaOption } from '../rule-options.ts';
 import {
     getTopLevelMochaExpression as getDirectTopLevelMochaExpression,
     isDirectStatementInScope
-} from './direct-mocha-statement.js';
+} from './direct-mocha-statement.ts';
 
 const optionSchema = {
     type: 'object',
     properties: {
         hookOrder: {
             type: 'string',
-            enum: ['setup-teardown', 'off']
+            enum: [ 'setup-teardown', 'off' ]
         },
         order: {
             type: 'string',
-            enum: ['hooks-tests-suites', 'off']
+            enum: [ 'hooks-tests-suites', 'off' ]
         },
         disallowDuplicateHooks: {
             type: 'boolean'
@@ -33,32 +33,32 @@ const optionSchema = {
         }
     },
     additionalProperties: false
-} as const satisfies RuleSchema;
+} as const;
 
 type Option = InferSchemaOption<typeof optionSchema>;
 type ResolvedOption = Option & {
-    disallowDuplicateHooks: boolean;
-    hookOrder: 'off' | 'setup-teardown';
-    order: 'hooks-tests-suites' | 'off';
-    disallowMixedTestsAndSuites: boolean;
+    readonly disallowDuplicateHooks: boolean;
+    readonly hookOrder: 'off' | 'setup-teardown';
+    readonly order: 'hooks-tests-suites' | 'off';
+    readonly disallowMixedTestsAndSuites: boolean;
 };
 type StructureEntityKind = 'hook' | 'suite' | 'testCase';
 type StructureLayer = {
-    hasReportedMixedStructure: boolean;
-    hasSeenSuite: boolean;
-    hasSeenTestCase: boolean;
-    highestSeenHookOrderName: string | null;
-    highestSeenHookOrderRank: number | null;
-    highestSeenKind: StructureEntityKind | null;
-    scopeNode: AnyFunction['body'] | Program;
-    usedHookNames: Set<string>;
+    readonly hasReportedMixedStructure: boolean;
+    readonly hasSeenSuite: boolean;
+    readonly hasSeenTestCase: boolean;
+    readonly highestSeenHookOrderName: string | null;
+    readonly highestSeenHookOrderRank: number | null;
+    readonly highestSeenKind: StructureEntityKind | null;
+    readonly scopeNode: AnyFunction['body'] | Program;
+    readonly usedHookNames: ReadonlySet<string>;
 };
 type DirectStructureContext = {
-    currentKind: StructureEntityKind;
-    currentLayer: Readonly<StructureLayer>;
+    readonly currentKind: StructureEntityKind;
+    readonly currentLayer: Readonly<StructureLayer>;
 };
 type TrackedStructureContext = DirectStructureContext & {
-    visitorContext: Readonly<VisitorContext>;
+    readonly visitorContext: Readonly<VisitorContext>;
 };
 type StructureTrackingOptions = Pick<
     ResolvedOption,
@@ -87,7 +87,7 @@ const hookOrderRank: Readonly<Record<string, number>> = {
     'suiteTeardown()': 3
 };
 
-function createStructureLayer(scopeNode: StructureLayer['scopeNode']): Readonly<StructureLayer> {
+function createStructureLayer(scopeNode: Readonly<StructureLayer['scopeNode']>): Readonly<StructureLayer> {
     return {
         hasReportedMixedStructure: false,
         hasSeenSuite: false,
@@ -146,8 +146,8 @@ function hasUnexpectedOrder(
 function shouldReportMixedStructure(layer: Readonly<StructureLayer>, currentKind: StructureEntityKind): boolean {
     return !layer.hasReportedMixedStructure &&
         (
-            (currentKind === 'suite' && layer.hasSeenTestCase) ||
-            (currentKind === 'testCase' && layer.hasSeenSuite)
+            currentKind === 'suite' && layer.hasSeenTestCase ||
+            currentKind === 'testCase' && layer.hasSeenSuite
         );
 }
 
@@ -160,8 +160,8 @@ function shouldReportDuplicateHook(
 }
 
 type OrderedHook = {
-    name: string;
-    rank: number;
+    readonly name: string;
+    readonly rank: number;
 };
 
 function getTerminalName(name: string): string {
@@ -273,8 +273,11 @@ function createTrackedLayer(
     };
 }
 
-function replaceCurrentLayer(layers: StructureLayer[], nextLayer: Readonly<StructureLayer>): void {
-    layers.splice(-1, 1, nextLayer);
+function replaceCurrentLayer(
+    layers: readonly StructureLayer[],
+    nextLayer: Readonly<StructureLayer>
+): readonly StructureLayer[] {
+    return [ ...layers.slice(0, -1), nextLayer ];
 }
 
 function getDirectStructureContext(
@@ -362,10 +365,10 @@ function reportUnexpectedHookOrderIfNeeded(
 
 function trackStructureLayer(
     context: Readonly<Rule.RuleContext>,
-    layers: StructureLayer[],
+    layers: readonly StructureLayer[],
     trackedStructureContext: Readonly<TrackedStructureContext>,
     options: Readonly<StructureTrackingOptions>
-): void {
+): readonly StructureLayer[] {
     const { currentLayer } = trackedStructureContext;
     const { disallowDuplicateHooks, disallowMixedTestsAndSuites, hookOrder } = options;
     const reportsMixedStructure = reportMixedStructureIfNeeded(
@@ -376,7 +379,7 @@ function trackStructureLayer(
 
     reportDuplicateHookIfNeeded(context, trackedStructureContext, disallowDuplicateHooks);
     reportUnexpectedHookOrderIfNeeded(context, trackedStructureContext, hookOrder);
-    replaceCurrentLayer(
+    return replaceCurrentLayer(
         layers,
         createTrackedLayer(currentLayer, trackedStructureContext, reportsMixedStructure, hookOrder)
     );
@@ -385,12 +388,13 @@ function trackStructureLayer(
 export const consistentStructureRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
-        languages: ['js/js'],
         docs: {
             description: 'Require consistent structure for Mocha test entities',
+            recommended: true,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/consistent-structure.md'
         },
-        defaultOptions: [defaultOption],
+        schema: [ optionSchema ],
+        defaultOptions: [ defaultOption ],
         messages: {
             unexpectedHookAfterSuite: 'Unexpected hook after a child suite.',
             unexpectedHookAfterTest: 'Unexpected hook after a test case.',
@@ -399,13 +403,13 @@ export const consistentStructureRule: Readonly<Rule.RuleModule> = {
             unexpectedMixedTestsAndSuites: 'Unexpected mix of test cases and child suites at the same level.',
             unexpectedTestAfterSuite: 'Unexpected test case after a child suite.'
         },
-        schema: [optionSchema]
+        languages: [ 'js/js' ]
     },
     create(context) {
         const { order, disallowDuplicateHooks, disallowMixedTestsAndSuites, hookOrder } = getRuleOption<
             ResolvedOption
         >(context);
-        const layers: StructureLayer[] = [];
+        let layers: readonly StructureLayer[] = [];
 
         function registerStructure(visitorContext: Readonly<VisitorContext>, currentKind: StructureEntityKind): void {
             const directStructureContext = getDirectStructureContext(layers, visitorContext, currentKind);
@@ -421,7 +425,7 @@ export const consistentStructureRule: Readonly<Rule.RuleModule> = {
                 reportUnexpectedOrder(context, visitorContext, highestSeenKind, directKind);
             }
 
-            trackStructureLayer(
+            layers = trackStructureLayer(
                 context,
                 layers,
                 { ...directStructureContext, visitorContext },
@@ -431,11 +435,11 @@ export const consistentStructureRule: Readonly<Rule.RuleModule> = {
 
         return createMochaVisitors(context, {
             Program(node) {
-                layers.push(createStructureLayer(node));
+                layers = [ ...layers, createStructureLayer(node) ];
             },
 
             'Program:exit'() {
-                layers.pop();
+                layers = layers.slice(0, -1);
             },
 
             suite(visitorContext) {
@@ -446,7 +450,7 @@ export const consistentStructureRule: Readonly<Rule.RuleModule> = {
                 const { node } = visitorContext;
 
                 if (isFunction(node) && isBlockStatement(node.body)) {
-                    layers.push(createStructureLayer(node.body));
+                    layers = [ ...layers, createStructureLayer(node.body) ];
                 }
             },
 
@@ -454,7 +458,7 @@ export const consistentStructureRule: Readonly<Rule.RuleModule> = {
                 const { node } = visitorContext;
 
                 if (isFunction(node) && isBlockStatement(node.body)) {
-                    layers.pop();
+                    layers = layers.slice(0, -1);
                 }
             },
 

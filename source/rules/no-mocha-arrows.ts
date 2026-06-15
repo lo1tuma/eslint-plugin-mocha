@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion -- needed */
 import type { Rule, SourceCode } from 'eslint';
-import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { getParentNode, isArrowFunctionExpression } from '../ast/node-types.js';
-import type { ArrowFunctionExpression } from '../ast/node-types.js';
+import { createMochaVisitors } from '../ast/mocha-visitors.ts';
+import { type ArrowFunctionExpression, getParentNode, isArrowFunctionExpression } from '../ast/node-types.ts';
 
 function extractSourceTextByRange(sourceCode: Readonly<SourceCode>, start: number, end: number): string {
     return sourceCode.text.slice(start, end).trim();
@@ -66,7 +65,7 @@ function fixArrowFunction(
         // When it((...) => { ... }),
         // simply replace '(...) => ' with 'function () '
         return fixer.replaceTextRange(
-            [fn.range![0], fn.body.range![0]],
+            [ fn.range![0], fn.body.range![0] ],
             formatFunctionHead(sourceCode, fn)
         );
     }
@@ -92,16 +91,17 @@ function fixArrowFunction(
 export const noMochaArrowsRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'suggestion',
-        languages: ['js/js'],
         docs: {
             description: 'Disallow arrow functions as arguments to mocha functions',
+            recommended: true,
             url: 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/no-mocha-arrows.md'
         },
         fixable: 'code',
+        schema: [],
         messages: {
             unexpectedArrowFunction: 'Do not pass arrow functions to {{name}}'
         },
-        schema: []
+        languages: [ 'js/js' ]
     },
     create(context) {
         const { sourceCode } = context;

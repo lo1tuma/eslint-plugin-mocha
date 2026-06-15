@@ -1,55 +1,54 @@
 import { RuleTester } from 'eslint';
-import { withInterface } from '../mocha-interface-test-cases.js';
-import { maxTopLevelSuitesRule } from './max-top-level-suites.js';
+import { withInterface } from '../mocha-interface-test-cases.ts';
+import { maxTopLevelSuitesRule } from './max-top-level-suites.ts';
+
 const ruleTester = new RuleTester({ languageOptions: { sourceType: 'script' } });
 
 ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
     valid: [
-        {
-            code: 'describe("This is a test", function () { });'
-        },
-        {
-            code: 'context("This is a test", function () { });'
-        },
+        'describe("This is a test", function () { });',
+        'context("This is a test", function () { });',
         withInterface('TDD', {
             code: 'suite("This is a test", function () { });'
         }),
-        {
-            code: 'describe("This is a test", function () { describe("This is a different test", function () { }) });'
-        },
-        {
-            code: 'context("This is a test", function () { context("This is a different test", function () { }) });'
-        },
+        'describe("This is a test", function () { describe("This is a different test", function () { }) });',
+        'context("This is a test", function () { context("This is a different test", function () { }) });',
         withInterface('TDD', {
             code: 'suite("This is a test", function () { suite("This is a different test", function () { }) });'
         }),
         {
-            options: [{ limit: 2 }],
-            code: 'describe("This is a test", function () { });'
+            code: 'describe("This is a test", function () { });',
+            options: [ { limit: 2 } ],
+            name: 'allows top-level suites below the configured limit'
         },
         {
-            options: [{ limit: 1 }],
-            code: 'someOtherFunction();'
+            code: 'someOtherFunction();',
+            options: [ { limit: 1 } ],
+            name: 'ignores non-suite calls with a positive limit'
         },
         {
-            options: [{ limit: 0 }],
-            code: 'someOtherFunction();'
+            code: 'someOtherFunction();',
+            options: [ { limit: 0 } ],
+            name: 'ignores non-suite calls with a zero limit'
         },
         {
-            options: [{}],
-            code: 'someOtherFunction();'
+            code: 'someOtherFunction();',
+            options: [ {} ],
+            name: 'ignores non-suite calls with default options'
         },
         {
             code: 'foo("This is a test", function () { });',
+            name: 'allows custom suites from legacy settings below the limit',
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
+                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
             }
         },
         {
             code: 'foo("This is a test", function () { });',
+            name: 'allows custom suites from nested settings below the limit',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
                 }
             }
         },
@@ -81,9 +80,10 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                 sourceType: 'module',
                 ecmaVersion: 2015
             },
+            name: 'allows imported custom member-expression suites below the limit',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'describe.foo', type: 'suite', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'describe.foo', type: 'suite', interface: 'BDD' } ]
                 }
             }
         },
@@ -99,9 +99,10 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                 sourceType: 'module',
                 ecmaVersion: 2015
             },
+            name: 'allows imported custom chained suites below the limit',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'describe.foo()', type: 'suite', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'describe.foo()', type: 'suite', interface: 'BDD' } ]
                 }
             }
         }
@@ -112,7 +113,13 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
             code: 'describe("this is a test", function () { });' +
                 'describe("this is a different test", function () { });',
             errors: [
-                { message: 'The number of top-level suites is more than 1.' }
+                {
+                    message: 'The number of top-level suites is more than 1.',
+                    line: 1,
+                    column: 45,
+                    endLine: 1,
+                    endColumn: 98
+                }
             ]
         },
         {
@@ -123,7 +130,13 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                 ecmaVersion: 2015
             },
             errors: [
-                { message: 'The number of top-level suites is more than 1.' }
+                {
+                    message: 'The number of top-level suites is more than 1.',
+                    line: 1,
+                    column: 31,
+                    endLine: 1,
+                    endColumn: 60
+                }
             ]
         },
         {
@@ -131,14 +144,26 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                 'describe("this is a different test", function () { });' +
                 'describe("this is an another different test", function () { });',
             errors: [
-                { message: 'The number of top-level suites is more than 1.' }
+                {
+                    message: 'The number of top-level suites is more than 1.',
+                    line: 1,
+                    column: 45,
+                    endLine: 1,
+                    endColumn: 98
+                }
             ]
         },
         {
             code: 'context("this is a test", function () { });' +
                 'context("this is a different test", function () { });',
             errors: [
-                { message: 'The number of top-level suites is more than 1.' }
+                {
+                    message: 'The number of top-level suites is more than 1.',
+                    line: 1,
+                    column: 44,
+                    endLine: 1,
+                    endColumn: 96
+                }
             ]
         },
         withInterface('TDD', {
@@ -151,7 +176,13 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
         {
             code: 'describe("this is a test", function () { }); context("this is a test", function () { });',
             errors: [
-                { message: 'The number of top-level suites is more than 1.' }
+                {
+                    message: 'The number of top-level suites is more than 1.',
+                    line: 1,
+                    column: 46,
+                    endLine: 1,
+                    endColumn: 88
+                }
             ]
         },
         {
@@ -159,7 +190,13 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                 'someOtherFunction();' +
                 'describe("this is a different test", function () { });',
             errors: [
-                { message: 'The number of top-level suites is more than 1.' }
+                {
+                    message: 'The number of top-level suites is more than 1.',
+                    line: 1,
+                    column: 65,
+                    endLine: 1,
+                    endColumn: 118
+                }
             ]
         },
         {
@@ -167,29 +204,49 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                 'describe("this is a test", function () { });' +
                 'describe("this is a different test", function () { });',
             errors: [
-                { message: 'The number of top-level suites is more than 1.' }
+                {
+                    message: 'The number of top-level suites is more than 1.',
+                    line: 1,
+                    column: 65,
+                    endLine: 1,
+                    endColumn: 118
+                }
             ]
         },
         {
-            options: [{ limit: 2 }],
             code: 'describe.skip("this is a test", function () { });' +
                 'describe.only("this is a different test", function () { });' +
                 'describe("this is a whole different test", function () { });',
+            options: [ { limit: 2 } ],
             errors: [
-                { message: 'The number of top-level suites is more than 2.' }
-            ]
+                {
+                    message: 'The number of top-level suites is more than 2.',
+                    line: 1,
+                    column: 109,
+                    endLine: 1,
+                    endColumn: 168
+                }
+            ],
+            name: 'reports BDD suites above the configured limit'
         },
         {
-            options: [{ limit: 1 }],
             code: 'xdescribe("this is a test", function () { });' +
                 'describe.only("this is a different test", function () { });' +
                 'describe("this is a whole different test", function () { });',
+            options: [ { limit: 1 } ],
             errors: [
-                { message: 'The number of top-level suites is more than 1.' }
-            ]
+                {
+                    message: 'The number of top-level suites is more than 1.',
+                    line: 1,
+                    column: 46,
+                    endLine: 1,
+                    endColumn: 104
+                }
+            ],
+            name: 'reports exclusive and pending BDD suites above the limit'
         },
         withInterface('TDD', {
-            options: [{ limit: 2 }],
+            options: [ { limit: 2 } ],
             code: 'suite.skip("this is a test", function () { });' +
                 'suite.only("this is a different test", function () { });' +
                 'suite("this is a whole different test", function () { });',
@@ -198,54 +255,99 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
             ]
         }),
         {
-            options: [{ limit: 2 }],
             code: 'context.skip("this is a test", function () { });' +
                 'context.only("this is a different test", function () { });' +
                 'context("this is a whole different test", function () { });',
+            options: [ { limit: 2 } ],
             errors: [
-                { message: 'The number of top-level suites is more than 2.' }
-            ]
+                {
+                    message: 'The number of top-level suites is more than 2.',
+                    line: 1,
+                    column: 107,
+                    endLine: 1,
+                    endColumn: 165
+                }
+            ],
+            name: 'reports TDD suites above the configured limit'
         },
         {
-            options: [{ limit: 0 }],
             code: 'describe("this is a test", function () { });',
+            options: [ { limit: 0 } ],
             errors: [
-                { message: 'The number of top-level suites is more than 0.' }
-            ]
+                {
+                    message: 'The number of top-level suites is more than 0.',
+                    line: 1,
+                    column: 1,
+                    endLine: 1,
+                    endColumn: 44
+                }
+            ],
+            name: 'reports suites when the configured limit is zero'
         },
         {
-            options: [{}],
             code: 'describe("this is a test", function () { });' +
                 'describe.only("this is a different test", function () { });',
+            options: [ {} ],
             errors: [
-                { message: 'The number of top-level suites is more than 1.' }
-            ]
+                {
+                    message: 'The number of top-level suites is more than 1.',
+                    line: 1,
+                    column: 45,
+                    endLine: 1,
+                    endColumn: 103
+                }
+            ],
+            name: 'reports suites above the default limit'
         },
         {
             code: 'foo("this is a test", function () { });' +
                 'foo("this is a different test", function () { });',
+            errors: [
+                {
+                    message: 'The number of top-level suites is more than 1.',
+                    line: 1,
+                    column: 40,
+                    endLine: 1,
+                    endColumn: 88
+                }
+            ],
+            name: 'reports custom suites from legacy settings above the limit',
             settings: {
-                'mocha/additionalCustomNames': [{ name: 'foo', type: 'suite', interface: 'BDD' }]
-            },
-            errors: [
-                { message: 'The number of top-level suites is more than 1.' }
-            ]
+                'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
+            }
         },
         {
             code: 'foo("this is a test", function () { });' +
                 'foo("this is a different test", function () { });',
+            errors: [
+                {
+                    message: 'The number of top-level suites is more than 1.',
+                    line: 1,
+                    column: 40,
+                    endLine: 1,
+                    endColumn: 88
+                }
+            ],
+            name: 'reports custom suites from nested settings above the limit',
             settings: {
                 mocha: {
-                    additionalCustomNames: [{ name: 'foo', type: 'suite', interface: 'BDD' }]
+                    additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
                 }
-            },
-            errors: [
-                { message: 'The number of top-level suites is more than 1.' }
-            ]
+            }
         },
         {
             code: 'describe.foo("bar")("this is a test", function () { });' +
                 'context.foo("this is a different test", function () { });',
+            errors: [
+                {
+                    message: 'The number of top-level suites is more than 1.',
+                    line: 1,
+                    column: 56,
+                    endLine: 1,
+                    endColumn: 112
+                }
+            ],
+            name: 'reports mixed custom member-expression suites above the limit',
             settings: {
                 mocha: {
                     additionalCustomNames: [
@@ -253,14 +355,21 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                         { name: 'context.foo', type: 'suite', interface: 'BDD' }
                     ]
                 }
-            },
-            errors: [
-                { message: 'The number of top-level suites is more than 1.' }
-            ]
+            }
         },
         {
             code: 'forEach([ 1, 2, 3 ]).describe("this is a test", function () { });' +
                 'context.foo("this is a different test", function () { });',
+            errors: [
+                {
+                    message: 'The number of top-level suites is more than 1.',
+                    line: 1,
+                    column: 66,
+                    endLine: 1,
+                    endColumn: 122
+                }
+            ],
+            name: 'reports mixed custom chained suites above the limit',
             settings: {
                 mocha: {
                     additionalCustomNames: [
@@ -268,10 +377,7 @@ ruleTester.run('max-top-level-suites', maxTopLevelSuitesRule, {
                         { name: 'context.foo', type: 'suite', interface: 'BDD' }
                     ]
                 }
-            },
-            errors: [
-                { message: 'The number of top-level suites is more than 1.' }
-            ]
+            }
         }
     ]
 });
