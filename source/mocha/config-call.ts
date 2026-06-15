@@ -26,25 +26,19 @@ function isFiniteNumber(value: unknown): value is number {
 }
 
 function getNamedConfigPropertyName(property: Readonly<CallExpression['callee']>): MochaConfigCall | null {
-    if (!isMemberExpression(property) || !isIdentifier(property.property) || property.computed) {
-        return null;
-    }
-
-    return isMochaConfigCallName(property.property.name)
+    const name = isMemberExpression(property) && !property.computed && isIdentifier(property.property)
         ? property.property.name
         : null;
+
+    return name !== null && isMochaConfigCallName(name) ? name : null;
 }
 
 function getComputedConfigPropertyName(property: Readonly<CallExpression['callee']>): MochaConfigCall | null {
-    if (!isMemberExpression(property) || !property.computed || !isLiteral(property.property)) {
-        return null;
-    }
-
-    const name = String(property.property.value);
-
-    return isMochaConfigCallName(name)
-        ? name
+    const name = isMemberExpression(property) && property.computed && isLiteral(property.property)
+        ? String(property.property.value)
         : null;
+
+    return name !== null && isMochaConfigCallName(name) ? name : null;
 }
 
 function getPropertyName(

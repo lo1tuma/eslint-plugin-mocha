@@ -18,6 +18,9 @@ type PendingSegmentCollection = {
     readonly reportedNodeSet: WeakSet<Rule.Node>;
     readonly reportedNodes: readonly Rule.Node[];
 };
+type PendingSegmentCollectionWithPendingSegments = PendingSegmentCollection & {
+    readonly pendingSegments: readonly [Rule.CodePathSegment, ...readonly Rule.CodePathSegment[]];
+};
 type ReportedNodeSelector = (
     context: Readonly<CallbackHandlingContext>,
     pathState: Readonly<PathState>,
@@ -128,8 +131,8 @@ function createPendingSegmentCollection(
     };
 }
 
-function dropPendingSegment(collection: Readonly<PendingSegmentCollection>): readonly [
-    Rule.CodePathSegment | undefined,
+function dropPendingSegment(collection: Readonly<PendingSegmentCollectionWithPendingSegments>): readonly [
+    Rule.CodePathSegment,
     PendingSegmentCollection
 ] {
     const [ segment, ...pendingSegments ] = collection.pendingSegments;
@@ -141,11 +144,17 @@ function dropPendingSegment(collection: Readonly<PendingSegmentCollection>): rea
             pendingSegments,
             queuedSegmentIds: new Set(
                 Array.from(collection.queuedSegmentIds).filter(function (segmentId) {
-                    return segmentId !== segment?.id;
+                    return segmentId !== segment.id;
                 })
             )
         }
     ];
+}
+
+function hasPendingSegment(
+    collection: Readonly<PendingSegmentCollection>
+): collection is PendingSegmentCollectionWithPendingSegments {
+    return collection.pendingSegments.length > 0;
 }
 
 function processPendingSegments(
@@ -155,13 +164,11 @@ function processPendingSegments(
 ): PendingSegmentCollection {
     let collection = initialCollection;
 
-    while (collection.pendingSegments.length > 0) {
+    while (hasPendingSegment(collection)) {
         const [ segment, nextCollection ] = dropPendingSegment(collection);
         collection = nextCollection;
 
-        if (segment !== undefined) {
-            collection = processPendingSegment(context, collection, segment, selectReportedNode);
-        }
+        collection = processPendingSegment(context, collection, segment, selectReportedNode);
     }
 
     return collection;

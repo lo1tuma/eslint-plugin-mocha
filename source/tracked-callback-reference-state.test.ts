@@ -147,18 +147,57 @@ suite('tracked callback reference state', function () {
         assert.deepStrictEqual(trackedProperties, new Set());
     });
 
-    test('applyContainerPropertyAssignment() removes bindings whose tracked properties become empty', function () {
-        const nextState = applyContainerPropertyAssignment(
-            createSourceCode(),
-            pendingPathState(true, [], [ [ 'callbacks', [ 'done' ] ] ]),
-            {
-                propertyName: 'done',
-                source: null,
-                target: 'callbacks'
-            }
-        );
+    suite('container property assignments', function () {
+        test('applyContainerPropertyAssignment() removes bindings whose tracked properties become empty', function () {
+            const nextState = applyContainerPropertyAssignment(
+                createSourceCode(),
+                pendingPathState(true, [], [ [ 'callbacks', [ 'done' ] ] ]),
+                {
+                    propertyName: 'done',
+                    source: null,
+                    target: 'callbacks'
+                }
+            );
 
-        assert.deepStrictEqual(nextState.containerPropertiesByBinding, new Map());
+            assert.deepStrictEqual(nextState.containerPropertiesByBinding, new Map());
+        });
+
+        test('applyContainerPropertyAssignment() preserves unrelated tracked containers', function () {
+            const nextState = applyContainerPropertyAssignment(
+                createSourceCode(),
+                pendingPathState(true, [], [
+                    [ 'callbacks', [ 'done' ] ],
+                    [ 'otherCallbacks', [ 'finish' ] ]
+                ]),
+                {
+                    propertyName: 'done',
+                    source: null,
+                    target: 'callbacks'
+                }
+            );
+
+            assert.deepStrictEqual(
+                nextState.containerPropertiesByBinding,
+                new Map([ [ 'otherCallbacks', new Set([ 'finish' ]) ] ])
+            );
+        });
+
+        test('applyContainerPropertyAssignment() removes only the assigned tracked property', function () {
+            const nextState = applyContainerPropertyAssignment(
+                createSourceCode(),
+                pendingPathState(true, [], [ [ 'callbacks', [ 'done', 'finish' ] ] ]),
+                {
+                    propertyName: 'done',
+                    source: null,
+                    target: 'callbacks'
+                }
+            );
+
+            assert.deepStrictEqual(
+                nextState.containerPropertiesByBinding,
+                new Map([ [ 'callbacks', new Set([ 'finish' ]) ] ])
+            );
+        });
     });
 
     test('collectTrackedCallbackObjectProperties() ignores non-property entries even when they look initialized', function () {

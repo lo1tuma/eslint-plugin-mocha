@@ -6,27 +6,13 @@
 import type { Rule } from 'eslint';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { createMochaVisitors } from '../ast/mocha-visitors.js';
-import { isRuleNode } from '../ast/rule-node.js';
-import { hasProperty, isRecord } from '../record.js';
+import { isMochaCallbackReport } from './prefer-arrow-callback-report.js';
 
 const coreRule = builtinRules.get('prefer-arrow-callback');
 const docsUrl = 'https://github.com/lo1tuma/eslint-plugin-mocha/blob/main/documentation/rules/prefer-arrow-callback.md';
 
 if (coreRule === undefined) {
     throw new Error('Unable to load the ESLint core "prefer-arrow-callback" rule.');
-}
-
-function hasReportNode(
-    descriptor: Rule.ReportDescriptor
-): descriptor is Rule.ReportDescriptor & { readonly node: Rule.Node; } {
-    return isRecord(descriptor) && hasProperty(descriptor, 'node') && isRuleNode(descriptor.node);
-}
-
-function shouldSkipReport(
-    mochaCallbacks: WeakSet<Rule.Node>,
-    descriptor: Rule.ReportDescriptor
-): boolean {
-    return hasReportNode(descriptor) ? mochaCallbacks.has(descriptor.node) : false;
 }
 
 function createCoreContext(
@@ -43,7 +29,7 @@ function createCoreContext(
         id: context.id,
         options: context.options,
         report(descriptor: Rule.ReportDescriptor): void {
-            if (!shouldSkipReport(mochaCallbacks, descriptor)) {
+            if (!isMochaCallbackReport(mochaCallbacks, descriptor)) {
                 context.report(descriptor);
             }
         }

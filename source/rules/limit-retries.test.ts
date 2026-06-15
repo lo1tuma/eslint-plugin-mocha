@@ -15,34 +15,34 @@ ruleTester.run('limit-retries', limitRetriesRule, {
         {
             code: 'it("works", function () {}).retries();',
             options: [ { mode: 'max', max: 2 } ],
-            name: 'valid case 1'
+            name: 'allows retries calls without configured values'
         },
         {
             code: 'describe("suite", function () { this.retries(2); });',
             options: [ { mode: 'max', max: 2 } ],
-            name: 'valid case 2'
+            name: 'allows suite retry values at the maximum'
         },
         {
             code: 'it("works", function () { this["retries"](2); });',
             options: [ { mode: 'range', min: 0, max: 2 } ],
-            name: 'valid case 3'
+            name: 'allows computed retries calls inside the configured range'
         },
         {
             code: 'it("works", function () { (() => this.retries(2))(); });',
             options: [ { mode: 'range', min: 0, max: 2 } ],
             languageOptions: { ecmaVersion: 2015 },
-            name: 'valid case 4'
+            name: 'ignores retries calls inside nested functions'
         },
         {
             code: 'it("works", function () { function later() { this.retries(3); } });',
             options: [ { mode: 'max', max: 2 } ],
-            name: 'valid case 5'
+            name: 'ignores out-of-range retries calls inside nested functions'
         },
         {
             code: 'const retryLimit = 2; it("works", function () {}).retries(retryLimit);',
             options: [ { mode: 'max', max: 2 } ],
             languageOptions: { ecmaVersion: 2015 },
-            name: 'valid case 6'
+            name: 'allows static retry constants at the maximum'
         },
         {
             code: 'import { it } from "mocha"; it("works", function () {}).retries(2);',
@@ -51,13 +51,13 @@ ruleTester.run('limit-retries', limitRetriesRule, {
                 ecmaVersion: 2018,
                 sourceType: 'module'
             },
-            name: 'valid case 7',
+            name: 'allows required test retry values at the maximum',
             settings: { mocha: { interface: 'require' } }
         },
         {
             code: 'custom("works", function () {}).retries(2);',
             options: [ { mode: 'max', max: 2 } ],
-            name: 'valid case 8',
+            name: 'allows custom test retry values at the maximum',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]
@@ -94,7 +94,7 @@ ruleTester.run('limit-retries', limitRetriesRule, {
                 endLine: 1,
                 endColumn: 39
             } ],
-            name: 'invalid case 1'
+            name: 'reports retry values above the maximum'
         },
         {
             code: 'const retryLimit = 3; it("works", function () {}).retries(retryLimit);',
@@ -107,7 +107,7 @@ ruleTester.run('limit-retries', limitRetriesRule, {
                 endLine: 1,
                 endColumn: 70
             } ],
-            name: 'invalid case 2'
+            name: 'reports static retry constants above the maximum'
         },
         {
             code: 'it("works", function () {}).retries(-1);',
@@ -119,7 +119,7 @@ ruleTester.run('limit-retries', limitRetriesRule, {
                 endLine: 1,
                 endColumn: 40
             } ],
-            name: 'invalid case 3'
+            name: 'reports retry values below the configured range'
         },
         {
             code: 'describe("suite", function () { this["retries"](3); });',
@@ -131,7 +131,7 @@ ruleTester.run('limit-retries', limitRetriesRule, {
                 endLine: 1,
                 endColumn: 51
             } ],
-            name: 'invalid case 4'
+            name: 'reports computed retries calls above the configured range'
         },
         {
             code: 'import { it } from "mocha"; it("works", function () {}).retries(2);',
@@ -140,13 +140,13 @@ ruleTester.run('limit-retries', limitRetriesRule, {
                 sourceType: 'module'
             },
             errors: [ { message: unexpectedRetries, line: 1, column: 29, endLine: 1, endColumn: 67 } ],
-            name: 'invalid case 5',
+            name: 'reports required test retries calls without explicit options',
             settings: { mocha: { interface: 'require' } }
         },
         {
             code: 'custom("works", function () {}).retries(2);',
             errors: [ { message: unexpectedRetries, line: 1, column: 1, endLine: 1, endColumn: 43 } ],
-            name: 'invalid case 6',
+            name: 'reports custom test retries calls without explicit options',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]

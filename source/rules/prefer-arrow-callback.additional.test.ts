@@ -3,12 +3,13 @@ import { Linter, type Rule } from 'eslint';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { suite, test } from 'mocha';
 import { hasProperty, isRecord } from '../record.js';
-import type * as preferArrowCallbackModule from './prefer-arrow-callback.js';
 
 const builtinRuleName = 'prefer-arrow-callback';
 const originalGet = builtinRules.get.bind(builtinRules);
 
-type PreferArrowCallbackModule = typeof preferArrowCallbackModule;
+type PreferArrowCallbackModule = {
+    readonly preferArrowCallbackRule: Readonly<Rule.RuleModule>;
+};
 type RuleContextFixture = {
     readonly reportedMessages: readonly string[];
     readonly ruleContext: Rule.RuleContext;

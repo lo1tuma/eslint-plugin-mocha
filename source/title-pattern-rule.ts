@@ -1,7 +1,7 @@
-import { getStringIfConstant } from '@eslint-community/eslint-utils';
 import type { Rule } from 'eslint';
 import { createMochaVisitors, type VisitorContext } from './ast/mocha-visitors.js';
 import { type CallExpression, isCallExpression } from './ast/node-types.js';
+import { getTitleDescription } from './title-description.js';
 import { getRuleOption, type InferSchemaOption } from './rule-options.js';
 
 type NormalizedOptions = {
@@ -49,15 +49,13 @@ function hasValidOrNoDescription(
     mochaCallExpression: Readonly<CallExpression>,
     pattern: Readonly<RegExp>
 ): boolean {
-    const descriptionArgument = mochaCallExpression.arguments[0];
-    const description = descriptionArgument === undefined
-        ? null
-        : getStringIfConstant(
-            descriptionArgument,
-            context.sourceCode.getScope(mochaCallExpression)
-        );
+    const description = getTitleDescription(context.sourceCode, mochaCallExpression);
 
-    return description === null || pattern.test(description);
+    if (description.kind === 'missing' || description.kind === 'dynamic') {
+        return true;
+    }
+
+    return pattern.test(description.value);
 }
 
 function createTitlePatternRule(

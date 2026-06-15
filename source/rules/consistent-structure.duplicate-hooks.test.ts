@@ -10,47 +10,47 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
         {
             code: 'describe(function() { before(function() {}); it(function() {}); });',
             options,
-            name: 'valid case 1'
+            name: 'allows a single before hook'
         },
         {
             code: 'describe(function() { after(function() {}); it(function() {}); });',
             options,
-            name: 'valid case 2'
+            name: 'allows a single after hook'
         },
         {
             code: 'describe(function() { beforeEach(function() {}); it(function() {}); });',
             options,
-            name: 'valid case 3'
+            name: 'allows a single beforeEach hook'
         },
         {
             code: 'describe(function() { afterEach(function() {}); it(function() {}); });',
             options,
-            name: 'valid case 4'
+            name: 'allows a single afterEach hook'
         },
         {
             code: 'describe(function() { before(function() {}); after(function() {}); });',
             options,
-            name: 'valid case 5'
+            name: 'allows before and after hooks together'
         },
         {
             code: 'describe(function() { before(function() {}); beforeEach(function() {}); });',
             options,
-            name: 'valid case 6'
+            name: 'allows before and beforeEach hooks together'
         },
         {
             code: 'describe(function() { beforeEach(function() {}); afterEach(function() {}); });',
             options,
-            name: 'valid case 7'
+            name: 'allows beforeEach and afterEach hooks together'
         },
         {
             code: 'before(function() {}); beforeEach(function() {});',
             options,
-            name: 'valid case 8'
+            name: 'allows different hooks at top level'
         },
         {
             code: 'foo.before(function() {}); foo.before(function() {});',
             options,
-            name: 'valid case 9'
+            name: 'ignores member-expression hooks without custom settings'
         },
         {
             code: [
@@ -63,7 +63,7 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
-            name: 'valid case 10'
+            name: 'allows same hook in parent and child suites'
         },
         {
             code: [
@@ -76,7 +76,7 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
-            name: 'valid case 11'
+            name: 'allows same hook in child and parent suites'
         },
         {
             code: [
@@ -112,7 +112,7 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
-            name: 'valid case 12'
+            name: 'allows reused setup functions in separate suite scopes'
         },
         {
             code: [
@@ -129,7 +129,7 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
-            name: 'valid case 13'
+            name: 'allows arrow setup helpers inside child suites'
         },
         {
             code: [
@@ -142,7 +142,7 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
-            name: 'valid case 14'
+            name: 'allows same hook in describe.only and parent suites'
         },
         {
             code: [
@@ -155,7 +155,7 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
-            name: 'valid case 15'
+            name: 'allows same hook in describe.skip and parent suites'
         },
         {
             code: [
@@ -168,7 +168,7 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
-            name: 'valid case 16'
+            name: 'allows same hook in xdescribe and parent suites'
         },
         {
             code: [
@@ -181,7 +181,7 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
-            name: 'valid case 17'
+            name: 'allows same hook in context and parent suites'
         },
         {
             code: [
@@ -194,7 +194,7 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
-            name: 'valid case 18'
+            name: 'allows same hook in xcontext and parent suites'
         },
         {
             code: [
@@ -207,7 +207,7 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
-            name: 'valid case 19',
+            name: 'allows legacy custom suite settings to scope hooks',
             settings: {
                 'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
             }
@@ -223,7 +223,7 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
-            name: 'valid case 20',
+            name: 'allows custom suite settings to scope hooks',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
@@ -241,7 +241,7 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
-            name: 'valid case 21',
+            name: 'allows custom member suite names to scope hooks',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'describe.foo', type: 'suite', interface: 'BDD' } ]
@@ -259,7 +259,7 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
-            name: 'valid case 22',
+            name: 'allows custom callable member suite names to scope hooks',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'describe.foo()', type: 'suite', interface: 'BDD' } ]
@@ -295,7 +295,7 @@ ruleTester.run('consistent-structure duplicate hooks', consistentStructureRule, 
             ]
                 .join('\n'),
             options,
-            name: 'valid case 23',
+            name: 'allows dynamic custom suite names to scope hooks',
             settings: {
                 mocha: {
                     additionalCustomNames: [

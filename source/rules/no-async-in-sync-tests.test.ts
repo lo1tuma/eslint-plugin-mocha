@@ -67,10 +67,10 @@ function withLongerTimeout(testFn: RuleTesterTestFunction): RuleTesterTestFuncti
     };
 }
 
-function verifyWithParserServices(parserServices: unknown): readonly Linter.LintMessage[] {
+function verifyCodeWithParserServices(sourceText: string, parserServices: unknown): readonly Linter.LintMessage[] {
     const linter = new Linter({ configType: 'flat' });
 
-    return linter.verify('it("", function () { returnsPromise(); });', [ {
+    return linter.verify(sourceText, [ {
         languageOptions: {
             ecmaVersion: 2020,
             sourceType: 'script',
@@ -105,6 +105,10 @@ function verifyWithParserServices(parserServices: unknown): readonly Linter.Lint
             'mocha/no-async-in-sync-tests': 'error'
         }
     } ]);
+}
+
+function verifyWithParserServices(parserServices: unknown): readonly Linter.LintMessage[] {
+    return verifyCodeWithParserServices('it("", function () { returnsPromise(); });', parserServices);
 }
 
 function registerAdditionalTests(): void {
@@ -188,6 +192,51 @@ function registerAdditionalTests(): void {
             []
         );
     });
+
+    test('ignores promise method names on non-promise typed expressions', function () {
+        const messages = verifyCodeWithParserServices(
+            'it("", function () { queryBuilder().catch(function (reason) {}); });',
+            {
+                getTypeAtLocation() {
+                    return 'nonPromise';
+                },
+                program: {
+                    getTypeChecker() {
+                        return {
+                            getPromisedTypeOfPromise() {
+                                return undefined;
+                            }
+                        };
+                    }
+                }
+            }
+        );
+
+        assert.deepStrictEqual(messages, []);
+    });
+
+    test('does not inspect missing returned expressions', function () {
+        const messages = verifyCodeWithParserServices(
+            'it("", function () { load(function (error) {}); });',
+            {
+                getTypeAtLocation(node: unknown) {
+                    return typeof node === 'string' ? 'fakePromise' : 'notPromise';
+                },
+                program: {
+                    getTypeChecker() {
+                        return {
+                            getPromisedTypeOfPromise(type: unknown) {
+                                return type === 'fakePromise' ? {} : undefined;
+                            }
+                        };
+                    }
+                }
+            }
+        );
+
+        assert.strictEqual(messages.length, 1);
+        assert.strictEqual(messages[0]?.messageId, 'unexpectedCallbackAsyncOperation');
+    });
 }
 
 suite('no-async-in-sync-tests', function () {
@@ -211,13 +260,7 @@ suite('no-async-in-sync-tests', function () {
             {
                 code: 'it("", function () { setTimeout(work, 0); });',
                 options: [ allowSetTimeoutOption ],
-                name: 'valid case 1'
-            },
-            {
-                filename: typescriptFilename,
-                code: 'it("", function () { queryBuilder().catch(function (reason) {}); });\n' +
-                    'declare function queryBuilder(): { catch(callback: (reason: unknown) => number): number; };',
-                languageOptions: typescriptLanguageOptions
+                name: 'allows configured scheduled async methods'
             },
             {
                 filename: typescriptFilename,

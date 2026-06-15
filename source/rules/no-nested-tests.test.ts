@@ -12,7 +12,7 @@ ruleTester.run('no-nested-tests', noNestedTestsRule, {
         'describe("", function () { describe("", function () { it(); }); it(); })',
         {
             code: 'foo("", function () { it(); })',
-            name: 'valid case 1',
+            name: 'allows custom suites with nested tests',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
@@ -143,7 +143,7 @@ ruleTester.run('no-nested-tests', noNestedTestsRule, {
                 endLine: 1,
                 endColumn: 27
             } ],
-            name: 'invalid case 1',
+            name: 'reports custom suites in tests from legacy settings',
             settings: {
                 'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
             }
@@ -157,7 +157,7 @@ ruleTester.run('no-nested-tests', noNestedTestsRule, {
                 endLine: 1,
                 endColumn: 27
             } ],
-            name: 'invalid case 2',
+            name: 'reports custom suites in tests from nested settings',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]

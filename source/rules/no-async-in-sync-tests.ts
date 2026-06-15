@@ -75,19 +75,19 @@ function collectExpressions(
         return [ body ];
     }
 
-    const expressions: TraversableNode[] = [];
+    const expressions = new Set<TraversableNode>();
 
     for (const statement of body.body) {
         visitWithoutNestedFunctions(sourceCode, statement, function (node) {
             const expression = selectExpression(node);
 
             if (expression !== undefined) {
-                expressions.push(expression);
+                expressions.add(expression);
             }
         });
     }
 
-    return expressions;
+    return Array.from(expressions);
 }
 
 function getReturnedExpression(node: Readonly<TraversableNode>): ExtractedExpression {

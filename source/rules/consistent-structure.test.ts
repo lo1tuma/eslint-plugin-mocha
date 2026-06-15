@@ -63,17 +63,17 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
             code:
                 'describe(function() { before(function() {}); beforeEach(function() {}); afterEach(function() {}); after(function() {}); });',
             options: [ { hookOrder: 'setup-teardown' } ],
-            name: 'valid case 1'
+            name: 'allows setup-teardown hook order in a suite'
         },
         {
             code: 'before(function() {}); beforeEach(function() {}); afterEach(function() {}); after(function() {});',
             options: [ { hookOrder: 'setup-teardown' } ],
-            name: 'valid case 2'
+            name: 'allows setup-teardown hook order at top level'
         },
         {
             code: 'describe(function() { around(function() {}); before(function() {}); });',
             options: [ { hookOrder: 'setup-teardown' } ],
-            name: 'valid case 3',
+            name: 'allows custom hooks before built-in hooks',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'around', type: 'hook', interface: 'BDD' } ]
@@ -83,22 +83,22 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
         {
             code: 'describe(function() { it(function() {}); describe(function() {}); });',
             options: [ { order: 'hooks-tests-suites' } ],
-            name: 'valid case 4'
+            name: 'allows tests before child suites when configured'
         },
         {
             code: 'describe(function() { before(function() {}); it(function() {}); });',
             options: [ { order: 'hooks-tests-suites' } ],
-            name: 'valid case 5'
+            name: 'allows hooks before tests when configured'
         },
         {
             code: 'describe(function() { describe(function() {}); it(function() {}); });',
             options: [ { disallowMixedTestsAndSuites: false } ],
-            name: 'valid case 6'
+            name: 'allows mixed child suites and tests when mixing is enabled'
         },
         {
             code: 'describe(function() { describe(function() {}); it(function() {}); });',
             options: [ { order: 'off', disallowMixedTestsAndSuites: false } ],
-            name: 'valid case 7'
+            name: 'allows mixed child suites and tests when order is off'
         },
         withInterface('TDD', {
             code: 'suite(function() { setup(function() {}); suite(function() {}); suite(function() {}); });',
@@ -125,7 +125,7 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
             ]
                 .join('\n'),
             options: [ { order: 'hooks-tests-suites', disallowMixedTestsAndSuites: true } ],
-            name: 'valid case 8',
+            name: 'allows custom suite names in configured order',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
@@ -143,7 +143,7 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
             ]
                 .join('\n'),
             options: [ { hookOrder: 'setup-teardown' } ],
-            name: 'valid case 9',
+            name: 'allows dynamic custom hooks in setup-teardown order',
             settings: {
                 mocha: {
                     additionalCustomNames: [
@@ -168,7 +168,7 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
                 endLine: 1,
                 endColumn: 63
             } ],
-            name: 'invalid case 1'
+            name: 'reports hook after test case'
         },
         {
             code: 'describe(function() { describe(function() {}); before(function() {}); });',
@@ -180,7 +180,7 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
                 endLine: 1,
                 endColumn: 69
             } ],
-            name: 'invalid case 2'
+            name: 'reports hook after child suite'
         },
         {
             code: 'describe(function() { beforeEach(function() {}); before(function() {}); });',
@@ -192,7 +192,7 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
                 endLine: 1,
                 endColumn: 71
             } ],
-            name: 'invalid case 3'
+            name: 'reports before hook after beforeEach hook'
         },
         {
             code: 'describe(function() { describe(function() {}); it(function() {}); });',
@@ -204,7 +204,7 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
                 endLine: 1,
                 endColumn: 65
             } ],
-            name: 'invalid case 4'
+            name: 'reports test case after child suite'
         },
         {
             code: 'describe(function() { it(function() {}); describe(function() {}); });',
@@ -216,7 +216,7 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
                 endLine: 1,
                 endColumn: 65
             } ],
-            name: 'invalid case 5'
+            name: 'reports mixed child suite after test case'
         },
         {
             code: 'describe(function() { describe(function() {}); it(function() {}); });',
@@ -228,7 +228,7 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
                 endLine: 1,
                 endColumn: 65
             } ],
-            name: 'invalid case 6'
+            name: 'reports mixed test case after child suite'
         },
         {
             code: [
@@ -252,7 +252,7 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
                 },
                 { message: 'Unexpected test case after a child suite.', column: 5, line: 4, endLine: 4, endColumn: 22 }
             ],
-            name: 'invalid case 7'
+            name: 'reports ordering and mixed-suite violations together'
         },
         withInterface('TDD', {
             code: 'suite(function() { suite(function() {}); test(function() {}); });',
@@ -287,7 +287,7 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
                 endLine: 3,
                 endColumn: 23
             } ],
-            name: 'invalid case 8',
+            name: 'reports mixed custom suite after test case',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
@@ -310,7 +310,7 @@ ruleTester.run('consistent-structure', consistentStructureRule, {
                 endLine: 3,
                 endColumn: 45
             } ],
-            name: 'invalid case 9',
+            name: 'reports dynamic beforeEach hook after dynamic afterEach hook',
             settings: {
                 mocha: {
                     additionalCustomNames: [

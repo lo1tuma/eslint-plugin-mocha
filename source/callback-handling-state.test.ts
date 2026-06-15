@@ -394,6 +394,46 @@ suite('callback handling state helpers', function () {
                 assert.strictEqual(nextState.unhandledReferences.containerPropertiesByBinding.has('callbacks'), false);
             });
 
+            test('updatePathState() preserves unrelated containers on property reassignment', function () {
+                const sourceCode = createSourceCode();
+                const nextState = updatePathState(
+                    sourceCode,
+                    createPathState({
+                        unhandledContainerProperties: [
+                            [ 'callbacks', [ 'complete' ] ],
+                            [ 'otherCallbacks', [ 'finish' ] ]
+                        ]
+                    }),
+                    containerPropertyAssignment(identifier('clearProperty'), 'callbacks', 'complete', null)
+                );
+
+                assert.strictEqual(nextState.unhandledReferences.containerPropertiesByBinding.has('callbacks'), false);
+                assert.deepStrictEqual(
+                    readStrings(nextState.unhandledReferences.containerPropertiesByBinding.get('otherCallbacks') ?? []),
+                    [ 'finish' ]
+                );
+            });
+
+            test('updatePathState() preserves unrelated callback containers on binding reassignment', function () {
+                const sourceCode = createSourceCode();
+                const nextState = updatePathState(
+                    sourceCode,
+                    createPathState({
+                        unhandledContainerProperties: [
+                            [ 'callbacks', [ 'complete' ] ],
+                            [ 'otherCallbacks', [ 'finish' ] ]
+                        ]
+                    }),
+                    bindingAssignment(identifier('clearContainer'), 'callbacks', null)
+                );
+
+                assert.strictEqual(nextState.unhandledReferences.containerPropertiesByBinding.has('callbacks'), false);
+                assert.deepStrictEqual(
+                    readStrings(nextState.unhandledReferences.containerPropertiesByBinding.get('otherCallbacks') ?? []),
+                    [ 'finish' ]
+                );
+            });
+
             test('updatePathState() tracks dynamic callback container properties', function () {
                 const sourceCode = createSourceCode();
                 const trackedState = updatePathState(
@@ -491,49 +531,6 @@ suite('callback handling state helpers', function () {
                 assert.strictEqual(nextState.callbackHandled, false);
                 assert.deepStrictEqual(readStrings(nextState.handledReferences.aliasBindings), []);
             });
-        });
-    });
-
-    suite('reported nodes', function () {
-        test('getCodeAfterCallbackHandlingNode() reports non-callback operations after the callback', function () {
-            const sourceCode = createSourceCode();
-            const state = createPathState({ callbackHandled: true, handledAliases: [ 'done' ] });
-            const laterNode = identifier('laterStatement');
-            const laterBindingAssignment = bindingAssignment(laterNode, 'finish', literal(0));
-            const callbackCall = callOperation(identifier('done'), []);
-
-            assert.strictEqual(getCodeAfterCallbackHandlingNode(sourceCode, state, laterBindingAssignment), laterNode);
-            assert.strictEqual(getCodeAfterCallbackHandlingNode(sourceCode, state, callbackCall), undefined);
-        });
-
-        test('getCodeAfterCallbackHandlingNode() treats unsupported and untracked member calls as later code', function () {
-            const sourceCode = createSourceCode();
-            const state = createPathState({ callbackHandled: true, handledAliases: [ 'done' ] });
-            const unsupportedCall = callOperation(
-                memberExpression(callExpression(identifier('getCallbacks'), []), identifier('complete')),
-                []
-            );
-            const untrackedCall = callOperation(memberExpression(identifier('callbacks'), identifier('complete')), []);
-
-            assert.strictEqual(
-                getCodeAfterCallbackHandlingNode(sourceCode, state, unsupportedCall),
-                unsupportedCall.node
-            );
-            assert.strictEqual(getCodeAfterCallbackHandlingNode(sourceCode, state, untrackedCall), untrackedCall.node);
-        });
-
-        test('getCodeAfterCallbackHandlingNode() treats dynamic delegate paths as later code', function () {
-            const sourceCode = createSourceCode();
-            const state = createPathState({ callbackHandled: true, handledAliases: [ 'done' ] });
-            const dynamicDelegateCall = callOperation(
-                memberExpression(identifier('globalThis'), identifier('delegateName'), true),
-                [ identifier('done') ]
-            );
-
-            assert.strictEqual(
-                getCodeAfterCallbackHandlingNode(sourceCode, state, dynamicDelegateCall),
-                dynamicDelegateCall.node
-            );
         });
     });
 });

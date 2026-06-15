@@ -11,6 +11,11 @@ suite('node location helpers', function () {
         }, function (error: unknown) {
             return error instanceof Error && error.message === 'Expected node range.';
         });
+        assert.throws(function () {
+            expectNodeRange({ range: null });
+        }, function (error: unknown) {
+            return error instanceof Error && error.message === 'Expected node range.';
+        });
     });
 
     test('expectNodeLocation() returns locations and throws for missing ones', function () {

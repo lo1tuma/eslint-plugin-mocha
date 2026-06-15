@@ -36,7 +36,11 @@ type ReportMessageDetails = {
 };
 
 function validateOption(option: Readonly<Option>): void {
-    if (option.mode === 'range' && option.min > option.max) {
+    if (option.mode !== 'range') {
+        return;
+    }
+
+    if (option.min > option.max) {
         throw new TypeError('`min` must be less than or equal to `max`.');
     }
 }

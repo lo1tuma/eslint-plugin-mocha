@@ -14,6 +14,7 @@ const sourceRulesDir = path.join(currentFolderName, '../../../source/rules/');
 const documentationDir = path.join(currentFolderName, '../../../documentation/rules/');
 type PluginRuleName = keyof typeof plugin.rules;
 type PluginRule = Readonly<(typeof plugin.rules)[PluginRuleName]>;
+type RecommendedRuleDecision = Readonly<NonNullable<typeof plugin.configs.recommended.rules>[string]>;
 
 async function importModuleExports(filePath: string): Promise<Readonly<Record<string, unknown>>> {
     return await import(filePath) as Readonly<Record<string, unknown>>;
@@ -105,6 +106,12 @@ function selectAllRuleDecisions(allRules: NonNullable<typeof plugin.configs.all.
         'mocha/valid-test-title': allRules['mocha/valid-test-title'],
         'mocha/no-empty-title': allRules['mocha/no-empty-title']
     };
+}
+
+function isEnabledRuleDecision(decision: RecommendedRuleDecision | undefined): boolean {
+    return decision !== undefined &&
+        decision !== 'off' &&
+        (!Array.isArray(decision) || decision[0] !== 'off');
 }
 
 function assertNonEmptyString(value: unknown): void {
@@ -289,6 +296,21 @@ suite('eslint-plugin-mocha', function () {
                     'mocha/consistent-interface': 'off'
                 }
             );
+        });
+
+        test('should align rule metadata with the recommended config', function () {
+            const { rules: recommendedRules } = plugin.configs.recommended;
+
+            assert.notStrictEqual(recommendedRules, undefined);
+
+            for (const [ ruleName, rule ] of Object.entries(plugin.rules)) {
+                const fullRuleName = `mocha/${ruleName}`;
+
+                assert.strictEqual(
+                    rule.meta?.docs?.recommended ?? false,
+                    isEnabledRuleDecision(recommendedRules?.[fullRuleName])
+                );
+            }
         });
     });
 });

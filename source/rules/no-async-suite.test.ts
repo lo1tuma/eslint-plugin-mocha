@@ -40,7 +40,7 @@ ruleTester.run('no-async-suite', noAsyncSuiteRule, {
                 endLine: 1,
                 endColumn: 34
             } ],
-            name: 'invalid case 1',
+            name: 'reports async custom suite callbacks',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
@@ -134,7 +134,7 @@ ruleTester.run('no-async-suite', noAsyncSuiteRule, {
                 endLine: 1,
                 endColumn: 44
             } ],
-            name: 'invalid case 2',
+            name: 'reports async callbacks for custom chained suite calls',
             settings: {
                 mocha: {
                     additionalCustomNames: [
@@ -154,7 +154,7 @@ ruleTester.run('no-async-suite', noAsyncSuiteRule, {
                 endLine: 1,
                 endColumn: 58
             } ],
-            name: 'invalid case 3',
+            name: 'reports async callbacks for custom nested chained suite calls',
             settings: {
                 mocha: {
                     additionalCustomNames: [

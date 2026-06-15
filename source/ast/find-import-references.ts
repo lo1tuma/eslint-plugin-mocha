@@ -3,7 +3,7 @@ import type { Except } from 'type-fest';
 import { flatMapWithArgs, mapWithArgs } from '../list.js';
 import type { NameDetails } from '../mocha/name-details.js';
 import { getUniqueBaseNames } from '../mocha/path.js';
-import { hasProperty, isRecord } from '../record.js';
+import { isRecord } from '../record.js';
 import { type DynamicPath, isConstantPath } from './member-expression.js';
 import { getParentNode } from './node-types.js';
 import { findParentNodeAndPathForIdentifier, type ResolvedReference } from './resolved-reference.js';
@@ -28,20 +28,8 @@ type NamedImportBindingVariable = Readonly<Scope.Variable> & {
     readonly defs: readonly [ImportBindingDefinition, ...(readonly Scope.Definition[])];
 };
 
-type ScopeWithChildScopes = Readonly<Scope.Scope> & {
-    readonly childScopes: readonly Scope.Scope[];
-};
-
-function hasChildScopes(scope: Readonly<Scope.Scope>): scope is ScopeWithChildScopes {
-    return isRecord(scope) && hasProperty(scope, 'childScopes') && Array.isArray(scope.childScopes);
-}
-
 function getFirstChildScope(scope: Readonly<Scope.Scope> | null | undefined): Scope.Scope | undefined {
-    if (scope === null || scope === undefined || !hasChildScopes(scope)) {
-        return undefined;
-    }
-
-    return scope.childScopes[0];
+    return scope?.childScopes[0];
 }
 
 function isImportSpecifierNode(node: unknown): node is Readonly<ImportSpecifierNode> {

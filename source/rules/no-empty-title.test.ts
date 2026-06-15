@@ -78,7 +78,7 @@ ruleTester.run('no-empty-title', noEmptyTitleRule, {
         },
         {
             code: 'someFunction("this is a test", function () { });',
-            name: 'valid case 1',
+            name: 'allows titled custom test calls',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'someFunction', type: 'testCase', interface: 'BDD' } ]
@@ -117,7 +117,7 @@ ruleTester.run('no-empty-title', noEmptyTitleRule, {
             code: 'someFunction(function() { })',
             options: [ { message: 'Custom Error' } ],
             errors: [ { message: 'Custom Error', ...firstLine, line: 1, column: 1, endLine: 1, endColumn: 29 } ],
-            name: 'invalid case 1',
+            name: 'reports custom tests without a title argument',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'someFunction', type: 'testCase', interface: 'BDD' } ]

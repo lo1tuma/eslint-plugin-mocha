@@ -119,7 +119,7 @@ ruleTester.run('no-identical-title', noIdenticalTitleRule, {
                 'foo("describe2", function() {});'
             ]
                 .join('\n'),
-            name: 'valid case 1',
+            name: 'accepts distinct custom suite titles from legacy settings',
             settings: {
                 'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
             }
@@ -130,7 +130,7 @@ ruleTester.run('no-identical-title', noIdenticalTitleRule, {
                 'foo("describe2", function() {});'
             ]
                 .join('\n'),
-            name: 'valid case 2',
+            name: 'accepts distinct custom suite titles from nested settings',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
@@ -278,7 +278,7 @@ ruleTester.run('no-identical-title', noIdenticalTitleRule, {
                 endLine: 2,
                 endColumn: 32
             } ],
-            name: 'invalid case 1',
+            name: 'reports duplicate custom suite titles from legacy settings',
             settings: {
                 'mocha/additionalCustomNames': [ { name: 'foo', type: 'suite', interface: 'BDD' } ]
             }
@@ -296,7 +296,7 @@ ruleTester.run('no-identical-title', noIdenticalTitleRule, {
                 endLine: 2,
                 endColumn: 32
             } ],
-            name: 'invalid case 2',
+            name: 'reports duplicate custom suite titles from nested settings',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'foo', type: 'suite', interface: 'BDD' } ]

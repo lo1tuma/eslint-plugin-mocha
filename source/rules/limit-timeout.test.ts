@@ -16,39 +16,39 @@ ruleTester.run('limit-timeout', limitTimeoutRule, {
         {
             code: 'it("works", function () {}).timeout();',
             options: [ { mode: 'max', max: 5000 } ],
-            name: 'valid case 1'
+            name: 'allows timeout calls without configured values'
         },
         {
             code: 'it("works", function () {}).timeout(5000);',
             options: [ { mode: 'max', max: 5000 } ],
-            name: 'valid case 2'
+            name: 'allows test timeout values at the maximum'
         },
         {
             code: 'describe("suite", function () { this.timeout(5000); });',
             options: [ { mode: 'max', max: 5000 } ],
-            name: 'valid case 3'
+            name: 'allows suite timeout values at the maximum'
         },
         {
             code: 'it("works", function () { this["timeout"](5000); });',
             options: [ { mode: 'range', min: 1, max: 5000 } ],
-            name: 'valid case 4'
+            name: 'allows computed timeout calls inside the configured range'
         },
         {
             code: 'it("works", function () { (() => this.timeout(5000))(); });',
             options: [ { mode: 'range', min: 1, max: 5000 } ],
             languageOptions: { ecmaVersion: 2015 },
-            name: 'valid case 5'
+            name: 'ignores timeout calls inside nested functions'
         },
         {
             code: 'it("works", function () { function later() { this.timeout(0); } });',
             options: [ { mode: 'disallowDisabled' } ],
-            name: 'valid case 6'
+            name: 'ignores disabled timeout calls inside nested functions'
         },
         {
             code: 'const configuredTimeout = 5000; it("works", function () {}).timeout(configuredTimeout);',
             options: [ { mode: 'max', max: 5000 } ],
             languageOptions: { ecmaVersion: 2015 },
-            name: 'valid case 7'
+            name: 'allows static timeout constants at the maximum'
         },
         {
             code: 'import { it } from "mocha"; it("works", function () {}).timeout(5000);',
@@ -57,13 +57,13 @@ ruleTester.run('limit-timeout', limitTimeoutRule, {
                 ecmaVersion: 2018,
                 sourceType: 'module'
             },
-            name: 'valid case 8',
+            name: 'allows required test timeout values at the maximum',
             settings: { mocha: { interface: 'require' } }
         },
         {
             code: 'custom("works", function () {}).timeout(5000);',
             options: [ { mode: 'max', max: 5000 } ],
-            name: 'valid case 9',
+            name: 'allows custom test timeout values at the maximum',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]
@@ -94,20 +94,20 @@ ruleTester.run('limit-timeout', limitTimeoutRule, {
             code: 'it("works", function () {}).timeout(0);',
             options: [ { mode: 'disallowDisabled' } ],
             errors: [ { message: unexpectedDisabledTimeout, line: 1, column: 1, endLine: 1, endColumn: 39 } ],
-            name: 'invalid case 1'
+            name: 'reports disabled zero timeouts'
         },
         {
             code: 'it("works", function () { this.timeout(-1); });',
             options: [ { mode: 'disallowDisabled' } ],
             errors: [ { message: unexpectedDisabledTimeout, line: 1, column: 27, endLine: 1, endColumn: 43 } ],
-            name: 'invalid case 2'
+            name: 'reports disabled negative timeouts'
         },
         {
             code: 'const disabledTimeout = 2147483647; it("works", function () {}).timeout(disabledTimeout);',
             options: [ { mode: 'disallowDisabled' } ],
             languageOptions: { ecmaVersion: 2015 },
             errors: [ { message: unexpectedDisabledTimeout, line: 1, column: 37, endLine: 1, endColumn: 89 } ],
-            name: 'invalid case 3'
+            name: 'reports static disabled timeout constants'
         },
         {
             code: 'it("works", function () {}).timeout(5001);',
@@ -119,7 +119,7 @@ ruleTester.run('limit-timeout', limitTimeoutRule, {
                 endLine: 1,
                 endColumn: 42
             } ],
-            name: 'invalid case 4'
+            name: 'reports timeout values above the maximum'
         },
         {
             code: 'const configuredTimeout = 5001; it("works", function () {}).timeout(configuredTimeout);',
@@ -132,7 +132,7 @@ ruleTester.run('limit-timeout', limitTimeoutRule, {
                 endLine: 1,
                 endColumn: 87
             } ],
-            name: 'invalid case 5'
+            name: 'reports static timeout constants above the maximum'
         },
         {
             code: 'it("works", function () {}).timeout(0);',
@@ -144,7 +144,7 @@ ruleTester.run('limit-timeout', limitTimeoutRule, {
                 endLine: 1,
                 endColumn: 39
             } ],
-            name: 'invalid case 6'
+            name: 'reports timeout values below the configured range'
         },
         {
             code: 'describe("suite", function () { this["timeout"](6000); });',
@@ -156,7 +156,7 @@ ruleTester.run('limit-timeout', limitTimeoutRule, {
                 endLine: 1,
                 endColumn: 54
             } ],
-            name: 'invalid case 7'
+            name: 'reports computed timeout calls above the configured range'
         },
         {
             code: 'import { it } from "mocha"; it("works", function () {}).timeout(5000);',
@@ -165,13 +165,13 @@ ruleTester.run('limit-timeout', limitTimeoutRule, {
                 sourceType: 'module'
             },
             errors: [ { message: unexpectedTimeout, line: 1, column: 29, endLine: 1, endColumn: 70 } ],
-            name: 'invalid case 8',
+            name: 'reports required test timeout calls without explicit options',
             settings: { mocha: { interface: 'require' } }
         },
         {
             code: 'custom("works", function () {}).timeout(5000);',
             errors: [ { message: unexpectedTimeout, line: 1, column: 1, endLine: 1, endColumn: 46 } ],
-            name: 'invalid case 9',
+            name: 'reports custom test timeout calls without explicit options',
             settings: {
                 mocha: {
                     additionalCustomNames: [ { name: 'custom', type: 'testCase', interface: 'BDD' } ]
