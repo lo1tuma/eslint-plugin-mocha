@@ -57,7 +57,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git://github.com/lo1tuma/eslint-plugin-mocha.git"
+        "url": "git+https://github.com/lo1tuma/eslint-plugin-mocha.git"
     },
     "author": "Mathias Schreck <schreck.mathias@gmail.com>",
     "contributors": [
