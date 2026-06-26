@@ -1,0 +1,32 @@
+name: Release PR policy
+
+on:
+    pull_request:
+        types: [opened, reopened, synchronize, edited, labeled, unlabeled]
+
+permissions:
+    contents: read
+    pull-requests: read
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+    release-pr-policy:
+        runs-on: ubuntu-latest
+        name: Release PR policy
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  persist-credentials: false
+            - name: Use Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+            - name: Install dependencies
+              run: npm clean-install --ignore-scripts
+            - name: Validate release pull request
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: npx just validate-release-pr

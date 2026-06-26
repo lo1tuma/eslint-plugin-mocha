@@ -21,7 +21,7 @@
         "@enormora/eslint-config-mocha": "0.0.40",
         "@enormora/eslint-config-node": "0.0.34",
         "@enormora/eslint-config-typescript": "0.0.50",
-        "@packtory/cli": "0.0.26",
+        "@packtory/cli": "0.0.46",
         "@stryker-mutator/core": "9.6.1",
         "@stryker-mutator/mocha-runner": "9.6.1",
         "@types/estree": "1.0.9",
@@ -36,18 +36,8 @@
         "jscpd": "4.2.3",
         "knip": "6.14.2",
         "mocha": "11.1.0",
-        "pr-log": "6.1.1",
         "rust-just": "1.51.0",
         "typescript": "6.0.3"
-    },
-    "pr-log": {
-        "collapseRules": [
-            {
-                "label": "upgrade",
-                "pattern": "^⬆️ Update dependency (?<dependency>.+?) from (?<from>.+?) to (?<to>.+?)$",
-                "replace": "⬆️ Update dependency $<dependency> from $<from> to $<to>"
-            }
-        ]
     },
     "overrides": {
         "yargs": "18.0.0"

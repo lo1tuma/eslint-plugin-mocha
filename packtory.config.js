@@ -1,93 +1,101 @@
 // @ts-check
-/** @typedef {import('@packtory/cli/package.json')} PacktoryCliPackage */
-
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
 const projectFolder = process.cwd();
 const sourcesFolder = path.join(projectFolder, 'target/build/source');
-const dryRunTokenPlaceholder = 'dry-run-placeholder';
 
-// eslint-disable-next-line node/no-process-env -- publish auth comes from the environment
-const npmToken = process.env.NPM_TOKEN;
-
-function isLivePublishInvocation(commandLineArguments) {
-    return (
-        commandLineArguments.includes('publish') &&
-        commandLineArguments.includes('--no-dry-run')
-    );
+async function readPackageInfo() {
+    const packageJsonContent = await fs.readFile(path.join(projectFolder, 'package.json'), { encoding: 'utf8' });
+    return JSON.parse(packageJsonContent);
 }
 
-if (npmToken === undefined && isLivePublishInvocation(process.argv)) {
-    throw new Error('Missing NPM_TOKEN environment variable');
+function registrySettings() {
+    return {
+        auth: { type: 'npm-oidc', provider: 'github-actions' }
+    };
 }
 
-const packageJsonContent = await fs.readFile(path.join(projectFolder, 'package.json'), {
-    encoding: 'utf8'
-});
-const packageJson = JSON.parse(packageJsonContent);
-
-export const config = {
-    registrySettings: {
-        auth: {
-            publish: {
-                type: 'bearer-token',
-                token: npmToken ?? dryRunTokenPlaceholder
-            },
-            metadata: npmToken === undefined ? 'anonymous' : 'auto'
-        }
-    },
-    checks: {
-        noDevDependencyImports: {
-            enabled: true
-        },
-        requiredFiles: {
-            enabled: true,
-            files: [ 'LICENSE', 'readme.md' ]
-        },
-        uniqueTargetPaths: {
-            enabled: true
-        }
-    },
-    commonPackageSettings: {
+function commonPackageSettings(packageInfo) {
+    return {
         sourcesFolder,
-        mainPackageJson: packageJson,
+        mainPackageJson: packageInfo,
         includeSourceMapFiles: false,
         publishSettings: {
-            access: 'public'
+            access: 'public',
+            provenance: { type: 'auto' }
         },
         additionalPackageJsonAttributes: {
-            license: packageJson.license,
-            repository: packageJson.repository,
-            author: packageJson.author,
-            contributors: packageJson.contributors,
-            description: packageJson.description,
-            keywords: packageJson.keywords
+            author: packageInfo.author,
+            contributors: packageInfo.contributors,
+            description: packageInfo.description,
+            keywords: packageInfo.keywords,
+            license: packageInfo.license,
+            repository: packageInfo.repository
         }
-    },
-    packages: [
-        {
-            name: 'eslint-plugin-mocha',
-            versioning: {
-                automatic: false,
-                version: '11.3.0'
+    };
+}
+
+function releasePullRequestSettings() {
+    return {
+        branch: 'release/eslint-plugin-mocha',
+        body: 'Updates changelogs for the next `eslint-plugin-mocha` release.',
+        githubActionsCi: {
+            trigger: 'workflow-dispatch',
+            workflowFile: 'ci.yml',
+            requiredStatusContexts: [ 'Node 22', 'Node 24', 'Node 26' ]
+        }
+    };
+}
+
+function mochaPluginPackage() {
+    return {
+        name: 'eslint-plugin-mocha',
+        versioning: {
+            automatic: false,
+            source: 'pull-request-labels'
+        },
+        roots: {
+            main: {
+                js: 'plugin.js',
+                declarationFile: 'plugin.d.ts'
+            }
+        },
+        additionalFiles: [
+            {
+                sourceFilePath: path.join(projectFolder, 'README.md'),
+                targetFilePath: 'README.md'
             },
-            roots: {
-                main: {
-                    js: 'plugin.js',
-                    declarationFile: 'plugin.d.ts'
-                }
-            },
-            additionalFiles: [
-                {
-                    sourceFilePath: path.join(projectFolder, 'README.md'),
-                    targetFilePath: 'readme.md'
-                },
-                {
-                    sourceFilePath: path.join(projectFolder, 'LICENSE'),
-                    targetFilePath: 'LICENSE'
-                }
+            {
+                sourceFilePath: path.join(projectFolder, 'LICENSE'),
+                targetFilePath: 'LICENSE'
+            }
+        ]
+    };
+}
+
+/** @returns {Promise<import('@packtory/cli').PacktoryConfig & Record<string, unknown>>} */
+export async function buildConfig() {
+    const packageInfo = await readPackageInfo();
+
+    return {
+        registrySettings: registrySettings(),
+        changelog: {
+            packageTagFormat: '{version}',
+            outputs: [
+                { kind: 'repository-file', path: 'CHANGELOG.md' },
+                { kind: 'github-release' }
             ]
-        }
-    ]
-};
+        },
+        checks: {
+            noDevDependencyImports: { enabled: true },
+            requiredFiles: { enabled: true, files: [ 'LICENSE', 'README.md' ] },
+            uniqueTargetPaths: { enabled: true }
+        },
+        commonPackageSettings: commonPackageSettings(packageInfo),
+        releasePullRequest: releasePullRequestSettings(),
+        packages: [
+            mochaPluginPackage()
+        ]
+    };
+}
