@@ -48,6 +48,9 @@ test: test-unit-with-coverage test-bench
 coveralls:
     coveralls < ./target/coverage/lcov.info
 
+changelog:
+    pr-log
+
 pack-preview:
     packtory preview
 
