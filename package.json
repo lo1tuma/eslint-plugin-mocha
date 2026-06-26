@@ -36,8 +36,18 @@
         "jscpd": "4.2.3",
         "knip": "6.14.2",
         "mocha": "11.1.0",
+        "pr-log": "6.3.0",
         "rust-just": "1.51.0",
         "typescript": "6.0.3"
+    },
+    "pr-log": {
+        "collapseRules": [
+            {
+                "label": "upgrade",
+                "pattern": "^⬆️ Update dependency (?<dependency>.+?) from (?<from>.+?) to (?<to>.+?)$",
+                "replace": "⬆️ Update dependency $<dependency> from $<from> to $<to>"
+            }
+        ]
     },
     "overrides": {
         "yargs": "18.0.0"
