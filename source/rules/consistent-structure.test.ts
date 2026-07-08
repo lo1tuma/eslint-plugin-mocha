@@ -62,11 +62,11 @@ function readNestedMemberCallExpression(code: string): NestedMemberCallExpressio
     if (expression.type !== 'CallExpression') {
         throw new Error('Expected call expression.');
     }
-    const { callee } = expression;
+    const callee = expression.callee as Readonly<Rule.Node>;
     if (callee.type !== 'MemberExpression') {
         throw new Error('Expected member expression callee.');
     }
-    const calleeObject = callee.object;
+    const calleeObject = callee.object as Readonly<Rule.Node>;
     if (calleeObject.type !== 'MemberExpression') {
         throw new Error('Expected nested member expression callee.');
     }
@@ -371,7 +371,7 @@ suite('consistent-structure helpers', function () {
             }
         );
 
-        const result = getTopLevelMochaExpression(calleeObject.object);
+        const result = getTopLevelMochaExpression(calleeObject.object as Readonly<Rule.Node>);
 
         assert.strictEqual(result.type, 'MemberExpression');
         assert.strictEqual(result, callee);
