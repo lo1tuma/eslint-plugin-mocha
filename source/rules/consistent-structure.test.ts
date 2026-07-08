@@ -12,6 +12,12 @@ type ReadExpressionResult = {
     readonly expression: Readonly<Rule.Node>;
 };
 
+type NestedMemberCallExpression = {
+    readonly expression: Extract<Rule.Node, { readonly type: 'CallExpression'; }>;
+    readonly callee: Extract<Rule.Node, { readonly type: 'MemberExpression'; }>;
+    readonly calleeObject: Extract<Rule.Node, { readonly type: 'MemberExpression'; }>;
+};
+
 function readExpression(
     code: string
 ): ReadExpressionResult {
@@ -49,6 +55,22 @@ function readExpression(
         readonly sourceCode: Readonly<SourceCode>;
         readonly expression: Readonly<Rule.Node>;
     };
+}
+
+function readNestedMemberCallExpression(code: string): NestedMemberCallExpression {
+    const { expression } = readExpression(code);
+    if (expression.type !== 'CallExpression') {
+        throw new Error('Expected call expression.');
+    }
+    const { callee } = expression;
+    if (callee.type !== 'MemberExpression') {
+        throw new Error('Expected member expression callee.');
+    }
+    const calleeObject = callee.object;
+    if (calleeObject.type !== 'MemberExpression') {
+        throw new Error('Expected nested member expression callee.');
+    }
+    return { expression, callee, calleeObject };
 }
 
 ruleTester.run('consistent-structure', consistentStructureRule, {
@@ -334,15 +356,24 @@ suite('consistent-structure helpers', function () {
     });
 
     test('getTopLevelMochaExpression() walks up member expressions', function () {
-        const { expression } = readExpression('foo.bar.baz();');
+        const { expression, callee, calleeObject } = readNestedMemberCallExpression('foo.bar.baz();');
 
-        assert.strictEqual(expression.type, 'CallExpression');
-        assert.strictEqual(expression.callee.type, 'MemberExpression');
-        assert.strictEqual(expression.callee.object.type, 'MemberExpression');
+        assert.deepStrictEqual(
+            {
+                type: expression.type,
+                calleeType: callee.type,
+                calleeObjectType: calleeObject.type
+            },
+            {
+                type: 'CallExpression',
+                calleeType: 'MemberExpression',
+                calleeObjectType: 'MemberExpression'
+            }
+        );
 
-        const result = getTopLevelMochaExpression(expression.callee.object.object as unknown as Rule.Node);
+        const result = getTopLevelMochaExpression(calleeObject.object);
 
         assert.strictEqual(result.type, 'MemberExpression');
-        assert.strictEqual(result, expression.callee);
+        assert.strictEqual(result, callee);
     });
 });
