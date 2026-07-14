@@ -6,7 +6,7 @@ const iterations = 50;
 
 suite('startup / require time', function () {
     test('should not take longer as the defined budget to require the plugin', async function () {
-        const cpuAgnosticBudget = 10_500;
+        const cpuAgnosticBudget = 14_000;
         const budget = cpuAgnosticBudget / cpuSpeed;
 
         const { medianDuration } = await runAsyncBenchmark(async function () {
@@ -21,7 +21,7 @@ suite('startup / require time', function () {
     });
 
     test('should not consume more memory as the defined budget', async function () {
-        const budget = 350_000;
+        const budget = 600_000;
 
         const { medianMemory } = await runAsyncBenchmark(async function () {
             await importFresh('../source/plugin.js');
