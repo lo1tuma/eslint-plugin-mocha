@@ -1,0 +1,132 @@
+name: Release publish
+
+on:
+    workflow_call:
+        inputs:
+            release_pull_request_number:
+                default: ""
+                required: false
+                type: string
+    workflow_dispatch:
+        inputs:
+            release_pull_request_number:
+                required: true
+                type: string
+
+permissions: {}
+
+concurrency:
+    group: release-publish
+    cancel-in-progress: false
+
+jobs:
+    publish-release:
+        runs-on: ubuntu-latest
+        name: Publish release
+        permissions:
+            contents: write
+            id-token: write
+            pull-requests: read
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+                  persist-credentials: false
+            - name: Use Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+            - name: Install workflow dependencies
+              run: npm clean-install --ignore-scripts
+            - name: Authorize release publish
+              id: publish-target
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  RELEASE_PULL_REQUEST_NUMBER: ${{ inputs.release_pull_request_number }}
+              run: |
+                  set -euo pipefail
+
+                  if [ -n "$RELEASE_PULL_REQUEST_NUMBER" ]; then
+                      npx just authorize-release-publish --release-pull-request "$RELEASE_PULL_REQUEST_NUMBER"
+                  else
+                      npx just authorize-release-publish
+                  fi
+            - uses: actions/checkout@v4
+              if: steps.publish-target.outputs.should_publish == 'true'
+              with:
+                  ref: ${{ steps.publish-target.outputs.publish_commit_sha }}
+                  fetch-depth: 0
+                  path: target/release-source
+                  persist-credentials: true
+            - name: Use Node.js
+              if: steps.publish-target.outputs.should_publish == 'true'
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+            - name: Install release dependencies
+              if: steps.publish-target.outputs.should_publish == 'true'
+              working-directory: target/release-source
+              run: npm clean-install --ignore-scripts
+            - name: Check packages
+              if: steps.publish-target.outputs.should_publish == 'true'
+              working-directory: target/release-source
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: npx just publish-dry-run
+            - name: Audit release tooling
+              if: steps.publish-target.outputs.should_publish == 'true'
+              run: |
+                  mkdir -p target/release
+                  npm audit signatures --json --include-attestations > target/release/npm-audit-signatures.json
+                  node --input-type=module <<'NODE'
+                  import fs from 'node:fs/promises';
+
+                  const report = JSON.parse(
+                      await fs.readFile('target/release/npm-audit-signatures.json', { encoding: 'utf8' })
+                  );
+                  const packtory = report.verified.find((entry) => {
+                      return entry.name === '@packtory/cli';
+                  });
+
+                  if (packtory?.attestations?.provenance?.predicateType !== 'https://slsa.dev/provenance/v1') {
+                      throw new Error('Missing npm provenance for @packtory/cli');
+                  }
+                  NODE
+            - name: Configure release author
+              if: steps.publish-target.outputs.should_publish == 'true'
+              working-directory: target/release-source
+              run: |
+                  git config user.name 'github-actions[bot]'
+                  git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            - name: Publish package
+              if: steps.publish-target.outputs.should_publish == 'true'
+              working-directory: target/release-source
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  mkdir -p target/release
+                  git config remote.origin.push 'refs/tags/*:refs/tags/*'
+
+                  set +e
+                  npx just publish-release 2>&1 | tee target/release/publish.log
+                  status=${PIPESTATUS[0]}
+                  set -e
+
+                  if [ "$status" -eq 0 ]; then
+                      true
+                  elif grep -Eiq 'attestation|oidc|provenance|rekor|sigstore|tlog' target/release/publish.log; then
+                      sleep 30
+                      npx just publish-release
+                  else
+                      exit "$status"
+                  fi
+
+                  for tag in $(git tag --points-at HEAD 'eslint-plugin-mocha@*'); do
+                      version="${tag#eslint-plugin-mocha@}"
+
+                      if ! git rev-parse --verify "refs/tags/$version" >/dev/null 2>&1; then
+                          git tag -a "$version" -m "$version" HEAD
+                      fi
+
+                      git push origin "refs/tags/$version:refs/tags/$version"
+                  done
