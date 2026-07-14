@@ -5,6 +5,7 @@ on:
         branches: [main]
     pull_request:
         types: [opened, reopened, synchronize]
+    merge_group:
     workflow_dispatch:
         inputs:
             release_pull_request_number:
@@ -57,6 +58,31 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   path-to-lcov: ./target/coverage/lcov.info
                   parallel: true
+    release-pr-policy:
+        runs-on: ubuntu-latest
+        name: Release PR policy
+        if: >
+            github.event_name == 'pull_request' ||
+            github.event_name == 'merge_group' ||
+            (github.event_name == 'workflow_dispatch' && github.ref_name == 'release/eslint-plugin-mocha')
+        permissions:
+            contents: read
+            pull-requests: read
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  persist-credentials: false
+            - name: Use Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+            - name: Install dependencies
+              run: npm clean-install --ignore-scripts
+            - name: Validate release pull request
+              if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: npx just validate-release-pr
     mutation-testing:
         runs-on: ubuntu-latest
         name: Mutation testing
@@ -75,14 +101,31 @@ jobs:
             - name: Run mutation tests
               run: npx just test-mutation
               timeout-minutes: 30
-    maintain-release-pr:
+    publish-release:
         needs: build
+        name: Publish release
+        if: >
+            github.event_name == 'push' ||
+            (github.event_name == 'workflow_dispatch' && inputs.release_pull_request_number != '')
+        uses: ./.github/workflows/release-publish.yml
+        permissions:
+            contents: write
+            id-token: write
+            pull-requests: read
+        with:
+            release_pull_request_number: ${{ inputs.release_pull_request_number || '' }}
+    maintain-release-pr:
+        needs: publish-release
         runs-on: ubuntu-latest
         name: Maintain release PR
-        if: github.event_name == 'push'
-        concurrency:
-            group: release-pr-maintenance
-            cancel-in-progress: false
+        if: >
+            always() &&
+            (
+                github.event_name == 'push' ||
+                (github.event_name == 'workflow_dispatch' && inputs.release_pull_request_number == '')
+            ) &&
+            needs.publish-release.result != 'failure' &&
+            needs.publish-release.result != 'cancelled'
         permissions:
             actions: write
             contents: write
@@ -109,111 +152,6 @@ jobs:
               env:
                   GH_TOKEN: ${{ github.token }}
               run: npx just prepare-release
-    publish-release:
-        needs: build
-        runs-on: ubuntu-latest
-        name: Publish release
-        if: >
-            github.event_name == 'push' ||
-            (github.event_name == 'workflow_dispatch' && inputs.release_pull_request_number != '')
-        permissions:
-            contents: write
-            id-token: write
-            pull-requests: read
-        steps:
-            - uses: actions/checkout@v4
-              with:
-                  fetch-depth: 0
-                  persist-credentials: false
-            - name: Use Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 24
-            - name: Install dependencies
-              run: npm clean-install --ignore-scripts
-            - name: Authorize release publish
-              id: publish-target
-              env:
-                  GH_TOKEN: ${{ github.token }}
-                  RELEASE_PULL_REQUEST_NUMBER: ${{ inputs.release_pull_request_number }}
-              run: |
-                  set -euo pipefail
-
-                  if [ -n "$RELEASE_PULL_REQUEST_NUMBER" ]; then
-                      npx just authorize-release-publish --release-pull-request "$RELEASE_PULL_REQUEST_NUMBER"
-                  else
-                      npx just authorize-release-publish
-                  fi
-            - uses: actions/checkout@v4
-              if: steps.publish-target.outputs.should_publish == 'true'
-              with:
-                  ref: ${{ steps.publish-target.outputs.publish_commit_sha }}
-                  fetch-depth: 0
-                  persist-credentials: true
-            - name: Use Node.js
-              if: steps.publish-target.outputs.should_publish == 'true'
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 24
-            - name: Install dependencies
-              if: steps.publish-target.outputs.should_publish == 'true'
-              run: npm clean-install --ignore-scripts
-            - name: Check packages
-              if: steps.publish-target.outputs.should_publish == 'true'
-              env:
-                  GH_TOKEN: ${{ github.token }}
-              run: npx just publish-dry-run
-            - name: Audit npm signatures and attestations
-              if: steps.publish-target.outputs.should_publish == 'true'
-              run: |
-                  mkdir -p target/release
-                  npm audit signatures --json --include-attestations > target/release/npm-audit-signatures.json
-                  node --input-type=module <<'NODE'
-                  import fs from 'node:fs/promises';
-
-                  const report = JSON.parse(
-                      await fs.readFile('target/release/npm-audit-signatures.json', { encoding: 'utf8' })
-                  );
-                  const packtory = report.verified.find((entry) => {
-                      return entry.name === '@packtory/cli';
-                  });
-
-                  if (packtory?.attestations?.provenance?.predicateType !== 'https://slsa.dev/provenance/v1') {
-                      throw new Error('Missing npm provenance for @packtory/cli');
-                  }
-                  NODE
-            - name: Publish package
-              if: steps.publish-target.outputs.should_publish == 'true'
-              env:
-                  GH_TOKEN: ${{ github.token }}
-              run: |
-                  mkdir -p target/release
-                  git config remote.origin.push 'refs/tags/*:refs/tags/*'
-
-                  set +e
-                  npx just publish-release 2>&1 | tee target/release/publish.log
-                  status=${PIPESTATUS[0]}
-                  set -e
-
-                  if [ "$status" -ne 0 ] && grep -Eiq 'attestation|oidc|provenance|rekor|sigstore|tlog' target/release/publish.log; then
-                      sleep 30
-                      npx just publish-release
-                      status=0
-                  fi
-
-                  if [ "$status" -ne 0 ]; then
-                      exit "$status"
-                  fi
-
-                  for tag in $(git tag --points-at HEAD 'eslint-plugin-mocha@*'); do
-                      version="${tag#eslint-plugin-mocha@}"
-
-                      if ! git rev-parse --verify "refs/tags/$version" >/dev/null 2>&1; then
-                          git tag -a "$version" -m "$version" HEAD
-                      fi
-
-                      git push origin "refs/tags/$version:refs/tags/$version"
-                  done
     coverage:
         needs: build
         runs-on: ubuntu-latest

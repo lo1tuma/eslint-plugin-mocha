@@ -60,6 +60,9 @@ prepare-release: compile
 validate-release-pr:
     packtory release-pr validate
 
+validate-pr-labels pull-request-number:
+    pr-log validate-pull-request-labels {{pull-request-number}}
+
 authorize-release-publish *options:
     packtory release-pr authorize-publish {{options}}
 

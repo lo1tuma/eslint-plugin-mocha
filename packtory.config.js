@@ -43,7 +43,7 @@ function releasePullRequestSettings() {
         githubActionsCi: {
             trigger: 'workflow-dispatch',
             workflowFile: 'ci.yml',
-            requiredStatusContexts: [ 'Node 22', 'Node 24', 'Node 26' ]
+            requiredStatusContexts: [ 'Node 22', 'Node 24', 'Node 26', 'Release PR policy' ]
         }
     };
 }
@@ -82,6 +82,16 @@ export async function buildConfig() {
         registrySettings: registrySettings(),
         changelog: {
             packageTagFormat: '{version}',
+            prLog: {
+                ignoredLabels: [ 'release' ],
+                collapseRules: [
+                    {
+                        label: 'upgrade',
+                        pattern: '^⬆️ Update dependency (?<dependency>.+?) from (?<from>.+?) to (?<to>.+?)$',
+                        replace: '⬆️ Update dependency $<dependency> from $<from> to $<to>'
+                    }
+                ]
+            },
             outputs: [
                 { kind: 'repository-file', path: 'CHANGELOG.md' },
                 { kind: 'github-release' }
