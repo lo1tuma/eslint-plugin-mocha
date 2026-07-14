@@ -63,6 +63,7 @@ jobs:
                   path-to-lcov: ./target/coverage/lcov.info
                   parallel: true
     release-pr-policy:
+        needs: build
         runs-on: ubuntu-latest
         name: Release PR policy
         if: >
@@ -88,6 +89,7 @@ jobs:
                   GH_TOKEN: ${{ github.token }}
               run: npx just validate-release-pr
     mutation-testing:
+        needs: build
         runs-on: ubuntu-latest
         name: Mutation testing
         permissions:
@@ -106,11 +108,15 @@ jobs:
               run: npx just test-mutation
               timeout-minutes: 30
     publish-release:
-        needs: build
+        needs: [build, release-pr-policy, mutation-testing]
         name: Publish release
         if: >
-            github.event_name == 'push' ||
-            (github.event_name == 'workflow_dispatch' && inputs.release_pull_request_number != '')
+            !failure() &&
+            !cancelled() &&
+            (
+                github.event_name == 'push' ||
+                (github.event_name == 'workflow_dispatch' && inputs.release_pull_request_number != '')
+            )
         uses: ./.github/workflows/release-publish.yml
         permissions:
             contents: write
@@ -119,11 +125,12 @@ jobs:
         with:
             release_pull_request_number: ${{ inputs.release_pull_request_number || '' }}
     maintain-release-pr:
-        needs: publish-release
+        needs: [build, release-pr-policy, mutation-testing, publish-release]
         runs-on: ubuntu-latest
         name: Maintain release PR
         if: >
-            always() &&
+            !failure() &&
+            !cancelled() &&
             (
                 github.event_name == 'push' ||
                 (
