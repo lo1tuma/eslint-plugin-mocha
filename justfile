@@ -54,7 +54,25 @@ changelog:
 pack-preview:
     packtory preview
 
-pack-publish:
+prepare-release: compile
+    packtory release-pr maintain --no-dry-run
+
+validate-release-pr:
+    packtory release-pr validate
+
+validate-pr-labels pull-request-number:
+    pr-log validate-pull-request-labels {{pull-request-number}}
+
+authorize-release-publish *options:
+    packtory release-pr authorize-publish {{options}}
+
+publish-release: compile
+    packtory release --publish --tag --push --github-release --no-dry-run
+
+publish-dry-run: compile
+    packtory publish
+
+publish: compile
     packtory publish --no-dry-run
 
 update-eslint-docs *options:
