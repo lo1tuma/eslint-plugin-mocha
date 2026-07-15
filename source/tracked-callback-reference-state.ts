@@ -298,7 +298,7 @@ export function collectTrackedCallbackObjectProperties(
 ): Set<string> {
     const trackedProperties = new Set<string>();
 
-    for (const property of node.properties) {
+    node.properties.forEach(function collectTrackedCallbackProperty(property) {
         if (property.type === 'Property' && property.kind === 'init') {
             const propertyName = getStaticPropertyName(sourceCode, property);
             const isTrackedCallback = propertyName !== undefined &&
@@ -308,7 +308,7 @@ export function collectTrackedCallbackObjectProperties(
                 trackedProperties.add(propertyName);
             }
         }
-    }
+    });
 
     return trackedProperties;
 }

@@ -55,29 +55,28 @@ function extractPropertyName(
     return getIdentifierName(memberExpression.property);
 }
 
-// eslint-disable-next-line max-statements -- no good idea how to split this up
 export function extractMemberExpressionPath(sourceCode: Readonly<SourceCode>, node: Readonly<Rule.Node>): DynamicPath {
-    const path = [];
-    let currentNode: Rule.Node | null = node;
+    const path: DynamicPathSegment[] = [];
 
-    while (currentNode !== null) {
-        if (isMemberExpression(currentNode)) {
-            const propertyName = extractPropertyName(currentNode, sourceCode);
-            const formattedProperty = formatName(propertyName, currentNode);
-            path.unshift(formattedProperty);
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- bad typing in eslint core
-            currentNode = currentNode.object as (Rule.Node | null);
-        } else if (isCallExpression(currentNode)) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- bad typing in eslint core
-            currentNode = currentNode.callee as (Rule.Node | null);
-        } else if (isIdentifier(currentNode)) {
-            const formattedName = formatName(currentNode.name, currentNode);
-            path.unshift(formattedName);
-            return path;
-        } else {
-            return path;
+    function appendPathSegment(currentNode: Readonly<Rule.Node> | null): void {
+        if (currentNode !== null) {
+            if (isMemberExpression(currentNode)) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- bad typing in eslint core
+                appendPathSegment(currentNode.object as Rule.Node);
+
+                const propertyName = extractPropertyName(currentNode, sourceCode);
+                path.push(formatName(propertyName, currentNode));
+            } else if (isCallExpression(currentNode)) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- bad typing in eslint core
+                appendPathSegment(currentNode.callee as Rule.Node);
+            } else if (isIdentifier(currentNode)) {
+                path.push(formatName(currentNode.name, currentNode));
+            }
         }
     }
+
+    appendPathSegment(node);
+
     return path;
 }
 
