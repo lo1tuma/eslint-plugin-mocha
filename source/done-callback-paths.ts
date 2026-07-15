@@ -144,12 +144,12 @@ export function enqueueNextSegments(
     let nextPendingSegments = pendingSegments;
     let nextQueuedSegmentIds = queuedSegmentIds;
 
-    for (const nextSegment of nextSegments) {
+    nextSegments.forEach(function enqueueNextSegment(nextSegment) {
         if (!nextQueuedSegmentIds.has(nextSegment.id)) {
             nextPendingSegments = [ ...nextPendingSegments, nextSegment ];
             nextQueuedSegmentIds = new Set([ ...nextQueuedSegmentIds, nextSegment.id ]);
         }
-    }
+    });
 
     return [ nextPendingSegments, nextQueuedSegmentIds ];
 }
