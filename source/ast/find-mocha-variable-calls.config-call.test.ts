@@ -171,11 +171,29 @@ suite('findMochaVariableCalls() config calls', function () {
 
         const [ configCall, baseCall ] = expectTwoCalls(calls);
 
-        assert.deepStrictEqual(configCall.path, [ 'foo', 'bar()', 'timeout()' ]);
-        assert.deepStrictEqual(configCall.resolvedPath, [ 'foo', 'bar()', 'timeout()' ]);
-        assert.strictEqual(configCall.name, 'foo.bar().timeout()');
-        assert.deepStrictEqual(baseCall.path, [ 'foo', 'bar()' ]);
-        assert.deepStrictEqual(baseCall.resolvedPath, [ 'foo', 'bar()' ]);
-        assert.strictEqual(baseCall.name, 'foo.bar()');
+        assert.deepStrictEqual(
+            {
+                path: configCall.path,
+                resolvedPath: configCall.resolvedPath,
+                name: configCall.name
+            },
+            {
+                path: [ 'foo', 'bar()', 'timeout()' ],
+                resolvedPath: [ 'foo', 'bar()', 'timeout()' ],
+                name: 'foo.bar().timeout()'
+            }
+        );
+        assert.deepStrictEqual(
+            {
+                path: baseCall.path,
+                resolvedPath: baseCall.resolvedPath,
+                name: baseCall.name
+            },
+            {
+                path: [ 'foo', 'bar()' ],
+                resolvedPath: [ 'foo', 'bar()' ],
+                name: 'foo.bar()'
+            }
+        );
     });
 });

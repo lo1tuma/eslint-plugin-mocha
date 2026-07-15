@@ -1,4 +1,3 @@
-import assert from 'node:assert';
 import { type Rule, RuleTester } from 'eslint';
 import { suite, test } from 'mocha';
 import { noHooksRule } from './no-hooks.ts';
@@ -180,7 +179,5 @@ suite('no-hooks create()', function () {
                 }
             }
         } as unknown as Rule.RuleContext);
-
-        assert.ok(true);
     });
 });

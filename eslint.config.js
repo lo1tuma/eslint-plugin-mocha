@@ -1,6 +1,6 @@
 import { baseConfig } from '@enormora/eslint-config-base';
 import { createEslintPluginConfig } from '@enormora/eslint-config-eslint-plugin';
-import { mochaConfig } from '@enormora/eslint-config-mocha';
+import { mochaNodeAssertConfig } from '@enormora/eslint-config-mocha-node-assert';
 import { nodeConfig, nodeConfigFileConfig, nodeEntryPointFileConfig } from '@enormora/eslint-config-node';
 import { typescriptConfig } from '@enormora/eslint-config-typescript';
 
@@ -34,7 +34,7 @@ export default [
         files: [ 'dependency-cruiser.config.js', 'eslint.config.js', 'packtory.config.js', 'stryker.config.js' ]
     },
     {
-        ...mochaConfig,
+        ...mochaNodeAssertConfig,
         files: [ '**/*.test.ts', '**/*.test-support.ts', 'benchmarks/**/*.bench.ts' ]
     },
     {

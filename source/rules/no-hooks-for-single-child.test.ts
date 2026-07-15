@@ -1,4 +1,3 @@
-import assert from 'node:assert';
 import { type Rule, RuleTester } from 'eslint';
 import { suite, test } from 'mocha';
 import { noHooksForSingleChildRule } from './no-hooks-for-single-child.ts';
@@ -384,7 +383,5 @@ suite('no-hooks-for-single-child create()', function () {
                 }
             }
         } as unknown as Rule.RuleContext);
-
-        assert.ok(true);
     });
 });

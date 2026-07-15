@@ -203,15 +203,41 @@ suite('eslint-plugin-mocha', function () {
 
     suite('configs', function () {
         test('should expose itself in flat configs', function () {
-            assert.strictEqual(plugin.configs.all.plugins.mocha, plugin);
-            assert.strictEqual(plugin.configs.recommended.plugins.mocha, plugin);
+            assert.deepStrictEqual(
+                {
+                    all: plugin.configs.all.plugins.mocha,
+                    recommended: plugin.configs.recommended.plugins.mocha
+                },
+                {
+                    all: plugin,
+                    recommended: plugin
+                }
+            );
         });
 
         test('should expose the expected flat config metadata', function () {
-            assert.strictEqual(plugin.configs.all.name, 'mocha/all');
-            assert.strictEqual(plugin.configs.recommended.name, 'mocha/recommended');
-            assert.strictEqual(plugin.configs.all.languageOptions?.globals, globals.mocha);
-            assert.strictEqual(plugin.configs.recommended.languageOptions?.globals, globals.mocha);
+            assert.deepStrictEqual(
+                {
+                    all: {
+                        name: plugin.configs.all.name,
+                        globals: plugin.configs.all.languageOptions?.globals
+                    },
+                    recommended: {
+                        name: plugin.configs.recommended.name,
+                        globals: plugin.configs.recommended.languageOptions?.globals
+                    }
+                },
+                {
+                    all: {
+                        name: 'mocha/all',
+                        globals: globals.mocha
+                    },
+                    recommended: {
+                        name: 'mocha/recommended',
+                        globals: globals.mocha
+                    }
+                }
+            );
         });
 
         test('should configure the all config as intended', function () {

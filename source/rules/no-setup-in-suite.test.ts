@@ -1,4 +1,3 @@
-import assert from 'node:assert';
 import { type Rule, RuleTester } from 'eslint';
 import { suite, test } from 'mocha';
 import { withInterface } from '../mocha-interface-test-cases.ts';
@@ -436,7 +435,5 @@ suite('no-setup-in-suite create()', function () {
                 }
             }
         } as unknown as Rule.RuleContext);
-
-        assert.ok(true);
     });
 });
