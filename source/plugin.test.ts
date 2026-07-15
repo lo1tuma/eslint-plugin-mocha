@@ -138,7 +138,9 @@ function readRuleDocumentationUrl(ruleName: string, rule: PluginRule): string {
 }
 
 function assertRuleMessages(rule: PluginRule): void {
-    for (const message of Object.values(rule.meta?.messages ?? {})) {
+    const messages = Object.values(rule.meta?.messages ?? {});
+
+    for (const message of messages) {
         assertNonEmptyString(message);
     }
 }
