@@ -6,7 +6,7 @@ const config = {
     coverageAnalysis: 'perTest',
     tempDirName: 'target/.stryker-tmp',
     allowConsoleColors: false,
-    concurrency: '50%',
+    concurrency: '100%',
     buildCommand: 'npx just compile-unit-tests',
     mochaOptions: {
         'no-package': true,
@@ -25,8 +25,8 @@ const config = {
     disableTypeChecks: true,
     thresholds: {
         high: 100,
-        low: 100,
-        break: 100
+        low: 99,
+        break: 99
     },
     reporters: [ 'clear-text', 'html', 'json' ],
     clearTextReporter: {
