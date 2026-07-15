@@ -35,8 +35,9 @@ function collectSegmentReportedNodes(
 ): readonly [Rule.Node[], PathState] {
     const reportedNodes: Rule.Node[] = [];
     let nextState = clonePathState(entryState);
+    const operations = context.operationsBySegmentId.get(segment.id) ?? [];
 
-    for (const operation of context.operationsBySegmentId.get(segment.id) ?? []) {
+    for (const operation of operations) {
         const reportedNode = selectReportedNode(context, nextState, operation);
 
         if (reportedNode !== undefined) {
@@ -56,12 +57,12 @@ function recordReportedNodes(
 ): readonly Rule.Node[] {
     let nextReportedNodes = reportedNodes;
 
-    for (const reportedNode of segmentReportedNodes) {
+    segmentReportedNodes.forEach(function recordReportedNode(reportedNode) {
         if (!reportedNodeSet.has(reportedNode)) {
             reportedNodeSet.add(reportedNode);
             nextReportedNodes = [ ...nextReportedNodes, reportedNode ];
         }
-    }
+    });
 
     return nextReportedNodes;
 }

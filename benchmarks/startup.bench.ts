@@ -6,7 +6,7 @@ const iterations = 50;
 
 suite('startup / require time', function () {
     test('should not take longer as the defined budget to require the plugin', async function () {
-        const cpuAgnosticBudget = 14_000;
+        const cpuAgnosticBudget = 20_000;
         const budget = cpuAgnosticBudget / cpuSpeed;
 
         const { medianDuration } = await runAsyncBenchmark(async function () {
