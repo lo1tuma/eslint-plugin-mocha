@@ -9,6 +9,9 @@
         "enabled": true,
         "automerge": true
     },
+    "constraints": {
+        "npm": "10.9.8"
+    },
     "automerge": true,
     "automergeType": "pr",
     "packageRules": [
