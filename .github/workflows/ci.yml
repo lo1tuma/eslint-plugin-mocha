@@ -8,6 +8,10 @@ on:
     merge_group:
     workflow_dispatch:
         inputs:
+            maintain_release_pull_request:
+                default: false
+                required: false
+                type: boolean
             release_pull_request_number:
                 required: false
                 type: string
@@ -122,7 +126,11 @@ jobs:
             always() &&
             (
                 github.event_name == 'push' ||
-                (github.event_name == 'workflow_dispatch' && inputs.release_pull_request_number == '')
+                (
+                    github.event_name == 'workflow_dispatch' &&
+                    inputs.maintain_release_pull_request &&
+                    inputs.release_pull_request_number == ''
+                )
             ) &&
             needs.publish-release.result != 'failure' &&
             needs.publish-release.result != 'cancelled'
