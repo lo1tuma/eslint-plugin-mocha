@@ -16,11 +16,11 @@
         "type-fest": "4.40.0"
     },
     "devDependencies": {
-        "@enormora/eslint-config-base": "0.0.43",
-        "@enormora/eslint-config-eslint-plugin": "0.0.6",
-        "@enormora/eslint-config-mocha-node-assert": "0.0.3",
-        "@enormora/eslint-config-node": "0.0.34",
-        "@enormora/eslint-config-typescript": "0.0.50",
+        "@enormora/eslint-config-base": "0.0.51",
+        "@enormora/eslint-config-eslint-plugin": "0.0.7",
+        "@enormora/eslint-config-mocha-node-assert": "0.0.5",
+        "@enormora/eslint-config-node": "0.0.37",
+        "@enormora/eslint-config-typescript": "0.0.58",
         "@packtory/cli": "0.0.66",
         "@stryker-mutator/core": "9.6.1",
         "@stryker-mutator/mocha-runner": "9.6.1",
