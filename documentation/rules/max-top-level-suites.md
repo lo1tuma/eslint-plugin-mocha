@@ -1,4 +1,6 @@
-# Enforce the number of top-level suites in a single file (`mocha/max-top-level-suites`)
+# mocha/max-top-level-suites
+
+📝 Enforce the number of top-level suites in a single file.
 
 🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

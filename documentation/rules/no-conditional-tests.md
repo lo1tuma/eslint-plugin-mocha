@@ -1,4 +1,6 @@
-# Disallow conditional suite and test declarations (`mocha/no-conditional-tests`)
+# mocha/no-conditional-tests
+
+📝 Disallow conditional suite and test declarations.
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

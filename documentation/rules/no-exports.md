@@ -1,4 +1,6 @@
-# Disallow exports from test files (`mocha/no-exports`)
+# mocha/no-exports
+
+📝 Disallow exports from test files.
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

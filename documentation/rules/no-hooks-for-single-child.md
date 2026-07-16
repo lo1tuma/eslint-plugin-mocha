@@ -1,4 +1,6 @@
-# Disallow hooks with a single direct child (`mocha/no-hooks-for-single-child`)
+# mocha/no-hooks-for-single-child
+
+📝 Disallow hooks with a single direct child.
 
 🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 
