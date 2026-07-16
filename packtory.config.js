@@ -43,7 +43,14 @@ function releasePullRequestSettings() {
         githubActionsCi: {
             trigger: 'workflow-dispatch',
             workflowFile: 'ci.yml',
-            requiredStatusContexts: [ 'Node 22', 'Node 24', 'Node 26', 'Release PR policy' ]
+            requiredStatusContexts: [
+                'Node 22',
+                'Node 24',
+                'Node 26',
+                'Workflow security analysis',
+                'Release PR policy',
+                'Mutation testing'
+            ]
         }
     };
 }
