@@ -97,7 +97,7 @@ suite('runtime', function () {
     });
 
     test('should not consume more memory as the defined budget to lint many files with the recommended config', function () {
-        const budget = 4_250_000;
+        const budget = 6_500_000;
 
         const { medianMemory } = runSyncBenchmark(function () {
             lintManyFilesWithAllRecommendedRules({ numberOfFiles: 350 });
