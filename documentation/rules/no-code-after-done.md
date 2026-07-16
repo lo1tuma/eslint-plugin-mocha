@@ -1,4 +1,6 @@
-# Disallow executing code after calling a Mocha callback (`mocha/no-code-after-done`)
+# mocha/no-code-after-done
+
+📝 Disallow executing code after calling a Mocha callback.
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

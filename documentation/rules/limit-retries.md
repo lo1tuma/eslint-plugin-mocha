@@ -1,4 +1,6 @@
-# Enforce limits for Mocha retries (`mocha/limit-retries`)
+# mocha/limit-retries
+
+📝 Enforce limits for Mocha retries.
 
 🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

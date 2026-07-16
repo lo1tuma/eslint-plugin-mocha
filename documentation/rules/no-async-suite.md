@@ -1,4 +1,6 @@
-# Disallow async functions passed to a suite (`mocha/no-async-suite`)
+# mocha/no-async-suite
+
+📝 Disallow async functions passed to a suite.
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

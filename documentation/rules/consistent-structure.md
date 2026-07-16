@@ -1,4 +1,6 @@
-# Require consistent structure for Mocha test entities (`mocha/consistent-structure`)
+# mocha/consistent-structure
+
+📝 Require consistent structure for Mocha test entities.
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

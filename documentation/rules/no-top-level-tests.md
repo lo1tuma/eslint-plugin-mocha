@@ -1,4 +1,6 @@
-# Disallow top-level tests (`mocha/no-top-level-tests`)
+# mocha/no-top-level-tests
+
+📝 Disallow top-level tests.
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

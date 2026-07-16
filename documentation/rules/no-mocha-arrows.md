@@ -1,4 +1,6 @@
-# Disallow arrow functions as arguments to mocha functions (`mocha/no-mocha-arrows`)
+# mocha/no-mocha-arrows
+
+📝 Disallow arrow functions as arguments to mocha functions.
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

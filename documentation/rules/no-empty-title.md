@@ -1,4 +1,6 @@
-# Disallow empty suite and test descriptions (`mocha/no-empty-title`)
+# mocha/no-empty-title
+
+📝 Disallow empty suite and test descriptions.
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

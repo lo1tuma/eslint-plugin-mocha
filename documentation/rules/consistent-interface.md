@@ -1,4 +1,6 @@
-# Enforces consistent use of mocha interfaces (`mocha/consistent-interface`)
+# mocha/consistent-interface
+
+📝 Enforces consistent use of mocha interfaces.
 
 🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

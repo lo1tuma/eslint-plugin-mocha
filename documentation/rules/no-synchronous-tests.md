@@ -1,4 +1,6 @@
-# Disallow synchronous tests (`mocha/no-synchronous-tests`)
+# mocha/no-synchronous-tests
+
+📝 Disallow synchronous tests.
 
 🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

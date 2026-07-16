@@ -1,4 +1,6 @@
-# Require suite descriptions to match a pre-configured regular expression (`mocha/valid-suite-title`)
+# mocha/valid-suite-title
+
+📝 Require suite descriptions to match a pre-configured regular expression.
 
 🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 
