@@ -24,9 +24,9 @@ jobs:
         runs-on: ubuntu-latest
         name: Publish release
         permissions:
-            contents: write
-            id-token: write
-            pull-requests: read
+            contents: write # required to push release tags and create GitHub releases
+            id-token: write # required by npm trusted publishing to mint the OIDC token
+            pull-requests: read # required to validate release PR identity before publishing
         steps:
             - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
               with:
