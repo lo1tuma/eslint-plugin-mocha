@@ -5,8 +5,8 @@ on:
         types: [opened, reopened, synchronize, labeled, unlabeled]
 
 permissions:
-    contents: read
-    issues: read
+    contents: read # required for actions/checkout to read the repository source
+    issues: read # required to read pull request labels
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
@@ -29,4 +29,5 @@ jobs:
             - name: Validate pull request label
               env:
                   GH_TOKEN: ${{ github.token }}
-              run: npx just validate-pr-labels "${{ github.event.pull_request.number }}"
+                  PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
+              run: npx just validate-pr-labels "$PULL_REQUEST_NUMBER"
