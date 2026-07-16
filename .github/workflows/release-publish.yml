@@ -38,6 +38,24 @@ jobs:
                   node-version: 24
             - name: Install workflow dependencies
               run: npm clean-install --ignore-scripts
+            - name: Audit release tooling
+              run: |
+                  mkdir -p target/release
+                  npm audit signatures --json --include-attestations > target/release/npm-audit-signatures.json
+                  node --input-type=module <<'NODE'
+                  import fs from 'node:fs/promises';
+
+                  const report = JSON.parse(
+                      await fs.readFile('target/release/npm-audit-signatures.json', { encoding: 'utf8' })
+                  );
+                  const packtory = report.verified.find((entry) => {
+                      return entry.name === '@packtory/cli';
+                  });
+
+                  if (packtory?.attestations?.provenance?.predicateType !== 'https://slsa.dev/provenance/v1') {
+                      throw new Error('Missing npm provenance for @packtory/cli');
+                  }
+                  NODE
             - name: Authorize release publish
               id: publish-target
               env:
@@ -73,25 +91,6 @@ jobs:
               env:
                   GH_TOKEN: ${{ github.token }}
               run: npx just publish-dry-run
-            - name: Audit release tooling
-              if: steps.publish-target.outputs.should_publish == 'true'
-              run: |
-                  mkdir -p target/release
-                  npm audit signatures --json --include-attestations > target/release/npm-audit-signatures.json
-                  node --input-type=module <<'NODE'
-                  import fs from 'node:fs/promises';
-
-                  const report = JSON.parse(
-                      await fs.readFile('target/release/npm-audit-signatures.json', { encoding: 'utf8' })
-                  );
-                  const packtory = report.verified.find((entry) => {
-                      return entry.name === '@packtory/cli';
-                  });
-
-                  if (packtory?.attestations?.provenance?.predicateType !== 'https://slsa.dev/provenance/v1') {
-                      throw new Error('Missing npm provenance for @packtory/cli');
-                  }
-                  NODE
             - name: Configure release author
               if: steps.publish-target.outputs.should_publish == 'true'
               working-directory: target/release-source
