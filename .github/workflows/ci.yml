@@ -43,7 +43,7 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
             - name: Install dependencies
-              run: npm clean-install
+              run: npm clean-install --ignore-scripts
             - name: Compile
               run: npx just compile
             - name: Run linters
@@ -129,7 +129,7 @@ jobs:
               with:
                   node-version: 26
             - name: Install dependencies
-              run: npm clean-install
+              run: npm clean-install --ignore-scripts
             - name: Run mutation tests
               run: npx just test-mutation
               timeout-minutes: 30
