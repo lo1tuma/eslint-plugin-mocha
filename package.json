@@ -8,7 +8,7 @@
     },
     "exports": "./target/build/source/plugin.js",
     "dependencies": {
-        "@eslint-community/eslint-utils": "4.4.1",
+        "@eslint-community/eslint-utils": "4.9.1",
         "@eslint/core": "1.2.1",
         "globals": "15.14.0",
         "json-schema-to-ts": "3.1.1",
