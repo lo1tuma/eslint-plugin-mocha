@@ -1,4 +1,6 @@
-# Disallow async operations in synchronous tests or hooks (`mocha/no-async-in-sync-tests`)
+# mocha/no-async-in-sync-tests
+
+📝 Disallow async operations in synchronous tests or hooks.
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

@@ -1,4 +1,6 @@
-# Disallow suites to be nested within other suites (`mocha/no-nested-suites`)
+# mocha/no-nested-suites
+
+📝 Disallow suites to be nested within other suites.
 
 🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

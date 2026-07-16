@@ -1,4 +1,6 @@
-# Disallow exclusive tests (`mocha/no-exclusive-tests`)
+# mocha/no-exclusive-tests
+
+📝 Disallow exclusive tests.
 
 ⚠️ This rule _warns_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

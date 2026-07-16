@@ -1,4 +1,6 @@
-# Disallow returning from an async test or hook (`mocha/no-return-from-async`)
+# mocha/no-return-from-async
+
+📝 Disallow returning from an async test or hook.
 
 🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

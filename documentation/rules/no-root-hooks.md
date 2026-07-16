@@ -1,4 +1,6 @@
-# Disallow root hooks (`mocha/no-root-hooks`)
+# mocha/no-root-hooks
+
+📝 Disallow root hooks.
 
 🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

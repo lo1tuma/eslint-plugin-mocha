@@ -1,4 +1,6 @@
-# Require using arrow functions for callbacks (`mocha/prefer-arrow-callback`)
+# mocha/prefer-arrow-callback
+
+📝 Require using arrow functions for callbacks.
 
 🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

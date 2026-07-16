@@ -1,4 +1,6 @@
-# Enforce limits for Mocha slow thresholds (`mocha/limit-slow`)
+# mocha/limit-slow
+
+📝 Enforce limits for Mocha slow thresholds.
 
 🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

@@ -1,4 +1,6 @@
-# Disallow identical titles (`mocha/no-identical-title`)
+# mocha/no-identical-title
+
+📝 Disallow identical titles.
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

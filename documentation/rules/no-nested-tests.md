@@ -1,4 +1,6 @@
-# Disallow tests to be nested within other tests (`mocha/no-nested-tests`)
+# mocha/no-nested-tests
+
+📝 Disallow tests to be nested within other tests.
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

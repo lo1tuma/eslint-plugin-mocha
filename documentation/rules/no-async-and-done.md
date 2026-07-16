@@ -1,4 +1,6 @@
-# Disallow async functions that also use a Mocha callback (`mocha/no-async-and-done`)
+# mocha/no-async-and-done
+
+📝 Disallow async functions that also use a Mocha callback.
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 
