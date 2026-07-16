@@ -11,7 +11,7 @@
         "automerge": true
     },
     "constraints": {
-        "npm": "10.9.8"
+        "npm": "12.0.1"
     },
     "automerge": true,
     "automergeType": "pr",
