@@ -32,7 +32,7 @@
         "coveralls": "3.1.1",
         "dependency-cruiser": "18.1.0",
         "eslint": "10.7.0",
-        "eslint-doc-generator": "2.4.0",
+        "eslint-doc-generator": "3.6.0",
         "jscpd": "5.0.12",
         "knip": "6.27.0",
         "mocha": "11.7.6",

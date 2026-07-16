@@ -1,4 +1,6 @@
-# Enforce limits for Mocha timeouts (`mocha/limit-timeout`)
+# mocha/limit-timeout
+
+📝 Enforce limits for Mocha timeouts.
 
 🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

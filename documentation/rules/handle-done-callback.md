@@ -1,4 +1,6 @@
-# Enforces handling of callbacks for async tests in every branch (`mocha/handle-done-callback`)
+# mocha/handle-done-callback
+
+📝 Enforces handling of callbacks for async tests in every branch.
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

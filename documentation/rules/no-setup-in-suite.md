@@ -1,4 +1,6 @@
-# Disallow setup in suite blocks (`mocha/no-setup-in-suite`)
+# mocha/no-setup-in-suite
+
+📝 Disallow setup in suite blocks.
 
 🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

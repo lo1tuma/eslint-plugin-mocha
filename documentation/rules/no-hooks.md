@@ -1,4 +1,6 @@
-# Disallow hooks (`mocha/no-hooks`)
+# mocha/no-hooks
+
+📝 Disallow hooks.
 
 🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

@@ -1,4 +1,6 @@
-# Disallow calling a Mocha callback more than once (`mocha/no-done-twice`)
+# mocha/no-done-twice
+
+📝 Disallow calling a Mocha callback more than once.
 
 💼 This rule is enabled in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

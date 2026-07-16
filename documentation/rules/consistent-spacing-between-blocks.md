@@ -1,4 +1,6 @@
-# Require consistent spacing between blocks (`mocha/consistent-spacing-between-blocks`)
+# mocha/consistent-spacing-between-blocks
+
+📝 Require consistent spacing between blocks.
 
 🚫 This rule is _disabled_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 

@@ -1,4 +1,6 @@
-# Disallow pending tests (`mocha/no-pending-tests`)
+# mocha/no-pending-tests
+
+📝 Disallow pending tests.
 
 ⚠️ This rule _warns_ in the ✅ `recommended` [config](https://github.com/lo1tuma/eslint-plugin-mocha#configs).
 
