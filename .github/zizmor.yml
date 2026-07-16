@@ -1,0 +1,10 @@
+---
+rules:
+    unpinned-uses:
+        config:
+            policies:
+                "*": hash-pin
+
+    secrets-outside-env:
+        config:
+            allow: []
