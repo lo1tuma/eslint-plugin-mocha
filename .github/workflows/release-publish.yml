@@ -28,7 +28,7 @@ jobs:
             id-token: write
             pull-requests: read
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
               with:
                   fetch-depth: 0
                   persist-credentials: false
@@ -51,7 +51,7 @@ jobs:
                   else
                       npx just authorize-release-publish
                   fi
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
               if: steps.publish-target.outputs.should_publish == 'true'
               with:
                   ref: ${{ steps.publish-target.outputs.publish_commit_sha }}
