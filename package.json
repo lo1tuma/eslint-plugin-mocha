@@ -37,7 +37,7 @@
         "knip": "6.14.2",
         "mocha": "11.7.6",
         "pr-log": "6.4.1",
-        "rust-just": "1.51.0",
+        "rust-just": "1.56.0",
         "typescript": "6.0.3"
     },
     "pr-log": {
