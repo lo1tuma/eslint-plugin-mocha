@@ -39,7 +39,7 @@ jobs:
                   fetch-depth: 0
                   persist-credentials: false
             - name: Use Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
               with:
                   node-version: ${{ matrix.node }}
             - name: Install dependencies
@@ -57,7 +57,7 @@ jobs:
                   GH_TOKEN: ${{ github.token }}
               run: npx just publish-dry-run
             - name: Coveralls
-              uses: coverallsapp/github-action@v2.3.6
+              uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.6
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   path-to-lcov: ./target/coverage/lcov.info
@@ -78,7 +78,7 @@ jobs:
               with:
                   persist-credentials: false
             - name: Use Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
               with:
                   node-version: 24
             - name: Install dependencies
@@ -99,7 +99,7 @@ jobs:
               with:
                   persist-credentials: false
             - name: Use Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
               with:
                   node-version: 26
             - name: Install dependencies
@@ -154,7 +154,7 @@ jobs:
                   fetch-depth: 0
                   persist-credentials: true
             - name: Use Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
               with:
                   node-version: 24
             - name: Install dependencies
@@ -175,7 +175,7 @@ jobs:
             contents: read
         steps:
             - name: Coveralls Finished
-              uses: coverallsapp/github-action@v2.3.6
+              uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.6
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   parallel-finished: true
