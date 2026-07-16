@@ -57,7 +57,7 @@ jobs:
                   GH_TOKEN: ${{ github.token }}
               run: npx just publish-dry-run
             - name: Coveralls
-              uses: coverallsapp/github-action@master
+              uses: coverallsapp/github-action@v2.3.6
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   path-to-lcov: ./target/coverage/lcov.info
@@ -175,7 +175,7 @@ jobs:
             contents: read
         steps:
             - name: Coveralls Finished
-              uses: coverallsapp/github-action@master
+              uses: coverallsapp/github-action@v2.3.6
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   parallel-finished: true
