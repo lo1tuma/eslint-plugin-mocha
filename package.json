@@ -30,7 +30,7 @@
         "c8": "11.0.0",
         "change-case": "5.4.4",
         "coveralls": "3.1.1",
-        "dependency-cruiser": "17.4.3",
+        "dependency-cruiser": "18.1.0",
         "eslint": "10.7.0",
         "eslint-doc-generator": "2.0.2",
         "jscpd": "4.2.5",
