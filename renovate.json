@@ -9,9 +9,17 @@
         "enabled": true,
         "automerge": true
     },
+    "constraints": {
+        "npm": "10.9.8"
+    },
     "automerge": true,
     "automergeType": "pr",
     "packageRules": [
+        {
+            "matchPackageNames": ["npm"],
+            "matchDepTypes": ["constraints"],
+            "enabled": false
+        },
         {
             "matchPackagePatterns": ["^@enormora/eslint-config"],
             "groupName": "@enormora/eslint-config",
