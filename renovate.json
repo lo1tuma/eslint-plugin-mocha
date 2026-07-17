@@ -1,8 +1,8 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "github>enormora/renovate-config#1.0.0",
-    "github>enormora/renovate-config:renovate-automerge#1.0.0",
-    "github>enormora/renovate-config:node22#1.0.0"
-  ]
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "github>enormora/renovate-config#1.0.0",
+        "github>enormora/renovate-config:renovate-automerge#1.0.0",
+        "github>enormora/renovate-config:node22#1.0.0"
+    ]
 }
