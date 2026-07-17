@@ -39,7 +39,7 @@ jobs:
                   fetch-depth: 0
                   persist-credentials: false
             - name: Use Node.js
-              uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
                   node-version: ${{ matrix.node }}
             - name: Install dependencies
@@ -104,7 +104,7 @@ jobs:
               with:
                   persist-credentials: false
             - name: Use Node.js
-              uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
                   node-version: 24
             - name: Install dependencies
@@ -125,7 +125,7 @@ jobs:
               with:
                   persist-credentials: false
             - name: Use Node.js
-              uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
                   node-version: 26
             - name: Install dependencies
@@ -180,7 +180,7 @@ jobs:
                   fetch-depth: 0
                   persist-credentials: true
             - name: Use Node.js
-              uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
                   node-version: 24
             - name: Install dependencies
