@@ -29,6 +29,7 @@ function commonPackageSettings(packageInfo) {
             author: packageInfo.author,
             contributors: packageInfo.contributors,
             description: packageInfo.description,
+            engines: packageInfo.engines,
             keywords: packageInfo.keywords,
             license: packageInfo.license,
             repository: packageInfo.repository
