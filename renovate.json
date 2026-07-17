@@ -18,7 +18,7 @@
         "automerge": true
     },
     "constraints": {
-        "npm": "12.0.1"
+        "npm": "10.9.8"
     },
     "automerge": true,
     "automergeType": "pr",
@@ -27,13 +27,13 @@
     },
     "packageRules": [
         {
+            "matchDatasources": [
+                "npm"
+            ],
             "matchPackageNames": [
                 "npm"
             ],
-            "matchDepTypes": [
-                "constraints"
-            ],
-            "enabled": false
+            "allowedVersions": "<11.0.0"
         },
         {
             "matchPackageNames": [
