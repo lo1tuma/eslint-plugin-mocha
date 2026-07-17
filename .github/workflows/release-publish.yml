@@ -24,7 +24,7 @@ jobs:
         runs-on: ubuntu-latest
         name: Publish release
         permissions:
-            contents: write # required to push release tags and create GitHub releases
+            contents: write # required to create release tags and GitHub releases
             id-token: write # required by npm trusted publishing to mint the OIDC token
             pull-requests: read # required to validate release PR identity before publishing
         steps:
@@ -91,12 +91,6 @@ jobs:
               env:
                   GH_TOKEN: ${{ github.token }}
               run: npx just publish-dry-run
-            - name: Configure release author
-              if: steps.publish-target.outputs.should_publish == 'true'
-              working-directory: target/release-source
-              run: |
-                  git config user.name 'github-actions[bot]'
-                  git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
             - name: Publish package
               if: steps.publish-target.outputs.should_publish == 'true'
               working-directory: target/release-source
@@ -104,7 +98,6 @@ jobs:
                   GH_TOKEN: ${{ github.token }}
               run: |
                   mkdir -p target/release
-                  git config remote.origin.push 'refs/tags/*:refs/tags/*'
 
                   set +e
                   npx just publish-release 2>&1 | tee target/release/publish.log

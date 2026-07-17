@@ -145,7 +145,7 @@ jobs:
             )
         uses: ./.github/workflows/release-publish.yml
         permissions:
-            contents: write # required to push release tags and create GitHub releases
+            contents: write # required to create release tags and GitHub releases
             id-token: write # required by npm trusted publishing to mint the OIDC token
             pull-requests: read # required to validate release PR identity before publishing
         with:
@@ -185,10 +185,6 @@ jobs:
                   node-version: 24
             - name: Install dependencies
               run: npm clean-install --ignore-scripts
-            - name: Configure release author
-              run: |
-                  git config user.name 'github-actions[bot]'
-                  git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
             - name: Maintain release pull request
               env:
                   GH_TOKEN: ${{ github.token }}
