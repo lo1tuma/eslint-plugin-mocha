@@ -1,8 +1,15 @@
 {
-    "extends": ["config:recommended", "group:monorepos", "helpers:pinGitHubActionDigests"],
+    "extends": [
+        "config:recommended",
+        "group:monorepos",
+        "helpers:pinGitHubActionDigests"
+    ],
     "commitMessagePrefix": "⬆️ ",
     "commitMessageExtra": "{{#if isGroup}}{{#if newValue}}to {{newValue}}{{/if}}{{else}}from {{displayFrom}} to {{displayTo}}{{/if}}",
-    "labels": ["renovate", "upgrade"],
+    "labels": [
+        "renovate",
+        "upgrade"
+    ],
     "dependencyDashboard": false,
     "rebaseWhen": "behind-base-branch",
     "minimumReleaseAge": "3 days",
@@ -20,8 +27,12 @@
     },
     "packageRules": [
         {
-            "matchPackageNames": ["npm"],
-            "matchDepTypes": ["constraints"],
+            "matchPackageNames": [
+                "npm"
+            ],
+            "matchDepTypes": [
+                "constraints"
+            ],
             "enabled": false
         },
         {
@@ -35,9 +46,13 @@
             "groupSlug": "eslint"
         },
         {
-            "matchPackageNames": ["/^@packtory\\//"],
+            "matchPackageNames": [
+                "/^@packtory\\//"
+            ],
             "groupName": "@packtory dependencies",
             "groupSlug": "packtory"
         }
-    ]
+    ],
+    "platformAutomerge": false,
+    "automergeStrategy": "merge-commit"
 }
