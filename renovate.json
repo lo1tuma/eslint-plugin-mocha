@@ -1,58 +1,8 @@
 {
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
-        "config:recommended",
-        "group:monorepos",
-        "helpers:pinGitHubActionDigests"
-    ],
-    "commitMessagePrefix": "⬆️ ",
-    "commitMessageExtra": "{{#if isGroup}}{{#if newValue}}to {{newValue}}{{/if}}{{else}}from {{displayFrom}} to {{displayTo}}{{/if}}",
-    "labels": [
-        "renovate",
-        "upgrade"
-    ],
-    "dependencyDashboard": false,
-    "rebaseWhen": "behind-base-branch",
-    "minimumReleaseAge": "3 days",
-    "lockFileMaintenance": {
-        "enabled": true,
-        "automerge": true
-    },
-    "constraints": {
-        "npm": "10.9.8"
-    },
-    "automerge": true,
-    "automergeType": "pr",
-    "nvm": {
-        "enabled": false
-    },
-    "packageRules": [
-        {
-            "matchDatasources": [
-                "npm"
-            ],
-            "matchPackageNames": [
-                "npm"
-            ],
-            "allowedVersions": "<11.0.0"
-        },
-        {
-            "matchPackageNames": [
-                "/^@enormora\\/eslint-config/",
-                "/^@eslint\\//",
-                "/^@typescript-eslint\\//",
-                "/^eslint($|-)/"
-            ],
-            "groupName": "ESLint packages",
-            "groupSlug": "eslint"
-        },
-        {
-            "matchPackageNames": [
-                "/^@packtory\\//"
-            ],
-            "groupName": "@packtory dependencies",
-            "groupSlug": "packtory"
-        }
-    ],
-    "platformAutomerge": false,
-    "automergeStrategy": "merge-commit"
+        "github>enormora/renovate-config#1.0.0",
+        "github>enormora/renovate-config:renovate-automerge#1.0.0",
+        "github>enormora/renovate-config:node22#1.0.0"
+    ]
 }
