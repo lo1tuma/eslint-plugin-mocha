@@ -57,7 +57,7 @@ jobs:
                   GH_TOKEN: ${{ github.token }}
               run: npx just publish-dry-run
             - name: Coveralls
-              uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.6
+              uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   path-to-lcov: ./target/coverage/lcov.info
@@ -76,7 +76,7 @@ jobs:
               id: zizmor
               uses: zizmorcore/zizmor-action@6599ee8b7a49aef6a770f63d261d214911a7ce02 # v0.6.0
               with:
-                  version: 1.27.0
+                  version: 1.28.0
                   persona: pedantic
                   min-severity: informational
                   min-confidence: low
@@ -85,7 +85,7 @@ jobs:
               env:
                   SARIF_FILE: ${{ steps.zizmor.outputs.output-file }}
               run: |
-                  count="$(jq '[.runs[].results[]] | length' "$SARIF_FILE")"
+                  count="$(jq '[.runs[].results[] | select((.suppressions // []) | length == 0)] | length' "$SARIF_FILE")"
                   echo "zizmor findings: $count"
                   test "$count" -eq 0
     release-pr-policy:
@@ -197,7 +197,7 @@ jobs:
             contents: read # required by coverallsapp/github-action to read repository metadata
         steps:
             - name: Coveralls Finished
-              uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.6
+              uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   parallel-finished: true
