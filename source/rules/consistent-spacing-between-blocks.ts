@@ -48,10 +48,10 @@ function getSpacingCheck(
     const { statementNode, beforeToken } = entity;
     const statementNodeLocation = statementNode.loc;
     if (
-        isFirstStatementInScope(currentLayer.scopeNode, statementNode) ||
         beforeToken === null ||
         statementNodeLocation === null ||
-        statementNodeLocation === undefined
+        statementNodeLocation === undefined ||
+        isFirstStatementInScope(currentLayer.scopeNode, statementNode)
     ) {
         return undefined;
     }
