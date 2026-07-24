@@ -1,3 +1,95 @@
+## eslint-plugin-mocha 12.0.0 (July 24, 2026)
+
+### Breaking Changes
+
+* Rename `no-return-and-callback` to `no-return-and-done` ([#467](https://github.com/lo1tuma/eslint-plugin-mocha/pull/467))
+* Adjust `recommended` config defaults ([#466](https://github.com/lo1tuma/eslint-plugin-mocha/pull/466))
+* Rename no-synchronous-tests option to allowedAsyncMethods ([#449](https://github.com/lo1tuma/eslint-plugin-mocha/pull/449))
+* Rename no-setup-in-describe to no-setup-in-suite ([#447](https://github.com/lo1tuma/eslint-plugin-mocha/pull/447))
+* Rename no-hooks-for-single-case to no-hooks-for-single-child ([#448](https://github.com/lo1tuma/eslint-plugin-mocha/pull/448))
+* Move no-sibling-hooks functionality into consistent-structure ([#441](https://github.com/lo1tuma/eslint-plugin-mocha/pull/441))
+* Rename no-global-tests to no-top-level-tests ([#434](https://github.com/lo1tuma/eslint-plugin-mocha/pull/434))
+* Rename no-top-level-hooks to no-root-hooks ([#433](https://github.com/lo1tuma/eslint-plugin-mocha/pull/433))
+* Rename named-import interface setting from exports to require ([#432](https://github.com/lo1tuma/eslint-plugin-mocha/pull/432))
+* Require ESLint v10.2.0 ([#425](https://github.com/lo1tuma/eslint-plugin-mocha/pull/425))
+
+### Bug Fixes
+
+* Fix no-mocha-arrows fixer for commented concise bodies ([#430](https://github.com/lo1tuma/eslint-plugin-mocha/pull/430))
+* Don’t flag usage of non-configured mocha interface methods ([#431](https://github.com/lo1tuma/eslint-plugin-mocha/pull/431))
+* Declare rules as JS-only ([#426](https://github.com/lo1tuma/eslint-plugin-mocha/pull/426))
+* Guard the no-async-suite fixer against await expressions ([#417](https://github.com/lo1tuma/eslint-plugin-mocha/pull/417))
+
+### Features
+
+* Add `no-conditional-tests` rule ([#461](https://github.com/lo1tuma/eslint-plugin-mocha/pull/461))
+* Add `limit-slow` rule ([#458](https://github.com/lo1tuma/eslint-plugin-mocha/pull/458))
+* Add `limit-retries` rule ([#457](https://github.com/lo1tuma/eslint-plugin-mocha/pull/457))
+* Add `limit-timeout` rule ([#456](https://github.com/lo1tuma/eslint-plugin-mocha/pull/456))
+* Add rule no-done-twice to reject multiple done() calls ([#453](https://github.com/lo1tuma/eslint-plugin-mocha/pull/453))
+* Add `no-code-after-done` rule to reject code after done() ([#451](https://github.com/lo1tuma/eslint-plugin-mocha/pull/451))
+* Add rule no-async-and-done to forbid async callbacks with done ([#455](https://github.com/lo1tuma/eslint-plugin-mocha/pull/455))
+* Add rule for async operations in synchronous tests ([#444](https://github.com/lo1tuma/eslint-plugin-mocha/pull/444))
+* Add no-nested-suites rule ([#442](https://github.com/lo1tuma/eslint-plugin-mocha/pull/442))
+* Add consistent-structure rule for suite ordering ([#440](https://github.com/lo1tuma/eslint-plugin-mocha/pull/440))
+* Support custom hook names ([#422](https://github.com/lo1tuma/eslint-plugin-mocha/pull/422))
+
+### Enhancements
+
+* Add hook-order support to `consistent-structure` ([#462](https://github.com/lo1tuma/eslint-plugin-mocha/pull/462))
+* Extend no-pending-tests to catch this.skip() ([#454](https://github.com/lo1tuma/eslint-plugin-mocha/pull/454))
+* Extend no-async-in-sync-tests for scheduling APIs ([#452](https://github.com/lo1tuma/eslint-plugin-mocha/pull/452))
+* Allow commented skips in no-pending-tests ([#445](https://github.com/lo1tuma/eslint-plugin-mocha/pull/445))
+* handle-done-callback: require done callback handling in every branch ([#443](https://github.com/lo1tuma/eslint-plugin-mocha/pull/443))
+* Allow done callback property handoff ([#438](https://github.com/lo1tuma/eslint-plugin-mocha/pull/438))
+* Handle TypeScript this parameters in done callback rule ([#437](https://github.com/lo1tuma/eslint-plugin-mocha/pull/437))
+* Support custom exports wrapper functions ([#423](https://github.com/lo1tuma/eslint-plugin-mocha/pull/423))
+* Add suggestions for no-exports ([#421](https://github.com/lo1tuma/eslint-plugin-mocha/pull/421))
+* Add suggestions for no-pending-tests ([#419](https://github.com/lo1tuma/eslint-plugin-mocha/pull/419))
+* Add allow option to no-setup-in-describe ([#424](https://github.com/lo1tuma/eslint-plugin-mocha/pull/424))
+* Add suggestions for no-exclusive-tests ([#418](https://github.com/lo1tuma/eslint-plugin-mocha/pull/418))
+* Add an autofix for consistent-interface ([#420](https://github.com/lo1tuma/eslint-plugin-mocha/pull/420))
+* Performance improvements ([#414](https://github.com/lo1tuma/eslint-plugin-mocha/pull/414))
+* Report imported Mocha interface methods in consistent-interface ([#413](https://github.com/lo1tuma/eslint-plugin-mocha/pull/413))
+* Modernize ESLint plugin metadata and rule authoring ([#412](https://github.com/lo1tuma/eslint-plugin-mocha/pull/412))
+
+### Documentation
+
+* Document `mochaPlugin.configs.all` stability expectations ([#459](https://github.com/lo1tuma/eslint-plugin-mocha/pull/459))
+* Scope README config examples to test files ([#460](https://github.com/lo1tuma/eslint-plugin-mocha/pull/460))
+* Fix no-empty-title docs for suite titles and message option ([#450](https://github.com/lo1tuma/eslint-plugin-mocha/pull/450))
+* Document targeted Mocha version ([#436](https://github.com/lo1tuma/eslint-plugin-mocha/pull/436))
+* Document supported Mocha interfaces ([#435](https://github.com/lo1tuma/eslint-plugin-mocha/pull/435))
+* Overhaul documentation ([#411](https://github.com/lo1tuma/eslint-plugin-mocha/pull/411))
+
+### Dependency Upgrades
+
+* Update Linting-related dependencies ([#533](https://github.com/lo1tuma/eslint-plugin-mocha/pull/533))
+* ⬆️ Update @enormora/eslint-config ([#494](https://github.com/lo1tuma/eslint-plugin-mocha/pull/494))
+* Update `@enormora/eslint-config-*` packages ([#486](https://github.com/lo1tuma/eslint-plugin-mocha/pull/486))
+* Migrate `packtory.config.js` to `@packtory/cli@0.0.26` ([#476](https://github.com/lo1tuma/eslint-plugin-mocha/pull/476))
+* Update dependency @typescript-eslint/parser to v8.65.0 ([#537](https://github.com/lo1tuma/eslint-plugin-mocha/pull/537))
+* ⬆️ Update dependency eslint-doc-generator from 2.0.2 to 3.6.0 ([#516](https://github.com/lo1tuma/eslint-plugin-mocha/pull/516), [#513](https://github.com/lo1tuma/eslint-plugin-mocha/pull/513))
+* ⬆️ Update dependency globals from 15.14.0 to 17.7.0 ([#518](https://github.com/lo1tuma/eslint-plugin-mocha/pull/518), [#484](https://github.com/lo1tuma/eslint-plugin-mocha/pull/484))
+* ⬆️ Update dependency @eslint-community/eslint-utils from 4.4.1 to 4.9.1 ([#479](https://github.com/lo1tuma/eslint-plugin-mocha/pull/479))
+* ⬆️ Update dependency @typescript-eslint/parser from 8.61.0 to 8.64.0 ([#480](https://github.com/lo1tuma/eslint-plugin-mocha/pull/480))
+* ⬆️ Update dependency eslint from 10.4.1 to 10.7.0 ([#495](https://github.com/lo1tuma/eslint-plugin-mocha/pull/495))
+
+### Code Refactoring
+
+* Finish `stryker` follow-up without test-only exports ([#473](https://github.com/lo1tuma/eslint-plugin-mocha/pull/473))
+* Integrate `stryker` mutation testing ([#470](https://github.com/lo1tuma/eslint-plugin-mocha/pull/470))
+* Add jscpd to lint and deduplicate shared rule plumbing ([#469](https://github.com/lo1tuma/eslint-plugin-mocha/pull/469))
+* Add `knip` to `lint` ([#468](https://github.com/lo1tuma/eslint-plugin-mocha/pull/468))
+* Move shared title rule logic out of rules directory ([#446](https://github.com/lo1tuma/eslint-plugin-mocha/pull/446))
+* Add missing tests to get coverage of 100% ([#416](https://github.com/lo1tuma/eslint-plugin-mocha/pull/416))
+* Reuse core prefer-arrow-callback ([#415](https://github.com/lo1tuma/eslint-plugin-mocha/pull/415))
+
+### Build-Related
+
+* Migrate project tasks from npm scripts to just recipes ([#429](https://github.com/lo1tuma/eslint-plugin-mocha/pull/429))
+* Use `@enormora/eslint-config-mocha-node-assert` ([#493](https://github.com/lo1tuma/eslint-plugin-mocha/pull/493))
+
 ## 11.3.0 (May 18, 2026)
 
 ### Bug Fixes
