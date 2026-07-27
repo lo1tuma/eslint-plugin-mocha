@@ -34,7 +34,7 @@
         "eslint": "10.7.0",
         "eslint-doc-generator": "3.7.0",
         "jscpd": "5.0.12",
-        "knip": "6.27.0",
+        "knip": "6.29.0",
         "mocha": "11.7.6",
         "pr-log": "6.4.1",
         "rust-just": "1.57.0",
