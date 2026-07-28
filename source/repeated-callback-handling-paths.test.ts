@@ -239,6 +239,12 @@ function callOperation(
     };
 }
 
+function callbackHandoff(
+    node: Readonly<Rule.Node>
+): Extract<CallbackHandlingOperation, { readonly type: 'callbackHandoff'; }> {
+    return { node, type: 'callbackHandoff' };
+}
+
 function analyzeOperations(
     operationsBySegmentId: ReadonlyMap<string, CallbackHandlingOperation[]>,
     codePath: Readonly<Rule.CodePath>
@@ -448,6 +454,23 @@ suite('repeated callback handling path helpers', function () {
                         ]
                     ]
                 ]),
+                createCodePath(start, [ start ])
+            );
+
+            assert.deepStrictEqual(result, []);
+        });
+
+        test('collectRepeatedCallbackHandlingNodes() ignores callback handoffs as repeats', function () {
+            const start = createSegment('start');
+
+            const result = analyzeOperations(
+                new Map([ [
+                    'start',
+                    [
+                        callOperation(identifier('done'), []),
+                        callbackHandoff(identifier('callbackArgument'))
+                    ]
+                ] ]),
                 createCodePath(start, [ start ])
             );
 

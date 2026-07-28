@@ -3,6 +3,7 @@ import { createMochaVisitors } from '../ast/mocha-visitors.ts';
 import { isFunction } from '../ast/node-types.ts';
 import { asRuleNode } from '../ast/rule-node.ts';
 import type { CallbackHandlingOperation } from '../callback-handling-state.ts';
+import { hasUnhandledReturnPath } from '../done-callback-paths.ts';
 import { getIdentifierCallbackParameter } from '../mocha/callback-parameter.ts';
 import {
     getMemberExpressionBindingAndProperty,
@@ -28,6 +29,7 @@ export type TrackedCallbackFunction = DirectTrackedCallbackFunction | InheritedT
 
 type SharedCallbackTrackingOptions = {
     readonly ignorePending: boolean;
+    readonly trackHandledCallbackArguments: boolean;
 };
 type CallbackTrackingOptions =
     | SharedCallbackTrackingOptions & {
@@ -49,6 +51,7 @@ type TrackedCallbackFunctionContext = {
     readonly trackedCallbackNodes: Readonly<WeakSet<Rule.Node>>;
 };
 type FunctionState = {
+    readonly node: Readonly<Rule.Node>;
     readonly tracked: TrackedCallbackFunction | undefined;
     readonly upper: FunctionState | null;
 };
@@ -143,6 +146,12 @@ function isDirectTrackedCallbackFunction(
     return trackedFunction.callbackName !== undefined;
 }
 
+function isInheritedTrackedCallbackFunction(
+    trackedFunction: Readonly<TrackedCallbackFunction>
+): trackedFunction is Readonly<InheritedTrackedCallbackFunction> {
+    return trackedFunction.callbackName === undefined;
+}
+
 function reportTrackedFunction(
     callbackTrackingOptions: Readonly<CallbackTrackingOptions>,
     trackedFunction: Readonly<TrackedCallbackFunction>
@@ -166,6 +175,7 @@ export function createTrackedCallbackVisitors(
     callbackTrackingOptions: Readonly<CallbackTrackingOptions>
 ): Readonly<Rule.RuleListener> {
     const trackedCallbackNodes = new WeakSet<Rule.Node>();
+    const handledCallbackNodes = new WeakSet<Rule.Node>();
     let currentFunction: FunctionState | null = null;
 
     function recordOperation(operation: Readonly<CallbackHandlingOperation>): void {
@@ -184,6 +194,7 @@ export function createTrackedCallbackVisitors(
 
         if (currentFunction !== null) {
             currentFunction = {
+                node: currentFunction.node,
                 tracked: {
                     ...trackedFunction,
                     operationsBySegmentId
@@ -210,6 +221,34 @@ export function createTrackedCallbackVisitors(
         trackedCallbackNodes.add(node);
     }
 
+    function trackHandledCallbackNode(
+        node: Readonly<Rule.Node>,
+        trackedFunction: Readonly<TrackedCallbackFunction>
+    ): void {
+        if (
+            callbackTrackingOptions.trackHandledCallbackArguments &&
+            isInheritedTrackedCallbackFunction(trackedFunction) &&
+            !hasUnhandledReturnPath({
+                callbackBinding: trackedFunction.callbackBinding,
+                codePath: trackedFunction.codePath,
+                operationsBySegmentId: trackedFunction.operationsBySegmentId,
+                sourceCode: context.sourceCode
+            })
+        ) {
+            handledCallbackNodes.add(asRuleNode(node));
+        }
+    }
+
+    function hasHandledCallbackArgument(
+        node: Readonly<Parameters<Exclude<Rule.RuleListener['CallExpression'], undefined>>[0]>
+    ): boolean {
+        return node.arguments.some(function (argument) {
+            const candidate = argument.type === 'SpreadElement' ? argument.argument : argument;
+
+            return handledCallbackNodes.has(asRuleNode(candidate));
+        });
+    }
+
     return createMochaVisitors(context, {
         testCaseCallback(visitorContext) {
             if (visitorContext.modifier === 'pending' && callbackTrackingOptions.ignorePending) {
@@ -225,6 +264,7 @@ export function createTrackedCallbackVisitors(
 
         onCodePathStart(codePath, node) {
             currentFunction = {
+                node,
                 tracked: createTrackedCallbackFunction({
                     sourceCode: context.sourceCode,
                     trackedCallbackNodes,
@@ -238,9 +278,14 @@ export function createTrackedCallbackVisitors(
         },
 
         onCodePathEnd() {
+            const endedFunction = currentFunction;
             const trackedFunction = currentFunction?.tracked;
 
             if (trackedFunction !== undefined) {
+                if (endedFunction !== null) {
+                    trackHandledCallbackNode(endedFunction.node, trackedFunction);
+                }
+
                 reportTrackedFunction(callbackTrackingOptions, trackedFunction);
             }
 
@@ -270,6 +315,10 @@ export function createTrackedCallbackVisitors(
         },
 
         'CallExpression:exit'(node) {
+            if (callbackTrackingOptions.trackHandledCallbackArguments && hasHandledCallbackArgument(node)) {
+                recordOperation({ node, type: 'callbackHandoff' });
+            }
+
             recordOperation({ node, type: 'call' });
         },
 

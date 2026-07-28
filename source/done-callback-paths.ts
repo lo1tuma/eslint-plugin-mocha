@@ -22,6 +22,10 @@ type Operation =
         readonly type: 'call';
     }
     | {
+        readonly node: Readonly<Rule.Node>;
+        readonly type: 'callbackHandoff';
+    }
+    | {
         readonly propertyName: string | undefined;
         readonly source: Readonly<Rule.Node> | null;
         readonly target: TrackedBinding;
@@ -94,6 +98,10 @@ function applyOperation(
     state: Readonly<PendingPathState>,
     operation: Operation
 ): PendingPathState {
+    if (operation.type === 'callbackHandoff') {
+        return createHandledPendingPathState();
+    }
+
     if (operation.type === 'bindingAssignment') {
         return applyBindingAssignment(sourceCode, state, operation);
     }

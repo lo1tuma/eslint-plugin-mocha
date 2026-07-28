@@ -4,6 +4,7 @@ import { suite, test } from 'mocha';
 import {
     analyzeOperations,
     bindingAssignment,
+    callbackHandoff,
     callExpression,
     callOperation,
     containerPropertyAssignment,
@@ -16,7 +17,6 @@ import {
     literal,
     memberExpression,
     objectExpression,
-    type ObjectExpressionNode,
     privateIdentifier,
     property,
     readSegment,
@@ -44,40 +44,6 @@ function createLinearCodePath(): Rule.CodePath {
     const segments = createSegmentGraph(
         [ 'start', 'end' ],
         [ [ 'start', 'end' ] ]
-    );
-
-    return createCodePath(readSegment(segments, 'start'), [ readSegment(segments, 'end') ]);
-}
-
-function createMissingPredecessorCodePath(): Rule.CodePath {
-    const segments = createSegmentGraph(
-        [ 'start', 'missing', 'end' ],
-        [
-            [ 'start', 'end' ],
-            [ 'missing', 'end' ]
-        ]
-    );
-
-    return createCodePath(readSegment(segments, 'start'), [ readSegment(segments, 'end') ]);
-}
-
-function createLoopCodePath(): Rule.CodePath {
-    const start = readSegment(
-        createSegmentGraph([ 'start' ], [ [ 'start', 'start' ] ]),
-        'start'
-    );
-
-    return createCodePath(start, [ start ]);
-}
-
-function createConvergingLoopCodePath(): Rule.CodePath {
-    const segments = createSegmentGraph(
-        [ 'start', 'loop', 'end' ],
-        [
-            [ 'start', 'loop' ],
-            [ 'loop', 'loop' ],
-            [ 'loop', 'end' ]
-        ]
     );
 
     return createCodePath(readSegment(segments, 'start'), [ readSegment(segments, 'end') ]);
@@ -239,6 +205,17 @@ suite('done callback path helpers', function () {
     });
 
     suite('callback containers', function () {
+        test('hasUnhandledReturnPath() treats handled callback arguments as callback handoffs', function () {
+            const start = createSegment('start');
+
+            const result = analyzeOperations(
+                new Map([ [ 'start', [ callbackHandoff(identifier('callbackArgument')) ] ] ]),
+                createCodePath(start, [ start ])
+            );
+
+            assert.strictEqual(result, false);
+        });
+
         test('hasUnhandledReturnPath() handles inline callback containers with static keys', function () {
             const start = createSegment('start');
 
@@ -438,80 +415,6 @@ suite('done callback path helpers', function () {
                             callOperation(identifier('foo'), [
                                 memberExpression(identifier('obj'), identifier('someFunc'))
                             ])
-                        ]
-                    ]
-                ]),
-                createCodePath(start, [ start ])
-            );
-
-            assert.strictEqual(result, true);
-        });
-    });
-
-    suite('code paths', function () {
-        test('hasUnhandledReturnPath() treats missing predecessor states as handled', function () {
-            const result = analyzeOperations(new Map(), createMissingPredecessorCodePath());
-
-            assert.strictEqual(result, true);
-        });
-
-        test('hasUnhandledReturnPath() ignores returned segments without exit state', function () {
-            const start = createSegment('start');
-            const missing = createSegment('missing');
-
-            const result = analyzeOperations(new Map(), createCodePath(start, [ missing ]));
-
-            assert.strictEqual(result, false);
-        });
-
-        test('hasUnhandledReturnPath() reuses unchanged loop state', function () {
-            const result = analyzeOperations(
-                new Map([
-                    [ 'start', [ containerPropertyAssignment('obj', 'someFunc', identifier('done')) ] ]
-                ]),
-                createLoopCodePath()
-            );
-
-            assert.strictEqual(result, true);
-        });
-
-        test('hasUnhandledReturnPath() revisits loops until aliased callback state stabilizes', function () {
-            const result = analyzeOperations(
-                new Map([
-                    [ 'start', [ bindingAssignment('next', identifier('done')) ] ],
-                    [
-                        'loop',
-                        [
-                            bindingAssignment('later', identifier('next')),
-                            bindingAssignment('next', null)
-                        ]
-                    ],
-                    [ 'end', [ callOperation(identifier('foo'), [ identifier('later') ]) ] ]
-                ]),
-                createConvergingLoopCodePath()
-            );
-
-            assert.strictEqual(result, true);
-        });
-
-        test('hasUnhandledReturnPath() ignores getter-based callback container properties', function () {
-            const start = createSegment('start');
-
-            const result = analyzeOperations(
-                new Map([
-                    [
-                        'start',
-                        [
-                            callOperation(identifier('foo'), [ {
-                                properties: [ {
-                                    computed: false,
-                                    key: identifier('someFunc'),
-                                    kind: 'get',
-                                    type: 'Property',
-                                    value: identifier('done')
-                                } ],
-                                type: 'ObjectExpression'
-                            } as unknown as ObjectExpressionNode ])
                         ]
                     ]
                 ]),

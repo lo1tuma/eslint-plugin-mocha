@@ -77,6 +77,16 @@ it('foo', function (done) {
     asyncFunction({ callback: done });
 });
 
+it('foo', function (done) {
+    loadData()
+        .then(function () {
+            done();
+        })
+        .catch(function (error) {
+            done(error);
+        });
+});
+
 before(function (done) {
     asyncInitialization(function () {
         initialized = true;

@@ -46,7 +46,8 @@ function collectOperationTypes(code: string): readonly string[] {
                     operationTypes = operations.map(function (operation) {
                         return operation.type;
                     });
-                }
+                },
+                trackHandledCallbackArguments: false
             });
         }
     };
@@ -75,7 +76,8 @@ suite('callback tracking', function () {
                 includeInheritedCallbackBinding: true,
                 onTrackedFunctionEnd(trackedFunction) {
                     trackedFunctions.push(trackedFunction);
-                }
+                },
+                trackHandledCallbackArguments: false
             }
         );
         const codePath = createCodePath();

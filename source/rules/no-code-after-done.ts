@@ -41,7 +41,8 @@ export const noCodeAfterDoneRule: Readonly<Rule.RuleModule> = {
             includeInheritedCallbackBinding: true,
             onTrackedFunctionEnd(trackedFunction) {
                 reportCodeAfterDone(context, trackedFunction);
-            }
+            },
+            trackHandledCallbackArguments: false
         });
     }
 };
