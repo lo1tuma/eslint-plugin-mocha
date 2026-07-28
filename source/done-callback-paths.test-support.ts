@@ -203,6 +203,10 @@ export function callOperation(
     };
 }
 
+export function callbackHandoff(node: Readonly<Rule.Node>): Operation {
+    return { node, type: 'callbackHandoff' };
+}
+
 export function analyzeOperations(
     operationsBySegmentId: ReadonlyMap<string, readonly Operation[]>,
     codePath: Readonly<Rule.CodePath>

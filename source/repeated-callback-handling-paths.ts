@@ -13,6 +13,9 @@ function getRepeatedCallbackHandlingNode(
     operation: Readonly<CallbackHandlingOperation>
 ): Rule.Node | undefined {
     const repeatedNodeByOperationType = {
+        callbackHandoff() {
+            return undefined;
+        },
         bindingAssignment() {
             return undefined;
         },

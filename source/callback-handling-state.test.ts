@@ -220,6 +220,12 @@ function callOperation(
     };
 }
 
+function callbackHandoff(
+    node: Readonly<Rule.Node>
+): Extract<CallbackHandlingOperation, { readonly type: 'callbackHandoff'; }> {
+    return { node, type: 'callbackHandoff' };
+}
+
 function createChangedClone(state: Readonly<CallbackPathState>): CallbackPathState {
     const clone = clonePathState(state);
     const callbackProperties = clone.handledReferences.containerPropertiesByBinding.get('callbacks') ?? [];
@@ -237,6 +243,15 @@ function createChangedClone(state: Readonly<CallbackPathState>): CallbackPathSta
 }
 
 suite('callback handling state helpers', function () {
+    test('updatePathState() treats callback handoffs as callback handling', function () {
+        const sourceCode = createSourceCode();
+        const state = createPathState();
+        const nextState = updatePathState(sourceCode, state, callbackHandoff(identifier('callbackArgument')));
+
+        assert.strictEqual(nextState.callbackHandled, true);
+        assert.deepStrictEqual(readSortedStrings(nextState.handledReferences.aliasBindings), [ 'done' ]);
+    });
+
     test('clonePathState() deep-copies alias and container state', function () {
         const state = createPathState({
             callbackHandled: true,

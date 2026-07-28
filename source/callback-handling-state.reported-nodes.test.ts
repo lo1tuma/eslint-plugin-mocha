@@ -116,6 +116,12 @@ function callOperation(
     };
 }
 
+function callbackHandoff(
+    node: Readonly<Rule.Node>
+): Extract<CallbackHandlingOperation, { readonly type: 'callbackHandoff'; }> {
+    return { node, type: 'callbackHandoff' };
+}
+
 suite('callback handling reported nodes', function () {
     test('getCodeAfterCallbackHandlingNode() reports non-callback operations after the callback', function () {
         const sourceCode = createSourceCode();
@@ -155,6 +161,16 @@ suite('callback handling reported nodes', function () {
         assert.strictEqual(
             getCodeAfterCallbackHandlingNode(sourceCode, state, dynamicDelegateCall),
             dynamicDelegateCall.node
+        );
+    });
+
+    test('getCodeAfterCallbackHandlingNode() ignores callback handoff operations', function () {
+        const sourceCode = createSourceCode();
+        const state = createPathState();
+
+        assert.strictEqual(
+            getCodeAfterCallbackHandlingNode(sourceCode, state, callbackHandoff(identifier('callbackArgument'))),
+            undefined
         );
     });
 });

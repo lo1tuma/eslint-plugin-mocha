@@ -1,7 +1,11 @@
 import type { Rule } from 'eslint';
 import { hasUnhandledReturnPath } from '../done-callback-paths.ts';
 import { getRuleOption, type InferSchemaOption } from '../rule-options.ts';
-import { createTrackedCallbackVisitors, type DirectTrackedCallbackFunction } from './callback-tracking.ts';
+import {
+    createTrackedCallbackVisitors,
+    type DirectTrackedCallbackFunction,
+    type TrackedCallbackFunction
+} from './callback-tracking.ts';
 
 const optionSchema = {
     type: 'object',
@@ -41,6 +45,12 @@ function reportUnhandledDoneCallback(
     });
 }
 
+function isDirectTrackedCallbackFunction(
+    trackedFunction: Readonly<TrackedCallbackFunction>
+): trackedFunction is Readonly<DirectTrackedCallbackFunction> {
+    return trackedFunction.callbackName !== undefined;
+}
+
 export const handleDoneCallbackRule: Readonly<Rule.RuleModule> = {
     meta: {
         type: 'problem',
@@ -60,10 +70,13 @@ export const handleDoneCallbackRule: Readonly<Rule.RuleModule> = {
         const { ignorePending } = getRuleOption<ResolvedOption>(context);
         return createTrackedCallbackVisitors(context, {
             ignorePending,
-            includeInheritedCallbackBinding: false,
+            includeInheritedCallbackBinding: true,
             onTrackedFunctionEnd(trackedFunction) {
-                reportUnhandledDoneCallback(context, trackedFunction);
-            }
+                if (isDirectTrackedCallbackFunction(trackedFunction)) {
+                    reportUnhandledDoneCallback(context, trackedFunction);
+                }
+            },
+            trackHandledCallbackArguments: true
         });
     }
 };

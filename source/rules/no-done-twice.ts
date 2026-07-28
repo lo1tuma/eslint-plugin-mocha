@@ -41,7 +41,8 @@ export const noDoneTwiceRule: Readonly<Rule.RuleModule> = {
             includeInheritedCallbackBinding: false,
             onTrackedFunctionEnd(trackedFunction) {
                 reportDoneTwice(context, trackedFunction);
-            }
+            },
+            trackHandledCallbackArguments: false
         });
     }
 };

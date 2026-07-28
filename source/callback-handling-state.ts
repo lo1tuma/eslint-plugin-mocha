@@ -49,6 +49,10 @@ export type CallbackHandlingOperation =
         readonly source: Readonly<Rule.Node> | null;
         readonly target: TrackedBinding;
         readonly type: 'bindingAssignment';
+    }
+    | {
+        readonly node: Rule.Node;
+        readonly type: 'callbackHandoff';
     };
 
 export type CallbackHandlingContext = {
@@ -320,11 +324,26 @@ function mergeReferenceStates(
     };
 }
 
+function markCallbackHandled(state: Readonly<CallbackPathState>): CallbackPathState {
+    return {
+        callbackHandled: true,
+        handledReferences: mergeReferenceStates([
+            state.handledReferences,
+            state.unhandledReferences
+        ]),
+        unhandledReferences: cloneReferenceState(state.unhandledReferences)
+    };
+}
+
 export function updatePathState(
     sourceCode: Readonly<Rule.RuleContext['sourceCode']>,
     state: Readonly<CallbackPathState>,
     operation: Readonly<CallbackHandlingOperation>
 ): CallbackPathState {
+    if (operation.type === 'callbackHandoff') {
+        return markCallbackHandled(state);
+    }
+
     if (operation.type === 'bindingAssignment') {
         return {
             callbackHandled: state.callbackHandled,
@@ -345,14 +364,7 @@ export function updatePathState(
         return clonePathState(state);
     }
 
-    return {
-        callbackHandled: true,
-        handledReferences: mergeReferenceStates([
-            state.handledReferences,
-            state.unhandledReferences
-        ]),
-        unhandledReferences: cloneReferenceState(state.unhandledReferences)
-    };
+    return markCallbackHandled(state);
 }
 
 function isCallbackHandlingCallInAnyTrackedReferenceState(
@@ -371,6 +383,10 @@ export function getCodeAfterCallbackHandlingNode(
     state: Readonly<CallbackPathState>,
     operation: Readonly<CallbackHandlingOperation>
 ): Rule.Node | undefined {
+    if (operation.type === 'callbackHandoff') {
+        return undefined;
+    }
+
     return state.callbackHandled && !isCallbackHandlingCallInAnyTrackedReferenceState(sourceCode, state, operation)
         ? operation.node
         : undefined;

@@ -89,7 +89,6 @@ export async function buildConfig() {
     return {
         registrySettings: registrySettings(),
         changelog: {
-            packageTagFormat: '{version}',
             prLog: {
                 ignoredLabels: [ 'release' ],
                 collapseRules: [
