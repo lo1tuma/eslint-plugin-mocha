@@ -1,3 +1,9 @@
+## eslint-plugin-mocha 12.0.1 (July 28, 2026)
+
+### Bug Fixes
+
+* Fix `handle-done-callback` for nested callback handoffs ([#549](https://github.com/lo1tuma/eslint-plugin-mocha/pull/549))
+
 ## eslint-plugin-mocha 12.0.0 (July 27, 2026)
 
 ### Breaking Changes
