@@ -46,7 +46,7 @@
         ]
     },
     "overrides": {
-        "yargs": "18.0.0"
+        "yargs": "18.1.0"
     },
     "peerDependencies": {
         "eslint": ">=10.2.0"
