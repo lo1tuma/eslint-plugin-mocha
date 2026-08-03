@@ -9,6 +9,17 @@
 * Update type-fest to 5.8.0
 * Update dependency globals to v17.8.0 ([#552](https://github.com/lo1tuma/eslint-plugin-mocha/pull/552))
 
+## eslint-plugin-mocha 12.0.2 (August 3, 2026)
+
+### Bug Fixes
+
+* Fix `handle-done-callback` for object property callbacks ([#561](https://github.com/lo1tuma/eslint-plugin-mocha/pull/561))
+
+### Dependency Upgrades
+
+* Update type-fest to 5.8.0
+* Update dependency globals to v17.8.0 ([#552](https://github.com/lo1tuma/eslint-plugin-mocha/pull/552))
+
 ## eslint-plugin-mocha 12.0.1 (July 28, 2026)
 
 ### Bug Fixes
