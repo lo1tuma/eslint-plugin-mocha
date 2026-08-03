@@ -8,14 +8,10 @@ suite('node location helpers', function () {
         assert.deepStrictEqual(expectNodeRange({ range: [ 4, 8 ] }), [ 4, 8 ]);
         assert.throws(function () {
             expectNodeRange({});
-        }, function (error: unknown) {
-            return error instanceof Error && error.message === 'Expected node range.';
-        });
+        }, { name: 'TypeError', message: 'Expected node range.' });
         assert.throws(function () {
             expectNodeRange({ range: null });
-        }, function (error: unknown) {
-            return error instanceof Error && error.message === 'Expected node range.';
-        });
+        }, { name: 'TypeError', message: 'Expected node range.' });
     });
 
     test('expectNodeLocation() returns locations and throws for missing ones', function () {
@@ -27,8 +23,6 @@ suite('node location helpers', function () {
         assert.strictEqual(expectNodeLocation({ loc: location }), location);
         assert.throws(function () {
             expectNodeLocation({});
-        }, function (error: unknown) {
-            return error instanceof Error && error.message === 'Expected node location.';
-        });
+        }, { name: 'TypeError', message: 'Expected node location.' });
     });
 });

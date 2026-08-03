@@ -25,9 +25,7 @@ suite('node type helpers', function () {
 
         assert.throws(function () {
             getParentNode(node);
-        }, function (error: unknown) {
-            return error instanceof Error && error.message === 'Expected node to have a parent.';
-        });
+        }, { name: 'Error', message: 'Expected node to have a parent.' });
     });
 
     test('isLiteral() rejects non-literal nodes', function () {
@@ -43,9 +41,7 @@ suite('node type helpers', function () {
     test('expectCallExpression() throws for other node types', function () {
         assert.throws(function () {
             expectCallExpression(asNode({ type: 'Identifier' }));
-        }, function (error: unknown) {
-            return error instanceof Error && error.message === 'Expected CallExpression node, got Identifier.';
-        });
+        }, { name: 'TypeError', message: 'Expected CallExpression node, got Identifier.' });
     });
 
     test('expectMemberExpression() returns member expression nodes', function () {
@@ -62,8 +58,6 @@ suite('node type helpers', function () {
     test('expectMemberExpression() throws for other node types', function () {
         assert.throws(function () {
             expectMemberExpression(asNode({ type: 'Identifier' }));
-        }, function (error: unknown) {
-            return error instanceof Error && error.message === 'Expected MemberExpression node, got Identifier.';
-        });
+        }, { name: 'TypeError', message: 'Expected MemberExpression node, got Identifier.' });
     });
 });
