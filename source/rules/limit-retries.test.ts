@@ -170,10 +170,7 @@ suite('limit-retries', function () {
                     }
                 });
             },
-            function (error: unknown) {
-                return error instanceof Error &&
-                    error.message.includes('`min` must be less than or equal to `max`.');
-            }
+            { name: 'TypeError', message: /`min` must be less than or equal to `max`\./u }
         );
     });
 });

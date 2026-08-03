@@ -32,10 +32,7 @@ suite('settings', function () {
                 function () {
                     getAdditionalNames({ 'mocha/additionalCustomNames': 'foo' });
                 },
-                function (error: unknown) {
-                    return error instanceof TypeError &&
-                        error.message === 'additionalCustomNames must be an array';
-                }
+                { name: 'TypeError', message: 'additionalCustomNames must be an array' }
             );
         });
 
@@ -44,10 +41,7 @@ suite('settings', function () {
                 function () {
                     getAdditionalNames({ 'mocha/additionalCustomNames': [ 'foo' ] });
                 },
-                function (error: unknown) {
-                    return error instanceof Error &&
-                        error.message === 'additionalCustomNames item must be an object';
-                }
+                { name: 'Error', message: 'additionalCustomNames item must be an object' }
             );
         });
 
@@ -58,10 +52,7 @@ suite('settings', function () {
                         'mocha/additionalCustomNames': [ { interface: 'foo', name: 'bar', type: 'suite' } ]
                     });
                 },
-                function (error: unknown) {
-                    return error instanceof Error &&
-                        error.message === 'additionalCustomNames interface foo is invalid';
-                }
+                { name: 'Error', message: 'additionalCustomNames interface foo is invalid' }
             );
         });
 
@@ -72,10 +63,7 @@ suite('settings', function () {
                         'mocha/additionalCustomNames': [ { interface: 'BDD', name: 42, type: 'suite' } ]
                     });
                 },
-                function (error: unknown) {
-                    return error instanceof TypeError &&
-                        error.message === 'additionalCustomNames name missing or invalid';
-                }
+                { name: 'TypeError', message: 'additionalCustomNames name missing or invalid' }
             );
         });
 
@@ -86,10 +74,7 @@ suite('settings', function () {
                         'mocha/additionalCustomNames': [ { interface: 'BDD', name: 'bar', type: 42 } ]
                     });
                 },
-                function (error: unknown) {
-                    return error instanceof TypeError &&
-                        error.message === 'additionalCustomNames type missing or invalid';
-                }
+                { name: 'TypeError', message: 'additionalCustomNames type missing or invalid' }
             );
         });
 
@@ -100,10 +85,7 @@ suite('settings', function () {
                         'mocha/additionalCustomNames': [ { interface: 'BDD', name: 'bar', type: 'config' } ]
                     });
                 },
-                function (error: unknown) {
-                    return error instanceof Error &&
-                        error.message === 'additionalCustomNames type config is invalid';
-                }
+                { name: 'Error', message: 'additionalCustomNames type config is invalid' }
             );
         });
     });

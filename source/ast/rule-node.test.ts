@@ -12,16 +12,12 @@ suite('rule node helpers', function () {
     test('asRuleNode() throws for non-node values', function () {
         assert.throws(function () {
             asRuleNode(null);
-        }, function (error: unknown) {
-            return error instanceof Error && error.message === 'Expected ESLint rule node.';
-        });
+        }, { name: 'TypeError', message: 'Expected ESLint rule node.' });
     });
 
     test('asRuleNode() rejects nodes whose type is not a string', function () {
         assert.throws(function () {
             asRuleNode({ type: 1 });
-        }, function (error: unknown) {
-            return error instanceof Error && error.message === 'Expected ESLint rule node.';
-        });
+        }, { name: 'TypeError', message: 'Expected ESLint rule node.' });
     });
 });

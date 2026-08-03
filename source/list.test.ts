@@ -58,9 +58,7 @@ suite('list helpers', function () {
             function () {
                 getLastOrThrow([]);
             },
-            function (error: unknown) {
-                return error instanceof Error && error.message === 'No item in list exists';
-            }
+            { name: 'Error', message: 'No item in list exists' }
         );
     });
 });
