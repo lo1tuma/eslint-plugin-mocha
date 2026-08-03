@@ -105,6 +105,7 @@ export async function buildConfig() {
             ]
         },
         checks: {
+            typeScriptIntegrity: { enabled: true, declarations: 'all' },
             noDevDependencyImports: { enabled: true },
             requiredFiles: { enabled: true, files: [ 'LICENSE', 'README.md' ] },
             uniqueTargetPaths: { enabled: true }
