@@ -34,9 +34,24 @@ ruleTester.run('handle-done-callback', handleDoneCallbackRule, {
         'it("", function (done) { done(new Error("foo")); });',
         'it("", function (done) { promise.then(done).catch(done); });',
         'it("", function (done) { asyncFunction(function () { done(); }); });',
+        'it("", function (done) { runTask({ onSuccess: function () { done(); } }); });',
         'it("", function (done) { asyncFunction(function (error) { if (error) { done(error); } else { done(); } }); });',
         'it("", function (done) { Promise.resolve().then(function () { done(); }).catch(function (error) { done(error); }); });',
         'it("", function (done) { Promise.resolve().then(() => { done(); }).catch((error) => { done(error); }); });',
+        {
+            code: 'it("", function (done) { runTask({ onSuccess: () => { done(); } }); });',
+            languageOptions: { ecmaVersion: 6 }
+        },
+        {
+            code: 'it("", function (done) { runTask({ onSuccess() { done(); }, ' +
+                'onFailure() { expect(error).to.exist; } }); });',
+            languageOptions: { ecmaVersion: 6 }
+        },
+        {
+            code: 'it("", function (done) { runTask({ next() { calculate(); }, ' +
+                'onSuccess() { done(); }, onError() { done(error); } }); });',
+            languageOptions: { ecmaVersion: 6 }
+        },
         'it("", function (done) { promise.then(function () { done(); }, function (error) { done(error); }); });',
         'it("", function (done) { promise.then(() => done(), (error) => done(error)); });',
         'it("", function (done) { promise.then(function () { done(); }).catch(done); });',
@@ -132,6 +147,17 @@ ruleTester.run('handle-done-callback', handleDoneCallbackRule, {
         },
         {
             code: 'it("", function (done) { asyncFunction(function (error) { expect(error).to.be.null; }); });',
+            errors: [ {
+                message: 'Expected "done" callback to be handled.',
+                column: 18,
+                line: 1,
+                endLine: 1,
+                endColumn: 22
+            } ]
+        },
+        {
+            code: 'it("", function (done) { runTask({ onSuccess() { expect(true).to.equal(true); } }); });',
+            languageOptions: { ecmaVersion: 6 },
             errors: [ {
                 message: 'Expected "done" callback to be handled.',
                 column: 18,
