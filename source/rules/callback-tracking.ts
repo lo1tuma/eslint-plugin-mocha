@@ -170,6 +170,15 @@ function reportTrackedFunction(
     }
 }
 
+function isHandledCallbackObjectArgument(
+    node: Readonly<Rule.Node>,
+    handledCallbackNodes: Readonly<WeakSet<Rule.Node>>
+): boolean {
+    return node.type === 'ObjectExpression' && node.properties.some(function (property) {
+        return property.type === 'Property' && handledCallbackNodes.has(asRuleNode(property.value));
+    });
+}
+
 export function createTrackedCallbackVisitors(
     context: Readonly<Rule.RuleContext>,
     callbackTrackingOptions: Readonly<CallbackTrackingOptions>
@@ -245,7 +254,11 @@ export function createTrackedCallbackVisitors(
         return node.arguments.some(function (argument) {
             const candidate = argument.type === 'SpreadElement' ? argument.argument : argument;
 
-            return handledCallbackNodes.has(asRuleNode(candidate));
+            if (handledCallbackNodes.has(asRuleNode(candidate))) {
+                return true;
+            }
+
+            return isHandledCallbackObjectArgument(asRuleNode(candidate), handledCallbackNodes);
         });
     }
 
