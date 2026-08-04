@@ -7,11 +7,6 @@ on:
                 default: ""
                 required: false
                 type: string
-    workflow_dispatch:
-        inputs:
-            release_pull_request_number:
-                required: true
-                type: string
 
 permissions: {}
 
