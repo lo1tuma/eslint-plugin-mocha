@@ -179,6 +179,16 @@ function isHandledCallbackObjectArgument(
     });
 }
 
+function isOrContainsHandledCallback(
+    node: Readonly<Rule.Node>,
+    handledCallbackNodes: Readonly<WeakSet<Rule.Node>>
+): boolean {
+    if (handledCallbackNodes.has(asRuleNode(node))) {
+        return true;
+    }
+    return isHandledCallbackObjectArgument(node, handledCallbackNodes);
+}
+
 export function createTrackedCallbackVisitors(
     context: Readonly<Rule.RuleContext>,
     callbackTrackingOptions: Readonly<CallbackTrackingOptions>
@@ -254,11 +264,7 @@ export function createTrackedCallbackVisitors(
         return node.arguments.some(function (argument) {
             const candidate = argument.type === 'SpreadElement' ? argument.argument : argument;
 
-            if (handledCallbackNodes.has(asRuleNode(candidate))) {
-                return true;
-            }
-
-            return isHandledCallbackObjectArgument(asRuleNode(candidate), handledCallbackNodes);
+            return isOrContainsHandledCallback(asRuleNode(candidate), handledCallbackNodes);
         });
     }
 
@@ -336,6 +342,14 @@ export function createTrackedCallbackVisitors(
         },
 
         'VariableDeclarator:exit'(node) {
+            if (
+                callbackTrackingOptions.trackHandledCallbackArguments &&
+                node.init !== null &&
+                isOrContainsHandledCallback(asRuleNode(node.init), handledCallbackNodes)
+            ) {
+                recordOperation({ node, type: 'callbackHandoff' });
+            }
+
             if (node.id.type !== 'Identifier') {
                 return;
             }
@@ -349,6 +363,13 @@ export function createTrackedCallbackVisitors(
         },
 
         'AssignmentExpression:exit'(node) {
+            if (
+                callbackTrackingOptions.trackHandledCallbackArguments &&
+                isOrContainsHandledCallback(asRuleNode(node.right), handledCallbackNodes)
+            ) {
+                recordOperation({ node, type: 'callbackHandoff' });
+            }
+
             if (node.left.type === 'Identifier') {
                 recordOperation({
                     node,

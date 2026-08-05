@@ -18,6 +18,8 @@ ruleTester.run('no-code-after-done', noCodeAfterDoneRule, {
         'it("title", function(done) { getCallbacks().complete = done; done(); });',
         'it("title", async function() { await work(); });',
         'it("title", function() { work(); });',
+        'it("title", function(done) { const obj = {}; obj.method = function() { done(); }; return obj; });',
+        'it("title", function(done) { let handler; handler = function() { done(); }; });',
         'notMocha("title", function(done) { done(); expect(true).to.be.false; });',
 
         {
@@ -73,6 +75,10 @@ ruleTester.run('no-code-after-done', noCodeAfterDoneRule, {
             code: 'it("title", function(this: Mocha.Context, done) { done(); expect(true).to.be.true; });',
             languageOptions: typescriptLanguageOptions,
             errors: [ { message, line: 1, column: 59, endLine: 1, endColumn: 71 } ]
-        }
+        },
+        {
+            code: 'it("title", function(done) { const obj = {}; obj.method = function() { done(); expect(true).to.be.true; }; });',
+            errors: [ { message, line: 1, column: 80, endLine: 1, endColumn: 92 } ]
+        },
     ]
 });

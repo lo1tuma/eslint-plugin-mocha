@@ -91,7 +91,14 @@ ruleTester.run('handle-done-callback', handleDoneCallbackRule, {
         {
             code: 'before(async function setupApplication(this: Mocha.Context) { this.timeout(6000); });',
             languageOptions: typescriptLanguageOptions
-        }
+        },
+        'it("", function (done) { const handler = function () { done(); }; });',
+        'it("", function (done) { let handler; handler = function () { done(); }; });',
+        'it("", function (done) { var writable = {}; writable._final = function (callback) { done(); }; });',
+        {
+            code: 'it("", function (done) { const handler = () => { done(); }; });',
+            languageOptions: { ecmaVersion: 6 }
+        },
     ],
 
     invalid: [
