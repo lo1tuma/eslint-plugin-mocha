@@ -22,7 +22,7 @@
         "@enormora/eslint-config-mocha-node-assert": "0.0.10",
         "@enormora/eslint-config-node": "0.0.41",
         "@enormora/eslint-config-typescript": "0.0.63",
-        "@packtory/cli": "0.0.80",
+        "@packtory/cli": "0.0.81",
         "@stryker-mutator/core": "9.6.1",
         "@stryker-mutator/mocha-runner": "9.6.1",
         "@types/mocha": "10.0.10",
