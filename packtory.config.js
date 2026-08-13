@@ -98,6 +98,11 @@ export async function buildConfig() {
                         label: 'upgrade',
                         pattern: '^⬆️ Update dependency (?<dependency>.+?) from (?<from>.+?) to (?<to>.+?)$',
                         replace: '⬆️ Update dependency $<dependency> from $<from> to $<to>'
+                    },
+                    {
+                        label: 'upgrade',
+                        pattern: '^⬆️ (?<dependency>Lock file maintenance|Update .+ dependencies)(?<from>)(?<to>)$',
+                        replace: '⬆️ $<dependency>'
                     }
                 ]
             },
