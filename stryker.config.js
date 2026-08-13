@@ -1,5 +1,7 @@
 // @ts-check
-/** @typedef {import('@stryker-mutator/core/package.json')} StrykerCorePackage */
+/**
+ * @typedef {import('@stryker-mutator/core/package.json')} StrykerCorePackage
+ */
 
 const config = {
     testRunner: 'mocha',

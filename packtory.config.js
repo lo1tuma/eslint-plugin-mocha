@@ -82,7 +82,9 @@ function mochaPluginPackage() {
     };
 }
 
-/** @returns {Promise<import('@packtory/cli').PacktoryConfig & Record<string, unknown>>} */
+/**
+ * @returns {Promise<import('@packtory/cli').PacktoryConfig & Record<string, unknown>>}
+ */
 export async function buildConfig() {
     const packageInfo = await readPackageInfo();
 
