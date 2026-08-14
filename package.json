@@ -26,7 +26,7 @@
         "@stryker-mutator/core": "9.6.1",
         "@stryker-mutator/mocha-runner": "9.6.1",
         "@types/mocha": "10.0.10",
-        "@typescript-eslint/parser": "8.66.0",
+        "@typescript-eslint/parser": "8.67.0",
         "c8": "12.0.0",
         "change-case": "5.4.4",
         "coveralls": "3.1.1",
