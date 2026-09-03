@@ -14,7 +14,7 @@
         "globals": "17.11.0",
         "json-schema-to-ts": "3.1.1",
         "tslib": "2.8.1",
-        "type-fest": "5.8.0"
+        "type-fest": "5.9.0"
     },
     "devDependencies": {
         "@enormora/eslint-config-base": "0.0.61",
