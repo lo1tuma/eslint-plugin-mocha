@@ -51,11 +51,6 @@ jobs:
             - name: Run tests
               run: npx just test
               timeout-minutes: 20
-            - name: Check packages
-              if: matrix.node == 24
-              env:
-                  GH_TOKEN: ${{ github.token }}
-              run: npx just publish-dry-run
             - name: Coveralls
               uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2.3.8
               with:
@@ -63,6 +58,28 @@ jobs:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   path-to-lcov: ./target/coverage/lcov.info
                   parallel: true
+    package-checks:
+        needs: build
+        runs-on: ubuntu-latest
+        name: Package checks
+        permissions:
+            contents: read # required for actions/checkout to read the repository source
+            pull-requests: read # required to read release PR files and metadata
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  fetch-depth: 0
+                  persist-credentials: false
+            - name: Use Node.js
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: 26
+            - name: Install dependencies
+              run: npm clean-install --ignore-scripts
+            - name: Check packages
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: npx just publish-dry-run
     workflow-security:
         runs-on: ubuntu-latest
         name: Workflow security analysis
@@ -128,7 +145,7 @@ jobs:
             - name: Use Node.js
               uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
-                  node-version: 24
+                  node-version: 26
             - name: Install dependencies
               run: npm clean-install --ignore-scripts
             - name: Validate release pull request
@@ -156,7 +173,7 @@ jobs:
               run: npx just test-mutation
               timeout-minutes: 30
     publish-release:
-        needs: [build, release-pr-policy, mutation-testing]
+        needs: [build, package-checks, release-pr-policy, mutation-testing]
         name: Publish release
         if: >
             !failure() &&
@@ -204,7 +221,7 @@ jobs:
             - name: Use Node.js
               uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
-                  node-version: 24
+                  node-version: 26
             - name: Install dependencies
               run: npm clean-install --ignore-scripts
             - name: Maintain release pull request

@@ -20,6 +20,7 @@ function commonPackageSettings(packageInfo) {
     return {
         sourcesFolder,
         mainPackageJson: packageInfo,
+        deadCodeElimination: { enabled: true },
         includeSourceMapFiles: false,
         publishSettings: {
             access: 'public',
@@ -48,6 +49,7 @@ function releasePullRequestSettings() {
                 'Node 22',
                 'Node 24',
                 'Node 26',
+                'Package checks',
                 'Workflow security analysis',
                 'Release PR policy',
                 'Mutation testing'
@@ -71,11 +73,11 @@ function mochaPluginPackage() {
         },
         additionalFiles: [
             {
-                sourceFilePath: path.join(projectFolder, 'README.md'),
+                inputFilePath: path.join(projectFolder, 'README.md'),
                 targetFilePath: 'README.md'
             },
             {
-                sourceFilePath: path.join(projectFolder, 'LICENSE'),
+                inputFilePath: path.join(projectFolder, 'LICENSE'),
                 targetFilePath: 'LICENSE'
             }
         ]
@@ -114,8 +116,11 @@ export async function buildConfig() {
         checks: {
             typeScriptIntegrity: { enabled: true, declarations: 'all' },
             noDevDependencyImports: { enabled: true },
+            noUnusedBundleDependencies: { enabled: true },
+            noDuplicatedFiles: { enabled: true },
             requiredFiles: { enabled: true, files: [ 'LICENSE', 'README.md' ] },
-            uniqueTargetPaths: { enabled: true }
+            uniqueTargetPaths: { enabled: true },
+            noUnexposedExecutables: { enabled: true }
         },
         commonPackageSettings: commonPackageSettings(packageInfo),
         releasePullRequest: releasePullRequestSettings(),

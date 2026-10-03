@@ -30,7 +30,7 @@ jobs:
             - name: Use Node.js
               uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
-                  node-version: 24
+                  node-version: 26
             - name: Install workflow dependencies
               run: npm clean-install --ignore-scripts
             - name: Audit release tooling
@@ -75,7 +75,7 @@ jobs:
               if: steps.publish-target.outputs.should_publish == 'true'
               uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
-                  node-version: 24
+                  node-version: 26
             - name: Install release dependencies
               if: steps.publish-target.outputs.should_publish == 'true'
               working-directory: target/release-source
