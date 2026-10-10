@@ -1,3 +1,19 @@
+## eslint-plugin-mocha 12.0.3 (October 10, 2026)
+
+### Dependency Upgrades
+
+* ⬆️ Update dependency globals to v17.13.0 ([#656](https://github.com/lo1tuma/eslint-plugin-mocha/pull/656))
+* ⬆️ Update dependency globals to v17.12.0 ([#627](https://github.com/lo1tuma/eslint-plugin-mocha/pull/627))
+* ⬆️ Update dependency globals to v17.11.0 ([#593](https://github.com/lo1tuma/eslint-plugin-mocha/pull/593))
+* ⬆️ Update dependency globals to v17.10.0 ([#592](https://github.com/lo1tuma/eslint-plugin-mocha/pull/592))
+* Update dependency globals to v17.9.0 ([#569](https://github.com/lo1tuma/eslint-plugin-mocha/pull/569))
+* ⬆️ Update dependency type-fest to v5.10.0 ([#639](https://github.com/lo1tuma/eslint-plugin-mocha/pull/639))
+* ⬆️ Update dependency type-fest to v5.9.0 ([#623](https://github.com/lo1tuma/eslint-plugin-mocha/pull/623))
+
+### Build-Related
+
+* Harden Packtory package checks ([#655](https://github.com/lo1tuma/eslint-plugin-mocha/pull/655))
+
 ## eslint-plugin-mocha 12.0.2 (August 3, 2026)
 
 ### Bug Fixes
