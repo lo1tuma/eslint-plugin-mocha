@@ -34,7 +34,7 @@
         "dependency-cruiser": "18.5.0",
         "eslint": "10.9.0",
         "eslint-doc-generator": "3.7.0",
-        "jscpd": "5.4.0",
+        "jscpd": "5.4.1",
         "knip": "6.41.0",
         "mocha": "11.8.0",
         "pr-log": "6.5.0",
