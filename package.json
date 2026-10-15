@@ -4,7 +4,7 @@
     "description": "Eslint rules for mocha.",
     "type": "module",
     "engines": {
-        "node": ">=22.0.0"
+        "node": "^22.13.0 || >=24.0.0"
     },
     "exports": "./target/build/source/plugin.js",
     "dependencies": {
@@ -22,7 +22,7 @@
         "@enormora/eslint-config-mocha-node-assert": "0.0.16",
         "@enormora/eslint-config-node": "0.0.46",
         "@enormora/eslint-config-typescript": "0.0.69",
-        "@packtory/cli": "0.0.120",
+        "@packtory/cli": "0.0.124",
         "@stryker-mutator/core": "10.0.0",
         "@stryker-mutator/mocha-runner": "10.0.0",
         "@types/mocha": "10.0.10",

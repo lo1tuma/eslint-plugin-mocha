@@ -48,7 +48,7 @@ test: test-unit-with-coverage test-bench
 coveralls:
     coveralls < ./target/coverage/lcov.info
 
-pack-preview:
+pack-preview: compile
     packtory preview
 
 prepare-release: compile
@@ -75,3 +75,7 @@ publish: compile
 update-eslint-docs *options:
     tsc --build source/tsconfig.sources.json
     eslint-doc-generator --ignore-config all --path-rule-doc 'documentation/rules/{name}.md' --url-configs 'https://github.com/lo1tuma/eslint-plugin-mocha#configs' {{options}}
+
+check-packages: compile
+    rm -rf target/package-checks
+    packtory pack --all --format folder --out target/package-checks

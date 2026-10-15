@@ -70,7 +70,7 @@ jobs:
                   ref: ${{ steps.publish-target.outputs.publish_commit_sha }}
                   fetch-depth: 0
                   path: target/release-source
-                  persist-credentials: true
+                  persist-credentials: false
             - name: Use Node.js
               if: steps.publish-target.outputs.should_publish == 'true'
               uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -101,7 +101,7 @@ jobs:
 
                   if [ "$status" -eq 0 ]; then
                       true
-                  elif grep -Eiq 'attestation|oidc|provenance|rekor|sigstore|tlog' target/release/publish.log; then
+                  elif grep -Eiq 'equivalent entry already exists|ECONNRESET|ETIMEDOUT|EAI_AGAIN|status (429|500|502|503|504)' target/release/publish.log; then
                       sleep 30
                       npx just publish-release
                   else

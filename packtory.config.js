@@ -12,21 +12,21 @@ async function readPackageInfo() {
 
 function registrySettings() {
     return {
-        auth: { type: 'npm-oidc', provider: 'github-actions' }
+        authentication: { type: 'npm-open-identity-connect', provider: 'github-actions' }
     };
 }
 
 function commonPackageSettings(packageInfo) {
     return {
         sourcesFolder,
-        mainPackageJson: packageInfo,
+        mainPackageManifest: packageInfo,
         deadCodeElimination: { enabled: true },
         includeSourceMapFiles: false,
         publishSettings: {
             access: 'public',
-            provenance: { type: 'auto' }
+            provenance: { type: 'automatic' }
         },
-        additionalPackageJsonAttributes: {
+        additionalPackageManifestAttributes: {
             author: packageInfo.author,
             contributors: packageInfo.contributors,
             description: packageInfo.description,
@@ -42,7 +42,7 @@ function releasePullRequestSettings() {
     return {
         branch: 'release/eslint-plugin-mocha',
         body: 'Updates changelogs for the next `eslint-plugin-mocha` release.',
-        githubActionsCi: {
+        githubActionsContinuousIntegration: {
             trigger: 'workflow-dispatch',
             workflowFile: 'ci.yml',
             requiredStatusContexts: [
@@ -58,6 +58,40 @@ function releasePullRequestSettings() {
     };
 }
 
+/**
+@returns {NonNullable<import('@packtory/cli').PacktoryConfiguration['changelog']>}
+*/
+function createChangelogSettings() {
+    return {
+        pullRequestLog: {
+            ignoredLabels: [ 'release' ],
+            collapseRules: [
+                {
+                    label: 'upgrade',
+                    pattern: '^(?<prefix>⬆️ )?Update dependency (?<dependency>.+?) from (?<from>.+?) to (?<to>.+?)$',
+                    replace: '$<prefix>Update dependency $<dependency> from $<from> to $<to>'
+                },
+                {
+                    label: 'upgrade',
+                    pattern: '^(?<prefix>⬆️ )?Update (?:dependency )?`?(?<dependency>.+?)`? to `?(?<to>[^` ]+)`?$',
+                    replace: '$<prefix>Update dependency $<dependency> to $<to>',
+                    versionGroup: 'to'
+                },
+                {
+                    label: 'upgrade',
+                    pattern: '^(?<prefix>⬆️ )?(?<dependency>Lock file maintenance|Update (?:.+ dependencies|eslint))$',
+                    replace: '$<prefix>$<dependency>',
+                    collapse: 'same'
+                }
+            ]
+        },
+        outputs: [
+            { kind: 'repository-file', path: 'CHANGELOG.md' },
+            { kind: 'github-release' }
+        ]
+    };
+}
+
 function mochaPluginPackage() {
     return {
         name: 'eslint-plugin-mocha',
@@ -67,7 +101,7 @@ function mochaPluginPackage() {
         },
         roots: {
             main: {
-                js: 'plugin.js',
+                javaScript: 'plugin.js',
                 declarationFile: 'plugin.d.ts'
             }
         },
@@ -85,42 +119,23 @@ function mochaPluginPackage() {
 }
 
 /**
- * @returns {Promise<import('@packtory/cli').PacktoryConfig & Record<string, unknown>>}
+ * @returns {Promise<import('@packtory/cli').PacktoryConfiguration & Record<string, unknown>>}
  */
-export async function buildConfig() {
+export async function buildConfiguration() {
     const packageInfo = await readPackageInfo();
 
     return {
         registrySettings: registrySettings(),
-        changelog: {
-            prLog: {
-                ignoredLabels: [ 'release' ],
-                collapseRules: [
-                    {
-                        label: 'upgrade',
-                        pattern: '^⬆️ Update dependency (?<dependency>.+?) from (?<from>.+?) to (?<to>.+?)$',
-                        replace: '⬆️ Update dependency $<dependency> from $<from> to $<to>'
-                    },
-                    {
-                        label: 'upgrade',
-                        pattern: '^⬆️ (?<dependency>Lock file maintenance|Update .+ dependencies)(?<from>)(?<to>)$',
-                        replace: '⬆️ $<dependency>'
-                    }
-                ]
-            },
-            outputs: [
-                { kind: 'repository-file', path: 'CHANGELOG.md' },
-                { kind: 'github-release' }
-            ]
-        },
+        changelog: createChangelogSettings(),
         checks: {
             typeScriptIntegrity: { enabled: true, declarations: 'all' },
-            noDevDependencyImports: { enabled: true },
+            noDevelopmentDependencyImports: { enabled: true },
             noUnusedBundleDependencies: { enabled: true },
             noDuplicatedFiles: { enabled: true },
             requiredFiles: { enabled: true, files: [ 'LICENSE', 'README.md' ] },
             uniqueTargetPaths: { enabled: true },
-            noUnexposedExecutables: { enabled: true }
+            noUnexposedExecutables: { enabled: true },
+            nodeEngineCompatibility: { enabled: true }
         },
         commonPackageSettings: commonPackageSettings(packageInfo),
         releasePullRequest: releasePullRequestSettings(),
