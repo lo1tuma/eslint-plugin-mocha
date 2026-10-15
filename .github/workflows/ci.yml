@@ -76,10 +76,10 @@ jobs:
                   node-version: 26
             - name: Install dependencies
               run: npm clean-install --ignore-scripts
-            - name: Check packages
+            - name: Publish dry run
               env:
                   GH_TOKEN: ${{ github.token }}
-              run: npx just check-packages
+              run: npx just publish-dry-run
     workflow-security:
         runs-on: ubuntu-latest
         name: Workflow security analysis
