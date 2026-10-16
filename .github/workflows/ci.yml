@@ -76,7 +76,7 @@ jobs:
                   node-version: 26
             - name: Install dependencies
               run: npm clean-install --ignore-scripts
-            - name: Check packages
+            - name: Publish dry run
               env:
                   GH_TOKEN: ${{ github.token }}
               run: npx just publish-dry-run

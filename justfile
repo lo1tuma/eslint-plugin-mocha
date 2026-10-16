@@ -48,20 +48,20 @@ test: test-unit-with-coverage test-bench
 coveralls:
     coveralls < ./target/coverage/lcov.info
 
-pack-preview:
+pack-preview: compile
     packtory preview
 
 prepare-release: compile
-    packtory release-pr maintain --no-dry-run
+    packtory release-pull-request maintain --no-dry-run
 
 validate-release-pr:
-    packtory release-pr validate
+    packtory release-pull-request validate
 
 validate-pr-labels pull-request-number:
     pr-log validate-pull-request-labels {{pull-request-number}}
 
 authorize-release-publish *options:
-    packtory release-pr authorize-publish {{options}}
+    packtory release-pull-request authorize-publish {{options}}
 
 publish-release: compile
     packtory release --publish --tag --push --github-release --no-dry-run
