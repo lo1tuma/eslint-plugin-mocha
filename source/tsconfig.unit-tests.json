@@ -3,8 +3,17 @@
     "compilerOptions": {
         "tsBuildInfoFile": "../target/buildcache/unit-tests.tsbuildinfo",
         "rootDir": "..",
-        "types": ["node", "mocha"]
+        "types": [
+            "@enormora/tsconfig-node",
+            "mocha"
+        ]
     },
-    "references": [{ "path": "./tsconfig.sources.json" }],
-    "include": ["./**/*.test.ts"]
+    "references": [
+        {
+            "path": "./tsconfig.sources.json"
+        }
+    ],
+    "include": [
+        "./**/*.test.ts"
+    ]
 }

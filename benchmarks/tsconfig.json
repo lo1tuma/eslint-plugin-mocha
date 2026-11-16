@@ -3,8 +3,17 @@
     "compilerOptions": {
         "tsBuildInfoFile": "../target/buildcache/benchmarks.tsbuildinfo",
         "rootDir": "..",
-        "types": ["node", "mocha"]
+        "types": [
+            "@enormora/tsconfig-node",
+            "mocha"
+        ]
     },
-    "include": ["./**/*.ts"],
-    "references": [{ "path": "../source/tsconfig.sources.json" }]
+    "include": [
+        "./**/*.ts"
+    ],
+    "references": [
+        {
+            "path": "../source/tsconfig.sources.json"
+        }
+    ]
 }

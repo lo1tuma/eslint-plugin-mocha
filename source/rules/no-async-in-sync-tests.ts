@@ -141,19 +141,19 @@ function getParserServicesRecord(sourceCode: Readonly<SourceCode>): Record<strin
 function getPromisedTypeReader(
     services: Readonly<Record<string, unknown>>
 ): TypeCheckerLike['getPromisedTypeOfPromise'] | undefined {
-    const program = isRecord(services.program) ? services.program : undefined;
+    const program = isRecord(services['program']) ? services['program'] : undefined;
 
-    if (!isTypeCheckerFactory(program?.getTypeChecker)) {
+    if (!isTypeCheckerFactory(program?.['getTypeChecker'])) {
         return undefined;
     }
 
-    const typeChecker = program.getTypeChecker();
+    const typeChecker = program['getTypeChecker']();
 
-    if (!isRecord(typeChecker) || !isPromisedTypeReader(typeChecker.getPromisedTypeOfPromise)) {
+    if (!isRecord(typeChecker) || !isPromisedTypeReader(typeChecker['getPromisedTypeOfPromise'])) {
         return undefined;
     }
 
-    return typeChecker.getPromisedTypeOfPromise;
+    return typeChecker['getPromisedTypeOfPromise'];
 }
 
 function getParserServicesWithTypeInformation(
@@ -161,7 +161,7 @@ function getParserServicesWithTypeInformation(
 ): Readonly<ParserServicesWithTypeInformation> | undefined {
     const services = getParserServicesRecord(sourceCode);
 
-    if (services === undefined || !isGetTypeAtLocation(services.getTypeAtLocation)) {
+    if (services === undefined || !isGetTypeAtLocation(services['getTypeAtLocation'])) {
         return undefined;
     }
 
@@ -172,7 +172,7 @@ function getParserServicesWithTypeInformation(
     }
 
     return {
-        getTypeAtLocation: services.getTypeAtLocation,
+        getTypeAtLocation: services['getTypeAtLocation'],
         getPromisedTypeOfPromise: promisedTypeReader
     };
 }

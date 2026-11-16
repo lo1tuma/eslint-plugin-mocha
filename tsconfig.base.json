@@ -1,31 +1,11 @@
 {
+    "extends": "@enormora/tsconfig-node/tsconfig.json",
     "compilerOptions": {
         "target": "ES2023",
-        "module": "node16",
-        "moduleResolution": "node16",
-        "erasableSyntaxOnly": true,
-        "rewriteRelativeImportExtensions": true,
-        "resolveJsonModule": true,
-        "strict": true,
-        "sourceMap": true,
-        "allowJs": false,
-        "allowSyntheticDefaultImports": true,
-        "composite": true,
-        "declaration": true,
-        "declarationMap": true,
-        "esModuleInterop": true,
-        "exactOptionalPropertyTypes": true,
         "importHelpers": true,
-        "isolatedModules": true,
-        "noFallthroughCasesInSwitch": true,
-        "noImplicitReturns": true,
-        "noImplicitOverride": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "noUncheckedIndexedAccess": true,
-        "verbatimModuleSyntax": true,
         "outDir": "./target/build",
-        "types": [],
-        "skipLibCheck": false
+        "lib": [
+            "ES2023"
+        ]
     }
 }
