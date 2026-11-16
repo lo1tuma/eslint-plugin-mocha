@@ -34,9 +34,9 @@ function getFirstChildScope(scope: Readonly<Scope.Scope> | null | undefined): Sc
 
 function isImportSpecifierNode(node: unknown): node is Readonly<ImportSpecifierNode> {
     return isRecord(node) &&
-        node.type === 'ImportSpecifier' &&
-        isRecord(node.imported) &&
-        typeof node.imported.name === 'string';
+        node['type'] === 'ImportSpecifier' &&
+        isRecord(node['imported']) &&
+        typeof node['imported']['name'] === 'string';
 }
 
 function isExclusiveNamedImportBindingWithMatchingSource(

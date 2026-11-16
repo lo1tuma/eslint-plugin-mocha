@@ -54,7 +54,7 @@ const defaultIt = getRuleTesterTestFunction(RuleTester.it);
 const defaultItOnly = getRuleTesterTestFunction(RuleTester.itOnly);
 
 function hasTimeoutMethod(value: unknown): value is TimedTest {
-    return isRecord(value) && typeof value.timeout === 'function';
+    return isRecord(value) && typeof value['timeout'] === 'function';
 }
 
 function withLongerTimeout(testFn: RuleTesterTestFunction): RuleTesterTestFunction {

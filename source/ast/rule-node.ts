@@ -2,7 +2,7 @@ import type { Rule } from 'eslint';
 import { isRecord } from '../record.ts';
 
 export function isRuleNode(node: unknown): node is Rule.Node {
-    return isRecord(node) && typeof node.type === 'string';
+    return isRecord(node) && typeof node['type'] === 'string';
 }
 
 export function asRuleNode(node: unknown): Rule.Node {
