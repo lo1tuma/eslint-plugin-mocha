@@ -13,7 +13,7 @@ function settingFor(settings: Readonly<Record<string, unknown>>, propertyName: s
         return value;
     }
 
-    const mochaSettings = isRecord(settings['mocha']) ? settings['mocha'] : {};
+    const mochaSettings = isRecord(settings.mocha) ? settings.mocha : {};
     const mochaSetting = ownPropertyValue(mochaSettings, propertyName);
 
     if (mochaSetting !== undefined) {
@@ -33,17 +33,17 @@ function validateAdditionalNames(value: unknown): asserts value is readonly Cust
         if (!isRecord(item)) {
             throw new Error('additionalCustomNames item must be an object');
         }
-        if (!isMochaInterface(item['interface'])) {
-            throw new Error(`additionalCustomNames interface ${item['interface']} is invalid`);
+        if (!isMochaInterface(item.interface)) {
+            throw new Error(`additionalCustomNames interface ${item.interface} is invalid`);
         }
-        if (typeof item['name'] !== 'string') {
+        if (typeof item.name !== 'string') {
             throw new TypeError('additionalCustomNames name missing or invalid');
         }
-        if (typeof item['type'] !== 'string') {
+        if (typeof item.type !== 'string') {
             throw new TypeError('additionalCustomNames type missing or invalid');
         }
-        if (!isCustomMochaEntityType(item['type'])) {
-            throw new Error(`additionalCustomNames type ${item['type']} is invalid`);
+        if (!isCustomMochaEntityType(item.type)) {
+            throw new Error(`additionalCustomNames type ${item.type} is invalid`);
         }
     }
 }

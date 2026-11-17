@@ -8,8 +8,8 @@ function mergeMochaInterfaceIntoSettings(
     settings: Readonly<Record<string, unknown>> | undefined,
     interfaceToUse: MochaInterface
 ): Record<string, unknown> {
-    const mochaSettings = isRecord(settings?.['mocha'])
-        ? settings['mocha']
+    const mochaSettings = isRecord(settings?.mocha)
+        ? settings.mocha
         : {};
 
     return {
