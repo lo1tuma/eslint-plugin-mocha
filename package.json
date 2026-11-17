@@ -13,7 +13,6 @@
         "@types/estree": "1.0.10",
         "globals": "17.14.0",
         "json-schema-to-ts": "3.1.1",
-        "tslib": "2.9.1",
         "type-fest": "5.10.0"
     },
     "devDependencies": {
@@ -22,7 +21,7 @@
         "@enormora/eslint-config-mocha-node-assert": "0.0.16",
         "@enormora/eslint-config-node": "0.0.46",
         "@enormora/eslint-config-typescript": "0.0.69",
-        "@enormora/tsconfig-node": "0.0.2",
+        "@enormora/tsconfig-node": "0.0.3",
         "@packtory/cli": "0.0.121",
         "@stryker-mutator/core": "10.1.1",
         "@stryker-mutator/mocha-runner": "10.1.1",

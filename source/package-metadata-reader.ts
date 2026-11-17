@@ -15,12 +15,12 @@ export type PackageMetadataReaderDependencies = {
 function parsePackageMetadata(packageJsonPath: string, packageJson: unknown): Readonly<PackageMetadata> {
     if (
         isRecord(packageJson) &&
-        typeof packageJson['name'] === 'string' &&
-        typeof packageJson['version'] === 'string'
+        typeof packageJson.name === 'string' &&
+        typeof packageJson.version === 'string'
     ) {
         return {
-            name: packageJson['name'],
-            version: packageJson['version']
+            name: packageJson.name,
+            version: packageJson.version
         };
     }
 
@@ -38,7 +38,7 @@ function determineParentFolder(currentFolder: string): string {
 }
 
 function isEnoentError(error: unknown): boolean {
-    return isRecord(error) && error['code'] === 'ENOENT';
+    return isRecord(error) && error.code === 'ENOENT';
 }
 
 async function readPackageMetadata(

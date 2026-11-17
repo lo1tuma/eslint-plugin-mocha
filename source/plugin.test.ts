@@ -222,11 +222,11 @@ suite('eslint-plugin-mocha', function () {
                 {
                     all: {
                         name: plugin.configs.all.name,
-                        globals: plugin.configs.all.languageOptions?.['globals']
+                        globals: plugin.configs.all.languageOptions?.globals
                     },
                     recommended: {
                         name: plugin.configs.recommended.name,
-                        globals: plugin.configs.recommended.languageOptions?.['globals']
+                        globals: plugin.configs.recommended.languageOptions?.globals
                     }
                 },
                 {
