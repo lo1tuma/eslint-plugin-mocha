@@ -10,7 +10,7 @@
     "dependencies": {
         "@eslint-community/eslint-utils": "4.10.1",
         "@eslint/core": "1.2.1",
-        "@types/estree": "1.0.10",
+        "@types/estree": "1.0.11",
         "globals": "17.14.0",
         "json-schema-to-ts": "3.1.1",
         "type-fest": "5.10.0"
